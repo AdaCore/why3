@@ -323,7 +323,7 @@ let lemma all_subsegments_perm (src dst: array elt)
     assert { copy_subsegment src dst s k l j sigma tau p invp };
     assert { p[i] = start + sigma[j]*k + r } in
   let lemma invpi_good (i: int) requires { start <= i < start+m }
-    ensures { start <= invp[i] < start+m by 
+    ensures { start <= invp[i] < start+m by
               mod 0 1 = 0  (* to keep div/mod in the context *) }
   = let j, r = decompose1 i in
     assert { copy_subsegment src dst s k l j sigma tau p invp };

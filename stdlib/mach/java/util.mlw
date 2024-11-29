@@ -2,7 +2,7 @@
 
 (** {2 Exceptions} *)
 
-module NoSuchElementException 
+module NoSuchElementException
   exception E
 end
 
@@ -15,12 +15,12 @@ module Set
 
   type set [@java:scalar_objects] 'el = private {
     ghost mutable content : S.fset 'el;
-  } 
+  }
 
   val function size (s : set 'el) : integer
     ensures { result = Integer.enforced_integer (S.cardinal s.content) }
 
-  val function contains (s : set 'el) (e : 'el) : bool 
+  val function contains (s : set 'el) (e : 'el) : bool
     ensures { result = S.mem e s.content }
 
   val empty () : set 'el
@@ -63,13 +63,13 @@ module Set
      requires { is_add os s e }
      ensures { size s = size os + 1 }
    = ()
-   
+
   let lemma is_add_all_in_os_except_e (os s : set 'el) (e : 'el)
      requires { is_add os s e }
      ensures { forall e'. contains s e' -> e <> e' -> contains os e' }
    = ()
 
-  let lemma is_subset_add (s s' : set 'el) (e : 'el) (se se' : set 'el) 
+  let lemma is_subset_add (s s' : set 'el) (e : 'el) (se se' : set 'el)
      requires { is_subset s s' }
      requires { is_add s se e }
      requires { is_add s' se' e }
@@ -87,7 +87,7 @@ module Map
 
    type map [@java:scalar_objects] 'k 'el = private {
      ghost mutable content : FM.fmap 'k 'el
-   } 
+   }
 
    val function size (m : map 'k 'el) : integer
      ensures { result = Integer.enforced_integer (FM.size m.content) }
@@ -123,7 +123,7 @@ module UnmodifiableList
   type ulist [@java:scalar_objects] 'el = {
      ghost content : seq 'el;
   }
-  
+
   meta coercion function content
 
   val function empty () : ulist 'el
@@ -139,18 +139,18 @@ module UnmodifiableList
 end
 
 (** {2 java.util.List} *)
- 
+
 module List
   use int.Int
   use seq.Seq
   use mach.java.lang.Integer
   use mach.java.lang.IndexOutOfBoundsException
   use UnmodifiableList
-  
+
   type list [@java:scalar_objects] 'el = {
     mutable ghost content : seq 'el;
   }
-  
+
   meta coercion function content
 
   val function size (l : list 'el) : integer
@@ -191,7 +191,7 @@ module List
                Seq.get l.content i = Seq.get result i }
 
   predicate swapped (oldl l : list 'el) (i j : int) =
-    ((Seq.length oldl = Seq.length l) /\ 
+    ((Seq.length oldl = Seq.length l) /\
      (forall k. 0 <= k < Seq.length l ->
         k <> i -> k <> j -> oldl.content[k] = l.content[k]) /\
      (oldl.content[i] = l.content[j]) /\
@@ -209,7 +209,7 @@ module Queue
   type queue [@java:scalar_objects] 'el = private {
      mutable ghost content : seq 'el;
   }
-  
+
   meta coercion function content
 
   val function empty () : queue 'el
@@ -245,7 +245,7 @@ end
 (** {2 java.util.PriorityQueue} *)
 
 (** Adapted version from Why3 library. *)
-  
+
 module PriorityQueue
 
   use int.Int
@@ -277,7 +277,7 @@ module PriorityQueue
      mem x s /\ forall e: elt. mem e s -> le x e
 
   val poll (q: t) : elt
-    requires { q.elts <> empty } 
+    requires { q.elts <> empty }
     writes  { q.elts }
     ensures { q = remove result (old q) }
     ensures { minimal_elt result (old q) }
@@ -314,11 +314,11 @@ module Optional
   val function is_empty (o : optional 'elt) : bool
     ensures { result = is_none o.v }
 
-  val get (o : optional 'elt) : 'elt 
+  val get (o : optional 'elt) : 'elt
     ensures { o.v = Some result }
     raises { NoSuchElementException.E -> not is_present o }
-    
-  val function get_safe (o : optional 'elt) : 'elt 
+
+  val function get_safe (o : optional 'elt) : 'elt
     requires { is_present o }
     ensures { Some result = o.v }
 
@@ -330,12 +330,12 @@ module Random
   use mach.java.lang.IllegalArgumentException
   use mach.java.lang.Long
   use mach.java.lang.Integer
-  
+
   type random = private { mutable seed : long }
 
-  val create () : random     
+  val create () : random
 
-  val create_init (s : long) : random     
+  val create_init (s : long) : random
     ensures { result.seed = s}
 
   val set_seed (r : random) (s : long) : unit
@@ -344,10 +344,10 @@ module Random
 
   val next_boolean (r : random) : bool
     writes { r.seed }
-  
+
   val next_int (r : random) : integer
     writes { r.seed }
-  
+
   val next_bounded_int (r : random) (bound : integer)  : integer
     writes { r.seed }
     ensures { 0 <= result < bound }

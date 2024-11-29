@@ -155,7 +155,7 @@ module TagSet
        }
    invariant { elts = iterated.elts' }
    by { elts = S.empty; iterated = { elts' = S.empty; value = Array.make 0 (any key);} }
-   
+
 
   let create () : t
    ensures { result.elts = S.empty }
