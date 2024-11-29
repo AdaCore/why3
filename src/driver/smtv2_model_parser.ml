@@ -30,6 +30,10 @@ let debug =
       "Print@ debugging@ messages@ about@ parsing@ the@ SMTv2@ model@ for@ \
        counterexamples."
 
+let warn =
+  Loc.register_warning "smtv2_parser"
+    "Warning@ in@ parsing@ the@ SMTv2@ model@ for@ counterexamples@:"
+
 (*
 **********************************************************************
 **  Parsing the prover output (as string) to S-expressions
@@ -384,7 +388,8 @@ module FromSexpToModel = struct
     with E _ -> (
       try array sexp
     with E _ -> (
-      try application sexp with exn -> raise exn))))))
+      try application sexp
+    with E _ -> Tunparsed (string_of_sexp sexp)))))))
 
   and ite = function
     | List [ Atom "ite"; t1; t2; t3 ] -> Tite (term t1, term t2, term t3)
@@ -468,7 +473,6 @@ module FromSexpToModel = struct
   let get_fun_defs model =
     let fun_defs = List.filter_map fun_def model in
     Mstr.of_list fun_defs
-
 end
 
 (*
@@ -810,7 +814,7 @@ module FromModelToTerm = struct
           let t_concrete =
             Const (Fraction {frac_num; frac_den; frac_verbatim})
           in
-          (t_app div_ls [ t; t' ] div_ls.ls_value, t_concrete)
+          (t_app_infer div_ls [ t; t' ], t_concrete)
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
@@ -1027,11 +1031,11 @@ module FromModelToTerm = struct
             end
           end
       in
-      try (t_app ls ts' ls.ls_value,  concrete_apply_from_ls ls ts'_concrete)
-      with _ ->
-        error "Cannot apply lsymbol %a to terms (%a)@." Pretty.print_ls ls
+      try (t_app_infer ls ts',  concrete_apply_from_ls ls ts'_concrete)
+      with e ->
+        error "Cannot apply lsymbol %a to terms (%a) : %a@." Pretty.print_ls ls
           (Pp.print_list Pp.comma Pretty.print_term)
-          ts'
+          ts' Exn_printer.exn_printer e
     in
     match (qid, ts) with
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
@@ -1351,7 +1355,7 @@ module FromModelToTerm = struct
             in
             if t_equal t1' t2' then (t_true, concrete_const_bool true)
             else
-              ( t_app ls [ t1'; t2' ] ls.ls_value),
+              ( t_app_infer ls [ t1'; t2' ]),
                 concrete_apply_equ t1'_concrete t2'_concrete )
     | Term.Tapp (ls, ts), Apply (ls_name, ts_concrete) ->
         begin try
@@ -1360,7 +1364,7 @@ module FromModelToTerm = struct
             List.map
               (fun x -> eval_term env ~eval_prover_var seen_prover_vars terms x) ts')
           in
-          (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
+          (t_app_infer ls ts, Apply (ls_name, ts_concrete))
         with _ ->
           error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
             arity of application function is not the same"
@@ -1544,7 +1548,7 @@ module FromModelToTerm = struct
                   let t'_concrete = subst_concrete_term (Mstr.of_list [(vs'_concrete_name, Var x_name)]) t'_concrete in
                   let ls'_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls' in
                   (* construct the formula to be used in the epsilon term *)
-                  ( t_equ (t_app ls' [ t_var x ] ls'.ls_value) t',
+                  ( t_equ (t_app_infer ls' [ t_var x ]) t',
                     concrete_apply_equ (Apply (ls'_name, [ Var x_name ])) t'_concrete )
                 | _ ->
                   error_concrete_syntax "Function expected instead of concrete term %a for term %a"
@@ -1618,12 +1622,12 @@ module FromModelToTerm = struct
                   fields)
                 ts_concrete
             in
-            (t_app ls ts ls.ls_value, Record fields_values)
+            (t_app_infer ls ts, Record fields_values)
           else
-            (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
-        with _ -> (t_app ls ts ls.ls_value, Apply (ls_name, ts_concrete))
+            (t_app_infer ls ts, Apply (ls_name, ts_concrete))
+        with _ -> (t_app_infer ls ts, Apply (ls_name, ts_concrete))
         end
-      with _ ->
+      with _e ->
         error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
           arity of application function is not the same"
           Pretty.print_term t
@@ -1875,11 +1879,11 @@ module FromModelToTerm = struct
                 Some def
               with
               | E_parsing str | E_concrete_syntax str ->
-                  Debug.dprintf debug
+                    Loc.warning warn
                     "Error while checking function definition type %s: %s@." n str;
                   None
               | _ ->
-                  Debug.dprintf debug
+                  Loc.warning warn
                     "Error while checking function definition type %s@." n;
                   None)
           | exception Not_found -> None)
@@ -1898,8 +1902,8 @@ module FromModelToTerm = struct
               env.prover_fun_defs <- Mstr.add n (t,t_concrete) env.prover_fun_defs
             with
             | E_parsing str | E_concrete_syntax str ->
-                Debug.dprintf debug "Error while interpreting %s: %s@." n str
-            | _ -> Debug.dprintf debug "Error while interpreting %s@." n))
+                Loc.warning warn "Error while interpreting %s: %s@." n str
+            | _ -> Loc.warning warn "Error while interpreting %s@." n))
       prover_fun_defs;
     (*  Interpretation of queried function definitions. *)
     let terms =
@@ -1915,10 +1919,10 @@ module FromModelToTerm = struct
                 Some ((ls, oloc, attrs), (t, t_concrete))
               with
               | E_parsing str | E_concrete_syntax str ->
-                  Debug.dprintf debug "Error while interpreting %s: %s@." n str;
+                  Loc.warning warn "Error while interpreting %s: %s@." n str;
                   None
               | _ ->
-                  Debug.dprintf debug "Error while interpreting %s@." n;
+                  Loc.warning warn "Error while interpreting %s@." n;
                   None)
           | exception Not_found -> None)
         queried_fun_defs

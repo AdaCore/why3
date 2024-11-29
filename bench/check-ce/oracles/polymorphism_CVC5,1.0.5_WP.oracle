@@ -50,12 +50,27 @@ File polymorphism.mlw:
       x = (C 0 true)
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
 File "bench/check-ce/polymorphism.mlw", line 15, characters 30-37:
 Goal g.
 Prover result is: Unknown (unknown + incomplete) (235 steps).
-Sorry, we don't have a good counterexample for you :(
-
+The program does not comply to the verification goal, for example during the
+  following execution:
+File polymorphism.mlw:
+  Line 15:
+    x = (A 1)
+    x = (A 1)
+    Execution of main function `g'goal` with env:
+      x = (A 1)
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File polymorphism.mlw:
+  Line 15:
+    Property failure at postcondition of `g'goal` with:
+      x = (A 1)
 
