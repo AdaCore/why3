@@ -21,7 +21,7 @@ starting point and an end point. Both of these points are
 represented by a line number and a column number.
 
 So far, line numbers start with 1 and column number start with 0.
-(See {h <a href="https://gitlab.inria.fr/why3/why3/-/issues/706">this issue</a>})
+(See {{:https://gitlab.inria.fr/why3/why3/-/issues/706}this issue}.)
 
 *)
 
