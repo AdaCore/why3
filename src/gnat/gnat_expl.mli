@@ -36,9 +36,10 @@ type check_kind =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv

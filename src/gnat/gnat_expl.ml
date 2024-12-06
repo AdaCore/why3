@@ -32,9 +32,10 @@ type check_kind =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -99,9 +100,10 @@ let is_warning_kind r =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -215,9 +217,10 @@ let check_kind_from_string s =
    | "VC_POSTCONDITION"             -> VC_Postcondition
    | "VC_REFINED_POST"              -> VC_Refined_Post
    | "VC_CONTRACT_CASE"             -> VC_Contract_Case
-   | "VC_DISJOINT_CONTRACT_CASES"   -> VC_Disjoint_Contract_Cases
-   | "VC_COMPLETE_CONTRACT_CASES"   -> VC_Complete_Contract_Cases
+   | "VC_DISJOINT_CASES"            -> VC_Disjoint_Cases
+   | "VC_COMPLETE_CASES"            -> VC_Complete_Cases
    | "VC_EXCEPTIONAL_CASE"          -> VC_Exceptional_Case
+   | "VC_EXIT_CASE"                 -> VC_Exit_Case
    | "VC_LOOP_INVARIANT"            -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
@@ -287,9 +290,10 @@ let check_kind_to_ada kind =
    | VC_Postcondition             -> "VC_POSTCONDITION"
    | VC_Refined_Post              -> "VC_REFINED_POST"
    | VC_Contract_Case             -> "VC_CONTRACT_CASE"
-   | VC_Disjoint_Contract_Cases   -> "VC_DISJOINT_CONTRACT_CASES"
-   | VC_Complete_Contract_Cases   -> "VC_COMPLETE_CONTRACT_CASES"
+   | VC_Disjoint_Cases            -> "VC_DISJOINT_CASES"
+   | VC_Complete_Cases            -> "VC_COMPLETE_CASES"
    | VC_Exceptional_Case          -> "VC_EXCEPTIONAL_CASE"
+   | VC_Exit_Case                 -> "VC_EXIT_CASE"
    | VC_Loop_Invariant            -> "VC_LOOP_INVARIANT"
    | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
@@ -354,9 +358,10 @@ let check_kind_to_string kind =
    | VC_Postcondition             -> "postcondition"
    | VC_Refined_Post              -> "refined_post"
    | VC_Contract_Case             -> "contract_case"
-   | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
-   | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Disjoint_Cases            -> "disjoint_cases"
+   | VC_Complete_Cases            -> "complete_cases"
    | VC_Exceptional_Case          -> "exceptional_case"
+   | VC_Exit_Case                 -> "exit_case"
    | VC_Loop_Invariant            -> "loop_invariant"
    | VC_Loop_Invariant_Init       -> "loop_invariant_init"
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
