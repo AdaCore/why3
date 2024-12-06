@@ -3,48 +3,52 @@
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
   * new library `coma`: standard library of the plugin Coma
-  * additional operators in finite domain maps
-  * added a bunch of meta annotations for "unused dependencies" that
-    most of the time improve proof automation but very rarely may lose some
-    proofs :x:
+  * additional operators in library `fmap`
+  * added 16-bit integers in `mach/int`
+  * added a program equality in `bool`
+  * added meta annotations for "unused dependencies", which usually
+    improve proof automation but very rarely may lose some proofs :x:
+  * made most `(==)` operators trigger the `extensionality` transformation :x:
 
 Core
-  * extended notion of strategies: task-oriented strategies
-  * coma purposes
-    + parser_common: some non terminals `public`
-    + typing: added functions to type `term` in `denv`
-    + extmap: added `fold_right`
-    + extset: added `fold_right`
-    + wstdlib: added strongly connected component computation module
+  * records and range types now have some predefined symbol `foo'eq` and
+    some axiom `foo'inj` to express injectivity
+
+Transformations
+  * new transformation `extensionality` to help with equality proofs
 
 Plugins
   * new task-oriented strategy `forward_propagation` to automatically
-    propagate rounding errors in formulas involving unbounded
-    floats. See examples in `examples/numeric`
+    propagate rounding errors
   * new Coma plugin
 
 Provers
-  * Alt-Ergo FPA requires Alt-Ergo version at least 2.5.4
-  * support for Coq 8.19 (released Jan 24, 2024)
+  * Alt-Ergo FPA requires Alt-Ergo >= 2.5.4
   * drop support for versions of Coq < 8.16
-  * support for Z3 up to 4.13.x
-  * support for cvc5 up to 1.2.x
-  * support for Alt-Ergo 2.6.x
+  * support for Coq 8.19 (released Jan 24, 2024)
+  * support for Z3 4.13 (released Mar 7, 2024)
+  * support for CVC5 1.2 (released Aug 8, 2024)
+  * support for Coq 8.20 (released Sep 11, 2024)
+  * support for Alt-Ergo 2.6 (released Sep 24, 2024)
 
 Tools
-  * `why3 prove`: drop the option `--json-model-values` :x:
-  * `why3 execute`: added option `--rac-memlimit`.
-  * `why3 execute`: the `--rac-prover` option does not anymore support
-    specification of a time limit and memory limit :x:
-  * `why3 pp`: in LaTeX output, now also prints algebraic type
-    definitions and logic definition
-  * `why3 pp`: the ``--kind`` option does not exist anymore :x:
+  * `why3 prove`: dropped option `--json-model-values` :x:
+  * `why3 execute`: added option `--rac-memlimit`;
+    the `--rac-prover` option no longer supports specifying a time limit
+    and memory limit :x:
+  * `why3 pp`: the LaTeX output now shows algebraic types and logic definitions
+  * `why3 pp`: dropped option `--kind` :x:
+
+Extraction
+  * added support for Java
+  * improved extraction to C: floating-point numbers, global variables
 
 API
-  * a few changes about how to specify resource limits in particular
-    some renaming of `limit` into `limits` where appropriate. See also
-    issue #877, and the changes in the examples of the documentation
-    in Section "The Why3 API" :x:
+  * changed how resource limits are specified :x
+  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x
+
+Miscellaneous
+  * dependency on OCaml library `num` was replaced by `zarith`
 
 Version 1.7.2, April 18, 2024
 -----------------------------
