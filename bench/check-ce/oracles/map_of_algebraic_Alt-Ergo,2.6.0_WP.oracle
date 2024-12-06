@@ -1,0 +1,40 @@
+Warning: Error while checking function definition type match_p: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a2)) (Ssimple (Isymbol A1)))))
+with lsymbol match_p
+Warning: Error while interpreting x: Could not interpret term (UNPARSED .k1)
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting m: Could not interpret term (UNPARSED .k2)
+
+Warning: Error while checking function definition type match_p: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a13)) (Ssimple (Isymbol A1)))))
+with lsymbol match_p
+Warning: Error while interpreting x: Could not interpret term (UNPARSED .k11)
+
+Warning: Error while interpreting tqtint: Could not interpret term (UNPARSED .k14)
+
+Warning: Error while interpreting m: Could not interpret term (UNPARSED .k12)
+
+Warning: Error while interpreting is_signed_positive: Could not interpret term (UNPARSED .k15)
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `load_val` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `load_val` cannot be evaluated)
+File "bench/check-ce/map_of_algebraic.mlw", line 34, characters 4-16:
+Sub-goal Precondition of goal not_valid'vc.
+Prover result is: Unknown (unknown) (18 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `load_val` cannot be evaluated):
+File map_of_algebraic.mlw:
+  Line 33:
+    m :  = {block_size = "undefined"; mem_access_address = "undefined"}
+    m :  = {block_size = "undefined"; mem_access_address = "undefined"}
+    x :  = {base_addr = 0; offset = 0}
+    x :  = {base_addr = 0; offset = 0}
+

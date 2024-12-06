@@ -16,6 +16,9 @@ RUN apt-get update -yq && \
 ## CVC5 1.0.5
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
     chmod a+x /usr/local/bin/cvc5-1.0.5
+## CVC5 1.1.2
+# RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.1.2 && \
+#    chmod a+x /usr/local/bin/cvc5-1.1.2
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8
@@ -56,6 +59,11 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.2/z3-4
     unzip z3-4.12.2-x64-glibc-2.31.zip && \
     mv z3-4.12.2-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.12.2 && \
     rm -r z3-4.12.2-x64-glibc-2.31.zip z3-4.12.2-x64-glibc-2.31
+## Z3 4.13.2
+#RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4.13.2-x64-glibc-2.35.zip && \
+#    unzip z3-4.13.2-x64-glibc-2.35.zip && \
+#    mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
+#    rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
 
 # create user
 RUN adduser --disabled-password --gecos '' why3
@@ -71,12 +79,12 @@ RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
     opam switch create full   ocaml-base-compiler.4.13.1 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=latest $OPAM_PACKAGES && \
-    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.16.1 alt-ergo.2.5.4 && \
-    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.18.0 coq-flocq js_of_ocaml-ppx alt-ergo.2.5.4 sexplib ppx_deriving ppx_sexp_conv ocamlgraph zarith_stubs_js && \
+    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.16.1 alt-ergo.2.6.0 && \
+    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.18.0 coq-flocq js_of_ocaml-ppx alt-ergo.2.6.0 sexplib ppx_deriving ppx_sexp_conv ocamlgraph zarith_stubs_js && \
     opam clean -a -c -r -s --logs
 
 USER root
-RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
-RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
+RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.6.0
+RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.6.0
 
 USER why3

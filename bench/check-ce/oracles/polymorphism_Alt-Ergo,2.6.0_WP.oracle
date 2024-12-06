@@ -1,0 +1,85 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 7, characters 27-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 7, characters 27-34)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 7, characters 27-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 7, characters 27-34)
+File "bench/check-ce/polymorphism.mlw", line 7, characters 27-34:
+Goal gm.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File polymorphism.mlw:
+  Line 7:
+    x = (B 1)
+    x = (B 1)
+    Execution of main function `gm'goal` with env:
+      x = (B 1)
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File polymorphism.mlw:
+  Line 7:
+    Property failure at postcondition of `gm'goal1` with:
+      x = (B 1)
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 11, characters 22-35)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 11, characters 22-35)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 11, characters 22-35)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 11, characters 22-35)
+File "bench/check-ce/polymorphism.mlw", line 11, characters 22-35:
+Goal gm2.
+Prover result is: Unknown (unknown) (8 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File polymorphism.mlw:
+  Line 11:
+    x = (C 1 false)
+    x = (C 1 false)
+    Execution of main function `gm2'goal` with env:
+      x = (C 1 false)
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File polymorphism.mlw:
+  Line 11:
+    Property failure at postcondition of `gm2'goal1` with:
+      False = UNDEFINED
+      x = (C 1 false)
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/polymorphism.mlw", line 15, characters 30-37)
+File "bench/check-ce/polymorphism.mlw", line 15, characters 30-37:
+Goal g.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File polymorphism.mlw:
+  Line 15:
+    x = (A 1)
+    x = (A 1)
+    Execution of main function `g'goal` with env:
+      x = (A 1)
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File polymorphism.mlw:
+  Line 15:
+    Property failure at postcondition of `g'goal1` with:
+      x = (A 1)
+

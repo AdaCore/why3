@@ -1,0 +1,38 @@
+Warning, file "bench/check-ce/615.mlw", line 2, characters 9-10: unused variable t
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (check at "bench/check-ce/615.mlw", line 3, characters 12-28)
+  - Abstract RAC: FAILURE (check at "bench/check-ce/615.mlw", line 3, characters 12-28)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (check at "bench/check-ce/615.mlw", line 3, characters 12-28)
+  - Abstract RAC: FAILURE (check at "bench/check-ce/615.mlw", line 3, characters 12-28)
+File "bench/check-ce/615.mlw", line 3, characters 12-28:
+Sub-goal Check of goal f'vc.
+Prover result is: Unknown (unknown) (4 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File 615.mlw:
+  Line 2:
+    t = 0
+    x = (- 1)
+    t = 0
+    x = (- 1)
+    Execution of main function `f` with env:
+      t = 0
+      x = (- 1)
+      zero = 0
+      one = 1
+  Line 3:
+    Property failure at check with:
+      x = (- 1)
+

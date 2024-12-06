@@ -1,0 +1,50 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f` at "bench/check-ce/anonymous2.mlw", line 5, characters 4-5)
+  - Abstract RAC: STUCK (failure in precondition of `f` at "bench/check-ce/anonymous2.mlw", line 5, characters 4-5)
+- Selected model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
+- Checked model 2: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous2.mlw", line 9, characters 11-16)
+File "bench/check-ce/anonymous2.mlw", line 9, characters 11-16:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (8 steps).
+The contracts of the following functions/loops are too weak :
+  - Function 'h' at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25
+, for example during the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File anonymous2.mlw:
+  Line 3:
+    Constant z initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    z = {contents= 0}
+  Line 5:
+    x = 1
+    x = 1
+    Execution of main function `f` with env:
+      z = {contents= 0}
+      x = 1
+      zero = 0
+      one = 1
+  Line 8:
+    Giant-step execution of function `h` with args:
+      y = 1
+    z = {contents= 0}
+    result of `h` = ()
+  Line 9:
+    Property failure at assertion with:
+      z = {contents= 0}
+

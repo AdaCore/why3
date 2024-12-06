@@ -1,0 +1,75 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51)
+File "bench/check-ce/record_nested_one_field.mlw", line 14, characters 14-51:
+Sub-goal Postcondition of goal test_post'vc.
+Prover result is: Unknown (unknown) (31 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File record_nested_one_field.mlw:
+  Line 13:
+    x = 0
+    y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    x = 0
+    y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    Execution of main function `test_post` with env:
+      x = 0
+      y = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+      zero = 0
+      one = 1
+  Line 17:
+    Normal execution of function `cont_four` with args:
+      arg = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    Normal execution of function `(!)` with args:
+      r = {contents= {cont_two= {cont_one= 0}}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {cont_two= {cont_one= 0}}}
+File record_nested_one_field.mlw:
+  Line 17:
+    Normal execution of function `cont_two` with args:
+      arg = {cont_two= {cont_one= 0}}
+    Normal execution of function `cont_one` with args:
+      arg = {cont_one= 0}
+  Line 16:
+    Normal execution of function `(-)` with args:
+      x = 0
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = (-1)
+File record_nested_one_field.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-1)
+      _ = 0
+    Normal execution of function `cont_four` with args:
+      arg = {cont_four= {contents= {cont_two= {cont_one= 0}}}}
+    Normal execution of function `contents` with args:
+      arg = {contents= {cont_two= {cont_one= 0}}}
+    Normal execution of function `cont_two` with args:
+      arg = {cont_two= {cont_one= 0}}
+  Line 14:
+    Property failure at postcondition of `test_post` with:
+      x = 0
+      y = {cont_four= {contents= {cont_two= {cont_one= (-1)}}}}
+
