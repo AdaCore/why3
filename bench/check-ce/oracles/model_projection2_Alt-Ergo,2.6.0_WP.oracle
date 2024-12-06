@@ -1,0 +1,69 @@
+Warning: Error while interpreting to_array: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+Warning: Error while interpreting to_array: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `to_array`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `to_array`)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `to_array`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `to_array`)
+File "bench/check-ce/model_projection2.mlw", line 16, characters 38-60:
+Goal to_array_get.
+Prover result is: Unknown (unknown) (8 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for global `to_array`):
+File model_projection2.mlw:
+  Line 12:
+    get : poly_map int int -> int -> int = fun _arg_03 _arg_13 -> 1
+  Line 16:
+    i : int = 0
+    x :  = "undefined"
+  Line 24:
+    i :  = 0
+    result :  = Tuple0
+    x :  = "undefined"
+
+Warning: Error while interpreting to_array: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `get`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection2.mlw", line 26, characters 10-23)
+File "bench/check-ce/model_projection2.mlw", line 26, characters 10-23:
+Sub-goal Assertion of goal g2'vc.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File model_projection2.mlw:
+  Line 12:
+    get = fun (_arg_09:poly_map int int) (_arg_18:int) -> 41
+  Line 25:
+    x = UNDEFINED
+    x = UNDEFINED
+    Execution of main function `g2` with env:
+      get = fun (_arg_09:poly_map int int) (_arg_18:int) -> 41
+      x = UNDEFINED
+      zero = 0
+      one = 1
+  Line 26:
+    Property failure at assertion with:
+      x = UNDEFINED
+

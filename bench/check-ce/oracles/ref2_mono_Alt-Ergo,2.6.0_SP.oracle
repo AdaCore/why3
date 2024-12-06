@@ -1,0 +1,22 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2_mono.mlw", line 7, characters 11-16)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2_mono.mlw", line 7, characters 11-16)
+File "bench/check-ce/ref2_mono.mlw", line 7, characters 11-16:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (5 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+Unknown location:
+    _ = ()
+File ref2_mono.mlw:
+  Line 4:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+  Line 5:
+    Normal execution of function `t'mk` with args:
+      c = 1
+  Line 7:
+    Property failure at assertion with:
+

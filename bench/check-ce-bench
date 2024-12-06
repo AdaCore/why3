@@ -255,8 +255,23 @@ for file in $files; do
           z3stepsrac=$z3steps
           ;;
       "703_reduce_term")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           z3steps=500000
           z3stepsrac=$z3steps
+          ;;
+      "algebraic_types_mono")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "algebraic_types_poly")
+          skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "anonymous3")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "anonymous5")
           z3steps=500000
@@ -272,6 +287,7 @@ for file in $files; do
           skipae=yes
           ;;
       "array_mono")
+          skipae=yes
           z3steps=100000
           z3stepsrac=$z3steps
           ;;
@@ -287,7 +303,13 @@ for file in $files; do
           z3steps=100000
           z3stepsrac=$z3steps
           ;;
+      "falseCE")
+          skipae=yes
+          altergosteps=7500
+          altergostepsrac=$altergosteps
+          ;;
       "floats")
+          skipae=yes
           altergosteps=1000
           altergostepsrac=$altergosteps
           cvc5stepsrac=10000
@@ -295,6 +317,7 @@ for file in $files; do
           z3stepsrac=10000
           ;;
       "int_overflow")
+          skipae=yes
           z3steps=400000
           z3stepsrac=$z3steps
           ;;
@@ -303,6 +326,11 @@ for file in $files; do
           ;;
       "jlamp0_poly")
           skipae=yes
+          ;;
+      "lists")
+          skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "loop_inv_int_mono")
           skipae=yes
@@ -343,10 +371,10 @@ for file in $files; do
           ;;
     esac
     if [ "$skipae" = "yes" ] ; then
-          echo "Skipping unreproducible run of Alt-Ergo 2.5.4 on $filedir/$filebase.mlw";
+          echo "Skipping unreproducible run of Alt-Ergo 2.6.0 on $filedir/$filebase.mlw";
     else
-      run Alt-Ergo,2.5.4 $filedir $filebase true  $altergosteps $altergostepsrac
-      run Alt-Ergo,2.5.4 $filedir $filebase false  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.0 $filedir $filebase true  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.0 $filedir $filebase false  $altergosteps $altergostepsrac
     fi
     if [ "$skipcvc4" = "yes" ] ; then
           echo "Skipping unreproducible run of CVC4 1.8 on $filedir/$filebase.mlw";
@@ -379,7 +407,7 @@ if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
 if test "$petiot" -gt 0; then
-    petiot Alt-Ergo,2.5.4  10000
+    petiot Alt-Ergo,2.6.0  10000
     petiot Z3,4.8.10  500000
     petiot CVC4,1.8 10000
     petiot CVC5,1.0.5 10000

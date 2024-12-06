@@ -1,0 +1,27 @@
+Warning: Error while interpreting to_map: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+Warning: Error while interpreting to_map: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `set`)
+File "bench/check-ce/model_projection.mlw", line 23, characters 11-48:
+Sub-goal Assertion of goal g1'vc.
+Prover result is: Unknown (unknown) (12 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for global `set`):
+File model_projection.mlw:
+  Line 9:
+    get : t -> int -> int = fun _arg_05 _arg_15 -> 41
+  Line 19:
+    y :  = {d = "undefined"}
+  Line 21:
+    _ :  = Tuple0
+

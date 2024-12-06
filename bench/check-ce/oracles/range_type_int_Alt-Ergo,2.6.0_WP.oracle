@@ -1,0 +1,38 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated with uncaught exception ` This expression isn't supported:
+   (0:int32)
+ smtv2: don't know how to print this literal, consider adding a syntax rule in the driver`)
+  - Abstract RAC: INCOMPLETE (terminated with uncaught exception ` This expression isn't supported:
+   (0:int32)
+ smtv2: don't know how to print this literal, consider adding a syntax rule in the driver`)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/range_type_int.mlw", line 9, characters 12-27)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/range_type_int.mlw", line 9, characters 12-27)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/range_type_int.mlw", line 9, characters 12-27)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/range_type_int.mlw", line 9, characters 12-27)
+File "bench/check-ce/range_type_int.mlw", line 9, characters 12-27:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File range_type_int.mlw:
+  Line 7:
+    x = epsilon x:int32. int32'int x = 5
+    x = epsilon x:int32. int32'int x = 5
+    Execution of main function `f` with env:
+      x = epsilon x:int32. int32'int x = 5
+      zero = 0
+      one = 1
+  Line 9:
+    Property failure at assertion with:
+      x = epsilon x:int32. int32'int x = 5
+

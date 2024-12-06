@@ -25,13 +25,13 @@ end
 
 theory ieee_float.Float32
 
-  syntax function round "ae.float32 %1 %2"
+  syntax function round "(ae.float32 %1 %2)"
 
-  syntax function add  "ae.float32 %1 (+ %2 %3)"
-  syntax function sub  "ae.float32 %1 (- %2 %3)"
-  syntax function mul  "ae.float32 %1 (* %2 %3)"
-  syntax function div  "ae.float32 %1 (/ %2 %3)"
-  syntax function fma  "ae.float32 %1 (+ (* %2 %3) %4)"
+  syntax function add  "(ae.float32 %1 (+ %2 %3))"
+  syntax function sub  "(ae.float32 %1 (- %2 %3))"
+  syntax function mul  "(ae.float32 %1 (* %2 %3))"
+  syntax function div  "(ae.float32 %1 (/ %2 %3))"
+  syntax function fma  "(ae.float32 %1 (+ (* %2 %3) %4))"
 
   syntax predicate le  "(<= %1 %2)"
   syntax predicate lt  "(< %1 %2)"
@@ -42,13 +42,13 @@ end
 
 theory ieee_float.Float64
 
-  syntax function round "ae.float64 %1 %2"
+  syntax function round "(ae.float64 %1 %2)"
 
-  syntax function add  "ae.float64 %1 (+ %2 %3)"
-  syntax function sub  "ae.float64 %1 (- %2 %3)"
-  syntax function mul  "ae.float64 %1 (* %2 %3)"
-  syntax function div  "ae.float64 %1 (/ %2 %3)"
-  syntax function fma  "ae.float64 %1 (+ (* %2 %3) %4)"
+  syntax function add  "(ae.float64 %1 (+ %2 %3))"
+  syntax function sub  "(ae.float64 %1 (- %2 %3))"
+  syntax function mul  "(ae.float64 %1 (* %2 %3))"
+  syntax function div  "(ae.float64 %1 (/ %2 %3))"
+  syntax function fma  "(ae.float64 %1 (+ (* %2 %3) %4))"
 
   syntax predicate le  "(<= %1 %2)"
   syntax predicate lt  "(< %1 %2)"

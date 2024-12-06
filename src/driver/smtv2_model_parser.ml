@@ -153,13 +153,17 @@ module FromSexpToModel = struct
     | Atom s ->
       let s', i1, i2 = positive_constant_real s in
       { constant_real_value=
-          real_literal ~radix:10 ~neg:false ~int:i1 ~frac:i2 ~exp:None;
+          (try
+          real_literal ~radix:10 ~neg:false ~int:i1 ~frac:i2 ~exp:None
+          with _ -> atom_error s "constant_real");
         constant_real_verbatim= s'
       }
-    | List [ Atom "-"; Atom s ] ->
+    | List [ Atom "-"; Atom s ] as sexp ->
       let s', i1, i2 = positive_constant_real s in
       { constant_real_value=
-          real_literal ~radix:10 ~neg:true ~int:i1 ~frac:i2 ~exp:None;
+          (try
+          real_literal ~radix:10 ~neg:true ~int:i1 ~frac:i2 ~exp:None
+          with _ -> error sexp "constant_real");
         constant_real_verbatim= "-" ^ s'
       }
     | sexp -> error sexp "constant_real"
@@ -536,11 +540,11 @@ module FromModelToTerm = struct
   let rec smt_sort_to_ty ?(update_ty = None) env s =
     let optionally_update_sort s =
       match update_ty with
-        | None -> error "Cannot infer type from sort %a@." print_sort s
+        | None -> error "@[Cannot infer type from sort@ @[%a@]" print_sort s
         | Some ty ->
           Debug.dprintf debug
             "[smt_sort_to_ty] updating inferred_types with s = %a, ty = %a@."
-            print_sort s Pretty.print_ty ty;
+            print_sort s Pretty.print_ty_qualified ty;
           env.inferred_types <- (s, ty) :: env.inferred_types;
           ty
     in
@@ -551,7 +555,7 @@ module FromModelToTerm = struct
       | [] -> not_found s
       | [ (_, ty) ] -> ty
       | _ ->
-          error "Multiple matches in inferred_types for sort %a@."
+          error "@[Multiple matches in inferred_types for sort @[%a@]@]"
             print_sort s
     in
     match s with
@@ -574,7 +578,7 @@ module FromModelToTerm = struct
                   ]
             | _ ->
                 error "Inconsistent shapes for type %a and sort %a"
-                  Pretty.print_ty ty print_sort s))
+                  Pretty.print_ty_qualified ty print_sort s))
     | Ssimple i | Smultiple (i, _) ->
         let not_found s =
           let sort_name =
@@ -658,7 +662,7 @@ module FromModelToTerm = struct
                 if Ty.ty_equal vs.vs_ty vs_ty then vs
                 else
                   error "Type %a of variable %a does not match sort %a@."
-                    Pretty.print_ty vs.vs_ty Pretty.print_vs vs print_sort s
+                    Pretty.print_ty_qualified vs.vs_ty Pretty.print_vs_qualified vs print_sort s
               with Not_found ->
                 (* Create a fresh vsymbol if not found in [env.bound_vars]. *)
                 create_vsymbol (Ident.id_fresh n) vs_ty
@@ -680,14 +684,14 @@ module FromModelToTerm = struct
                 Debug.dprintf debug
                   "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = \
                   %a@."
-                  Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+                  Pretty.print_vs_qualified new_vs Pretty.print_ty_qualified vs_ty;
                 env.prover_vars <-
                   Mstr.add n (Ty.Mty.add vs_ty new_vs mvs) env.prover_vars;
                 new_vs
           with Not_found ->
             Debug.dprintf debug
               "[qual_id_to_term] updating prover_vars with vs = %a / vs_ty = %a@."
-              Pretty.print_vs new_vs Pretty.print_ty vs_ty;
+              Pretty.print_vs_qualified new_vs Pretty.print_ty_qualified vs_ty;
             env.prover_vars <-
               Mstr.add n (Ty.Mty.add vs_ty new_vs Ty.Mty.empty) env.prover_vars;
             new_vs)
@@ -1033,7 +1037,7 @@ module FromModelToTerm = struct
       in
       try (t_app_infer ls ts',  concrete_apply_from_ls ls ts'_concrete)
       with e ->
-        error "Cannot apply lsymbol %a to terms (%a) : %a@." Pretty.print_ls ls
+        error "@[Cannot apply lsymbol@ @[%a@] to terms@ @[(%a)@]:@ @[%a@]" Pretty.print_ls_qualified ls
           (Pp.print_list Pp.comma Pretty.print_term)
           ts' Exn_printer.exn_printer e
     in
@@ -1100,9 +1104,9 @@ module FromModelToTerm = struct
         error
           "Type %a for sort %a of array keys and/or type %a for sort %a of \
            array values do not match@."
-          (Pp.print_option_or_default "None" Pretty.print_ty)
+          (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
           key.t_ty print_sort s1
-          (Pp.print_option_or_default "None" Pretty.print_ty)
+          (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
           value.t_ty print_sort s2
     in
     let t_others, others_concrete = term_to_term env elts.array_others in
@@ -1184,9 +1188,9 @@ module FromModelToTerm = struct
       (t', t'_concrete))
     else
       error "Type %a for sort %a and type %a for term %a do not match@."
-        (Pp.print_option_or_default "None" Pretty.print_ty)
+        (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
         ty_s print_sort s
-        (Pp.print_option_or_default "None" Pretty.print_ty)
+        (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
         t'.t_ty print_term t
 
   (* Check that the definiton of a function in the SMT model matches the type
@@ -1195,7 +1199,7 @@ module FromModelToTerm = struct
     Debug.dprintf debug "-----------------------------@.";
     Debug.dprintf debug "[check_fun_def_type] fun_def = %a@." print_function_def
       (args, res, body);
-    Debug.dprintf debug "[check_fun_def_type] ls = %a@." Pretty.print_ls ls;
+    Debug.dprintf debug "[check_fun_def_type] ls = %a@." Pretty.print_ls_qualified ls;
     Debug.dprintf debug "[check_fun_def_type] ls.ls_value = %a@."
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ls.ls_value;
@@ -1220,10 +1224,10 @@ module FromModelToTerm = struct
       then ()
       else
         error "Type mismatch when interpreting %a with lsymbol %a@."
-          print_function_def (args, res, body) Pretty.print_ls ls
+          print_function_def (args, res, body) Pretty.print_ls_qualified ls
     with Invalid_argument _ ->
-      error "Function arity mismatch when interpreting %a with lsymbol %a@."
-        print_function_def (args, res, body) Pretty.print_ls ls
+      error "@[Function arity mismatch when interpreting@ @[%a@]@ with lsymbol@ @[%a@]@]"
+        print_function_def (args, res, body) Pretty.print_ls_qualified ls
 
   (* Interpretation of function definitions in the model to terms. *)
   let interpret_fun_def_to_term ~fmla env (args, res, body) =
@@ -1248,7 +1252,7 @@ module FromModelToTerm = struct
       Mstr.iter
         (fun key vs ->
           Debug.dprintf debug "[interpret_fun_def_to_term] bound_var = (%s, %a)@."
-            key Pretty.print_vs vs)
+            key Pretty.print_vs_qualified vs)
         env.bound_vars;
     let (t_body, t_body_concrete) = smt_term_to_term ~fmla env body res in
     let (t,t_concrete) =
@@ -1366,7 +1370,7 @@ module FromModelToTerm = struct
           in
           (t_app_infer ls ts, Apply (ls_name, ts_concrete))
         with _ ->
-          error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
+          error_concrete_syntax "@[Mismatch between term@ @[%a@] and concrete term@ @[%a@]:@ \
             arity of application function is not the same"
             Pretty.print_term t
             print_concrete_term t_concrete
@@ -1482,8 +1486,10 @@ module FromModelToTerm = struct
           List.iter
             (fun (str, (ls, t, t_concrete)) ->
               Debug.dprintf debug
-                "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@." Pretty.print_ty
-                key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+                "[ty_coercions] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
+                Pretty.print_ty_qualified
+                key str Pretty.print_ls_qualified ls Pretty.print_term t
+                print_concrete_term t_concrete)
             elt)
         ty_coercions;
     let ty_fields =
@@ -1511,7 +1517,8 @@ module FromModelToTerm = struct
           List.iter
             (fun (str, (ls, t, t_concrete)) ->
               Debug.dprintf debug "[ty_fields] ty = %a, str=%s, ls = %a, t=%a, t_concrete=%a@."
-                Pretty.print_ty key str Pretty.print_ls ls Pretty.print_term t print_concrete_term t_concrete)
+                Pretty.print_ty_qualified key str Pretty.print_ls_qualified ls
+                Pretty.print_term t print_concrete_term t_concrete)
             elt)
         ty_fields;
     (* for each prover variable, we create an epsilon term using type coercions
@@ -1752,7 +1759,7 @@ module FromModelToTerm = struct
     (* special case for type coercions:
      if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
     Debug.dprintf debug "[get_opt_coercion] vs.vs_ty = %a@."
-      Pretty.print_ty vs.vs_ty;
+      Pretty.print_ty_qualified vs.vs_ty;
     let is_proj_for_ty ty ls =
       match Ty.Mty.find_opt ty env.type_coercions with
       | None -> false
@@ -1826,17 +1833,17 @@ module FromModelToTerm = struct
       Mstr.iter
         (fun key (ls, _, _) ->
           Debug.dprintf debug "[queried_terms] name = %s, ls = %a@." key
-            Pretty.print_ls ls)
+            Pretty.print_ls_qualified ls)
         qterms;
       Mstr.iter
         (fun key ls ->
           Debug.dprintf debug "[constructors] name = %s, ls = %a/%d@." key
-            Pretty.print_ls ls (List.length ls.ls_args))
+            Pretty.print_ls_qualified ls (List.length ls.ls_args))
         pinfo.Printer.constructors;
       Mstr.iter
         (fun key ty ->
           Debug.dprintf debug "[types] name = %s, ty = %a@." key
-            Pretty.print_ty ty)
+            Pretty.print_ty_qualified ty)
         pinfo.Printer.type_sorts
       end;
     let env =
@@ -1880,11 +1887,11 @@ module FromModelToTerm = struct
               with
               | E_parsing str | E_concrete_syntax str ->
                     Loc.warning warn
-                    "Error while checking function definition type %s: %s@." n str;
+                    "@[Error while checking function definition type@ @[%s@]:@ @[%s@]@]" n str;
                   None
               | _ ->
                   Loc.warning warn
-                    "Error while checking function definition type %s@." n;
+                    "@[Error while checking function definition type@ @[%s@]" n;
                   None)
           | exception Not_found -> None)
         queried_fun_defs
@@ -1902,8 +1909,8 @@ module FromModelToTerm = struct
               env.prover_fun_defs <- Mstr.add n (t,t_concrete) env.prover_fun_defs
             with
             | E_parsing str | E_concrete_syntax str ->
-                Loc.warning warn "Error while interpreting %s: %s@." n str
-            | _ -> Loc.warning warn "Error while interpreting %s@." n))
+                Loc.warning warn "@[Error while interpreting@ @[%s@]:@ @[%s@]" n str
+            | _ -> Loc.warning warn "@[Error while interpreting @[%s@]@]" n))
       prover_fun_defs;
     (*  Interpretation of queried function definitions. *)
     let terms =
@@ -1919,10 +1926,10 @@ module FromModelToTerm = struct
                 Some ((ls, oloc, attrs), (t, t_concrete))
               with
               | E_parsing str | E_concrete_syntax str ->
-                  Loc.warning warn "Error while interpreting %s: %s@." n str;
+                  Loc.warning warn "@[Error while interpreting@ @[%s@]:@ @[%s@]" n str;
                   None
               | _ ->
-                  Loc.warning warn "Error while interpreting %s@." n;
+                  Loc.warning warn "@[Error while interpreting @[%s@]@]" n;
                   None)
           | exception Not_found -> None)
         queried_fun_defs
@@ -1933,7 +1940,7 @@ module FromModelToTerm = struct
           (fun n ((ls, oloc, _), (t, t_concrete)) ->
             Debug.dprintf debug
               "[TERMS %s] name = %s, ls = %a, oloc = %a, t = %a, t_concrete = %a@." desc n
-              Pretty.print_ls ls
+              Pretty.print_ls_qualified ls
               (Pp.print_option Pretty.print_loc_as_attribute) oloc
               Pretty.print_term t
               print_concrete_term t_concrete)

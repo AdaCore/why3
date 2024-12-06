@@ -1,0 +1,804 @@
+* Experiment isqrt
+** Original
+File "bench/check-ce/petiot2018/isqrt.mlw", line 10, characters 19-31:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 11, characters 19-31:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 12, characters 19-38:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 13, characters 19-35:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 14, characters 14-16:
+Sub-goal Loop variant decrease of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 10, characters 19-31:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 11, characters 19-31:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 12, characters 19-38:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 13, characters 19-35:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Valid.
+
+File "bench/check-ce/petiot2018/isqrt.mlw", line 5, characters 12-62:
+Sub-goal Postcondition of goal isqrt'vc.
+Prover result is: Valid.
+
+** isqrt-S1
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S1.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:10@loop invariant init --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S1.mlw", line 10, characters 19-31:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S1.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = (- 1)
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = (- 1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (- 1)
+File isqrt-S1.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = (- 1)
+      _ = (- 1)
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S1.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = (- 1)
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = 3
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 3
+File isqrt-S1.mlw:
+  Line 10:
+    Property failure at loop invariant init with:
+      n = (- 1)
+      r = {contents= (- 1)}
+
+** isqrt-S2
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S2.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:13@loop invariant init --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S2.mlw", line 13, characters 19-35:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S2.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 1
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S2.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 1
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S2.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = 2
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = 3
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 3
+File isqrt-S2.mlw:
+  Line 13:
+    Property failure at loop invariant init with:
+      r = {contents= 1}
+      z = {contents= 3}
+
+** isqrt-S3
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S3.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:13@loop invariant init --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S3.mlw", line 13, characters 15-30:
+Sub-goal Loop invariant init of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S3.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 1
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S3.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 1
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S3.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = (-2)
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = (-1)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-1)
+File isqrt-S3.mlw:
+  Line 13:
+    Property failure at loop invariant init with:
+      r = {contents= 1}
+      z = {contents= (-1)}
+
+** isqrt-S4
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S4.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:11@loop invariant preservation --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S4.mlw", line 11, characters 19-31:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S4.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 2
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 2
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 2
+File isqrt-S4.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 2
+      _ = 2
+    Normal execution of function `int_ref` with args:
+      i = 4
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 4
+File isqrt-S4.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = 2
+    Normal execution of function `(+)` with args:
+      _ = (-4)
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = (-3)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-3)
+File isqrt-S4.mlw:
+  Line 9:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File isqrt-S4.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 4
+      y = 2
+    Normal iteration of loop
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-3)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-3)}
+File isqrt-S4.mlw:
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File isqrt-S4.mlw:
+  Line 15:
+    Normal execution of function `(-)` with args:
+      x = 4
+      y = (-3)
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = (-3)
+    Normal execution of function `(+)` with args:
+      _ = 4
+      _ = 3
+File isqrt-S4.mlw:
+  Line 15:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 4}
+      i = 7
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-3)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-3)}
+File isqrt-S4.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-3)
+      _ = 2
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-3)}
+      i = (-1)
+  Line 17:
+    Normal execution of function `(!)` with args:
+      r = {contents= 2}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+File isqrt-S4.mlw:
+  Line 17:
+    Normal execution of function `(-)` with args:
+      x = 2
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = (-1)
+File isqrt-S4.mlw:
+  Line 17:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 2}
+      i = 1
+  Line 11:
+    Property failure at loop invariant preservation with:
+      r = {contents= 1}
+      y = {contents= 7}
+
+** isqrt-S5
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S5.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:11@loop invariant preservation --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S5.mlw", line 11, characters 19-31:
+Sub-goal Loop invariant preservation of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The following counterexample model could not be verified
+  (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S5.mlw", line 6, characters 10-19):
+File isqrt-S5.mlw:
+  Line 3:
+    n :  = 2
+    n : int = 2
+
+** isqrt-S6
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S6.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:5@postcondition --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S6.mlw", line 5, characters 12-62:
+Sub-goal Postcondition of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S6.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 3
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 3
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 3
+File isqrt-S6.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 3
+      _ = 3
+    Normal execution of function `int_ref` with args:
+      i = 9
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 9
+File isqrt-S6.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = 3
+    Normal execution of function `(+)` with args:
+      _ = (-6)
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = (-5)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-5)
+File isqrt-S6.mlw:
+  Line 9:
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = 1
+    Normal execution of function `(!)` with args:
+      r = {contents= 9}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+File isqrt-S6.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 9
+      y = 4
+    Normal iteration of loop
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-5)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-5)}
+File isqrt-S6.mlw:
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= 9}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+File isqrt-S6.mlw:
+  Line 15:
+    Normal execution of function `(+)` with args:
+      _ = 9
+      _ = (-5)
+    Normal execution of function `(:=)` with args:
+      r = {contents= 9}
+      i = 4
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-5)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-5)}
+File isqrt-S6.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-5)
+      _ = 2
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-5)}
+      i = (-3)
+  Line 17:
+    Normal execution of function `(!)` with args:
+      r = {contents= 3}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+File isqrt-S6.mlw:
+  Line 17:
+    Normal execution of function `(-)` with args:
+      x = 3
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = (-1)
+File isqrt-S6.mlw:
+  Line 17:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 3}
+      i = 2
+  Line 9:
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = 1
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File isqrt-S6.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 4
+      y = 4
+  Line 19:
+    Normal execution of function `(!)` with args:
+      r = {contents= 2}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+File isqrt-S6.mlw:
+  Line 5:
+    Property failure at postcondition of `isqrt` with:
+      n = 3
+      result = 2
+
+** isqrt-S7
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S7.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:5@postcondition --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S7.mlw", line 5, characters 12-62:
+Sub-goal Postcondition of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The following counterexample model could not be verified
+  (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S7.mlw", line 6, characters 10-19):
+File isqrt-S7.mlw:
+  Line 3:
+    n :  = 1
+    n : int = 1
+
+** isqrt-S8
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S8.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:5@postcondition --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S8.mlw", line 5, characters 12-62:
+Sub-goal Postcondition of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S8.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 0
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 0
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 0
+File isqrt-S8.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 0
+      _ = 0
+    Normal execution of function `int_ref` with args:
+      i = 0
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 0
+File isqrt-S8.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = 0
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = 1
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 1
+File isqrt-S8.mlw:
+  Line 9:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File isqrt-S8.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 0
+      y = 0
+  Line 19:
+    Normal execution of function `(!)` with args:
+      r = {contents= 0}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+File isqrt-S8.mlw:
+  Line 19:
+    Normal execution of function `(-)` with args:
+      x = 0
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = (-1)
+File isqrt-S8.mlw:
+  Line 5:
+    Property failure at postcondition of `isqrt` with:
+      n = 0
+      result = (-1)
+
+** isqrt-S9
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S9.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:14@loop variant decrease --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S9.mlw", line 14, characters 10-16:
+Sub-goal Loop variant decrease of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File isqrt-S9.mlw:
+  Line 3:
+    Execution of main function `isqrt` with env:
+      n = 3
+      zero = 0
+      one = 1
+  Line 6:
+    Normal execution of function `int_ref` with args:
+      i = 3
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 3
+File isqrt-S9.mlw:
+  Line 7:
+    Normal execution of function `( * )` with args:
+      _ = 3
+      _ = 3
+    Normal execution of function `int_ref` with args:
+      i = 9
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = 9
+File isqrt-S9.mlw:
+  Line 8:
+    Normal execution of function `( * )` with args:
+      _ = (-2)
+      _ = 3
+    Normal execution of function `(+)` with args:
+      _ = (-6)
+      _ = 1
+    Normal execution of function `int_ref` with args:
+      i = (-5)
+File lib.mlw:
+  Line 12:
+    Normal execution of function `int_ref'mk` with args:
+      contents = (-5)
+File isqrt-S9.mlw:
+  Line 9:
+    Normal execution of function `(!)` with args:
+      r = {contents= 9}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+File isqrt-S9.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 9
+      y = 3
+    Normal iteration of loop
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-5)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-5)}
+File isqrt-S9.mlw:
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= 9}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 9}
+File isqrt-S9.mlw:
+  Line 15:
+    Normal execution of function `(+)` with args:
+      _ = 9
+      _ = (-5)
+    Normal execution of function `(:=)` with args:
+      r = {contents= 9}
+      i = 4
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-5)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-5)}
+File isqrt-S9.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-5)
+      _ = 2
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-5)}
+      i = (-3)
+  Line 17:
+    Normal execution of function `(!)` with args:
+      r = {contents= 3}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 3}
+File isqrt-S9.mlw:
+  Line 17:
+    Normal execution of function `(-)` with args:
+      x = 3
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 3
+      _ = (-1)
+File isqrt-S9.mlw:
+  Line 17:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 3}
+      i = 2
+  Line 9:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File isqrt-S9.mlw:
+  Line 9:
+    Normal execution of function `(>)` with args:
+      x = 4
+      y = 3
+    Normal iteration of loop
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-3)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-3)}
+File isqrt-S9.mlw:
+  Line 15:
+    Normal execution of function `(!)` with args:
+      r = {contents= 4}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 4}
+File isqrt-S9.mlw:
+  Line 15:
+    Normal execution of function `(+)` with args:
+      _ = 4
+      _ = (-3)
+    Normal execution of function `(:=)` with args:
+      r = {contents= 4}
+      i = 1
+  Line 16:
+    Normal execution of function `(!)` with args:
+      r = {contents= (-3)}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= (-3)}
+File isqrt-S9.mlw:
+  Line 16:
+    Normal execution of function `(+)` with args:
+      _ = (-3)
+      _ = 2
+    Normal execution of function `(:=)` with args:
+      r = {contents= (-3)}
+      i = (-1)
+  Line 17:
+    Normal execution of function `(!)` with args:
+      r = {contents= 2}
+File lib.mlw:
+  Line 23:
+    Normal execution of function `contents` with args:
+      arg = {contents= 2}
+File isqrt-S9.mlw:
+  Line 17:
+    Normal execution of function `(-)` with args:
+      x = 2
+      y = 1
+File int.mlw:
+  Line 23:
+    Normal execution of function `(-_)` with args:
+      _ = 1
+    Normal execution of function `(+)` with args:
+      _ = 2
+      _ = (-1)
+File isqrt-S9.mlw:
+  Line 17:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 2}
+      i = 1
+  Line 14:
+    Property failure at loop variant decrease with:
+      n = 3
+      r = {contents= 1}
+      r = {contents= 2}
+      n = 3
+
+** isqrt-S10
+bin/why3 prove --library=bench/check-ce/petiot2018 bench/check-ce/petiot2018/experiments/isqrt-S10.mlw --apply-transform=split_vc --prover=Alt-Ergo,2.6.0,counterexamples --timelimit=15 --check-ce --rac-prover=Alt-Ergo,2.6.0 --sub-goal=:14@loop variant decrease --stepslimit=10000
+File "bench/check-ce/petiot2018/experiments/isqrt-S10.mlw", line 14, characters 14-16:
+Sub-goal Loop variant decrease of goal isqrt'vc.
+Prover result is: Unknown (unknown).
+The following counterexample model could not be verified
+  (abstract RAC fatal rac error: missing value for return value of call to int_ref at "bench/check-ce/petiot2018/experiments/isqrt-S10.mlw", line 8, characters 10-30):
+File isqrt-S10.mlw:
+  Line 3:
+    n :  = 0
+    n : int = 0
+
