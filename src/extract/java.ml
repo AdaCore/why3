@@ -675,7 +675,6 @@ module JavaCompilerInfo = struct
     }
   and class_method = {
       this_index : int option;
-      name : Ident.ident;
       owner : class_record;
     }
   and class_kind = REGULAR | INTERFACE | ABSTRACT
@@ -858,7 +857,7 @@ module JavaCompilerInfo = struct
     match Mid.find_opt ident cls.methods with
     | Some _ -> raise (MethodRedefinition ident.id_string)
     | None ->
-       let m = { this_index = this_index; name = ident; owner = cls } in
+       let m = { this_index = this_index; owner = cls } in
        cls.methods <- Mid.add ident m cls.methods;
        compinfo.known_methods <- Mid.add ident m compinfo.known_methods
 
