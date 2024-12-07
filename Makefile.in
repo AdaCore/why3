@@ -9,6 +9,8 @@
 #                                                                  #
 ####################################################################
 
+.DELETE_ON_ERROR:
+
 VERBOSEMAKE ?= @enable_verbose_make@
 
 ifeq ($(VERBOSEMAKE),yes)
@@ -347,35 +349,35 @@ ifeq (@enable_mpfr@,yes)
 
 ifeq (@old_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_old.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
 src/session/compress.ml: src/session/compress_z.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else
 src/session/compress.ml: src/session/compress_none.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 # sexp_conv
 
 ifeq (@enable_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else
 src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -1677,27 +1679,24 @@ trywhy3-full.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_FULL_PACK))
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml $(JSOO_DEBUG) --Werror $<
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror $<
 
 src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, json_base.cmo json_parser.cmo json_lexer.cmo bindings.cmo worker_proto.cmo shortener.cmo trywhy3.cmo)
-	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
-	js_of_ocaml $(JSOO_DEBUG) --Werror --extern-fs -I . -I src/trywhy3 \
-		--file=trywhy3.conf:/ \
-		--file=try_alt_ergo.drv:/ \
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror -I . -I src/trywhy3 \
+	  --extern-fs --file=trywhy3.conf:/ --file=try_alt_ergo.drv:/ \
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
-	+dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $< || rm -f $@
+	  +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
 
 src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
-	$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
-
-src/trywhy3/%.cmo: src/trywhy3/%.ml
-	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
-
-src/trywhy3/%.cmi: src/trywhy3/%.mli
-	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
 
 $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package js_of_ocaml
 
@@ -1731,17 +1730,16 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml-ppx \
-        -I src/ide
-
-src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
-	$(JSOCAMLCW) $(BFLAGS) -c $<
+src/ide/why3_js.cmo: BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
 src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
-	$(JSOCAMLCW) $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc -package js_of_ocaml \
+	  $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/ide/why3_js.js: src/ide/why3_js.byte
-	js_of_ocaml --Werror +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $< || rm -f $@
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml --Werror +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
 
 web_ide: src/ide/why3_js.js
 
