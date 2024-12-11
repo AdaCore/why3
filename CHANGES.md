@@ -1,5 +1,8 @@
 :x: marks a potential source of incompatibility
 
+Version 1.8.0, December 11, 2024
+--------------------------------
+
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
   * new library `coma`: standard library of the plugin Coma
