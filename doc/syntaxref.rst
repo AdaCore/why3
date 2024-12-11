@@ -1738,13 +1738,14 @@ by symbols with the exact same definition.
 Module interface
 ^^^^^^^^^^^^^^^^
 
-Module interface allows to only use an high level view, the interface, of a
-module during the proof and the actual implementation during the extraction. It
-is based on the cloning mechanism for checking the correspondence between the
-implementation and the interface.
+Module interfaces make it possible to use only a high-level view of a
+module, the interface, during verification. This relies on the cloning
+mechanism to check the correspondence between the implementation and
+the interface. The actual implementation is still used during the
+extraction.
 
-For example the interface can model the datastructure with a simple finite set,
-and the inmplementation use an ordered list:
+Below is the example of a data structure implemented using an ordered
+list. The interface models it as a finite set:
 
 .. code-block:: whyml
 
@@ -1828,9 +1829,10 @@ and the inmplementation use an ordered list:
 
     end
 
-During the proof of the function `main`, only the specifiction defined in `Set``
-are present. So, for example, the generated goals are not polluted with the
-invariants of `ListSet`. However, during extraction the code of `ListSet` is
+During the verification of the function ``main``, only the
+specification defined in ``Set`` is present. As a consequence, the
+generated verification conditions are not polluted with the invariants
+of ``ListSet``. However, during extraction, the code of ``ListSet`` is
 used.
 
 .. index:: standard library
