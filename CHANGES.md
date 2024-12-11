@@ -15,8 +15,9 @@ Standard library
 
 Core
   * records and range types now have some predefined symbol `foo'eq`
-    and some axiom `foo'inj` to express injectivity. See manual
-    Section "The WhyML Language Reference/Record Types".
+    and some axiom `foo'inj` to express injectivity; see Section
+    "The WhyML Language Reference/Record Types" of the manual
+    (contribution by Loïc Correnson)
 
 Transformations
   * new transformation `extensionality` to help with equality proofs
@@ -44,15 +45,18 @@ Tools
   * `why3 pp`: dropped option `--kind` :x:
 
 Extraction
-  * added support for Java, see Manual, Section "Executing WhyML Programs"
+  * added support for Java; see Section "Executing WhyML Programs" of the manual
+    (contribution by Gérald Point)
   * improved extraction to C: floating-point numbers, global variables
 
 API
-  * changed how resource limits are specified :x
-  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x
+  * changed how resource limits are specified :x:
+  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x:
 
 Miscellaneous
   * dependency on OCaml library `num` was replaced by `zarith`
+  * added support for native Windows compilation through Opam 2.2
+    (contribution by Basile Deslosges)
 
 Version 1.7.2, April 18, 2024
 -----------------------------
