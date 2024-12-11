@@ -11,8 +11,9 @@ Standard library
   * made most `(==)` operators trigger the `extensionality` transformation :x:
 
 Core
-  * records and range types now have some predefined symbol `foo'eq` and
-    some axiom `foo'inj` to express injectivity
+  * records and range types now have some predefined symbol `foo'eq`
+    and some axiom `foo'inj` to express injectivity. See manual
+    Section "The WhyML Language Reference/Record Types".
 
 Transformations
   * new transformation `extensionality` to help with equality proofs
@@ -20,7 +21,7 @@ Transformations
 Plugins
   * new task-oriented strategy `forward_propagation` to automatically
     propagate rounding errors
-  * new Coma plugin
+  * new frontend plugin "Coma"
 
 Provers
   * Alt-Ergo FPA requires Alt-Ergo >= 2.5.4
@@ -40,7 +41,7 @@ Tools
   * `why3 pp`: dropped option `--kind` :x:
 
 Extraction
-  * added support for Java
+  * added support for Java, see Manual, Section "Executing WhyML Programs"
   * improved extraction to C: floating-point numbers, global variables
 
 API
