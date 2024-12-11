@@ -26,10 +26,18 @@ prefix	    = @prefix@
 exec_prefix = @exec_prefix@
 datarootdir = @datarootdir@
 
+ifneq (@OCAML_OS_TYPE@,Win32)
 BINDIR  = $(DESTDIR)@bindir@
 LIBDIR  = $(DESTDIR)@libdir@
 DATADIR = $(DESTDIR)@datarootdir@
 MANDIR  = $(DESTDIR)@mandir@
+else
+# Convert every \ to / in Windows paths so that the \ do not need to be escaped
+BINDIR  = $(subst \,/,$(DESTDIR)@bindir@)
+LIBDIR  = $(subst \,/,$(DESTDIR)@libdir@)
+DATADIR = $(subst \,/,$(DESTDIR)@datarootdir@)
+MANDIR  = $(subst \,/,$(DESTDIR)@mandir@)
+endif
 TOOLDIR = $(LIBDIR)/why3/commands
 
 # OS specific stuff
@@ -409,17 +417,24 @@ clean::
 # debug optimisation ppx
 
 ifeq (@enable_ppx@,yes)
-src/util/ppx_debug_optim: src/util/debug_optim.ml
+src/util/ppx_debug_optim$(EXE): src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
 
-src/transform/reflection.cmx: src/util/ppx_debug_optim
-src/transform/reflection.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
-src/extract/mlinterp.cmx: src/util/ppx_debug_optim
-src/extract/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
+ifeq (@OCAML_OS_TYPE@,Win32)
+# Relative calls to executable on Windows cannot use / as path separator
+PPX_DEBUG_OPTIM_EXE = src\\util\\ppx_debug_optim$(EXE)
+else
+PPX_DEBUG_OPTIM_EXE = src/util/ppx_debug_optim$(EXE)
+endif
+
+src/transform/reflection.cmx: src/util/ppx_debug_optim$(EXE)
+src/transform/reflection.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
+src/extract/mlinterp.cmx: src/util/ppx_debug_optim$(EXE)
+src/extract/mlinterp.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
 
 clean::
-	rm -f src/util/ppx_debug_optim
+	rm -f src/util/ppx_debug_optim$(EXE)
 endif
 
 # Re
@@ -732,13 +747,34 @@ install-bin::
 
 install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
-bin/%:	bin/%.@OCAMLBEST@
-	ln -sf $(notdir $<) $@
-
 install_local:: share/drivers share/extraction_drivers share/stdlib
+
+ifneq (@OCAML_OS_TYPE@,Win32)
+bin/why3$(EXE): bin/why3.@OCAMLBEST@
+	ln -sf $(notdir $<) $@
 
 share/drivers share/extraction_drivers share/stdlib: share/%:
 	ln -snf ../$* $@
+else
+# On Windows with --enable-local, why3 does not find the files inside of
+# symbolic link folders. Make copies instead, and since this is not a link
+# anymore, make the copies every time the compilation is run.
+
+.PHONY: share/drivers share/extraction_drivers share/stdlib
+
+bin/why3$(EXE): bin/why3.@OCAMLBEST@
+	cp $< $@
+
+share/drivers share/extraction_drivers share/stdlib: share/%:
+	cp -r $* share/
+
+ifeq (@enable_local@,yes)
+clean::
+	rm -rf share/drivers
+	rm -rf share/extraction_drivers
+	rm -rf share/stdlib
+endif
+endif
 
 MAKEINC += $(TOOLSDEP)
 
