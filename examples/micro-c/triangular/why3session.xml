@@ -2,38 +2,38 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.4.1" timelimit="30" steplimit="0" memlimit="4000"/>
-<file format="micro-C" proved="true">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="micro-C">
 <path name=".."/><path name="triangular.c"/>
-<theory name="Triangular" proved="true">
- <goal name="triangular&#39;vc" expl="VC for triangular" proved="true">
- <transf name="split_vc" proved="true" >
+<theory name="Triangular">
+ <goal name="triangular&#39;vc" expl="VC for triangular">
+ <transf name="split_vc" >
   <goal name="triangular&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="2"/></proof>
   </goal>
   <goal name="triangular&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="5"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="triangular&#39;vc.2" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="15"/></proof>
   </goal>
   <goal name="triangular&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="14"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="15"/></proof>
   </goal>
-  <goal name="triangular&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="11.940000" steps="144117"/></proof>
+  <goal name="triangular&#39;vc.4" expl="loop invariant preservation">
+  <proof prover="1"><result status="timeout" time="5.000000" steps="110320"/></proof>
   </goal>
   <goal name="triangular&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="triangular2&#39;vc" expl="VC for triangular2" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="27"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="256"/></proof>
  </goal>
  <goal name="main&#39;vc" expl="VC for main" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
 </theory>
 </file>

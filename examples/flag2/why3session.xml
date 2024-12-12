@@ -3,44 +3,48 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="flag2.mlw"/>
 <theory name="Flag" proved="true">
  <goal name="eq_color&#39;vc" expl="VC for eq_color" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="11"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="11"/></proof>
  </goal>
  <goal name="nb_occ&#39;vc" expl="VC for nb_occ" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="2"/></proof>
  </goal>
  <goal name="nb_occ_split&#39;vc" expl="VC for nb_occ_split" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="35"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="130"/></proof>
  </goal>
  <goal name="nb_occ_ext&#39;vc" expl="VC for nb_occ_ext" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="58"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="316"/></proof>
  </goal>
  <goal name="nb_occ_store_outside_up" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="7"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="37"/></proof>
  </goal>
  <goal name="nb_occ_store_outside_down" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="7"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="41"/></proof>
  </goal>
  <goal name="nb_occ_store_eq_eq" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="41"/></proof>
  </goal>
  <goal name="nb_occ_store_eq_neq&#39;vc" expl="VC for nb_occ_store_eq_neq" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="30"/></proof>
+ <proof prover="1"><result status="timeout" time="5.000000" steps="112631"/></proof>
+ <proof prover="3"><result status="valid" time="0.013816" steps="50"/></proof>
  </goal>
  <goal name="nb_occ_store_neq_eq&#39;vc" expl="VC for nb_occ_store_neq_eq" proved="true">
- <proof prover="0"><result status="valid" time="0.050000" steps="62"/></proof>
+ <proof prover="1"><result status="valid" time="0.050000" steps="1818"/></proof>
  </goal>
  <goal name="nb_occ_store_neq_neq&#39;vc" expl="VC for nb_occ_store_neq_neq" proved="true">
- <proof prover="0"><result status="valid" time="0.040000" steps="49"/></proof>
+ <proof prover="1"><result status="valid" time="0.040000" steps="894"/></proof>
  </goal>
  <goal name="swap&#39;vc" expl="VC for swap" proved="true">
- <proof prover="0"><result status="valid" time="1.130000" steps="463"/></proof>
+ <proof prover="0"><result status="valid" time="0.740651" steps="463"/></proof>
+ <proof prover="1"><result status="timeout" time="5.000000" steps="68205"/></proof>
  </goal>
  <goal name="dutch_flag&#39;vc" expl="VC for dutch_flag" proved="true">
- <proof prover="0"><result status="valid" time="0.070000" steps="212"/></proof>
+ <proof prover="1"><result status="valid" time="0.194285" steps="2788"/></proof>
  </goal>
 </theory>
 </file>

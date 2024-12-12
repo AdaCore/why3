@@ -3,37 +3,37 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="unraveling_a_card_trick.mlw"/>
 <theory name="GilbreathCardTrickPure" proved="true">
  <goal name="shuffle_nil_nil_nil" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="6"/></proof>
+ <proof prover="2"><result status="valid" time="0.000000" steps="6"/></proof>
  </goal>
  <goal name="shuffle_sym" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="shuffle_sym.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="8"/></proof>
   </goal>
   <goal name="shuffle_sym.1" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="8"/></proof>
   </goal>
   <goal name="shuffle_sym.2" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="12"/></proof>
   </goal>
   <goal name="shuffle_sym.3" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="12"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="shuffle_length" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="shuffle_length.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="shuffle_length.1" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="shuffle_length.2" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="9120"/></proof>
@@ -49,7 +49,7 @@
  <proof prover="0"><result status="valid" time="0.120000" steps="27219"/></proof>
  </goal>
  <goal name="card_trick&#39;vc" expl="VC for card_trick" proved="true">
- <proof prover="1"><result status="valid" time="0.160000" steps="828"/></proof>
+ <proof prover="2"><result status="valid" time="0.042614" steps="1303"/></proof>
  </goal>
 </theory>
 </file>

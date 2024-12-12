@@ -2,8 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Yices" version="1.0.38" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -14,14 +13,14 @@
  <goal name="fib_even_3n&#39;vc" expl="VC for fib_even_3n" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="fib_even_3n&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="2"/></proof>
   <proof prover="2"><result status="valid" time="0.010000" steps="62"/></proof>
   <proof prover="3"><result status="valid" time="0.000000"/></proof>
   <proof prover="5"><result status="valid" time="0.000000" steps="89"/></proof>
   <proof prover="7"><result status="valid" time="0.010000" steps="2047"/></proof>
   </goal>
   <goal name="fib_even_3n&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="3"/></proof>
   <proof prover="2"><result status="valid" time="0.010000" steps="384"/></proof>
   <proof prover="3"><result status="valid" time="0.000000"/></proof>
   <proof prover="5"><result status="valid" time="0.000000" steps="77"/></proof>
@@ -88,7 +87,7 @@
   <proof prover="2"><result status="valid" time="0.015259" steps="23095"/></proof>
   </goal>
   <goal name="f&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="timeout" time="5.000000" steps="2531"/></proof>
+  <proof prover="1"><result status="valid" time="2.533163" steps="21486"/></proof>
   <proof prover="2" timelimit="1"><result status="valid" time="0.020000" steps="31292"/></proof>
   </goal>
   <goal name="f&#39;vc.15" expl="loop invariant preservation" proved="true">
@@ -98,7 +97,7 @@
   <proof prover="2"><result status="valid" time="0.010000" steps="14554"/></proof>
   </goal>
   <goal name="f&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="30"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="99"/></proof>
   <proof prover="2"><result status="valid" time="0.010000" steps="15024"/></proof>
   </goal>
  </transf>
@@ -107,7 +106,7 @@
  <proof prover="2"><result status="valid" time="0.010000" steps="1157"/></proof>
  </goal>
  <goal name="bench&#39;vc" expl="VC for bench" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="1" timelimit="1"><result status="valid" time="0.000000" steps="10"/></proof>
  </goal>
 </theory>
 </file>

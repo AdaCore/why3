@@ -3,186 +3,125 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="2.5.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="2.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="isqrt.mlw"/>
 <theory name="Square" proved="true">
  <goal name="sqr_non_neg" proved="true">
  <proof prover="2"><result status="valid" time="0.020000" steps="327"/></proof>
- <proof prover="3" timelimit="5"><result status="valid" time="0.000000" steps="2"/></proof>
- <proof prover="6"><result status="valid" time="0.010535" steps="4"/></proof>
- <proof prover="8"><result status="valid" time="0.009594" steps="6"/></proof>
+ <proof prover="9" timelimit="5"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
  <goal name="sqr_increasing" proved="true">
  <proof prover="0"><result status="valid" time="0.030000" steps="6472"/></proof>
  <proof prover="5"><result status="valid" time="0.027580" steps="3451"/></proof>
  </goal>
  <goal name="sqr_sum" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
- <proof prover="6"><result status="valid" time="0.012770" steps="53"/></proof>
- <proof prover="8"><result status="valid" time="0.016203" steps="55"/></proof>
+ <proof prover="9"><result status="valid" time="0.000000" steps="54"/></proof>
  </goal>
 </theory>
 <theory name="Simple" proved="true">
  <goal name="isqrt&#39;vc" expl="VC for isqrt" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="101"/></proof>
- <proof prover="6"><result status="valid" time="0.170593" steps="3287"/></proof>
- <proof prover="8"><result status="valid" time="0.018342" steps="101"/></proof>
+ <proof prover="9"><result status="valid" time="0.000000" steps="116"/></proof>
  </goal>
  <goal name="main&#39;vc" expl="VC for main" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="12"/></proof>
- <proof prover="6"><result status="valid" time="0.016484" steps="22"/></proof>
- <proof prover="8"><result status="valid" time="0.008430" steps="23"/></proof>
+ <proof prover="9"><result status="valid" time="0.000000" steps="24"/></proof>
  </goal>
 </theory>
 <theory name="NewtonMethod" proved="true">
  <goal name="sqrt&#39;vc" expl="VC for sqrt" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="sqrt&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="14"/></proof>
-  <proof prover="6"><result status="valid" time="0.010514" steps="17"/></proof>
-  <proof prover="8"><result status="valid" time="0.007865" steps="15"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="17"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="16"/></proof>
-  <proof prover="6"><result status="valid" time="0.016278" steps="22"/></proof>
-  <proof prover="8"><result status="valid" time="0.009239" steps="23"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="25"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.2" expl="check division by zero" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="6"/></proof>
-  <proof prover="6"><result status="valid" time="0.011034" steps="6"/></proof>
-  <proof prover="8"><result status="valid" time="0.007834" steps="3"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="3"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="8"/></proof>
-  <proof prover="6"><result status="valid" time="0.018192" steps="43"/></proof>
-  <proof prover="8"><result status="valid" time="0.012115" steps="73"/></proof>
+  <proof prover="9"><result status="valid" time="0.010000" steps="73"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="8"/></proof>
-  <proof prover="6"><result status="valid" time="0.014243" steps="8"/></proof>
-  <proof prover="8"><result status="valid" time="0.017643" steps="6"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="4"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="11"/></proof>
   <proof prover="5"><result status="valid" time="0.046491" steps="7773"/></proof>
-  <proof prover="6"><result status="valid" time="0.020766" steps="113"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="13"/></proof>
-  <proof prover="6"><result status="valid" time="0.022138" steps="128"/></proof>
-  <proof prover="8"><result status="valid" time="0.015849" steps="55"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="53"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="15"/></proof>
   <proof prover="5"><result status="valid" time="0.042609" steps="5408"/></proof>
-  <proof prover="6"><result status="valid" time="0.026370" steps="154"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.8" expl="check division by zero" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="20"/></proof>
-  <proof prover="6"><result status="valid" time="0.022741" steps="20"/></proof>
-  <proof prover="8"><result status="valid" time="0.003816" steps="11"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.9" expl="check division by zero" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="20"/></proof>
-  <proof prover="6"><result status="valid" time="0.017422" steps="20"/></proof>
-  <proof prover="8"><result status="valid" time="0.014188" steps="10"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.10" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="sqrt&#39;vc.10.0" expl="VC for sqrt" proved="true">
    <proof prover="4"><result status="valid" time="0.010000" steps="7782"/></proof>
    <proof prover="7"><result status="valid" time="0.014645" steps="10228"/></proof>
-   <proof prover="8"><result status="valid" time="0.136562" steps="1165"/></proof>
+   <proof prover="9" timelimit="5"><result status="valid" time="0.136562" steps="1085"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.1" expl="VC for sqrt" proved="true">
-   <proof prover="1"><result status="valid" time="0.030000" steps="317"/></proof>
-   <proof prover="6"><result status="valid" time="0.063408" steps="317"/></proof>
-   <proof prover="8"><result status="valid" time="0.142775" steps="1241"/></proof>
+   <proof prover="9" timelimit="1"><result status="valid" time="0.030000" steps="1150"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.2" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.040000" steps="28"/></proof>
-   <proof prover="6"><result status="valid" time="0.050283" steps="230"/></proof>
-   <proof prover="8"><result status="valid" time="0.024102" steps="100"/></proof>
+   <proof prover="9"><result status="valid" time="0.040000" steps="102"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.3" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="30"/></proof>
-   <proof prover="6"><result status="valid" time="0.064324" steps="247"/></proof>
-   <proof prover="8"><result status="valid" time="0.026133" steps="91"/></proof>
+   <proof prover="9"><result status="valid" time="0.010000" steps="91"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.4" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.000000" steps="28"/></proof>
-   <proof prover="6"><result status="valid" time="0.012507" steps="23"/></proof>
-   <proof prover="8"><result status="valid" time="0.015619" steps="12"/></proof>
+   <proof prover="9"><result status="valid" time="0.000000" steps="13"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.5" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.000000" steps="28"/></proof>
-   <proof prover="6"><result status="valid" time="0.015032" steps="25"/></proof>
-   <proof prover="8"><result status="valid" time="0.016801" steps="13"/></proof>
+   <proof prover="9"><result status="valid" time="0.000000" steps="13"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.6" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="30"/></proof>
-   <proof prover="6"><result status="valid" time="0.046213" steps="193"/></proof>
-   <proof prover="8"><result status="valid" time="0.030590" steps="95"/></proof>
+   <proof prover="9"><result status="valid" time="0.010000" steps="95"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.7" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.000000" steps="30"/></proof>
-   <proof prover="6"><result status="valid" time="0.053270" steps="176"/></proof>
-   <proof prover="8"><result status="valid" time="0.028213" steps="78"/></proof>
+   <proof prover="9"><result status="valid" time="0.000000" steps="77"/></proof>
    </goal>
    <goal name="sqrt&#39;vc.10.8" expl="VC for sqrt" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="38"/></proof>
-   <proof prover="6"><result status="valid" time="0.023530" steps="49"/></proof>
-   <proof prover="8"><result status="valid" time="0.019730" steps="26"/></proof>
+   <proof prover="9"><result status="valid" time="0.010000" steps="26"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sqrt&#39;vc.11" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="24"/></proof>
-  <proof prover="6"><result status="valid" time="0.015802" steps="24"/></proof>
-  <proof prover="8"><result status="valid" time="0.007699" steps="11"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.100000" steps="90"/></proof>
-  <proof prover="6"><result status="valid" time="0.045979" steps="279"/></proof>
-  <proof prover="8"><result status="valid" time="0.035607" steps="108"/></proof>
+  <proof prover="9"><result status="valid" time="0.100000" steps="106"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="26"/></proof>
-  <proof prover="6"><result status="valid" time="0.016139" steps="26"/></proof>
-  <proof prover="8"><result status="valid" time="0.019600" steps="10"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="27"/></proof>
-  <proof prover="6"><result status="valid" time="0.018250" steps="27"/></proof>
-  <proof prover="8"><result status="valid" time="0.007883" steps="1"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="0"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="28"/></proof>
-  <proof prover="6"><result status="valid" time="0.021596" steps="28"/></proof>
-  <proof prover="8"><result status="valid" time="0.004440" steps="10"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="29"/></proof>
-  <proof prover="6"><result status="valid" time="0.008860" steps="29"/></proof>
-  <proof prover="8"><result status="valid" time="0.013708" steps="10"/></proof>
+  <proof prover="9"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="59"/></proof>
-  <proof prover="6"><result status="valid" time="0.022032" steps="142"/></proof>
-  <proof prover="8"><result status="valid" time="0.048810" steps="378"/></proof>
+  <proof prover="9"><result status="valid" time="0.020000" steps="373"/></proof>
   </goal>
   <goal name="sqrt&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.060000" steps="4132"/></proof>
   <proof prover="7"><result status="valid" time="0.018463" steps="9877"/></proof>
-  <proof prover="8"><result status="valid" time="0.044753" steps="441"/></proof>
+  <proof prover="9" timelimit="5"><result status="valid" time="0.044753" steps="445"/></proof>
   </goal>
  </transf>
  </goal>

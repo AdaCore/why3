@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" alternative="counterexamples" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.4" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="times2float.mlw"/>
-<theory name="Top">
- <goal name="f&#39;vc" expl="VC for f">
+<theory name="Top" proved="true">
+ <goal name="f&#39;vc" expl="VC for f" proved="true">
  <proof prover="0" obsolete="true"><result status="timeout" time="5.000000" steps="2009908"/></proof>
  <proof prover="1" obsolete="true"><result status="unknown" time="0.140000" steps="387381"/></proof>
- <proof prover="2"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="2"><result status="valid" time="0.104543" steps="1539"/></proof>
  </goal>
 </theory>
 </file>

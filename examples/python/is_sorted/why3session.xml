@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="python" proved="true">
 <path name=".."/><path name="is_sorted.py"/>
 <theory name="Is_sorted" proved="true">
@@ -20,7 +20,7 @@
   <proof prover="1"><result status="valid" time="0.090000" steps="20448"/></proof>
   </goal>
   <goal name="main&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.060000" steps="44"/></proof>
+  <proof prover="3"><result status="valid" time="0.060000" steps="48"/></proof>
   </goal>
   <goal name="main&#39;vc.4" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.160000" steps="36816"/></proof>

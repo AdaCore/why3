@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="gnome_sort.mlw"/>
 <theory name="GnomeSort" proved="true">
@@ -31,7 +31,7 @@
   <proof prover="1"><result status="valid" time="0.010000" steps="49632"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="90"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="100"/></proof>
   </goal>
   <goal name="gnome_sort&#39;vc.8" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.010000" steps="49190"/></proof>

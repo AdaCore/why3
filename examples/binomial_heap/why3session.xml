@@ -3,8 +3,8 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Eprover" version="1.8-001" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.12.2" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="binomial_heap.mlw"/>
@@ -15,7 +15,7 @@
  <goal name="le_roots_trans" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="le_roots_trans.0" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="57"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
@@ -24,7 +24,7 @@
   <goal name="heaps_append.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="heaps_append.0.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="11"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="10"/></proof>
    </goal>
    <goal name="heaps_append.0.1" proved="true">
    <proof prover="2"><result status="valid" time="2.058527"/></proof>
@@ -38,7 +38,7 @@
   <goal name="heaps_reverse.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="heaps_reverse.0.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="9"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="8"/></proof>
    </goal>
    <goal name="heaps_reverse.0.1" proved="true">
    <proof prover="2"><result status="valid" time="0.130000"/></proof>
@@ -48,14 +48,14 @@
  </transf>
  </goal>
  <goal name="occ_nonneg&#39;vc" expl="VC for occ_nonneg" proved="true">
- <proof prover="3"><result status="valid" time="0.020000" steps="100"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="171"/></proof>
  </goal>
  <goal name="occ_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="occ_append.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="occ_append.0.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.000000" steps="8"/></proof>
+   <proof prover="1"><result status="valid" time="0.000000" steps="14"/></proof>
    </goal>
    <goal name="occ_append.0.1" proved="true">
    <transf name="compute_in_goal" proved="true" >
@@ -83,12 +83,12 @@
   <goal name="has_order_length.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="has_order_length.0.0" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="12"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="13"/></proof>
    </goal>
    <goal name="has_order_length.0.1" proved="true">
    <transf name="compute_in_goal" proved="true" >
     <goal name="has_order_length.0.1.0" proved="true">
-    <proof prover="3"><result status="valid" time="0.080000" steps="241"/></proof>
+    <proof prover="1"><result status="valid" time="0.080000" steps="3203"/></proof>
     </goal>
    </transf>
    </goal>
@@ -99,35 +99,35 @@
  <goal name="inv_trans" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="inv_trans.0" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="41"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="49"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="inv_reverse&#39;vc" expl="VC for inv_reverse" proved="true">
- <proof prover="3"><result status="valid" time="0.340000" steps="1370"/></proof>
+ <proof prover="1"><result status="valid" time="0.043232" steps="493"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="38"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="39"/></proof>
  </goal>
  <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="31"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="17"/></proof>
  </goal>
  <goal name="get_min&#39;vc" expl="VC for get_min" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="get_min&#39;vc.0" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="6"/></proof>
   </goal>
   <goal name="get_min&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="107"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="141"/></proof>
   </goal>
   <goal name="get_min&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="35"/></proof>
   </goal>
   <goal name="get_min&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.050000" steps="371"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="548"/></proof>
   </goal>
   <goal name="get_min&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="233"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="199"/></proof>
   </goal>
   <goal name="get_min&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.170000"/></proof>
@@ -146,10 +146,10 @@
  <goal name="add_tree&#39;vc" expl="VC for add_tree" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="add_tree&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="24"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="114"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="139"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.350000"/></proof>
@@ -158,13 +158,13 @@
   <proof prover="0"><result status="valid" time="0.100000"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="91"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="133"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="88"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="106"/></proof>
   </goal>
   <goal name="add_tree&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.200000"/></proof>
@@ -175,54 +175,54 @@
  </transf>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
- <proof prover="3"><result status="valid" time="0.040000" steps="319"/></proof>
+ <proof prover="1"><result status="valid" time="0.040000" steps="484"/></proof>
  </goal>
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="merge&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="120"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="147"/></proof>
   </goal>
   <goal name="merge&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="75"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="109"/></proof>
   </goal>
   <goal name="merge&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="30"/></proof>
   </goal>
   <goal name="merge&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="22"/></proof>
   </goal>
   <goal name="merge&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="34"/></proof>
   </goal>
   <goal name="merge&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="122"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="150"/></proof>
   </goal>
   <goal name="merge&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="22"/></proof>
   </goal>
   <goal name="merge&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="30"/></proof>
   </goal>
   <goal name="merge&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="81"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="114"/></proof>
   </goal>
   <goal name="merge&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="36"/></proof>
   </goal>
   <goal name="merge&#39;vc.10" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="123"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="170"/></proof>
   </goal>
   <goal name="merge&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="77"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="117"/></proof>
   </goal>
   <goal name="merge&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
   </goal>
   <goal name="merge&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="83"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="123"/></proof>
   </goal>
   <goal name="merge&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="30"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="39"/></proof>
   </goal>
   <goal name="merge&#39;vc.15" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.380000"/></proof>
@@ -231,13 +231,13 @@
   <proof prover="0"><result status="valid" time="0.100000"/></proof>
   </goal>
   <goal name="merge&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="30"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="30"/></proof>
   </goal>
   <goal name="merge&#39;vc.18" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="merge&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="395"/></proof>
+  <proof prover="1"><result status="valid" time="0.030000" steps="831"/></proof>
   </goal>
   <goal name="merge&#39;vc.20" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.170000"/></proof>
@@ -248,23 +248,23 @@
  </transf>
  </goal>
  <goal name="extract_min_tree&#39;vc" expl="VC for extract_min_tree" proved="true">
- <proof prover="3"><result status="valid" time="0.280000" steps="2968"/></proof>
+ <proof prover="1"><result status="valid" time="0.138742" steps="2805"/></proof>
  </goal>
  <goal name="extract_min&#39;vc" expl="VC for extract_min" proved="true">
- <proof prover="3"><result status="valid" time="0.100000" steps="451"/></proof>
+ <proof prover="1"><result status="valid" time="0.100000" steps="1192"/></proof>
  </goal>
  <goal name="has_order_size&#39;vc" expl="VC for has_order_size" proved="true">
  <proof prover="0"><result status="valid" time="0.100000"/></proof>
  </goal>
  <goal name="binomial_tree_size" proved="true">
- <proof prover="3"><result status="valid" time="0.010000" steps="33"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="61"/></proof>
  <proof prover="4"><result status="valid" time="0.010000" steps="28045"/></proof>
  </goal>
  <goal name="inv_size&#39;vc" expl="VC for inv_size" proved="true">
  <proof prover="0"><result status="valid" time="1.300000"/></proof>
  </goal>
  <goal name="heap_size" proved="true">
- <proof prover="3"><result status="valid" time="0.010000" steps="10"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="37"/></proof>
  <proof prover="4"><result status="valid" time="0.020000" steps="31038"/></proof>
  </goal>
 </theory>

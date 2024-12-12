@@ -2,9 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.8.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -473,13 +472,13 @@
   <proof prover="7"><result status="valid" time="0.080000" steps="10549"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="98"/></proof>
+  <proof prover="2" timelimit="5"><result status="valid" time="0.200384" steps="3869"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.100000" steps="119"/></proof>
+  <proof prover="2"><result status="valid" time="0.100000" steps="154"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.130000" steps="161"/></proof>
+  <proof prover="2"><result status="valid" time="0.130000" steps="1700"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.7" expl="loop variant decrease" proved="true">
   <proof prover="7"><result status="valid" time="0.110000" steps="14054"/></proof>
@@ -534,7 +533,7 @@
   <proof prover="7"><result status="valid" time="0.100000" steps="16344"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.21" expl="loop invariant init" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="64"/></proof>
+  <proof prover="2"><result status="valid" time="0.050000" steps="78"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.22" expl="loop invariant init" proved="true">
   <proof prover="7"><result status="valid" time="0.080000" steps="18010"/></proof>
@@ -678,7 +677,7 @@
   <proof prover="7"><result status="valid" time="0.210000" steps="39497"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.56" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.260000" steps="395"/></proof>
+  <proof prover="2"><result status="valid" time="0.260000" steps="1421"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.57" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.550000" steps="110751"/></proof>
@@ -757,7 +756,7 @@
   <proof prover="7"><result status="valid" time="0.240000" steps="57120"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.76" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.160000" steps="185"/></proof>
+  <proof prover="2"><result status="valid" time="0.041839" steps="384"/></proof>
   </goal>
   <goal name="shear_sort&#39;vc.77" expl="precondition" proved="true">
   <proof prover="7"><result status="valid" time="0.230000" steps="58174"/></proof>
@@ -952,10 +951,10 @@
   <goal name="shear_sort&#39;vc.129" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="shear_sort&#39;vc.129.0" expl="VC for shear_sort" proved="true">
-   <proof prover="4"><result status="valid" time="0.100000" steps="111"/></proof>
+   <proof prover="2"><result status="valid" time="0.100000" steps="158"/></proof>
    </goal>
    <goal name="shear_sort&#39;vc.129.1" expl="VC for shear_sort" proved="true">
-   <proof prover="4"><result status="valid" time="0.060000" steps="109"/></proof>
+   <proof prover="2"><result status="valid" time="0.060000" steps="107"/></proof>
    </goal>
    <goal name="shear_sort&#39;vc.129.2" expl="VC for shear_sort" proved="true">
    <proof prover="7"><result status="valid" time="0.120000" steps="50752"/></proof>
@@ -968,7 +967,7 @@
    <proof prover="7"><result status="valid" time="0.260000" steps="66426"/></proof>
    </goal>
    <goal name="shear_sort&#39;vc.130.1" expl="VC for shear_sort" proved="true">
-   <proof prover="4"><result status="valid" time="0.050000" steps="113"/></proof>
+   <proof prover="2"><result status="valid" time="0.050000" steps="111"/></proof>
    </goal>
    <goal name="shear_sort&#39;vc.130.2" expl="VC for shear_sort" proved="true">
    <proof prover="7"><result status="valid" time="0.120000" steps="50963"/></proof>
@@ -1005,7 +1004,7 @@
   <goal name="shear_sort&#39;vc.140" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="shear_sort&#39;vc.140.0" expl="precondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.080000" steps="105"/></proof>
+   <proof prover="2"><result status="valid" time="0.353148" steps="3277"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1103,7 +1102,7 @@
   <proof prover="7"><result status="valid" time="0.080000" steps="10285"/></proof>
   </goal>
   <goal name="quick_rec&#39;vc.20" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.210000" steps="743"/></proof>
+  <proof prover="2"><result status="valid" time="0.083848" steps="786"/></proof>
   </goal>
   <goal name="quick_rec&#39;vc.21" expl="variant decrease" proved="true">
   <proof prover="7"><result status="valid" time="0.070000" steps="10912"/></proof>
@@ -1112,7 +1111,7 @@
   <proof prover="7"><result status="valid" time="0.070000" steps="11007"/></proof>
   </goal>
   <goal name="quick_rec&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.190000" steps="875"/></proof>
+  <proof prover="2"><result status="valid" time="0.140510" steps="1256"/></proof>
   </goal>
   <goal name="quick_rec&#39;vc.24" expl="assertion" proved="true">
   <proof prover="7"><result status="valid" time="0.100000" steps="15466"/></proof>
