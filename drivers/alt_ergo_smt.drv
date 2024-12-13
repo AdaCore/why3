@@ -11,10 +11,11 @@ printer "smtv2.6par"
 valid "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Valid"
 unknown "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?I don't know" ""
 steplimitexceeded "^\\[Error\\]; Fatal Error: Steps limit reached"
+unknown "^unsupported$" "unsupported"
 
 steps "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:.*(\\([0-9]+.?[0-9]*\\) steps)" 1
 steps "^\\[Error\\]; Fatal Error: Steps limit reached: \\([0-9]+.?[0-9]*\\)" 1
-steps "Fatal error: exception AltErgoLib.Util.Step_limit_reached(\\([0-9]+.?[0-9]*\\))" 1
+steps "^Fatal error: exception AltErgoLib.Util.Step_limit_reached(\\([0-9]+.?[0-9]*\\))" 1
 
 (* valid "^unsat" *)
 (* unknown "^\\(unknown\\|sat\\|Fail\\)" "" *)
@@ -28,9 +29,7 @@ time "why3cpulimit time : %s s"
 transformation "counterexamples_dependent_intros"
 
 transformation "monomorphise_goal"
-transformation "inline_trivial"
-transformation "eliminate_builtin"
-transformation "remove_unused_keep_constants"
+import "common-transformations.gen"
 transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_epsilon"

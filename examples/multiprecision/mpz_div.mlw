@@ -21,7 +21,7 @@ use div.Div
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
+let partial wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   requires { mpz.alloc[num] > 0 /\ mpz.alloc[den] > 0 }
   requires { mpz.alloc[quot] > 0 /\ mpz.alloc[rem] > 0 }
   requires { mpz.readers[num] = 0 /\ mpz.readers[den] = 0
@@ -242,7 +242,7 @@ let wmpz_tdiv_qr (quot rem num den: mpz_ptr) : unit
   unchanged rem mpz mpzrq;
   return
 
-let wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
+let partial wmpz_tdiv_qr_ui (quot rem dividend: mpz_ptr) (divisor: limb) : limb
   requires { mpz.alloc[dividend] > 0 }
   requires { mpz.alloc[quot] > 0 /\ mpz.alloc[rem] > 0 }
   requires { mpz.readers[dividend] = 0 /\ mpz.readers[quot] = 0

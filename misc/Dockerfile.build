@@ -9,13 +9,16 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git graphviz libgmp-dev liblablgtksourceview3-ocaml-dev libmenhir-ocaml-dev libmpfr-dev libnum-ocaml-dev libzarith-ocaml-dev libzip-ocaml-dev menhir ocaml-nox opam python3-sexpdata unzip wget xauth xvfb && \
+    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git graphviz libgmp-dev liblablgtksourceview3-ocaml-dev libmenhir-ocaml-dev libmpfr-dev libzarith-ocaml-dev libzip-ocaml-dev menhir ocaml-nox opam python3-sexpdata unzip wget xauth xvfb && \
     apt-get clean
 
 # install provers
 ## CVC5 1.0.5
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
     chmod a+x /usr/local/bin/cvc5-1.0.5
+## CVC5 1.1.2
+# RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux -O /usr/local/bin/cvc5-1.1.2 && \
+#    chmod a+x /usr/local/bin/cvc5-1.1.2
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8
@@ -56,6 +59,11 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.2/z3-4
     unzip z3-4.12.2-x64-glibc-2.31.zip && \
     mv z3-4.12.2-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.12.2 && \
     rm -r z3-4.12.2-x64-glibc-2.31.zip z3-4.12.2-x64-glibc-2.31
+## Z3 4.13.2
+#RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4.13.2-x64-glibc-2.35.zip && \
+#    unzip z3-4.13.2-x64-glibc-2.35.zip && \
+#    mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
+#    rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
 
 # create user
 RUN adduser --disabled-password --gecos '' why3
@@ -64,19 +72,18 @@ ENV HOME /home/why3
 WORKDIR /home/why3
 
 # install opam
-ENV OPAM_PACKAGES="num menhir mlmpfr.4.1.0+bugfix2 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
+ENV OPAM_PACKAGES="menhir mlmpfr.4.1.0+bugfix2 lablgtk3-sourceview3 zarith camlzip conf-autoconf"
 RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
-    opam switch create latest ocaml-base-compiler.5.0.0 && \
+    opam switch create latest ocaml-base-compiler.5.2.1 && \
     opam switch create bench  ocaml-base-compiler.4.09.1 && \
-    opam switch create full   ocaml-base-compiler.4.13.1 && \
+    opam switch create full   ocaml-base-compiler.4.14.2 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=latest $OPAM_PACKAGES && \
-    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.16.1 alt-ergo.2.5.4 && \
-    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.18.0 coq-flocq js_of_ocaml-ppx alt-ergo.2.5.4 sexplib ppx_deriving ppx_sexp_conv ocamlgraph && \
+    opam install -y --switch=bench  $OPAM_PACKAGES zenon.0.8.5 coq.8.16.1 && \
+    opam install -y --switch=full   $OPAM_PACKAGES re coq.8.18.0 coq-flocq js_of_ocaml.5.8.2 js_of_ocaml-ppx alt-ergo.2.6.0 sexplib ppx_deriving ppx_sexp_conv ocamlgraph zarith_stubs_js && \
     opam clean -a -c -r -s --logs
 
 USER root
-RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
-RUN cp /home/why3/.opam/bench/bin/alt-ergo /usr/local/bin/alt-ergo-2.5.4
+RUN cp /home/why3/.opam/full/bin/alt-ergo /usr/local/bin/alt-ergo-2.6.0
 
 USER why3

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -360,25 +360,25 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
   let tlimit = limit.limit_time in
   let stepslimit = limit.limit_steps in
   let ans, time, steps =
-
-    (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
-    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
-    match ans with
-    | HighFailure _ | Unknown _ | Timeout ->
-       Debug.dprintf debug
-         "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
-       Timeout, tlimit, steps
-    | _ -> ans, time, steps
-    else
-      (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
-      if stepslimit > 0 && steps >= stepslimit then
+    (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
+    if stepslimit > 0 && steps >= stepslimit then
       match ans with
       | HighFailure _ | Unknown _ | StepLimitExceeded ->
-        Debug.dprintf debug
-          "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
-        StepLimitExceeded, time, steps
+          Debug.dprintf debug
+            "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
+          StepLimitExceeded, time, steps
       | _ -> ans, time, steps
-      else ans, time, steps
+    else
+      (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
+    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
+      match ans with
+      | HighFailure _ | Unknown _ | Timeout ->
+          Debug.dprintf debug
+            "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
+          Timeout, tlimit, steps
+      | _ -> ans, time, steps
+    else
+      ans, time, steps
   in
   (* We avoid times smaller than 1/1000000s*)
   let time = max 0.000001 time in

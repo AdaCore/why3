@@ -13,7 +13,7 @@ use int.Abs
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_neg (w u: mpz_ptr) : unit
+let partial wmpz_neg (w u: mpz_ptr) : unit
   requires { mpz.readers[u] = 0 /\ mpz.readers[w] = 0 }
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 }
   ensures { mpz.readers[u] = 0 /\ mpz.readers[w] = 0 }

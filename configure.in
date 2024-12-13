@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -9,7 +9,7 @@
 #                                                                  #
 ####################################################################
 
-AC_INIT([Why3], [1.7.2+git])
+AC_INIT([Why3], [1.8.0+git])
 
 # verbosemake
 
@@ -40,12 +40,6 @@ AC_ARG_ENABLE(native-code,
 AC_ARG_ENABLE(why3-lib,
     AS_HELP_STRING([--disable-why3-lib], [use an already installed Why3]),,
     enable_why3_lib=yes)
-
-# Zarith
-
-AC_ARG_ENABLE(zarith,
-    AS_HELP_STRING([--disable-zarith], [use Nums instead of Zarith for computations]),,
-    enable_zarith=check)
 
 # ocamlfind
 
@@ -169,6 +163,13 @@ AC_ARG_ENABLE(emacs-compilation,
 
 AC_ARG_VAR(EDITOR, [default editor])
 
+# Java look-up
+AC_ARG_ENABLE(java,
+    AS_HELP_STRING([--disable-java], [do not use java in bench]),
+    [enable_java=${enableval}],
+    [enable_java=yes])
+
+
 # either relocation or local, not both
 if test "$enable_relocation" = yes -a "$enable_local" = yes ; then
    AC_MSG_ERROR([cannot use --enable-relocation and --enable-local at the same time.])
@@ -180,30 +181,37 @@ AC_MSG_CHECKING([executable suffix])
 if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
+  BUILD_ENV_TYPE=Cygwin
   AC_MSG_RESULT([.exe <Cygwin>])
 elif uname -s | grep -q MINGW ; then
   EXE=.exe
   STRIP=strip
+  BUILD_ENV_TYPE=MinGW
   AC_MSG_RESULT([.exe <MinGW>])
 else
   EXE=
   STRIP=strip
+  BUILD_ENV_TYPE=Posix
   AC_MSG_RESULT([<none>])
 fi
 
-AC_PROG_CC
+# Check for ocamlc, as we need it to find the C compiler to use
+# we first look for it in the path; if not present, we fail
+AC_CHECK_PROG(OCAMLC,ocamlc,ocamlc,no)
+if test "$OCAMLC" = no ; then
+   AC_MSG_ERROR([cannot find ocamlc.])
+fi
+AC_MSG_CHECKING([ocaml os type])
+OCAML_OS_TYPE=$(OCAMLC -config-var os_type)
+AC_MSG_RESULT([$OCAML_OS_TYPE])
+
+AC_PROG_CC([ $(OCAMLC -config-var c_compiler) gcc cl.exe clang ])
 AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
 AC_DEFUN([AX_VERSION_GE], [AS_VERSION_COMPARE([$1],[$2],[$4],[$3],[$3])])
 
-# Check for Ocaml compilers
-
-# we first look for ocamlc in the path; if not present, we fail
-AC_CHECK_PROGS(OCAMLC,ocp-ocamlc ocamlc,no)
-if test "$OCAMLC" = no ; then
-   AC_MSG_ERROR([cannot find ocamlc.])
-fi
+# Check for the rest of Ocaml compilers
 
 # we extract Ocaml version number
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
@@ -214,7 +222,7 @@ AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [],
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
-OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
+OCAMLLIB=$($OCAMLC -where | tr -d '\r' | tr '\\' '/')
 AC_MSG_NOTICE([ocaml library path is $OCAMLLIB])
 
 # then we look for ocamlopt; if not present, we issue a warning
@@ -320,16 +328,13 @@ if test "$enable_ocamlfind" != no; then
    if test "$OCAMLFIND" = no; then
       reason_ocamlfind=" (not found)"
    else
-      OCAMLFINDLIB=$(ocamlfind printconf stdlib)
-      #if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-      #   found_ocamlfind=no
-      #   reason_ocamlfind=" (incompatible with OCaml)"
-      #   echo "but your ocamlfind is not compatible with your ocamlc:"
-      #   echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
-      #else
-      #   found_ocamlfind=yes
-      #fi
-      if test -n "$OCAMLFINDLIB"; then
+      OCAMLFINDLIB=$(ocamlfind printconf stdlib | tr -d '\r' | tr '\\' '/')
+      if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+         found_ocamlfind=no
+         reason_ocamlfind=" (incompatible with OCaml)"
+         echo "but your ocamlfind is not compatible with your ocamlc:"
+         echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      else
          found_ocamlfind=yes
       fi
    fi
@@ -344,7 +349,7 @@ fi
 
 if test "$enable_ocamlfind" != no; then
    #if ocamlfind is used it gives the install path for ocaml library
-   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir | tr -d '\r')
+   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir | tr -d '\r' | tr '\\' '/')
    enable_ocamlfind=yes
 else
    OCAMLINSTALLLIB=$OCAMLLIB
@@ -372,7 +377,11 @@ fi
 if test "$enable_local" = no; then
    LOCALDIR=''
 else
-   LOCALDIR="${PWD}"
+   if test "$OCAML_OS_TYPE" = Win32 -a "$BUILD_ENV_TYPE" = Cygwin; then
+      LOCALDIR="$(cygpath -m "$PWD" | tr -d '\r')"
+   else
+      LOCALDIR="$PWD"
+   fi
 fi
 
 # ppx
@@ -423,76 +432,29 @@ if test "$enable_emacs_compilation" = yes ; then
    fi
 fi
 
-# checking for Num
-# (ocamlfind cannot be trusted here, since the default installation path is $OCAMLLIB)
-found_num=no
-if test "$enable_ocamlfind" = yes; then
-   AC_MSG_CHECKING([for num using ocamlfind])
-   DIR=$($OCAMLFIND query num 2> /dev/null | tr -d '\r')
-   if test -z "$DIR"; then
-      AC_MSG_RESULT([no])
-      AC_MSG_ERROR([cannot find library Num using ocamlfind.])
-   fi
-   AC_MSG_RESULT([yes])
-   NUMPKG=num
-   NUMINCLUDE="-I $DIR"
-   found_num=yes
-   AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
-   AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
-fi
-if test "$found_num" = no; then
-   DIR="$OCAMLLIB"
-   NUMINCLUDE=
-   found_num=yes
-   AC_CHECK_FILE($DIR/nums.cma,,found_num=no)
-   AC_CHECK_FILE($DIR/num.cmi,,found_num=no)
-fi
-if test "$found_num" = no; then
-   AC_MSG_ERROR([cannot find library Num.])
-fi
-
 # checking for Zarith
-if test "$enable_zarith" = no; then
-   reason_zarith=" (disabled by user)"
-else
-   DIR=
-   found_zarith=yes
-   if test "$enable_ocamlfind" = yes; then
-      AC_MSG_CHECKING([for zarith using ocamlfind])
-      DIR=$($OCAMLFIND query zarith 2> /dev/null | tr -d '\r')
-      if test -n "$DIR"; then
-         AC_MSG_RESULT([yes])
-         BIGINTINCLUDE="-I $DIR"
-      else
-         AC_MSG_RESULT([no])
-         found_zarith=no
-      fi
-   else
-      BIGINTINCLUDE="-I +zarith"
-      DIR="$OCAMLLIB/zarith"
-      AC_CHECK_FILE($DIR/zarith.cma,,found_zarith=no)
-   fi
+DIR=
+found_zarith=yes
+if test "$enable_ocamlfind" = yes; then
+   AC_MSG_CHECKING([for zarith using ocamlfind])
+   DIR=$($OCAMLFIND query zarith 2> /dev/null | tr -d '\r')
    if test -n "$DIR"; then
-      AC_CHECK_FILE($DIR/z.cmi,,found_zarith=no)
+      AC_MSG_RESULT([yes])
+      BIGINTINCLUDE="-I $DIR"
+   else
+      AC_MSG_RESULT([no])
+      found_zarith=no
    fi
-   if test "$found_zarith" = no; then
-      if test "$enable_zarith" = yes; then
-         AC_MSG_ERROR([cannot find library zarith.])
-      fi
-      AC_MSG_WARN([cannot find library zarith, using Nums instead.])
-      enable_zarith=no
-      reason_zarith=" (zarith not found)"
-   fi
-fi
-
-if test "$enable_zarith" != no; then
-   BIGINTLIB=zarith
-   BIGINTPKG=zarith
-   enable_zarith=yes
 else
-   BIGINTLIB=nums
-   BIGINTPKG=num
-   BIGINTINCLUDE="$NUMINCLUDE"
+   BIGINTINCLUDE="-I +zarith"
+   DIR="$OCAMLLIB/zarith"
+   AC_CHECK_FILE($DIR/zarith.cma,,found_zarith=no)
+fi
+if test -n "$DIR"; then
+   AC_CHECK_FILE($DIR/z.cmi,,found_zarith=no)
+fi
+if test "$found_zarith" = no; then
+   AC_MSG_ERROR([cannot find library zarith.])
 fi
 
 # checking for apron for bddinfer
@@ -849,7 +811,7 @@ elif test "$enable_ocamlfind" != yes; then
    reason_js_of_ocaml=" (ocamlfind not available)"
 else
    found_js_of_ocaml=yes
-   for p in js_of_ocaml js_of_ocaml-ppx; do
+   for p in js_of_ocaml js_of_ocaml-ppx zarith_stubs_js; do
       AC_MSG_CHECKING([for $p])
       DIR=$($OCAMLFIND query $p 2> /dev/null | tr -d '\r')
       if test -z "$DIR"; then
@@ -945,7 +907,7 @@ else
     fi
     if test "$enable_sexp" = yes; then
         SEXPLIBPPX="ppx_sexp_conv"
-        SEXPLIB="sexplib sexplib.num"
+        SEXPLIB="sexplib"
     fi
 fi
 
@@ -1168,6 +1130,15 @@ if test -z "$EDITOR"; then
    esac
 fi
 
+# Check presence of java and javac used by whyml2java bench
+if test "$enable_java" = yes; then
+   AC_CHECK_PROG(JAVAC,javac,javac,no)
+   AC_CHECK_PROG(JAVA,java,java,no)
+else
+   JAVAC=no
+   JAVA=no
+fi
+
 # substitutions to perform
 AC_SUBST(VERSION)
 
@@ -1175,8 +1146,10 @@ AC_SUBST(enable_verbose_make)
 
 AC_SUBST(EXE)
 AC_SUBST(STRIP)
+AC_SUBST(BUILD_ENV_TYPE)
 
 AC_SUBST(OCAMLC)
+AC_SUBST(OCAML_OS_TYPE)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
 AC_SUBST(OCAMLLEX)
@@ -1210,15 +1183,11 @@ AC_SUBST(enable_sexp)
 AC_SUBST(SEXPLIB)
 AC_SUBST(SEXPLIBPPX)
 
-AC_SUBST(NUMINCLUDE)
 AC_SUBST(MLMPFR)
 AC_SUBST(enable_mpfr)
 AC_SUBST(old_mpfr)
 
-AC_SUBST(enable_zarith)
 AC_SUBST(BIGINTINCLUDE)
-AC_SUBST(BIGINTLIB)
-AC_SUBST(BIGINTPKG)
 
 AC_SUBST(enable_infer)
 AC_SUBST(enable_bddinfer)
@@ -1283,6 +1252,9 @@ AC_SUBST(WHY3INCLUDE)
 
 AC_SUBST(enable_relocation)
 
+AC_SUBST(JAVAC)
+AC_SUBST(JAVA)
+
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(src/config.sh)
@@ -1291,6 +1263,8 @@ AC_CONFIG_FILES(.merlin)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_FILES(src/jessie/.merlin)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
+AC_CONFIG_FILES(bench/java/Makefile)
+AC_CONFIG_FILES(doc/javaexamples/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/jessie/Makefile;
 chmod a-w src/config.sh;
@@ -1321,11 +1295,13 @@ echo "    S-expressions support   : $enable_sexp$reason_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    MPFR support            : $enable_mpfr$reason_mpfr"
 echo "    Re support              : $enable_re$reason_re"
+echo "Build environment"
+echo "    OCaml OS Type           : $OCAML_OS_TYPE"
+echo "    Build environment type  : $BUILD_ENV_TYPE"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
 echo "    Web IDE                 : $enable_web_ide$reason_web_ide"
-echo "    GMP arithmetic          : $enable_zarith$reason_zarith"
 echo "    Compressed sessions     : $enable_zip$reason_zip"
 echo "    Hypothesis selection    : $enable_hypothesis_selection$reason_hypothesis_selection"
 echo "    Stackify                : $enable_stackify$reason_stackify"

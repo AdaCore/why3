@@ -480,3 +480,5 @@ Not any WhyML code can be extracted to C. Here is a list of supported features a
    * Pattern matching is not supported
    * Exception raising and catching is not supported
    * ``break``, ``continue`` and ``return`` are supported
+
+.. include:: whyml2java.inc

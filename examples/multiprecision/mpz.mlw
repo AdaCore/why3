@@ -320,7 +320,7 @@ let partial wmpz_do_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   set_ptr x q;
   q
 
-let wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
+let partial wmpz_realloc (x:mpz_ptr) (sz:int32) : ptr limb
   requires { mpz.readers[x] = 0 }
   requires { 1 <= mpz.alloc[x] }
   ensures  { forall y. y <> x -> mpz_unchanged y mpz (old mpz) }

@@ -1,0 +1,268 @@
+Warning: Error while checking function definition type make: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+  (Var (Qannotident (Isymbol (Sprover @a1)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4))))))
+with lsymbol array.Array.make
+Warning: Error while checking function definition type elts: Function arity mismatch when interpreting
+(Function ()
+  (Sarray (Sint) (Ssimple (Isymbol A1)))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Sarray (Sint) (Ssimple (Isymbol A1))))))
+with lsymbol array.Array.elts
+Warning: Error while checking function definition type a1: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a4)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a
+
+Warning: Error while checking function definition type make: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+  (Var (Qannotident (Isymbol (Sprover @a6)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4))))))
+with lsymbol array.Array.make
+Warning: Error while checking function definition type elts: Function arity mismatch when interpreting
+(Function ()
+  (Sarray (Sint) (Ssimple (Isymbol A1)))
+  (Var (Qannotident (Isymbol (Sprover @a8)) (Sarray (Sint) (Ssimple (Isymbol A1))))))
+with lsymbol array.Array.elts
+Warning: Error while checking function definition type a1: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a9)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_poly.mlw", line 8, characters 4-8)
+File "bench/check-ce/array_poly.mlw", line 8, characters 4-8:
+Sub-goal Index in array bounds of goal f1'vc.
+Prover result is: Unknown (unknown) (4 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File array_poly.mlw:
+  Line 7:
+    a = []
+    a = []
+    Execution of main function `f1` with env:
+      a = []
+      zero = 0
+      one = 1
+  Line 8:
+    Normal execution of function `([])` with args:
+      a = []
+      i = 0
+    Property failure at precondition of `([])` with:
+      a = []
+      i = 0
+
+File "bench/check-ce/array_poly.mlw", line 13, characters 4-14:
+Sub-goal Index in array bounds of goal f2'vc.
+Prover result is: Valid (2 steps).
+
+Warning: Error while checking function definition type mixfix_lblsmnrb: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint)))
+                                  (_arg_1 (Sint))
+                                  (_arg_2 (Sint)))
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a7)) (Smultiple (Isymbol array) (Sint))))) with lsymbol array.
+Array.
+([<-])
+
+Warning: Error while checking function definition type make: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol array) (Ssimple (Isymbol A5)))
+  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol array) (Ssimple (Isymbol A5))))))
+with lsymbol array.Array.make
+Warning: Error while checking function definition type elts: Type mismatch when interpreting (Function ((arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sarray (Sint) (Sint))
+                                  (Ite
+                                    (Apply (Qident (Isymbol =)) (Var (Qident (Isymbol arg_0)))
+                                      (Var (Qident (Isymbol a2))))
+                                    (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a8)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=42; verbatim=42))
+                                      (Cint {value=1; verbatim=1)
+                                      (Cint {value=42; verbatim=42))
+                                    (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a9)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=0; verbatim=0))
+                                      (Cint {value=1; verbatim=1)
+                                      (Cint {value=42; verbatim=42)))) with lsymbol array.
+Array.
+elts
+
+Warning: Error while checking function definition type a2: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a7)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a1
+
+Warning: Error while checking function definition type a1: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a6)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a2
+
+Warning: Error while checking function definition type mixfix_lblsmnrb: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint)))
+                                  (_arg_1 (Sint))
+                                  (_arg_2 (Sint)))
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a17)) (Smultiple (Isymbol array) (Sint))))) with lsymbol array.
+Array.
+([<-])
+
+Warning: Error while checking function definition type make: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol array) (Ssimple (Isymbol A5)))
+  (Var (Qannotident (Isymbol (Sprover @a12)) (Smultiple (Isymbol array) (Ssimple (Isymbol A5))))))
+with lsymbol array.Array.make
+Warning: Error while checking function definition type elts: Type mismatch when interpreting (Function ((arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sarray (Sint) (Sint))
+                                  (Ite
+                                    (Apply (Qident (Isymbol =)) (Var (Qident (Isymbol arg_0)))
+                                      (Var (Qident (Isymbol a2))))
+                                    (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a18)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=42; verbatim=42))
+                                      (Cint {value=1; verbatim=1)
+                                      (Cint {value=42; verbatim=42))
+                                    (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a19)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=0; verbatim=0))
+                                      (Cint {value=1; verbatim=1)
+                                      (Cint {value=42; verbatim=42)))) with lsymbol array.
+Array.
+elts
+
+Warning: Error while checking function definition type a2: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a17)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a1
+
+Warning: Error while checking function definition type a1: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a16)) (Smultiple (Isymbol array) (Sint))))) with lsymbol a2
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+- Checked model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+- Selected model 2: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+  - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_poly.mlw", line 10, characters 6-8)
+File "bench/check-ce/array_poly.mlw", line 12, characters 14-26:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown (unknown) (45 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type make: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+                                  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))))) with lsymbol array.
+Array.
+make
+
+Warning: Error while checking function definition type length: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a3)) (Sint))))
+with lsymbol array.Array.length
+Warning: Error while checking function definition type elts: Function arity mismatch when interpreting
+(Function ()
+  (Sarray (Sint) (Ssimple (Isymbol A1)))
+  (Var (Qannotident (Isymbol (Sprover @a4)) (Sarray (Sint) (Ssimple (Isymbol A1))))))
+with lsymbol array.Array.elts
+Warning: Error while checking function definition type make: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+                                  (Var (Qannotident (Isymbol (Sprover @a8)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))))) with lsymbol array.
+Array.
+make
+
+Warning: Error while checking function definition type length: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sint)
+                                  (Cint {value=2; verbatim=2)) with lsymbol array.
+Array.
+length
+
+Warning: Error while checking function definition type elts: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sarray (Sint) (Sint))
+                                  (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a12)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=1; verbatim=1))
+                                    (Cint {value=1; verbatim=1)
+                                    (Cint {value=0; verbatim=0))) with lsymbol array.
+Array.
+elts
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/array_poly.mlw", line 27, characters 14-22:
+Sub-goal Postcondition of goal f1'vc.
+Prover result is: Unknown (unknown) (3 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type make: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+                                  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))))) with lsymbol array.
+Array.
+make
+
+Warning: Error while checking function definition type length: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a3)) (Sint))))
+with lsymbol array.Array.length
+Warning: Error while checking function definition type elts: Function arity mismatch when interpreting
+(Function ()
+  (Sarray (Sint) (Ssimple (Isymbol A1)))
+  (Var (Qannotident (Isymbol (Sprover @a4)) (Sarray (Sint) (Ssimple (Isymbol A1))))))
+with lsymbol array.Array.elts
+Warning: Error while checking function definition type make: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))
+                                  (Var (Qannotident (Isymbol (Sprover @a8)) (Smultiple (Isymbol array) (Ssimple (Isymbol A4)))))) with lsymbol array.
+Array.
+make
+
+Warning: Error while checking function definition type length: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sint)
+                                  (Cint {value=2; verbatim=2)) with lsymbol array.
+Array.
+length
+
+Warning: Error while checking function definition type elts: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol array) (Sint))))
+                                  (Sarray (Sint) (Sint))
+                                  (Apply (Qident (Isymbol store)) (Apply (Qident (Isymbol store)) (Var (Qannotident (Isymbol (Sprover @a12)) (Sarray (Sint) (Sint))))
+                                                                    (Cint {value=0; verbatim=0)
+                                                                    (Cint {value=1; verbatim=1))
+                                    (Cint {value=1; verbatim=1)
+                                    (Cint {value=0; verbatim=0))) with lsymbol array.
+Array.
+elts
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 2: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/array_poly.mlw", line 32, characters 14-27:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown (unknown) (4 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

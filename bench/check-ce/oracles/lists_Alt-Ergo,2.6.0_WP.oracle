@@ -1,0 +1,182 @@
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A1)))))
+with lsymbol match_list
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 14, characters 26-39)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 14, characters 26-39)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 14, characters 26-39)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 14, characters 26-39)
+File "bench/check-ce/lists.mlw", line 14, characters 26-39:
+Goal g1.
+Prover result is: Unknown (unknown) (9 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File lists.mlw:
+  Line 14:
+    l = Nil
+    l = Nil
+    Execution of main function `g1'goal` with env:
+      l = Nil
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File lists.mlw:
+  Line 14:
+    Property failure at postcondition of `g1'goal` with:
+      l = Nil
+
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A1)))))
+with lsymbol match_list
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol l))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/lists.mlw", line 16, characters 26-39:
+Goal g2.
+Prover result is: Unknown (unknown) (9 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A4))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A4)))))
+with lsymbol match_list1
+Warning: Error while checking function definition type l: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol list) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a8)) (Smultiple (Isymbol list) (Sint))))) with lsymbol l
+
+Warning: Error while checking function definition type index_list: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a4)) (Sint))))
+with lsymbol index_list
+Warning: Error while checking function definition type Cons_proj_2: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A8)))
+  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol list) (Ssimple (Isymbol A8))))))
+with lsymbol Cons_proj_21
+Warning: Error while checking function definition type Cons_proj_1: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A7))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Ssimple (Isymbol A7)))))
+with lsymbol Cons_proj_11
+Warning: Error while checking function definition type Cons: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A2)))
+  (Var (Qannotident (Isymbol (Sprover @a6)) (Smultiple (Isymbol list) (Ssimple (Isymbol A2))))))
+with lsymbol Cons
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 25, characters 30-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 25, characters 30-43)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 25, characters 30-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/lists.mlw", line 25, characters 30-43)
+File "bench/check-ce/lists.mlw", line 25, characters 30-43:
+Goal g1.
+Prover result is: Unknown (unknown) (4 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File lists.mlw:
+  Line 25:
+    l = Nil1
+    l = Nil1
+    Execution of main function `g1'goal` with env:
+      l = Nil1
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File lists.mlw:
+  Line 25:
+    Property failure at postcondition of `g1'goal2` with:
+      l = Nil1
+
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A4))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A4)))))
+with lsymbol match_list1
+Warning: Error while checking function definition type l: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol list) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a8)) (Smultiple (Isymbol list) (Sint))))) with lsymbol l1
+
+Warning: Error while checking function definition type index_list: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a4)) (Sint))))
+with lsymbol index_list
+Warning: Error while checking function definition type Cons_proj_2: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A8)))
+  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol list) (Ssimple (Isymbol A8))))))
+with lsymbol Cons_proj_21
+Warning: Error while checking function definition type Cons_proj_1: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A7))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Ssimple (Isymbol A7)))))
+with lsymbol Cons_proj_11
+Warning: Error while checking function definition type Cons: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A2)))
+  (Var (Qannotident (Isymbol (Sprover @a6)) (Smultiple (Isymbol list) (Ssimple (Isymbol A2))))))
+with lsymbol Cons
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A4))
+  (Var (Qannotident (Isymbol (Sprover @a14)) (Ssimple (Isymbol A4)))))
+with lsymbol match_list1
+Warning: Error while checking function definition type l: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol list) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a17)) (Smultiple (Isymbol list) (Sint))))) with lsymbol l1
+
+Warning: Error while checking function definition type Cons_proj_1: Type mismatch when interpreting (Function ((_arg_0 (Smultiple (Isymbol list) (Sint))))
+                                  (Sint)
+                                  (Cint {value=0; verbatim=0)) with lsymbol Cons_proj_11
+
+Warning: Error while checking function definition type Cons: Type mismatch when interpreting (Function ((_arg_0 (Sint))
+                                  (_arg_1 (Smultiple (Isymbol list) (Sint))))
+                                  (Smultiple (Isymbol list) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a17)) (Smultiple (Isymbol list) (Sint))))) with lsymbol Cons
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol l))
+
+Warning: Error while interpreting index_list: No variable in bound_vars matching qualified identifier (Qident (Isymbol l))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/lists.mlw", line 27, characters 30-43:
+Goal g2.
+Prover result is: Unknown (unknown) (4 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -58,8 +58,15 @@ intros s1 s2 h1.
 unfold infix_eqeq in h1. unfold mem in h1.
 destruct s1, s2.
 assert (x = x0).
-eapply set.Set.extensionality. intro. eauto.
-subst.
+{ 
+  apply MapExt.extensionality. 
+  unfold MapExt.infix_eqeq. 
+  intro y. 
+  generalize (h1 y); clear h1; intro h1.
+  unfold set.Set.mem in h1.
+  destruct (x y); destruct (x0 y); intuition.
+}
+subst x.
 assert (e = e0).
 (* TODO maybe provable on such property ? *)
 apply Logic.ProofIrrelevance.proof_irrelevance.
@@ -354,7 +361,12 @@ split; intros.
   unfold diff, disjoint, mem, is_empty, inter in *.
   destruct s1, s2.
   intros. apply set.Set.disjoint_diff_eq.
-  apply set.Set.extensionality. intro. eapply H0.
+  apply MapExt.extensionality.
+  unfold MapExt.infix_eqeq.
+  intro y.
+  generalize (H0 y); clear H0; intro H0.
+  unfold set.Set.diff, set.Set.mem in *.
+  destruct (x y); destruct (x0 y); intuition.
 Qed.
 
 (* Why3 goal *)

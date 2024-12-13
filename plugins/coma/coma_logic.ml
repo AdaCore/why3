@@ -30,6 +30,9 @@ let debug_slow = Debug.register_info_flag "coma_no_merge"
 let debug_triv = Debug.register_info_flag "coma_no_trivial"
   ~desc:"Discard@ trivial@ proof@ obligations."
 
+let debug_recipe = Debug.register_info_flag "coma_print_recipes"
+  ~desc:"Print@ intermediate@ verification@ conditions."
+
 let is_true f = match f.t_node with
   | Ttrue -> true | _ -> false
 
@@ -241,6 +244,76 @@ let w_solid w =
   t_solid true w.wp &&
   Mhs.for_all (fun _ f -> t_solid false f) w.sp
 
+(* Record splitting *)
+
+let record_fields : (vsymbol list * vsymbol Mls.t) Wvs.t = Wvs.create 63
+
+let rec complete_fields kn v =
+  try let ts = match v.vs_ty.ty_node with
+        | Tyapp (ts,_) -> ts | _ -> raise Exit in
+      let cs,fl = match Decl.find_constructors kn ts
+                  with [c] -> c | _ -> raise Exit in
+      let fl = List.map (Opt.get_exn Exit) fl in
+      let sb = ty_match_args v.vs_ty in
+      let mk_vs f ty =
+        let nm = v.vs_name.id_string ^ "'" ^ f.ls_name.id_string in
+        let vs = create_vsymbol (id_fresh nm) (ty_inst sb ty) in
+        complete_fields kn vs; vs in
+      let vl = List.map2 mk_vs fl cs.ls_args in
+      let fm = List.fold_right2 Mls.add fl vl Mls.empty in
+      Wvs.set record_fields v (vl,fm)
+  with Exit | Not_found -> ()
+
+let complete_fields kn v =
+  if not (Wvs.mem record_fields v) then complete_fields kn v
+
+let inline_projections f =
+  let rec simp lm f = match f.t_node with
+    | Tapp (ls,[t]) when ls.ls_value <> None ->
+        let t = simp lm t in
+        t_attr_copy f (match t.t_node with
+          | Tvar v ->
+              (try t_var @@ Mls.find ls (try Mvs.find v lm
+              with Not_found -> snd (Wvs.find record_fields v))
+              with Not_found -> t_app ls [t] f.t_ty)
+          | _ -> t_app ls [t] f.t_ty)
+    | Tlet (t,b) ->
+        let t = simp lm t in
+        let u,s = t_open_bound b in
+        let lm = match t.t_node with
+          | Tvar v ->
+              (try Mvs.add u (try Mvs.find v lm
+              with Not_found -> snd (Wvs.find record_fields v)) lm
+              with Not_found -> lm)
+          | _ -> lm in
+        t_attr_copy f (t_let_close_simp u t (simp lm s))
+    | _ -> t_map (simp lm) f in
+  simp Mvs.empty f
+
+let split_record v s cvs =
+  let rec fields ll lm cvs vl vfm s = match s.t_node with
+    | Tapp (cs,tl) when cs.ls_constr = 1 ->
+        List.fold_left2 (add_vt ll lm) cvs vl tl
+    | Tvar u when Wvs.mem record_fields u ->
+        let add cvs v u = add_vt ll lm cvs v (t_var u) in
+        List.fold_left2 add cvs vl (fst (Wvs.find record_fields u))
+    | Tvar u when Mvs.mem u lm ->
+        fields ll lm cvs vl vfm (Mvs.find u lm)
+    | Tlet (t,b) ->
+        let u,f = t_open_bound b in
+        fields ((s,u,t)::ll) (Mvs.add u t lm) cvs vl vfm f
+    | _ ->
+        let add f v cvs = add_vt ll lm cvs v (t_app_infer f [s]) in
+        Mls.fold add vfm cvs
+  and add_vt ll lm cvs v s =
+    let relet s (f,u,t) = t_attr_copy f (t_let_close_simp u t s) in
+    let cvs = Mvs.add v (List.fold_left relet s ll) cvs in
+    try let vl,vfm = Wvs.find record_fields v in
+        fields ll lm cvs vl vfm s
+    with Not_found -> cvs
+  in
+  add_vt [] Mvs.empty cvs v s
+
 (* Coma expressions *)
 
 type param =
@@ -318,7 +391,7 @@ let c_clone_vs c v =
   create_vsymbol (id_clone v.vs_name) (c_inst_ty c v.vs_ty)
 
 let c_add_tv c u t = { c with c_tv = Mtv.add u t c.c_tv }
-let c_add_vs c v s = { c with c_vs = Mvs.add v s c.c_vs }
+let c_add_vs c v s = { c with c_vs = split_record v s c.c_vs }
 
 let c_add_hs c h d =
   let ph = if c.c_go then Shs.empty else Shs.add h c.c_ph in
@@ -371,7 +444,7 @@ let f_all pl f =
 
 (* Pretty-printing (debug only) *)
 
-let _print_formula fmt e =
+let print_formula fmt e =
   let pp_p fmt = function
     | Pt tv -> Format.pp_print_char fmt '\''; Format.pp_print_string fmt tv.tv_name.id_string
     | Pv vs -> Format.pp_print_string fmt vs.vs_name.id_string
@@ -441,22 +514,36 @@ let rec consume mm c pl bl =
 
 and factorize mm c hl h wr pl kk =
   if Debug.test_flag debug_slow || unmergeable pl then hl,kk else
-  let lz = lazy (let pl = wr_to_pl wr pl in
-    let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
-      let z = c_clone_vs c v in  let t = t_var z in
-      z::zl, Mvs.add z v zv, (v,t)::vt, Bv t::bl in
-    let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
-    let zw = kk true bl in let nm = not (Shs.mem h mm) || w_solid zw in
-    let h = if nm then h else create_hsymbol (id_clone h.hs_name) in
-    h, zl, zw, fun bl ->
-      let sph f = {wp = t_true; sp = Mhs.singleton h f} in
-      if pl = [] then if nm then zw else sph t_true else
-      let c,ul,_,_ = consume Shs.empty c pl bl in
-      let link (v,t) = t_equ t (c_find_vs c v) in
-      w_forall ul (if nm then w_subst (Mvs.map (c_find_vs c) zv) zw
-                         else sph (t_and_l (List.map link vt)))) in
-  lz::hl, fun go bl ->
-    if go then let lazy (_,_,_,zk) = lz in zk bl else w_true
+  let lz = lazy (prefact (Shs.mem h mm) c h (wr_to_pl wr pl) kk) in
+  lz::hl, fun go bl -> if go then let lazy (_,_,_,zk) = lz in zk bl
+                             else w_true
+
+and prefact mh c h pl kk =
+  let rec fields v (vz,zl,zv,vt) =
+    let z = c_clone_vs c v in
+    let zl,zv,vt = if mh then zl,zv,vt else try
+      let ul,um = Wvs.find record_fields v in
+      let vz,zl,zv,vt = List.fold_right fields ul (Mvs.empty,zl,zv,vt) in
+      let vtoz u = try Mvs.find u vz with Not_found -> assert false in
+      Wvs.set record_fields z (List.map vtoz ul, Mls.map vtoz um); zl,zv,vt
+    with Not_found -> zl,zv,vt in
+    Mvs.add v z vz, z::zl, Mvs.add z v zv, (v, t_var z)::vt in
+  let [@warning "-8"] dup (Pv v|Pr v) (zl,zv,vt,bl) =
+    let _,zl,zv,vt = fields v (Mvs.empty,zl,zv,vt) in
+    zl, zv, vt, Bv (snd (List.hd vt))::bl in
+  let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
+  let zw = kk true bl in
+  let abort_mh = mh && w_solid zw in let mh = mh && not abort_mh in
+  let [@warning "-8"] ripe (Pv v|Pr v) = Wvs.mem record_fields v in
+  if abort_mh && List.exists ripe pl then prefact mh c h pl kk else
+  let h = if mh then create_hsymbol (id_clone h.hs_name) else h in
+  h, zl, zw, fun bl ->
+    let sph f = {wp = t_true; sp = Mhs.singleton h f} in
+    if pl = [] then if mh then sph t_true else zw else
+    let c,ul,_,_ = consume Shs.empty c pl bl in
+    let link (v,t) = t_equ t (c_find_vs c v) in
+    w_forall ul (if mh then sph (t_and_l (List.map link vt))
+                 else w_subst (Mvs.map (c_find_vs c) zv) zw)
 
 let close vl hl {wp;sp} =
   let pile (vl,wl,sh) (lazy (h,zl,zw,_)) =  match Mhs.find h sp with
@@ -509,9 +596,34 @@ let rec fill_mm lh = function
   | Fneu (f,ss) -> Fneu (fill_mm (Mhs.set_inter lh ss) f, ss)
   | Fany -> Fany
 
-let top_eval c f = vc_simp (f_eval c (fill_mm Mhs.empty f) []).wp
+let rec scan_fields kn pl = List.iter (function
+  | Pc (_,wr,pl) -> List.iter (complete_fields kn) wr;
+                    scan_fields kn pl
+  | Pv v | Pr v  -> complete_fields kn v
+  | Pt _ -> ()) pl
 
-let top_handler c f = f_handler c (fill_mm Mhs.empty f)
+let rec quick_fields kn = function
+  | Fsym _ as f -> f
+  | Flam (pl, mm, f) -> scan_fields kn pl; Flam (pl, mm, quick_fields kn f)
+  | Fcut (s, pp, f) -> Fcut (inline_projections s, pp, quick_fields kn f)
+  | Fall (pl,f) -> scan_fields kn pl; Fall (pl, quick_fields kn f)
+  | Fagt (f, t) -> Fagt (quick_fields kn f, t)
+  | Fagv (f, s) -> Fagv (quick_fields kn f, inline_projections s)
+  | Fagr (f, r) -> Fagr (quick_fields kn f, r)
+  | Fagc (f, g) -> Fagc (quick_fields kn f, quick_fields kn g)
+  | Fand (f, g) -> Fand (quick_fields kn f, quick_fields kn g)
+  | Fneu (f,ss) -> Fneu (quick_fields kn f, ss)
+  | Fany -> Fany
+
+let top_eval kn c f =
+  let f = fill_mm Mhs.empty f in
+  Debug.dprintf debug_recipe "@[%a@]@." print_formula f;
+  vc_simp (f_eval c (quick_fields kn f) []).wp
+
+let top_handler kn c f =
+  let f = fill_mm Mhs.empty f in
+  Debug.dprintf debug_recipe "@[%a@]@." print_formula f;
+  f_handler c (quick_fields kn f)
 
 let rec drop_attr at = function
   | Fcut (s,pp,f) ->  let s = if pp then t_attr_remove at s else s in
@@ -780,11 +892,12 @@ let wr_defn hc flat dfl =
 
 (* Top-level Coma definitions *)
 
-type context = (vsymbol list * param list) Mhs.t * cache
+type context = Decl.known_map * (vsymbol list * param list) Mhs.t * cache
 
-let c_empty = Mhs.empty, c_empty
+let c_empty = Mid.empty, Mhs.empty, c_empty
 
-let c_merge (hco,co) (hcn,cn) =
+let c_merge (kno,hco,co) (knn,hcn,cn) =
+  Mid.set_union knn kno,
   Mhs.set_union hcn hco,
   { c_tv = Mtv.set_union cn.c_tv co.c_tv;
     c_vs = Mvs.set_union cn.c_vs co.c_vs;
@@ -792,24 +905,26 @@ let c_merge (hco,co) (hcn,cn) =
     c_ph = Shs.empty;
     c_go = true }
 
-let vc_expr (hc,c) e =
-  top_eval c @@ of_tt @@ vc true hc (wox_expr (wr_expr hc e)) []
+let c_known (_,hc,c) kn = kn, hc, c
 
-let vc_defn (hc,c) flat dfl =
+let vc_expr (kn,hc,c) e =
+  top_eval kn c @@ of_tt @@ vc true hc (wox_expr (wr_expr hc e)) []
+
+let vc_defn (kn,hc,c) flat dfl =
   let dfl = wox_defn (wr_defn hc flat dfl) in
   let pl,ll,fl,_ = vc_defn true hc flat dfl in
   let ctx c pl bl = let c,_,_,_ = consume Shs.empty c pl bl in c in
-  let bl_of_gl c gl = List.map (fun g -> Bc (top_handler c g)) gl in
+  let bl_of_gl c gl = List.map (fun g -> Bc (top_handler kn c g)) gl in
   let cc = if flat then c else ctx c pl (jack true [] pl) in
   let add_dl (pl,gl) c = ctx c pl (bl_of_gl c gl) in
   let c = List.fold_right add_dl ll cc in
-  let eval (h,_,_,_) f = h, top_eval (if flat then cc else c) f in
+  let eval (h,_,_,_) f = h, top_eval kn (if flat then cc else c) f in
   let keep (_,f) = not (Debug.test_flag debug_triv && is_true f) in
-  (hc_of_pl hc pl, c), List.filter keep (List.map2 eval dfl fl)
+  (kn, hc_of_pl hc pl, c), List.filter keep (List.map2 eval dfl fl)
 
 let extspec_attr = create_attribute "coma:extspec"
 
-let vc_spec (hc,c) h =
+let vc_spec (_,hc,c) h =
   if not (hs_tagged extspec_attr h) then [] else
   let wr, pl = Mhs.find h hc in
   if unspeccable pl then [] else

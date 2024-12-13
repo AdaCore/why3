@@ -123,7 +123,7 @@ module Base64
         (if length s >= 2 && s[length s - 2] = eq_symbol then 2 else 1)
     else 0
 
-  let get_pad (s: string): int63
+  let partial get_pad (s: string): int63
     ensures { result = get_pad s }
   = if length s >= 1 && eq_char s[length s - 1] eq_symbol then
         (if length s >= 2 && eq_char s[length s - 2] eq_symbol then 2 else 1)
@@ -137,7 +137,7 @@ module Base64
 
   lemma calc_pad_mod3: forall s. mod (length s + calc_pad s) 3 = 0
 
-  let calc_pad (s: string): int63
+  let partial calc_pad (s: string): int63
     ensures { result = calc_pad s }
   = if length s % 3 = 1 then 2 else
       if length s % 3 = 2 then 1 else 0
@@ -247,7 +247,7 @@ module Base64
     assert { forall i. 0 <= i < length s2 -> s2[i] = s3[i]};
     assert { eq_string s2 s3}
 
-  let encode (s: string) : string
+  let partial encode (s: string) : string
     ensures { encoding s result }
   = let padding = calc_pad s in
     let sp = concat s (make padding (chr 0)) in
@@ -290,7 +290,7 @@ module Base64
     StringBuffer.add_string r (make padding eq_symbol);
     StringBuffer.contents r
 
-  let decode (s: string) : string
+  let partial decode (s: string) : string
     requires { valid_b64 s }
     ensures  { encoding result s }
   = let ref i = 0 in
@@ -324,7 +324,7 @@ module Base64
     done;
     StringBuffer.sub r 0 (length r - get_pad s)
 
-  let decode_encode (s: string) : unit
+  let partial decode_encode (s: string) : unit
   = let s1 = encode s in
     let s2 = decode s1 in
     assert { s = s2 }

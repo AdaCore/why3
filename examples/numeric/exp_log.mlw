@@ -103,24 +103,8 @@ module ExpLogDouble
       abs (to_real result -. log (to_real x)) <=. abs (log (to_real x)) *. log_error +. log_cst_error
     }
 
-  constant log2_error:real
-  axiom log2_error_bounds : 0. <=. log2_error <=. 1.
-  val function log2_approx (x:udouble) : udouble
-    requires { 0. <. to_real x }
-    ensures {
-      abs (to_real result -. log2 (to_real x)) <=. abs (log2 (to_real x)) *. log2_error
-    }
-
-  constant log10_error:real
-  axiom log10_error_bounds : 0. <=. log10_error <=. 1.
-  val function log10_approx (x:udouble) : udouble
-    requires { 0. <. to_real x }
-    ensures {
-      abs (to_real result -. log10 (to_real x)) <=. abs (log10 (to_real x)) *. log10_error
-    }
-
   constant exp_error:real
-  axiom exp_error_bounds : 0. <=. exp_error <=. 0x1p-3
+  axiom exp_error_bounds : 0. <=. exp_error <=. 0.5
   val function exp_approx (x:udouble) : udouble
     ensures {
       abs (to_real result -. exp (to_real x)) <=. exp_error *. exp (to_real x)
@@ -142,6 +126,7 @@ module ExpLogDouble
   = log_approx (exp_approx(x)) ++. log_approx (exp_approx(y))
 
   let example2 (x y : udouble)
+    requires { exp_error <=. 0x1p-2 }
     ensures {
       let exact = log(exp(to_real x) +. exp (to_real y)) in
       abs (to_real result -. exact)
@@ -150,14 +135,146 @@ module ExpLogDouble
     }
   = log_approx (exp_approx(x) ++. exp_approx(y))
 
+  let lse4 (x1 x2 x3 x4 : udouble)
+    requires { exp_error <=. 0x1p-3 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4))
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (4.0 *. exp_error +. 3.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = log_approx (exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3) ++. exp_approx(x4))
+
+  let lse5 (x1 x2 x3 x4 x5: udouble)
+    requires { exp_error <=. 0x1p-3 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4) +. exp (to_real x5))
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (5.0 *. exp_error +. 4.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = log_approx (exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3)
+                ++. exp_approx(x4) ++. exp_approx(x5))
+
+let lse6 (x1 x2 x3 x4 x5 x6 : udouble)
+    requires { exp_error <=. 0x1p-3 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4) +. exp (to_real x5)
+             +. exp (to_real x6) )
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (6.0 *. exp_error +. 5.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = log_approx (exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3)
+                ++. exp_approx(x4) ++. exp_approx(x5) ++.
+                exp_approx(x6))
+
+let lse7 (x1 x2 x3 x4 x5 x6 x7 : udouble)
+    requires { exp_error <=. 0x1p-3 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4) +. exp (to_real x5)
+             +. exp (to_real x6) +. exp (to_real x7) )
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (7.0 *. exp_error +. 6.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = log_approx (exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3)
+                ++. exp_approx(x4) ++. exp_approx(x5) ++.
+                exp_approx(x6) ++. exp_approx(x7))
+
+
+let lse8 (x1 x2 x3 x4 x5 x6 x7 x8 : udouble)
+    requires { exp_error <=. 0x1p-4 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4) +. exp (to_real x5)
+             +. exp (to_real x6) +. exp (to_real x7) +.
+             exp (to_real x8) )
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (8.0 *. exp_error +. 7.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = log_approx (exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3)
+                ++. exp_approx(x4) ++. exp_approx(x5) ++.
+                exp_approx(x6) ++. exp_approx(x7) ++. exp_approx(x8))
+
+
+  let lse10 (x1 x2 x3 x4 x5 x6 x7 x8 x9 x10: udouble)
+    requires { exp_error <=. 0x1p-4 }
+    ensures {
+      let exact =
+        log (exp (to_real x1) +. exp (to_real x2) +.
+             exp (to_real x3) +. exp (to_real x4) +. exp (to_real x5)
+             +. exp (to_real x6) +. exp (to_real x7) +.
+             exp (to_real x8) +. exp (to_real x9) +. exp (to_real x10))
+      in
+      abs (to_real result -. exact)
+      <=. abs exact *. log_error
+          -. log (1.0 -. (10.0 *. exp_error +. 9.0 *. eps))
+             *. (1.0 +. log_error)
+          +. log_cst_error
+          }
+  = let s  = exp_approx(x1) ++. exp_approx(x2) ++. exp_approx(x3)
+                ++. exp_approx(x4) ++. exp_approx(x5) ++.
+                exp_approx(x6) ++. exp_approx(x7) ++. exp_approx(x8)
+                ++. exp_approx(x9) ++. exp_approx(x10) in
+    assert { to_real s >. 0.0 };
+    log_approx s
+
+  (** log in base 2 and 10 *)
+
+  constant log2_rel_error:real
+  axiom log2_rel_error_bounds : 0. <=. log2_rel_error <=. 1.
+  constant log2_abs_error:real
+  axiom log2_abs_error_bounds : 0. <=. log2_abs_error <=. 1.
+  val function log2_approx (x:udouble) : udouble
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log2 (to_real x)) <=.
+        abs (log2 (to_real x)) *. log2_rel_error +. log2_abs_error
+    }
+
+  constant log10_error:real
+  axiom log10_error_bounds : 0. <=. log10_error <=. 1.
+  val function log10_approx (x:udouble) : udouble
+    requires { 0. <. to_real x }
+    ensures {
+      abs (to_real result -. log10 (to_real x)) <=. abs (log10 (to_real x)) *. log10_error
+    }
+
   let example3 (x y : udouble)
     requires { 0. <. to_real x }
     requires { 0. <. to_real y }
     ensures {
       let exact = log2(to_real x +. to_real y) in
       abs (to_real result -. exact)
-      <=. abs exact *. log2_error
-         +. ((-. log2 (1.0 -. (eps))) *. (1.0 +. log2_error))
+      <=. abs exact *. log2_rel_error
+         +. (-. log2 (1.0 -. (eps))) *. (1.0 +. log2_rel_error)
+         +. log2_abs_error
     }
   = log2_approx (x ++. y)
 
@@ -171,5 +288,47 @@ module ExpLogDouble
          +. ((-. log10 (1.0 -. (eps))) *. (1.0 +. log10_error))
     }
   = log10_approx (x ++. y)
+
+(*** the following is to hard so far
+
+  val exact_cte (x:real) : udouble
+    ensures { to_real result = x }
+
+  let lemma exp_pos (x:real)
+    requires { x >=. 0.0}
+    ensures { exp x -. 1.0 >=. 0.0 }
+  = ()
+
+  let sl2se (a1 a2 rho: udouble)
+    requires { exp_error <. 0x1p-8 }
+    ensures {
+      let s11 = to_real a1 +. to_real rho -. to_real a1 in
+      let s12 = to_real a1 +. to_real rho -. to_real a2 in
+      let s21 = to_real a2 +. to_real rho -. to_real a1 in
+      let s22 = to_real a2 +. to_real rho -. to_real a2 in
+      let exact =
+        log2 (exp (-0.5 *. (s11 *. s11)) +. exp (-0.5 *. (s22 *. s12)))
+        +. log2 (exp (-0.5 *. (s21 *. s21)) +. exp (-0.5 *. (s22 *. s22)))
+      in
+      abs (to_real result -. exact)
+      <=. 0.0
+          }
+  =
+    let half = exact_cte (-0.5) in
+    let s11 = a1 ++. rho --. a1 in
+    let s12 = a1 ++. rho --. a2 in
+    let t11 = exp_approx(half**.(s11**.s11)) in
+    let t12 = exp_approx(half**.(s12**.s12)) in
+    let u1 = t11 ++. t12 in
+    let v1 = log2_approx u1 in
+    let s21 = a2 ++. rho --. a1 in
+    let s22 = a2 ++. rho --. a2 in
+    let t21 = exp_approx(half**.(s21**.s21)) in
+    let t22 = exp_approx(half**.(s22**.s22)) in
+    let u2 = t21 ++. t22 in
+    let v2 = log2_approx u2 in
+    v1 ++. v2
+
+*)
 
 end

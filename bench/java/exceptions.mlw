@@ -1,0 +1,67 @@
+module Exception1
+   [@java:exception:Exception]
+   use mach.java.lang.Integer
+
+   type t = { value : integer; d : bool }
+
+   exception E1 t
+
+   let crt[@java:constructor] (i : integer) : t =
+       { value = i; d = false }
+end
+
+module Exception2
+   [@java:exception:Exception]
+   use mach.java.lang.Integer
+
+   type t = { value : integer; d : bool }
+   
+   exception E2 t
+   
+   let crt[@java:constructor] (i : integer) : t =
+       { value = i; d = false }
+end
+
+module ExceptionThrow
+   use Exception1
+   use Exception2
+   use mach.java.lang.Integer
+   use mach.java.lang.IndexOutOfBoundsException
+   use mach.java.util.NoSuchElementException
+
+   let func (i : integer) : integer
+      ensures { result = i }
+      raises { Exception1.E1 v -> (Exception1.value v = i) && (i = 0) }
+      raises { Exception2.E2 v -> (Exception2.value v = i) && (i = 1) }
+      raises { IndexOutOfBoundsException.E -> i = 2 }
+      raises { NoSuchElementException.E -> i = 3 }      
+   =
+      if i = 0 then raise Exception1.E1 (Exception1.crt i);
+      if i = 1 then raise Exception2.E2 (Exception2.crt i);
+      if i = 2 then raise IndexOutOfBoundsException.E;
+      if i = 3 then raise NoSuchElementException.E;
+      i
+end
+
+
+module ExceptionCatch
+  use mach.java.lang.Integer
+  use Exception1
+  use Exception2
+  use mach.java.lang.IndexOutOfBoundsException
+  use mach.java.util.NoSuchElementException
+  use ExceptionThrow
+
+  let no_raise (i : integer) : integer
+    requires { i <> 1 }
+    ensures { result = i }
+    raises { Exception1.E1 v -> (Exception1.value v = i) && (i = 0) }
+  =
+    try
+      func i
+    with
+      Exception2.E2 _ -> absurd
+     | IndexOutOfBoundsException.E -> i
+     | NoSuchElementException.E -> i
+    end
+end

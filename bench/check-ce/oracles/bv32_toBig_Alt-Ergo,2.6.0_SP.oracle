@@ -1,0 +1,87 @@
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40)
+File "bench/check-ce/bv32_toBig.mlw", line 8, characters 27-40:
+Sub-goal Precondition of goal ok'vc.
+Prover result is: Unknown (unknown) (35 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File bv32_toBig.mlw:
+  Line 8:
+    i = 0
+    i = 0
+    Execution of main function `ok` with env:
+      i = 0
+      zero = 0
+      one = 1
+    (giant-step) execution of unimplemented function `toBig`
+      _ = 0
+    result of `toBig` = 0
+    (giant-step) execution of unimplemented function `u`
+      i = 0
+    Property failure at precondition of `u` with:
+      i = 0
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41)
+File "bench/check-ce/bv32_toBig.mlw", line 10, characters 27-41:
+Sub-goal Precondition of goal ko'vc.
+Prover result is: Unknown (unknown) (35 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 10, characters 29-41):
+File bv.mlw:
+  Line 319:
+    is_signed_positive : t -> bool = [|_ => false|]
+File bv32_toBig.mlw:
+  Line 10:
+    i :  = 0
+    i :  = 0
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55)
+File "bench/check-ce/bv32_toBig.mlw", line 13, characters 14-40:
+Sub-goal Postcondition of goal ko2'vc.
+Prover result is: Unknown (unknown) (34 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/bv32_toBig.mlw", line 13, characters 45-55):
+File bv.mlw:
+  Line 319:
+    is_signed_positive : t -> bool = [|_ => false|]
+File bv32_toBig.mlw:
+  Line 12:
+    i :  = 0
+    i :  = 0
+

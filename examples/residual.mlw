@@ -91,7 +91,7 @@ module ResidualOCaml
   val partial length (s: ostring) : int63
     ensures { result = length s >= 0 }
 
-  let decide (w: ostring) (r: regexp) : bool
+  let partial decide (w: ostring) (r: regexp) : bool
     ensures { result <-> mem w r }
   = let ref r' = r in
     for i = 0 to length w - 1 do

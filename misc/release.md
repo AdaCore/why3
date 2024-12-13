@@ -55,7 +55,6 @@
 * update the repository, if this is the most recent release
   - forward the `stable` branch of the Why3 repository:
     `git push origin bugfix/v$VERSION:stable`
-  - run the manual job `trywhy3` in the corresponding pipeline on the `stable` branch
   - merge back the changes to the `master` branch
   - update the first line of `configure.in` using `$RELEASE+git`,
     commit and push the change to `master`

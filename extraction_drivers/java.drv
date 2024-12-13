@@ -1,0 +1,378 @@
+(** Java driver *)
+
+printer "java"
+
+module mach.java.lang.Integer
+  syntax type integer  "int"
+  syntax literal integer "%c"
+
+  syntax val min_integer "Integer.MIN_VALUE" prec 0
+  syntax val max_integer "Integer.MAX_VALUE" prec 0
+  
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  syntax val to_int  "(%1).intValue()"
+
+  remove module
+end
+
+module mach.java.lang.Long
+  syntax type long  "long"
+  syntax literal long "%c"
+
+  syntax val min_long "Long.MIN_VALUE" prec 0
+  syntax val max_long "Long.MAX_VALUE" prec 0
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  syntax val of_integer "Long.valueOf(%1)" prec 15 15
+  syntax val int_value "Integer.valueOf((int)%1)" prec 15 15
+
+  remove module
+
+end
+
+module mach.java.lang.Short
+  syntax type short  "short"
+  syntax literal short "%c"
+
+  syntax val min_short "Short.MIN_VALUE" prec 0
+  syntax val max_short "Short.MAX_VALUE" prec 0
+
+  syntax val (+)     "%1 + %2"   prec 4 4 3
+  syntax val (-)     "%1 - %2"   prec 4 4 3
+  syntax val (-_)    "-%1"       prec 2 1
+  syntax val ( * )   "%1 * %2"   prec 3 3 2
+  syntax val (/)     "%1 / %2"   prec 3 3 2
+  syntax val (%)     "%1 % %2"   prec 3 3 2
+  syntax val (=)     "%1 == %2"  prec 7 7 6
+  syntax val (<=)    "%1 <= %2"  prec 6 6 5
+  syntax val (<)     "%1 < %2"   prec 6 6 5
+  syntax val (>=)    "%1 >= %2"  prec 6 6 5
+  syntax val (>)     "%1 > %2"   prec 6 6 5
+
+  remove module
+end
+
+module string.String
+  syntax type string "String"
+  syntax literal string "%c" 
+end
+
+module mach.java.lang.String
+
+  syntax val equals "%1.equals (%2)"              prec 15 14 14
+  syntax val concat "%1.concat (%2)"              prec 15 14 14
+  syntax val of_integer "String.valueOf(%1)"      prec 15
+  syntax val of_long "String.valueOf(%1)"         prec 15 
+  syntax val format_1 "String.format(%1, %2)"     prec 15 14
+  syntax val format_2 "String.format(%1, %2, %3)" prec 15 14 14
+  syntax val format_3 "String.format(%1, %2, %3, %4)" prec 15 14 14 14
+  syntax val format_4 "String.format(%1, %2, %3, %4, %5)" prec 15 14 14 14 14
+  
+  remove module
+end
+
+module mach.java.lang.System
+  syntax val out "System.out" prec 0
+  syntax val err "System.err" prec 0 
+
+  remove module
+end
+
+module mach.java.io.PrintStream
+  prelude export "import java.io.PrintStream;"
+
+  syntax type print_stream "PrintStream"
+  
+  syntax val print    "%1.print(%2)" prec 15 14 
+  syntax val println  "%1.println(%2)" prec 15 14 
+
+  remove module
+end
+
+module mach.java.util.NoSuchElementException
+  prelude export "import java.util.NoSuchElementException;"
+  syntax exception E "NoSuchElementException"
+
+  remove module
+end
+
+module mach.java.lang.IndexOutOfBoundsException
+  syntax exception E "IndexOutOfBoundsException"
+  remove module
+end
+
+module mach.java.lang.IllegalArgumentException
+  syntax exception E "IllegalArgumentException"
+  remove module
+end
+
+module mach.java.lang.ArithmeticException
+  syntax exception E "ArithmeticException"
+  remove module
+end
+
+module mach.java.util.Set
+  prelude export "import java.util.Set;"
+  prelude export "import java.util.HashSet;"
+
+  syntax type set "Set<%1>"
+
+  syntax val empty  "new HashSet<> ()" prec 15
+  syntax val size   "%1.size ()" prec 15 
+  syntax val contains  "%1.contains (%2)" prec 15
+  syntax val equals "%1.equals (%2)" prec 15
+  syntax val add    "%1.add (%2)" prec 15 14 14
+
+  remove module
+end
+
+module mach.java.util.Map
+  prelude export "import java.util.Map;"
+  prelude export "import java.util.HashMap;"
+
+  syntax type map "Map<%1,%2>"
+
+  syntax val empty  "new HashMap<> ()" prec 15
+  syntax val size   "%1.size ()" prec 15 
+  syntax val containsKey  "%1.containsKey (%2)" prec 15
+  syntax val put    "%1.put (%2, %3)" prec 15 14 14
+  syntax val get    "%1.get (%2)" prec 15 14 14
+
+  remove module
+end
+
+module mach.java.util.List
+  prelude export "import java.util.List;"
+  prelude export "import java.util.ArrayList;"
+
+  syntax type list "List<%1>"
+
+  syntax val empty   "new ArrayList<> ()" prec 15 
+  syntax val size    "%1.size()" prec 15 
+  syntax val add     "%1.add(%2)" prec 15 14 14 
+  syntax val get     "%1.get(%2)" prec 15 14 14
+  syntax val insert  "%1.add(%2, %3)" prec 15 14 14 14
+  syntax val set     "%1.set(%2, %3)" prec 15 14 14 14
+  
+  (* List.copyOf needs JDKs >= 10 *)
+  syntax val copy_of "List.copyOf(%1)" prec 15 14
+
+  remove module
+end
+
+module mach.java.util.UnmodifiableList
+  prelude export "import java.util.List;"
+
+  syntax type ulist "List<%1>"
+
+  syntax val size   "%1.size ()" prec 15 
+  syntax val get    "%1.get (%2)" prec 15 14 14
+
+  remove module
+end
+
+module mach.java.util.Queue
+  prelude export "import java.util.Queue;"
+  prelude export "import java.util.ArrayDeque;"
+
+  syntax type queue "Queue<%1>"
+
+  syntax val empty    "new ArrayDeque()" prec 15
+  syntax val size     "%1.size()" prec 15 14
+  syntax val poll     "%1.poll()" prec 15 14
+  syntax val peek     "%1.peek()" prec 15 14
+  syntax val add      "%1.add(%2)" prec 15 14 14
+  syntax val is_empty "%1.isEmpty()" prec 15 14
+  syntax val equals   "%1.equals(%2)" prec 15 14 14
+
+  remove module
+end
+
+module mach.java.util.Optional
+  prelude export "import java.util.Optional;"
+  
+  syntax type optional "Optional<%1>"
+
+  syntax val empty  "Optional.ofNullable(null)" prec 15
+  syntax val build  "Optional.of(%1)" prec 15
+  syntax val is_present "%1.isPresent()" prec 15 14
+  syntax val is_empty "%1.isEmpty()" prec 15 14
+  syntax val get "%1.get()" prec 15 14
+  syntax val get_safe "%1.get()" prec 15 14
+  
+  remove module
+end
+
+module pqueue.PqueueNoDup
+  remove module
+end
+
+module set.Set
+  remove module
+end
+
+module ref.Ref
+  syntax type ref   "%1"
+  syntax val ref    "%1"
+  syntax val (!)    "%1"        prec 2 1
+  syntax val (:=)   "%1 = %2"   prec 15 14
+  remove module
+end
+
+module ref.Refint
+  syntax val incr       "%1 = %1+1" prec 15 14
+  syntax val decr       "%1 = %1+1" prec 15 14
+  syntax val (+=)       "%1 = %1+%2" prec 15 14
+  syntax val (-=)       "%1 = %1-%2" prec 15 14
+  syntax val ( *=)       "%1 = %1+%2" prec 15 14
+  
+  remove module
+end
+
+module mach.java.lang.Array
+  prelude export "import java.util.Arrays;\n"
+
+  syntax type array     "%1 []"
+  syntax val length     "%1.length"
+  syntax val ([])       "%1[%2]" prec 1 1 15
+  syntax val ([]<-)     "%1[%2] = %3" prec 1 1 15 14
+
+(*  syntax val equals     "Objects.deepEquals(%1, %2)" prec 1 1 15 14 *)
+(*  syntax val hash_code  "Arrays.deepHashCode(%1)" prec 1 1 15 14 *)
+  syntax val equals     "%1.equals(%2)" prec 1 1 15 14
+  syntax val hash_code  "%1.hashCode()" prec 1 1 15
+
+  remove module
+end
+
+module mach.java.util.Random
+  prelude export "import java.util.Random;\n"
+
+  syntax type random           "Random"
+  syntax val create           "new Random()"
+  syntax val create_init      "new Random(%1)"
+  syntax val set_seed         "%1.setSeed(%2)" prec 1 1 15 14
+  syntax val next_boolean     "%1.nextBoolean()" prec 1 1 15 
+  syntax val next_int         "%1.nextInt()" prec 1 1 15 
+  syntax val next_bounded_int "%1.nextInt(%2)" prec 1 1 15 14
+
+  remove module
+end
+
+(* remove some modules from the standard library *)
+
+
+module bool.Bool
+  syntax type bool "boolean"
+  remove module
+end
+
+module map.Map
+  remove module
+end
+
+module map.Const
+  remove module
+end
+
+module number.Divisibility
+  remove module
+end
+
+module int.Int
+  remove module
+end
+
+module int.Abs
+  remove module
+end
+
+module int.ComputerDivision
+  remove module
+end
+
+module int.EuclideanDivision
+  remove module
+end
+
+module int.MinMax
+  remove module
+end
+
+module int.Power
+  remove module
+end
+
+module int.Sum
+  remove module
+end
+
+module real.Real
+  remove module
+end
+
+module real.ExpLog
+  remove module
+end
+
+module real.RealInfix
+  remove module
+end
+
+module real.Square
+  remove module
+end
+
+module mach.int.Unsigned
+  remove module
+end
+
+module seq.Seq
+  remove module
+end
+
+module seq.FreeMonoid
+  remove module
+end
+
+module int.NumOf
+  remove module
+end
+
+module set.Fset
+  remove module
+end
+
+module fmap.Fmap
+  remove module
+end
+
+module pigeon.Pigeonhole
+  remove module
+end
+
+module option.Option
+  remove module
+end

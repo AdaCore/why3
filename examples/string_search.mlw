@@ -29,10 +29,10 @@ module Occurs
   use string.OCaml
   use Spec
 
-  let occurs (pat text: string) (p: int63) : bool
+  let partial occurs (pat text: string) (p: int63) : bool
     requires { 0 <= p <= length text - length pat }
     ensures  { result <-> matches pat text p }
-  = let ghost n = length text in
+  = let (ghost n) = length text in
     let m = length pat in
     for i = 0 to m - 1 do
       invariant { substring text p i == substring pat 0 i }
@@ -53,7 +53,7 @@ module Naive
   use Spec
   use Occurs
 
-  let search1 (pat text: string) : int63
+  let partial search1 (pat text: string) : int63
     requires { length pat <= length text }
     ensures  { -1 <= result <= length text - length pat }
     ensures  { if result = -1 then
@@ -69,7 +69,7 @@ module Naive
     done;
     -1
 
-  let search2 (pat text: string) : int63
+  let partial search2 (pat text: string) : int63
     requires { length pat <= length text }
     ensures  { -1 <= result <= length text - length pat }
     ensures  { if result = -1 then
@@ -119,7 +119,7 @@ module BadShiftTable
               pat[length pat - j] <> c }
   by { pat = ""; sht = M.create () }
 
-  let make_table (pat: string) : bad_shift_table
+  let partial make_table (pat: string) : bad_shift_table
   = let m = length pat in
     let sht = M.create () in
     for i = 0 to m - 1 do
@@ -163,7 +163,7 @@ module BadShiftTable
     = assert { (substring text j m)[i + m - j] = c } in
     ()
 
-  let search (bst: bad_shift_table) (text: string) : int63
+  let partial search (bst: bad_shift_table) (text: string) : int63
     requires { length bst.pat <= length text }
     ensures  { -1 <= result <= length text - length bst.pat }
     ensures  { if result = -1 then
@@ -188,4 +188,3 @@ module BadShiftTable
    -1
 
 end
-

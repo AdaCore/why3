@@ -77,6 +77,10 @@ module Bounded_int
 
   axiom extensionality: forall x y: t. to_int x = to_int y -> x = y
 
+(* does not seems to be a systematically good idea
+   meta extensionality function to_int
+   *)
+
   val (=) (a:t) (b:t) : bool
     ensures { result <-> a = b }
     ensures { to_int a = to_int b -> result }

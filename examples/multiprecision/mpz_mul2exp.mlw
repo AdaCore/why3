@@ -23,7 +23,7 @@ use int.Abs
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_mul_2exp (r u:mpz_ptr) (cnt: limb) : unit
+let partial wmpz_mul_2exp (r u:mpz_ptr) (cnt: limb) : unit
   requires { mpz.alloc[r] >= 1 /\ mpz.alloc[u] >= 1 }
   requires { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] + div cnt 64 + 1 <= max_int32 }

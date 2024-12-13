@@ -43,7 +43,7 @@ let lemma no_borrow_ptr (x y r: ptr limb) (nx ny:int) (b:limb)
   ensures  { b = 0 }
 = no_borrow (value x nx) (value y ny) (value r nx) (l2i b) (power radix nx)
 
-let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+let rec partial wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                         (scratch: ptr limb) (ghost k: int) : unit
   requires { valid x sx }
   requires { valid y sy }
@@ -109,10 +109,10 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
            (wmpn_cmp x0 x1 n) < 0
          end
       then begin
-        let ghost b = wmpn_sub_n xsm1 x1 x0 n in
+        let (ghost b) = wmpn_sub_n xsm1 x1 x0 n in
         no_borrow_ptr x1 x0 xsm1 (p2i n) (p2i n) b;
         vm1_neg := true end
-      else let ghost b = wmpn_sub_n xsm1 x0 x1 n in
+      else let (ghost b) = wmpn_sub_n xsm1 x0 x1 n in
            no_borrow_ptr x0 x1 xsm1 (p2i n) (p2i n) b
     else
       (* n-s=1*)
@@ -122,7 +122,7 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
         assert { value x0 s < value x1 s };
         value_tail x0 s;
         assert { value x0 n = value x0 s };
-        let ghost b = wmpn_sub_n xsm1 x1 x0 s in
+        let (ghost b) = wmpn_sub_n xsm1 x1 x0 s in
         no_borrow_ptr x1 x0 xsm1 (p2i s) (p2i s) b;
         value_sub_shift_no_change (pelts xsm1) (xsm1.offset) (p2i s) (p2i s) 0;
         set_ofs xsm1 s 0;
@@ -153,11 +153,11 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
            (wmpn_cmp y0 y1 n) < 0
          end
       then begin
-        let ghost b = wmpn_sub_n ysm1 y1 y0 n in
+        let (ghost b) = wmpn_sub_n ysm1 y1 y0 n in
         no_borrow_ptr y1 y0 ysm1 (p2i n) (p2i n) b;
         vm1_neg := not !vm1_neg end
       else
-        let ghost b = wmpn_sub_n ysm1 y0 y1 n in
+        let (ghost b) = wmpn_sub_n ysm1 y0 y1 n in
         no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i n) b;
     else
       let y0t = C.incr y0 t in
@@ -168,7 +168,7 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
         assert { value y0 t < value y1 t };
         value_concat y0 t n;
         assert { value y0 n = value y0 t };
-        let ghost b = wmpn_sub_n ysm1 y1 y0 t in
+        let (ghost b) = wmpn_sub_n ysm1 y1 y0 t in
         no_borrow_ptr y1 y0 ysm1 (p2i t) (p2i t) b;
         assert { forall j. (j < offset r \/ offset r + sx + sy <= j)
                              -> (pelts r)[j] = (pelts r)[j] at BSM1 };
@@ -195,7 +195,7 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                   \/ (not c1
                       so value y1 t <= value y0 t
                       so value y0 t <= value y0 n) };
-        let ghost b = wmpn_sub ysm1 y0 n y1 t in
+        let (ghost b) = wmpn_sub ysm1 y0 n y1 t in
         no_borrow_ptr y0 y1 ysm1 (p2i n) (p2i t) b;
         end
   end;
@@ -784,7 +784,7 @@ let rec wmpn_toom22_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
   (* Choose which multiplication algorithm is called recursively.
      Equivalent to the macros WMPN_TOOM22_MUL_REC and WMPN_TOOM22_MUL_N_REC
      respectively, in wmpn_toom22_mul.c *)
-with wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
+with partial wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
                          (scratch:ptr limb) (ghost k: int)
      : unit
   requires { valid x sx }
@@ -816,7 +816,7 @@ with wmpn_toom22_mul_rec (r x: ptr limb) (sx:int32) (y:ptr limb) (sy: int32)
     then wmpn_toom22_mul r x sx y sy scratch k
     else wmpn_toom32_mul r x sx y sy scratch k
 
-with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
+with partial wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) : unit
   requires { valid x sz }
   requires { valid y sz }
   requires { valid r (sz + sz) }
@@ -843,7 +843,7 @@ with wmpn_toom22_mul_n_rec (r x y scratch: ptr limb) (sz:int32) (ghost k: int) :
   then wmpn_mul_basecase r x sz y sz
   else wmpn_toom22_mul r x sz y sz scratch k
 
-with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
+with partial wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                      (scratch: ptr limb) (ghost k: int) : unit
   requires { valid x sx }
   requires { valid y sy }
@@ -923,7 +923,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
       then begin
         assert { value xp1 n < value x1 n };
         assert { value xp1 n = a0 + a2 };
-        let ghost b = wmpn_sub_n xm1 x1 xp1 n in
+        let (ghost b) = wmpn_sub_n xm1 x1 xp1 n in
         assert { b = 0 };
         hi := 0;
         vm1_neg := true end
@@ -959,11 +959,11 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
       let cmp = wmpn_cmp y0 y1 n in
       if (cmp < 0)
       then begin
-        let ghost b = wmpn_sub_n ym1 y1 y0 n in
+        let (ghost b) = wmpn_sub_n ym1 y1 y0 n in
         assert { b = 0 };
         vm1_neg := not !vm1_neg end
       else begin
-        let ghost b = wmpn_sub_n ym1 y0 y1 n in
+        let (ghost b) = wmpn_sub_n ym1 y0 y1 n in
         assert { b = 0 }
         end
       end
@@ -978,7 +978,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
         value_concat y0 t n;
         assert { value y0 t = value y0 n };
         assert { value y0 t < value y1 t };
-        let ghost b = wmpn_sub_n ym1 y1 y0 t in
+        let (ghost b) = wmpn_sub_n ym1 y1 y0 t in
         assert { b = 0 };
         let ghost ym1z = { ym1 } in
         let ym1t = C.incr ym1 t in
@@ -1011,7 +1011,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
                   \/ (not c1
                       so value y1 t <= value y0 t
                       so value y0 t <= value y0 n) };
-        let ghost b = wmpn_sub ym1 y0 n y1 t in
+        let (ghost b) = wmpn_sub ym1 y0 n y1 t in
         assert { b = 0 }
         end;
       end
@@ -1326,7 +1326,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     end;
     label Shift in
     let s = (2 * n) + 1 in
-    let ghost low = wmpn_rshift scratch scratch s 1 in
+    let (ghost low) = wmpn_rshift scratch scratch s 1 in
     assert { low = 0 /\ value scratch s = vx0 + vx2
              by (low + radix * value scratch s)
                 = value (scratch at Shift) s * power 2 (Limb.length - 1)
@@ -1484,8 +1484,8 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
     ensures { min r3n = old min r3n /\ max r3n = old max r3n }
     ensures { plength r3n = old plength r3n }
     if (s > t)
-    then let ghost _ = wmpn_mul r3n x2 s y1 t (k-1) in ()
-    else let ghost _ = wmpn_mul r3n y1 t x2 s (k-1) in ()
+    then let (ghost _) = wmpn_mul r3n x2 s y1 t (k-1) in ()
+    else let (ghost _) = wmpn_mul r3n y1 t x2 s (k-1) in ()
   end;
   assert { (a0 + m * a1 + m * m * a2) * (b0 + m * b1)
            = m * vy + vx0 + m * m * m * vx3 - m * m * vx0 - m * vx3 };
@@ -1767,7 +1767,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
            by value r (sx + sy) = value r (sx + sy) at JoinL
               = value r (sx + sy) at JoinR }
 
-  with wmpn_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) (ghost k: int) : limb
+  with partial wmpn_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32) (ghost k: int) : limb
     requires { valid x sx }
     requires { valid y sy }
     requires { valid r (sx + sy) }
@@ -2108,7 +2108,7 @@ with wmpn_toom32_mul (r x:ptr limb) (sx:int32) (y:ptr limb) (sy:int32)
   (** `wmpn_mul_n r x y sz` multiplies `(x, sz)` and `(y, sz)` and
   writes the result to `(r, 2*sz)`. `r` must not overlap with either
   `x` or `y`. Corresponds to `mpn_mul_n`.  *)
-  let wmpn_mul_n (r x y:t) (sz:int32) (ghost k: int) : unit
+  let partial wmpn_mul_n (r x y:t) (sz:int32) (ghost k: int) : unit
     requires { sz > 0 }
     requires { valid x sz }
     requires { valid y sz }

@@ -31,8 +31,6 @@ build: [
    "--disable-js-of-ocaml"
    "--disable-re"
    "--enable-ocamlfind"
-   "--disable-zarith" {!zarith:installed}
-   "--enable-zarith" {zarith:installed}
    "--disable-mpfr" {!mlmpfr:installed}
    "--enable-mpfr" {mlmpfr:installed}
    "--disable-zip" {!camlzip:installed}
@@ -53,14 +51,13 @@ install: [
 
 depends: [
   "conf-autoconf" {build & dev}
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.09"}
   "ocamlfind" {build}
-  "menhir" {>= "20170418"}
-  "num"
+  "menhir" {>= "20200211"}
+  "zarith"
 ]
 
 depopts: [
-  "zarith"
   "camlzip"
   "ocamlgraph"
   "sexplib"
@@ -73,7 +70,6 @@ conflicts: [
   "why3-base"
   "ocamlgraph" {< "1.8.2"}
   "mlmpfr" {< "4.0.0"}
-  "base-effects"
 ]
 
 synopsis: "Why3 environment for deductive program verification"

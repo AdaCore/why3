@@ -1,0 +1,442 @@
+File bench/check-ce/records_inv.mlw:
+Goal r'vc.
+Prover result is: Valid (0 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 16, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 16, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 16, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 16, characters 14-24)
+File "bench/check-ce/records_inv.mlw", line 16, characters 14-24:
+Sub-goal Postcondition of goal record_match_eval_test1'vc.
+Prover result is: Unknown (unknown) (13 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 15:
+    x = {f= 0; g= true}
+    x = {f= 0; g= true}
+    Execution of main function `record_match_eval_test1` with env:
+      x = {f= 0; g= true}
+      zero = 0
+      one = 1
+  Line 18:
+    Normal execution of function `g` with args:
+      arg = {f= 0; g= true}
+  Line 19:
+    Normal execution of function `f` with args:
+      arg = {f= 0; g= true}
+  Line 16:
+    Property failure at postcondition of `record_match_eval_test1` with:
+      result = 0
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 24, characters 14-24)
+File "bench/check-ce/records_inv.mlw", line 24, characters 14-24:
+Sub-goal Postcondition of goal record_match_eval_test2'vc.
+Prover result is: Unknown (unknown) (10 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 23:
+    x = {f= 0; g= false}
+    x = {f= 0; g= false}
+    Execution of main function `record_match_eval_test2` with env:
+      x = {f= 0; g= false}
+      zero = 0
+      one = 1
+  Line 26:
+    Normal execution of function `f` with args:
+      arg = {f= 0; g= false}
+  Line 24:
+    Property failure at postcondition of `record_match_eval_test2` with:
+      result = 0
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 31, characters 9-25)
+File "bench/check-ce/records_inv.mlw", line 31, characters 9-25:
+Sub-goal Precondition of goal record_match_eval_test3'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 28:
+    x = {contents= {f= 0; g= false}}
+    x = {contents= {f= 0; g= false}}
+    Execution of main function `record_match_eval_test3` with env:
+      x = {contents= {f= 0; g= false}}
+      zero = 0
+      one = 1
+  Line 31:
+    Normal execution of function `(!)` with args:
+      r = {contents= {f= 0; g= false}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {f= 0; g= false}}
+File records_inv.mlw:
+  Line 31:
+    Normal execution of function `g` with args:
+      arg = {f= 0; g= false}
+    Normal execution of function `r'mk` with args:
+      f = 6
+      g = false
+    Property failure at precondition of `r'mk` with:
+      f = 6
+
+File "bench/check-ce/records_inv.mlw", line 29, characters 14-18:
+Sub-goal Postcondition of goal record_match_eval_test3'vc.
+Prover result is: Valid (16 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 36, characters 9-26)
+File "bench/check-ce/records_inv.mlw", line 36, characters 9-26:
+Sub-goal Precondition of goal record_match_eval_test4'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 33:
+    x = {contents= {f= 0; g= false}}
+    x = {contents= {f= 0; g= false}}
+    Execution of main function `record_match_eval_test4` with env:
+      x = {contents= {f= 0; g= false}}
+      zero = 0
+      one = 1
+  Line 36:
+    Normal execution of function `(!)` with args:
+      r = {contents= {f= 0; g= false}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {f= 0; g= false}}
+File records_inv.mlw:
+  Line 36:
+    Normal execution of function `g` with args:
+      arg = {f= 0; g= false}
+    Normal execution of function `r'mk` with args:
+      f = 6
+      g = false
+    Property failure at precondition of `r'mk` with:
+      f = 6
+
+File "bench/check-ce/records_inv.mlw", line 34, characters 14-22:
+Sub-goal Postcondition of goal record_match_eval_test4'vc.
+Prover result is: Valid (20 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 42, characters 9-26)
+File "bench/check-ce/records_inv.mlw", line 42, characters 9-26:
+Sub-goal Precondition of goal record_match_eval_test44'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 39:
+    x = {contents= {f= 0; g= false}}
+    x = {contents= {f= 0; g= false}}
+    Execution of main function `record_match_eval_test44` with env:
+      x = {contents= {f= 0; g= false}}
+      zero = 0
+      one = 1
+  Line 42:
+    Normal execution of function `(!)` with args:
+      r = {contents= {f= 0; g= false}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {f= 0; g= false}}
+File records_inv.mlw:
+  Line 42:
+    Normal execution of function `g` with args:
+      arg = {f= 0; g= false}
+    Normal execution of function `r'mk` with args:
+      f = 6
+      g = false
+    Property failure at precondition of `r'mk` with:
+      f = 6
+
+File "bench/check-ce/records_inv.mlw", line 43, characters 13-22:
+Sub-goal Assertion of goal record_match_eval_test44'vc.
+Prover result is: Valid (14 steps).
+
+File "bench/check-ce/records_inv.mlw", line 40, characters 14-22:
+Sub-goal Postcondition of goal record_match_eval_test44'vc.
+Prover result is: Valid (10 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/records_inv.mlw", line 51, characters 9-26)
+File "bench/check-ce/records_inv.mlw", line 51, characters 9-26:
+Sub-goal Precondition of goal test_record_match_eval_test5'vc.
+Prover result is: Unknown (unknown) (7 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 46:
+    Constant re initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= {f= 0; g= false}}
+    re = {contents= {f= 0; g= false}}
+  Line 48:
+    x = {contents= {f= 0; g= false}}
+    x = {contents= {f= 0; g= false}}
+    Execution of main function `test_record_match_eval_test5` with env:
+      re = {contents= {f= 0; g= false}}
+      x = {contents= {f= 0; g= false}}
+      zero = 0
+      one = 1
+  Line 51:
+    Normal execution of function `(!)` with args:
+      r = {contents= {f= 0; g= false}}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= {f= 0; g= false}}
+File records_inv.mlw:
+  Line 51:
+    Normal execution of function `g` with args:
+      arg = {f= 0; g= false}
+    Normal execution of function `r'mk` with args:
+      f = 6
+      g = false
+    Property failure at precondition of `r'mk` with:
+      f = 6
+
+File "bench/check-ce/records_inv.mlw", line 49, characters 14-26:
+Sub-goal Postcondition of goal test_record_match_eval_test5'vc.
+Prover result is: Valid (19 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 66, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 66, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 66, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 66, characters 14-24)
+File "bench/check-ce/records_inv.mlw", line 66, characters 14-24:
+Sub-goal Postcondition of goal record_match_eval_test1'vc.
+Prover result is: Unknown (unknown) (15 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 65:
+    x = {f1= 0; g1= true}
+    x = {f1= 0; g1= true}
+    Execution of main function `record_match_eval_test1` with env:
+      x = {f1= 0; g1= true}
+      zero = 0
+      one = 1
+  Line 68:
+    Normal execution of function `g` with args:
+      arg = {f1= 0; g1= true}
+  Line 69:
+    Normal execution of function `f` with args:
+      arg = {f1= 0; g1= true}
+  Line 66:
+    Property failure at postcondition of `record_match_eval_test11` with:
+      result = 0
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 74, characters 14-24)
+File "bench/check-ce/records_inv.mlw", line 74, characters 14-24:
+Sub-goal Postcondition of goal record_match_eval_test2'vc.
+Prover result is: Unknown (unknown) (12 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 73:
+    x = {f1= 0; g1= false}
+    x = {f1= 0; g1= false}
+    Execution of main function `record_match_eval_test2` with env:
+      x = {f1= 0; g1= false}
+      zero = 0
+      one = 1
+  Line 76:
+    Normal execution of function `f` with args:
+      arg = {f1= 0; g1= false}
+  Line 74:
+    Property failure at postcondition of `record_match_eval_test21` with:
+      result = 0
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 79, characters 14-17)
+File "bench/check-ce/records_inv.mlw", line 79, characters 14-17:
+Sub-goal Postcondition of goal record_match_eval_test3'vc.
+Prover result is: Unknown (unknown) (10 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 78:
+    x = {f1= 0; g1= false}
+    x = {f1= 0; g1= false}
+    Execution of main function `record_match_eval_test3` with env:
+      x = {f1= 0; g1= false}
+      zero = 0
+      one = 1
+  Line 79:
+    Property failure at postcondition of `record_match_eval_test31` with:
+      True = UNDEFINED
+      x = {f1= 6; g1= false}
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/records_inv.mlw", line 84, characters 14-22)
+File "bench/check-ce/records_inv.mlw", line 84, characters 14-22:
+Sub-goal Postcondition of goal record_match_eval_test4'vc.
+Prover result is: Unknown (unknown) (11 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File records_inv.mlw:
+  Line 83:
+    x = {f1= 0; g1= false}
+    x = {f1= 0; g1= false}
+    Execution of main function `record_match_eval_test4` with env:
+      x = {f1= 0; g1= false}
+      zero = 0
+      one = 1
+  Line 84:
+    Property failure at postcondition of `record_match_eval_test41` with:
+      True = UNDEFINED
+      result = {f1= 6; g1= false}
+

@@ -6,7 +6,7 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2024-06-18"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2024-12-06"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -15,13 +15,13 @@ build-image:
   image: docker
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
-    - if docker pull "$BUILD_IMAGE"; then echo "Image already exists!"; exit 1; fi
+    - if docker manifest inspect "$BUILD_IMAGE"; then echo "Image already exists!"; exit 0; fi
     - docker build --force-rm -t "$BUILD_IMAGE" - < misc/Dockerfile.build
     - docker push "$BUILD_IMAGE"
     - docker rmi "$BUILD_IMAGE"
-  only:
-    variables:
-      - $NEW_BUILD_IMAGE
+  rules:
+    - changes:
+        - misc/Dockerfile.build
   tags:
     - large
 

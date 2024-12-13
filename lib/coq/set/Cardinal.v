@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,6 +18,7 @@ Require int.Int.
 Require set.Set.
 Require map.Map.
 Require map.Const.
+Require map.MapExt.
 
 Require Import Lia.
 
@@ -418,7 +419,7 @@ Lemma cardinal_add {a:Type} {a_WT:WhyType a} :
 Proof.
 intros x s h1.
 split; intros.
-- rewrite <- (set.Set.extensionality s (Map.set s x true)). reflexivity. intro.
+- rewrite <- (MapExt.extensionality s (Map.set s x true)). reflexivity. intro.
   unfold set.Set.mem, Map.set in *. destruct why_decidable_eq; try subst; intuition.
 - assert (is_finite (Map.set s x true)). { apply is_finite_add. assumption. }
   unfold cardinal.
@@ -464,7 +465,7 @@ split.
   fold s'. 
   assert (Map.set s' x true = s). 
   { 
-    apply set.Set.extensionality. intro e.
+    apply MapExt.extensionality. intro e.
     unfold s', set.Set.mem. unfold Map.set. destruct why_decidable_eq. subst. intuition.
     intuition.
   }
@@ -478,8 +479,10 @@ split.
 - intros.
   assert (Map.set s x false = s).
   {
-    apply set.Set.extensionality. intro. unfold Map.set, set.Set.mem.
-    destruct why_decidable_eq; intuition. subst. eauto.
+    apply MapExt.extensionality. intro. unfold Map.set.
+    unfold set.Set.mem in H.
+    destruct why_decidable_eq; auto.
+    subst x0; destruct (s x); intuition.
   }
   rewrite H0. reflexivity.
 Qed.
@@ -538,16 +541,16 @@ assert (List.incl l1 l2).
 {
   intros e H1. eapply Heq2. eapply h2. eapply Heq1. assumption.
 }
-eapply set.Set.extensionality. intro.
-unfold set.Set.mem.
+eapply MapExt.extensionality. intro.
 unfold set.Set.subset in h2.
-rewrite <- Heq2, <- Heq1.
-assert (List.length l1 = List.length l2).
-{
-  lia.
+generalize (Heq1 x); clear Heq1; intro Heq1.
+generalize (Heq2 x); clear Heq2; intro Heq2.
+assert (List.In x l1 <-> List.In x l2).
+{ assert (List.length l1 = List.length l2) by lia.
+  split. eauto.
+  eapply List.NoDup_length_incl; eauto. lia.
 }
-split. eauto.
-eapply List.NoDup_length_incl; eauto. lia.
+destruct (s1 x); destruct (s2 x); intuition.
 Qed.
 
 (* Why3 goal *)

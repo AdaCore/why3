@@ -16,7 +16,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
+categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c extraction_java goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -428,6 +428,48 @@ extract_and_test_c () {
     echo "ok"
 }
 
+extract_and_test_java () {
+    dir=$1
+    shift
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
+        exit 1
+    fi
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
+        exit 1
+    fi
+    printf "non-regression... "
+    if ! $make non-regression > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make non-regression
+        $make non-regression
+        exit 1
+    fi
+    printf "compile... "
+    if ! $make compile > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make compile
+        $make compile
+        exit 1
+    fi
+    printf "execute... "
+    if ! $make run > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make run
+        $make run
+        exit 1
+    fi
+    echo "ok"
+}
+
 list_stuff () {
     pgm="bin/why3$suffix"
     printf "  $*... "
@@ -479,6 +521,7 @@ if enabled stdlib; then
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
+goods stdlib/mach/java
 echo ""
 fi
 
@@ -527,6 +570,7 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
+goods examples/c_cursor "-L examples/c_cursor"
 goods examples/prover "-L examples/prover --warn-off=unused_variable"
 goods examples/python
 goods examples/micro-c
@@ -702,6 +746,12 @@ extract_and_test_c bench/extraction/852_int16
 echo ""
 fi
 
+if enabled extraction_java; then
+echo "=== Checking extraction to Java ==="
+extract_and_test_java bench/java
+echo ""
+fi
+
 if enabled replay-without-shapes; then
 echo "=== Checking replay without shapes ==="
 replay_without_shape examples/tests/replay
@@ -740,6 +790,7 @@ fi
 if enabled stackify && test -n "$has_stackify"; then
     echo "=== Checking stackify ==="
     replay examples/stackify --merging-only
+    echo ""
 fi
 
 
@@ -758,6 +809,7 @@ fi
 if enabled realizations; then
     echo "=== Checking realizations ==="
     bench/check_realizations.sh || exit $?
+    echo ""
 fi
 
 if enabled mlwprinter; then

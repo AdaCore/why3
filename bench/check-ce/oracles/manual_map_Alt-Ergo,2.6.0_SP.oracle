@@ -1,0 +1,22 @@
+Warning: Error while interpreting x: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+Warning: Error while interpreting result: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+Warning: Error while interpreting x: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+Warning: Error while interpreting result: No lsymbol found for qualified identifier (Qident (Isymbol store))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `set` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to set at "bench/check-ce/manual_map.mlw", line 7, characters 5-18)
+File "bench/check-ce/manual_map.mlw", line 5, characters 14-36:
+Sub-goal Postcondition of goal test_map'vc.
+Prover result is: Unknown (unknown) (20 steps).
+The following counterexample model could not be verified
+  (concrete RAC terminated because Postcondition of `set` cannot be evaluated, abstract RAC fatal rac error: missing value for return value of call to set at "bench/check-ce/manual_map.mlw", line 7, characters 5-18):
+File manual_map.mlw:
+  Line 4:
+    x :  = "undefined"
+    x :  = "undefined"
+

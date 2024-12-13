@@ -1,0 +1,387 @@
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol s))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 6, characters 21-34:
+Goal T1.
+Prover result is: Unknown (unknown) (9 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 7, characters 21-35:
+Goal T2.
+Prover result is: Unknown (unknown) (8 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting concat1: No variable in bound_vars matching qualified identifier (Qident (Isymbol s2))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 8, characters 25-52:
+Goal T3.
+Prover result is: Unknown (unknown) (8 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `T4'goal` at "bench/check-ce/strings.mlw", line 9, characters 7-9)
+  - Abstract RAC: STUCK (failure in precondition of `T4'goal` at "bench/check-ce/strings.mlw", line 9, characters 7-9)
+- Selected model 1: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `T4'goal1` at "bench/check-ce/strings.mlw", line 9, characters 7-9)
+  - Abstract RAC: STUCK (failure in precondition of `T4'goal1` at "bench/check-ce/strings.mlw", line 9, characters 7-9)
+File "bench/check-ce/strings.mlw", line 9, characters 38-55:
+Goal T4.
+Prover result is: Unknown (unknown) (9 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 10, characters 59-78:
+Goal T5.
+Prover result is: Unknown (unknown) (12 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol s))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 11, characters 59-79:
+Goal T6.
+Prover result is: Unknown (unknown) (12 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T7'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T7'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T7'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T7'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 12, characters 59-78:
+Goal T7.
+Prover result is: Unknown (unknown) (12 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `T7'goal1` cannot be evaluated):
+File string.mlw:
+  Line 86:
+    length : string -> int = [|_ => 0|]
+  Line 96:
+    lt : string -> string -> bool = fun _arg_095 _arg_178 -> true
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 12:
+    s :  = ""
+    s :  = ""
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T8'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T8'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T8'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T8'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 13, characters 59-79:
+Goal T8.
+Prover result is: Unknown (unknown) (12 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `T8'goal1` cannot be evaluated):
+File string.mlw:
+  Line 96:
+    lt : string -> string -> bool = fun _arg_0109 _arg_190 -> true
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 13:
+    s :  = ""
+    s :  = ""
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T9'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T9'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T9'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T9'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 14, characters 59-78:
+Goal T9.
+Prover result is: Unknown (unknown) (12 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `T9'goal1` cannot be evaluated):
+File string.mlw:
+  Line 86:
+    length : string -> int = [|_ => 0|]
+  Line 111:
+    le : string -> string -> bool = fun _arg_0124 _arg_1102 -> true
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 14:
+    s :  = ""
+    s :  = ""
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol s))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/strings.mlw", line 15, characters 60-80:
+Goal T10.
+Prover result is: Unknown (unknown) (12 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 16, characters 22-79)
+File "bench/check-ce/strings.mlw", line 16, characters 60-79:
+Goal T11.
+Prover result is: Unknown (unknown) (12 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File strings.mlw:
+  Line 16:
+    s = ""
+    s = ""
+    Execution of main function `T11'goal` with env:
+      s = ""
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File strings.mlw:
+  Line 16:
+    Property failure at postcondition of `T11'goal` with:
+      s = ""
+
+Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T12'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T12'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T12'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T12'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 17, characters 60-80:
+Goal T12.
+Prover result is: Unknown (unknown) (12 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `T12'goal1` cannot be evaluated):
+File string.mlw:
+  Line 111:
+    le : string -> string -> bool = fun _arg_0167 _arg_1138 -> true
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 17:
+    s :  = ""
+    s :  = ""
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 18, characters 22-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 18, characters 22-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 18, characters 22-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 18, characters 22-28)
+File "bench/check-ce/strings.mlw", line 18, characters 22-28:
+Goal T13.
+Prover result is: Unknown (unknown) (8 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File strings.mlw:
+  Line 18:
+    s = ""
+    s = ""
+    Execution of main function `T13'goal` with env:
+      s = ""
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File strings.mlw:
+  Line 18:
+    Property failure at postcondition of `T13'goal` with:
+      s = ""
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 19, characters 22-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 19, characters 22-34)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 19, characters 22-34)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 19, characters 22-34)
+File "bench/check-ce/strings.mlw", line 19, characters 22-34:
+Goal T14.
+Prover result is: Unknown (unknown) (8 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File strings.mlw:
+  Line 19:
+    s = ""
+    s = ""
+    Execution of main function `T14'goal` with env:
+      s = ""
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File strings.mlw:
+  Line 19:
+    Property failure at postcondition of `T14'goal` with:
+      s = ""
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 20, characters 24-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 20, characters 24-45)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 20, characters 24-45)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/strings.mlw", line 20, characters 24-45)
+File "bench/check-ce/strings.mlw", line 20, characters 24-45:
+Goal T15.
+Prover result is: Unknown (unknown) (11 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File strings.mlw:
+  Line 20:
+    s = ""
+    i = 0
+    s = ""
+    i = 0
+    Execution of main function `T15'goal` with env:
+      i = 0
+      s = ""
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File strings.mlw:
+  Line 20:
+    Property failure at postcondition of `T15'goal` with:
+      i = 0
+      s = ""
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T16'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T16'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `T16'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `T16'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 21, characters 22-38:
+Goal T16.
+Prover result is: Unknown (unknown) (8 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `T16'goal1` cannot be evaluated):
+File string.mlw:
+  Line 86:
+    length : string -> int = [|_ => 0|]
+  Line 198:
+    prefixof : string -> string -> bool = fun _arg_0226 _arg_1185 -> false
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 21:
+    s :  = ""
+    s :  = ""
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `T17'goal` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `T17'goal` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `T17'goal1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `T17'goal1` cannot be evaluated)
+File "bench/check-ce/strings.mlw", line 22, characters 42-54:
+Goal T17.
+Prover result is: Unknown (unknown) (9 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `T17'goal1` cannot be evaluated):
+File string.mlw:
+  Line 86:
+    length : string -> int = [|_ => 0|]
+  Line 198:
+    prefixof : string -> string -> bool = fun _arg_0241 _arg_1197 -> true
+  Line 343:
+    to_int : string -> int = [|_ => -1|]
+File strings.mlw:
+  Line 22:
+    s :  = ""
+    s :  = ""
+

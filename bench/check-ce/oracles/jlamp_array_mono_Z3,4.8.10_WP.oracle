@@ -25,6 +25,7 @@ File jlamp_array_mono.mlw:
     a :  = {elts = [|_ => {to_int => 3}|]; length = 0}
     a : array = {elts = [|_ => {to_int => 3}|]; length = 0}
 
+Warning: Error while interpreting mixfix_lbrb
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
@@ -50,6 +51,8 @@ File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
 Prover result is: Valid (336 steps).
 
+Warning: Error while interpreting mixfix_lbrb: No lsymbol found for qualified identifier (Qident (Isymbol select))
+
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
@@ -74,6 +77,8 @@ File jlamp_array_mono.mlw:
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
 Prover result is: Valid (336 steps).
+
+Warning: Error while interpreting mixfix_lbrb: No lsymbol found for qualified identifier (Qident (Isymbol select))
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

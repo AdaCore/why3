@@ -11,9 +11,7 @@ filename "%f-%t-%g.ae"
    these unused-ce-related variables, even in the context.  *)
 transformation "counterexamples_dependent_intros"
 
-transformation "inline_trivial"
-transformation "eliminate_builtin"
-transformation "remove_unused_keep_constants"
+import "common-transformations.gen"
 transformation "eliminate_recursion"
 transformation "eliminate_inductive"
 transformation "eliminate_epsilon"

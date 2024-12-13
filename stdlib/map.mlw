@@ -36,6 +36,8 @@ module MapExt
   (* This lemma is actually provable in Why3, because of how
      eliminate_epsilon handles equality to a lambda-term. *)
 
+  meta extensionality predicate (==)
+
 end
 
 (** {2 Sorted Maps (indexed by integers)} *)
