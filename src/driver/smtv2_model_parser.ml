@@ -371,8 +371,10 @@ module FromSexpToModel = struct
         let id = identifier sexp in
         match id with
         | Isymbol (Sprover n') | Iindexedsymbol (Sprover n', _) ->
+          (try
             let ty_sexp = get_type_from_prover_variable n' in
             Qannotident (id, sort ty_sexp)
+          with _ -> Qident id)
         | Isymbol _ | Iindexedsymbol _ -> Qident id)
 
   let arg = function
