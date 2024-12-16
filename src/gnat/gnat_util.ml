@@ -147,5 +147,6 @@ let set_debug_flags_gnatprove () =
   Loc.disable_warning warn_reduction_aborted;
   Loc.disable_warning Theory.warn_axiom_abstract;
   Loc.disable_warning warn_missing_shapes;
-  Loc.disable_warning Dterm.warn_unused_variable
+  Loc.disable_warning Dterm.warn_unused_variable;
+  Loc.disable_warning Smtv2_model_parser.warn
 
