@@ -507,19 +507,17 @@ and pp_transparent_type_definition fmt (n : transparent_type_definition_id) =
 
 and pp_universal_quantif fmt (n : universal_quantif_id) =
   let Universal_quantif r = n.desc in
-  Format.fprintf fmt "@[(%a forall@ %a@ :@ %a@ [%a].@[%a@])@]"
+  Format.fprintf fmt "@[(%a forall@ %a@ [%a].@[%a@])@]"
   pp_symbol_set_label r.labels
-  pp_why_node_list (r.variables.elt0 :: r.variables.elts)
-  pp_why_node r.var_type
+  pp_binder_list (r.binders.elt0 :: r.binders.elts)
   pp_why_node_option r.triggers
   pp_why_node r.pred
 
 and pp_existential_quantif fmt (n : existential_quantif_id) =
   let Existential_quantif r = n.desc in
-  Format.fprintf fmt "@[(%a exists@ %a@ :@ %a@ .@[%a@])@]"
+  Format.fprintf fmt "@[(%a exists@ %a@ .@[%a@])@]"
   pp_symbol_set_label r.labels
-  pp_why_node_list (r.variables.elt0 :: r.variables.elts)
-  pp_why_node r.var_type
+  pp_binder_list (r.binders.elt0 :: r.binders.elts)
   pp_why_node r.pred
 
 and pp_triggers fmt (n : triggers_id) =
