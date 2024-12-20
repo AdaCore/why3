@@ -32,9 +32,10 @@ type check_kind =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -45,6 +46,8 @@ type check_kind =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -99,9 +102,10 @@ let is_warning_kind r =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -112,6 +116,8 @@ let is_warning_kind r =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -215,9 +221,10 @@ let check_kind_from_string s =
    | "VC_POSTCONDITION"             -> VC_Postcondition
    | "VC_REFINED_POST"              -> VC_Refined_Post
    | "VC_CONTRACT_CASE"             -> VC_Contract_Case
-   | "VC_DISJOINT_CONTRACT_CASES"   -> VC_Disjoint_Contract_Cases
-   | "VC_COMPLETE_CONTRACT_CASES"   -> VC_Complete_Contract_Cases
+   | "VC_DISJOINT_CASES"            -> VC_Disjoint_Cases
+   | "VC_COMPLETE_CASES"            -> VC_Complete_Cases
    | "VC_EXCEPTIONAL_CASE"          -> VC_Exceptional_Case
+   | "VC_EXIT_CASE"                 -> VC_Exit_Case
    | "VC_LOOP_INVARIANT"            -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
@@ -228,6 +235,8 @@ let check_kind_from_string s =
    | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
    | "VC_ASSERT_STEP"               -> VC_Assert_Step
    | "VC_RAISE"                     -> VC_Raise
+   | "VC_UNEXPECTED_PROGRAM_EXIT"   -> VC_Unexpected_Program_Exit
+   | "VC_PROGRAM_EXIT_POST"         -> VC_Program_Exit_Post
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
@@ -287,9 +296,10 @@ let check_kind_to_ada kind =
    | VC_Postcondition             -> "VC_POSTCONDITION"
    | VC_Refined_Post              -> "VC_REFINED_POST"
    | VC_Contract_Case             -> "VC_CONTRACT_CASE"
-   | VC_Disjoint_Contract_Cases   -> "VC_DISJOINT_CONTRACT_CASES"
-   | VC_Complete_Contract_Cases   -> "VC_COMPLETE_CONTRACT_CASES"
+   | VC_Disjoint_Cases            -> "VC_DISJOINT_CASES"
+   | VC_Complete_Cases            -> "VC_COMPLETE_CASES"
    | VC_Exceptional_Case          -> "VC_EXCEPTIONAL_CASE"
+   | VC_Exit_Case                 -> "VC_EXIT_CASE"
    | VC_Loop_Invariant            -> "VC_LOOP_INVARIANT"
    | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
@@ -300,6 +310,8 @@ let check_kind_to_ada kind =
    | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
    | VC_Assert_Step               -> "VC_ASSERT_STEP"
    | VC_Raise                     -> "VC_RAISE"
+   | VC_Unexpected_Program_Exit   -> "VC_UNEXPECTED_PROGRAM_EXIT"
+   | VC_Program_Exit_Post         -> "VC_PROGRAM_EXIT_POST"
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
@@ -354,9 +366,10 @@ let check_kind_to_string kind =
    | VC_Postcondition             -> "postcondition"
    | VC_Refined_Post              -> "refined_post"
    | VC_Contract_Case             -> "contract_case"
-   | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
-   | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Disjoint_Cases            -> "disjoint_cases"
+   | VC_Complete_Cases            -> "complete_cases"
    | VC_Exceptional_Case          -> "exceptional_case"
+   | VC_Exit_Case                 -> "exit_case"
    | VC_Loop_Invariant            -> "loop_invariant"
    | VC_Loop_Invariant_Init       -> "loop_invariant_init"
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
@@ -367,6 +380,8 @@ let check_kind_to_string kind =
    | VC_Assert_Premise            -> "assert_premise"
    | VC_Assert_Step               -> "assert_step"
    | VC_Raise                     -> "raise"
+   | VC_Unexpected_Program_Exit   -> "unexpected_program_exit"
+   | VC_Program_Exit_Post         -> "program_exit_post"
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
@@ -487,7 +502,8 @@ let read_vc_labels acc s =
         | Some Gp_Already_Proved ->
            b.already_proved <- true
         | Some Gp_Inlined ->
-          if b.extra_node = None then b.inline <- Some (-1)
+          if b.inline <> None then ()
+          else if b.extra_node = None then b.inline <- Some (-1)
           else b.inline <- b.extra_node
         | None ->
             ()
