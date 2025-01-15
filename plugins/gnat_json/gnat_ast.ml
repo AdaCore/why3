@@ -365,8 +365,8 @@ and 'a why_node_desc =
   | Field_association : {field: identifier_id; value: expr_id} -> [> field_association_tag] why_node_desc
   | Variant : {cmp_op: identifier_id; labels: symbol_set; expr: term_id} -> [> variant_tag] why_node_desc
   | Variants : {variants: variant_list} -> [> variants_tag] why_node_desc
-  | Universal_quantif : {variables: identifier_list; labels: symbol_set; var_type: type_id; triggers: triggers_oid; pred: pred_id} -> [> universal_quantif_tag] why_node_desc
-  | Existential_quantif : {variables: identifier_list; labels: symbol_set; var_type: type_id; pred: pred_id} -> [> existential_quantif_tag] why_node_desc
+  | Universal_quantif : {binders: binder_list; labels: symbol_set; triggers: triggers_oid; pred: pred_id} -> [> universal_quantif_tag] why_node_desc
+  | Existential_quantif : {binders: binder_list; labels: symbol_set; pred: pred_id} -> [> existential_quantif_tag] why_node_desc
   | Not : {right: expr_id} -> [> not_tag] why_node_desc
   | Connection : {left: expr_id; op: connector; right: expr_id; more_right: expr_olist} -> [> connection_tag] why_node_desc
   | Label : {labels: symbol_set; def: expr_id; typ: type_oid} -> [> label_tag] why_node_desc
@@ -1599,28 +1599,26 @@ module From_json = struct
         variants = variant_opaque_list_from_json variants;
       } in
       {info; desc}
-    | `List [`String "W_UNIVERSAL_QUANTIF"; id; domain; variables; labels; var_type; triggers; pred] ->
+    | `List [`String "W_UNIVERSAL_QUANTIF"; id; domain; binders; labels; triggers; pred] ->
       let info = {
         id = int_from_json id;
         domain = domain_from_json domain;
       } in
       let desc = Universal_quantif {
-        variables = identifier_opaque_list_from_json variables;
+        binders = binder_opaque_list_from_json binders;
         labels = symbol_set_from_json labels;
-        var_type = type_opaque_id_from_json var_type;
         triggers = triggers_opaque_oid_from_json triggers;
         pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
-    | `List [`String "W_EXISTENTIAL_QUANTIF"; id; domain; variables; labels; var_type; pred] ->
+    | `List [`String "W_EXISTENTIAL_QUANTIF"; id; domain; binders; labels; pred] ->
       let info = {
         id = int_from_json id;
         domain = domain_from_json domain;
       } in
       let desc = Existential_quantif {
-        variables = identifier_opaque_list_from_json variables;
+        binders = binder_opaque_list_from_json binders;
         labels = symbol_set_from_json labels;
-        var_type = type_opaque_id_from_json var_type;
         pred = pred_opaque_id_from_json pred;
       } in
       {info; desc}
