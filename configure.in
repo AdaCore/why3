@@ -743,6 +743,15 @@ elif test "$found_ocamlgraph" = no; then
    enable_stackify=no
    reason_stackify=" (ocamlgraph not found)"
    AC_MSG_WARN([cannot find library ocamlgraph, stackify disabled.])
+else
+   AX_VERSION_GE([$OCAMLVERSION], 4.12, [], [
+      if test "$enable_stackify" = yes; then
+         AC_MSG_ERROR([cannot enable stackify without ocaml >= 4.12.])
+      fi
+      enable_stackify=no
+      reason_stackify=" (ocaml < 4.12)"
+      AC_MSG_WARN([ocaml is < 4.12, stackify disabled.])
+   ])
 fi
 
 if test "$enable_stackify" != no; then
