@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mccarthy.mlw"/>
 <theory name="McCarthy91" proved="true">
  <goal name="f91&#39;vc" expl="VC for f91" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="20"/></proof>
+ <proof prover="2"><result status="valid" time="0.000000" steps="73"/></proof>
  </goal>
  <goal name="f91_tco&#39;vc" expl="VC for f91_tco" proved="true">
  <transf name="split_vc" proved="true" >
@@ -37,10 +37,10 @@
  </transf>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
- <proof prover="0"><result status="valid" time="0.620000" steps="1863"/></proof>
+ <proof prover="2"><result status="valid" time="0.153101" steps="3606"/></proof>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="58"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="89"/></proof>
  </goal>
 </theory>
 <theory name="McCarthyWithGhostMonitor" proved="true">
@@ -59,38 +59,38 @@
 </theory>
 <theory name="McCarthy91Mach" proved="true">
  <goal name="f91&#39;vc" expl="VC for f91" proved="true">
- <proof prover="0" timelimit="5"><result status="valid" time="0.070000" steps="612"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.070000" steps="275"/></proof>
  </goal>
  <goal name="f91_nonrec&#39;vc" expl="VC for f91_nonrec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="f91_nonrec&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="10"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="31"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.1" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="41"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.2" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="22"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="138"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="552"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.4" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="44"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.5" expl="loop variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="20"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="23"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="2.660000" steps="3726"/></proof>
+  <proof prover="2"><result status="valid" time="0.181771" steps="4462"/></proof>
   </goal>
   <goal name="f91_nonrec&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="34"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="f91_pseudorec&#39;vc" expl="VC for f91_pseudorec" proved="true">
- <proof prover="0" timelimit="5"><result status="valid" time="0.150000" steps="675"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.026105" steps="372"/></proof>
  </goal>
 </theory>
 </file>

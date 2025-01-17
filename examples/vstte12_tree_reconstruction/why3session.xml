@@ -7,20 +7,19 @@
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.3.3" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte12_tree_reconstruction.mlw"/>
 <theory name="Tree" proved="true">
  <goal name="depths_head" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="depths_head.0" proved="true">
-  <proof prover="8"><result status="valid" time="0.020000" steps="200"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="224"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="depths_unique&#39;vc" expl="VC for depths_unique" proved="true">
- <proof prover="8"><result status="valid" time="0.170000" steps="1932"/></proof>
+ <proof prover="6"><result status="valid" time="0.715080" steps="12238"/></proof>
  </goal>
  <goal name="depths_prefix" proved="true">
  <transf name="induction_ty_lex" proved="true" >
@@ -33,7 +32,7 @@
  <proof prover="3"><result status="valid" time="0.060000" steps="421047"/></proof>
  </goal>
  <goal name="depths_subtree&#39;vc" expl="VC for depths_subtree" proved="true">
- <proof prover="8"><result status="valid" time="0.100000" steps="1365"/></proof>
+ <proof prover="6"><result status="valid" time="0.100000" steps="412"/></proof>
  </goal>
  <goal name="depths_unique2" proved="true">
  <proof prover="2"><result status="valid" time="0.020000"/></proof>
@@ -99,7 +98,7 @@
  <goal name="g_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="g_append.0" proved="true">
-  <proof prover="7"><result status="valid" time="0.181845" steps="471"/></proof>
+  <proof prover="6"><result status="valid" time="0.061512" steps="1074"/></proof>
   </goal>
  </transf>
  </goal>

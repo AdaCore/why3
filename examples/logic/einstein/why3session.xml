@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Eprover" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -13,6 +12,7 @@
 <prover id="8" name="Metis" version="2.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="9" name="Z3" version="3.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Eprover" version="1.8-001" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="11" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="14" name="Vampire" version="0.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="16" name="veriT" version="201410" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -23,7 +23,6 @@
 <path name=".."/><path name="einstein.why"/>
 <theory name="Goals">
  <goal name="G1" proved="true">
- <proof prover="0"><result status="valid" time="0.090000" steps="374"/></proof>
  <proof prover="1"><result status="timeout" time="1.000000"/></proof>
  <proof prover="2"><result status="unknown" time="0.170000"/></proof>
  <proof prover="3"><result status="unknown" time="0.040000"/></proof>
@@ -34,6 +33,7 @@
  <proof prover="8"><result status="timeout" time="1.000000"/></proof>
  <proof prover="9"><result status="valid" time="0.480000"/></proof>
  <proof prover="10"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="11"><result status="valid" time="0.090000" steps="4805"/></proof>
  <proof prover="12"><result status="valid" time="0.100000" steps="374"/></proof>
  <proof prover="14"><result status="valid" time="1.500000"/></proof>
  <proof prover="16"><result status="timeout" time="1.000000"/></proof>
@@ -42,7 +42,6 @@
  <proof prover="21"><result status="valid" time="0.080000" steps="12598"/></proof>
  </goal>
  <goal name="Wrong">
- <proof prover="0"><result status="unknown" time="0.160000" steps="572"/></proof>
  <proof prover="1"><result status="timeout" time="1.000000"/></proof>
  <proof prover="2"><result status="unknown" time="0.060000"/></proof>
  <proof prover="3"><result status="unknown" time="0.040000"/></proof>
@@ -53,6 +52,7 @@
  <proof prover="8"><result status="timeout" time="1.000000"/></proof>
  <proof prover="9"><result status="timeout" time="1.000000"/></proof>
  <proof prover="10"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="11"><result status="unknown" time="0.516626" steps="26911"/></proof>
  <proof prover="12" timelimit="1"><result status="unknown" time="0.160000" steps="572"/></proof>
  <proof prover="14"><result status="timeout" time="1.000000"/></proof>
  <proof prover="16"><result status="timeout" time="1.000000"/></proof>
@@ -61,7 +61,6 @@
  <proof prover="21"><result status="unknown" time="0.070000" steps="12727"/></proof>
  </goal>
  <goal name="G2" proved="true">
- <proof prover="0"><result status="valid" time="0.110000" steps="385"/></proof>
  <proof prover="1"><result status="timeout" time="1.000000"/></proof>
  <proof prover="2"><result status="unknown" time="0.060000"/></proof>
  <proof prover="3"><result status="unknown" time="0.040000"/></proof>
@@ -72,6 +71,7 @@
  <proof prover="8"><result status="timeout" time="1.000000"/></proof>
  <proof prover="9"><result status="valid" time="0.620000"/></proof>
  <proof prover="10"><result status="valid" time="0.790000"/></proof>
+ <proof prover="11"><result status="valid" time="0.110000" steps="3761"/></proof>
  <proof prover="12"><result status="valid" time="0.110000" steps="385"/></proof>
  <proof prover="14"><result status="valid" time="1.270000"/></proof>
  <proof prover="16"><result status="timeout" time="1.000000"/></proof>

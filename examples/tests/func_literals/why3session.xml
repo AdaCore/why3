@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="func_literals.mlw"/>
 <theory name="Top">
@@ -16,12 +16,12 @@
  <goal name="g2" proved="true">
  <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="8335"/></proof>
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="30469"/></proof>
- <proof prover="2"><result status="valid" time="0.010000" steps="12"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="24"/></proof>
  </goal>
  <goal name="g3" proved="true">
  <proof prover="0" obsolete="true"><result status="valid" time="0.060000" steps="8589"/></proof>
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="29007"/></proof>
- <proof prover="2"><result status="valid" time="0.010000" steps="49"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="61"/></proof>
  </goal>
  <goal name="g4" proved="true">
  <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="7225"/></proof>
@@ -31,16 +31,16 @@
  <goal name="seq_ok1&#39;vc" expl="VC for seq_ok1" proved="true">
  <proof prover="0" obsolete="true"><result status="valid" time="0.060000" steps="11483"/></proof>
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49845"/></proof>
- <proof prover="2"><result status="valid" time="0.059801" steps="645"/></proof>
+ <proof prover="2"><result status="valid" time="0.059801" steps="67"/></proof>
  </goal>
  <goal name="seq_ok2&#39;vc" expl="VC for seq_ok2" proved="true">
  <proof prover="0" obsolete="true"><result status="valid" time="0.070000" steps="11911"/></proof>
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49308"/></proof>
- <proof prover="2"><result status="valid" time="0.010000" steps="37"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="67"/></proof>
  </goal>
  <goal name="seq_ok3&#39;vc" expl="VC for seq_ok3" proved="true">
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="50282"/></proof>
- <proof prover="2"><result status="valid" time="0.086013" steps="767"/></proof>
+ <proof prover="2"><result status="valid" time="0.086013" steps="77"/></proof>
  <transf name="split_vc" >
   <goal name="seq_ok3&#39;vc.0" expl="precondition">
   <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="5708"/></proof>
@@ -52,7 +52,7 @@
  </goal>
  <goal name="seq_ok4&#39;vc" expl="VC for seq_ok4" proved="true">
  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49810"/></proof>
- <proof prover="2"><result status="valid" time="0.010000" steps="33"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="77"/></proof>
  <transf name="split_vc" >
   <goal name="seq_ok4&#39;vc.0" expl="precondition">
   <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="5708"/></proof>
@@ -84,7 +84,7 @@
  </goal>
  <goal name="array_ok2&#39;vc" expl="VC for array_ok2" proved="true">
  <proof prover="1" obsolete="true"><result status="valid" time="0.030000" steps="113769"/></proof>
- <proof prover="2"><result status="valid" time="0.111472" steps="611"/></proof>
+ <proof prover="2"><result status="valid" time="0.111472" steps="741"/></proof>
  <transf name="split_vc" >
   <goal name="array_ok2&#39;vc.0" expl="array creation size">
   <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="7301"/></proof>
@@ -120,7 +120,7 @@
  </goal>
  <goal name="array_ok4&#39;vc" expl="VC for array_ok4" proved="true">
  <proof prover="1" obsolete="true"><result status="valid" time="0.030000" steps="106857"/></proof>
- <proof prover="2"><result status="valid" time="0.080000" steps="309"/></proof>
+ <proof prover="2"><result status="valid" time="0.080000" steps="711"/></proof>
  </goal>
 </theory>
 </file>

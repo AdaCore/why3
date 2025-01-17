@@ -2,9 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="word_common_factor.mlw"/>
 <theory name="Top" proved="true">
@@ -12,12 +11,12 @@
  <proof prover="2"><result status="valid" time="0.050000" steps="3995"/></proof>
  </goal>
  <goal name="power_add&#39;vc" expl="VC for power_add" proved="true">
- <proof prover="1"><result status="valid" time="0.140000" steps="270"/></proof>
+ <proof prover="3"><result status="valid" time="0.140000" steps="1018"/></proof>
  </goal>
  <goal name="common_factor&#39;vc" expl="VC for common_factor" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="common_factor&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="11"/></proof>
   </goal>
   <goal name="common_factor&#39;vc.1" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.140000" steps="14298"/></proof>
@@ -61,7 +60,7 @@
   <proof prover="2"><result status="valid" time="0.060000" steps="15198"/></proof>
   </goal>
   <goal name="common_factor&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.080000" steps="1375"/></proof>
+  <proof prover="3"><result status="valid" time="0.080000" steps="1207"/></proof>
   </goal>
  </transf>
  </goal>

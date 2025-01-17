@@ -3,8 +3,9 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_fm2012_LRS.mlw"/>
@@ -13,7 +14,7 @@
  <proof prover="4"><result status="valid" time="0.010000" steps="8708"/></proof>
  </goal>
  <goal name="longest_common_prefix_succ" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="28"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="110"/></proof>
  </goal>
  <goal name="lcp&#39;vc" expl="VC for lcp" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -65,7 +66,7 @@
   <proof prover="2"><result status="valid" time="0.010000" steps="4587"/></proof>
   </goal>
   <goal name="compare&#39;vc.6" expl="unreachable point" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.010000" steps="25"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.010000" steps="1029"/></proof>
   </goal>
   <goal name="compare&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.000000" steps="3674"/></proof>
@@ -74,7 +75,7 @@
   <proof prover="2"><result status="valid" time="0.020000" steps="5242"/></proof>
   </goal>
   <goal name="compare&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="44"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="176"/></proof>
   </goal>
  </transf>
  </goal>
@@ -82,7 +83,7 @@
  <proof prover="2"><result status="valid" time="0.040000" steps="12932"/></proof>
  </goal>
  <goal name="le_trans" proved="true">
- <proof prover="3"><result status="valid" time="0.080000" steps="254"/></proof>
+ <proof prover="1"><result status="valid" time="0.080000" steps="1496"/></proof>
  </goal>
  <goal name="sort&#39;vc" expl="VC for sort" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -138,7 +139,7 @@
   <proof prover="2"><result status="valid" time="0.050000" steps="18133"/></proof>
   </goal>
   <goal name="sort&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="109"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="298"/></proof>
   </goal>
   <goal name="sort&#39;vc.18" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.020000" steps="16130"/></proof>
@@ -147,7 +148,7 @@
   <proof prover="2"><result status="valid" time="0.060000" steps="18647"/></proof>
   </goal>
   <goal name="sort&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="177"/></proof>
+  <proof prover="1"><result status="valid" time="0.060000" steps="443"/></proof>
   </goal>
   <goal name="sort&#39;vc.21" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.070000" steps="23287"/></proof>
@@ -156,10 +157,10 @@
   <proof prover="2"><result status="valid" time="0.200000" steps="39574"/></proof>
   </goal>
   <goal name="sort&#39;vc.23" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.680000" steps="938"/></proof>
+  <proof prover="1"><result status="valid" time="0.201482" steps="1857"/></proof>
   </goal>
   <goal name="sort&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.560000" steps="925"/></proof>
+  <proof prover="1"><result status="valid" time="0.168310" steps="1865"/></proof>
   </goal>
   <goal name="sort&#39;vc.25" expl="assertion" proved="true">
   <proof prover="2"><result status="valid" time="0.050000" steps="17803"/></proof>
@@ -168,7 +169,7 @@
   <proof prover="2"><result status="valid" time="0.030000" steps="15642"/></proof>
   </goal>
   <goal name="sort&#39;vc.27" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.130000" steps="345"/></proof>
+  <proof prover="1"><result status="valid" time="0.130000" steps="236"/></proof>
   </goal>
   <goal name="sort&#39;vc.28" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.030000" steps="15693"/></proof>
@@ -212,7 +213,7 @@
   <proof prover="2"><result status="valid" time="0.030000" steps="13339"/></proof>
   </goal>
   <goal name="create&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="37"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="72"/></proof>
   </goal>
   <goal name="create&#39;vc.4" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.050000" steps="13000"/></proof>
@@ -246,7 +247,7 @@
   <proof prover="2"><result status="valid" time="0.070000" steps="17236"/></proof>
   </goal>
   <goal name="lcp&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="76"/></proof>
+  <proof prover="3"><result status="valid" time="0.024780" steps="157"/></proof>
   </goal>
  </transf>
  </goal>
@@ -258,10 +259,10 @@
 </theory>
 <theory name="LRS" proved="true">
  <goal name="lcp_sym" proved="true">
- <proof prover="3"><result status="valid" time="0.010000" steps="40"/></proof>
+ <proof prover="3"><result status="valid" time="0.028641" steps="163"/></proof>
  </goal>
  <goal name="le_le_common_prefix" proved="true">
- <proof prover="3"><result status="valid" time="0.050000" steps="155"/></proof>
+ <proof prover="1"><result status="valid" time="0.166915" steps="1745"/></proof>
  </goal>
  <goal name="le_le_longest_common_prefix" proved="true">
  <proof prover="2"><result status="valid" time="0.040000" steps="13058"/></proof>

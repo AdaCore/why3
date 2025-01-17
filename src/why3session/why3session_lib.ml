@@ -108,6 +108,7 @@ let status_filter x =
   | "valid" -> Valid
   | "invalid" -> Invalid
   | "highfailure" -> HighFailure ""
+  | "timeout" -> Timeout
   | _ -> assert false
 
 let filter_spec =
@@ -121,9 +122,9 @@ let filter_spec =
     KLong "filter-is-leaf", opt_three opt_filter_is_leaf,
     "[yes|no] select only proofs of leaf goals,\ni.e., those without transformations";
     KLong "filter-status",
-    Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "highfailure"]),
+    Hnd1 (AList (',', ASymbol ["valid"; "invalid"; "timeout"; "highfailure"]),
           fun l -> opt_status := List.map status_filter l),
-    "[valid|invalid|highfailure] select proof attempts\nwith the given status";
+    "[valid|invalid|timeout|highfailure] select proof attempts\nwith the given status";
   ]
 
 type filters =
@@ -137,13 +138,21 @@ type filters =
 let provers_of_filter_prover whyconf = function
   | Prover p        -> C.Sprover.singleton p
   | FilterProver fp ->
-    C.Mprover.map (Util.const ()) (C.filter_provers whyconf fp)
+    (* There is an issue here: if the prover is uninstalled_prover,
+    filter_provers will return an empty map without raising an exception *)
+   let s = C.Mprover.map (Util.const ()) (C.filter_provers whyconf fp) in
+   if C.Sprover.is_empty s
+    then raise (C.ProverNotFound (whyconf,fp))
+   else s
 
 let prover_of_filter_prover whyconf = function
   | Prover p        -> p
   | FilterProver fp ->
     (C.filter_one_prover whyconf fp).C.prover
 
+let print_filter_prover fmt = function
+  | Prover p -> Why3.Whyconf.print_prover fmt p
+  | FilterProver fp -> Why3.Whyconf.print_filter_prover fmt fp
 
 let read_filter_spec whyconf : filters * bool =
   let should_exit = ref false in

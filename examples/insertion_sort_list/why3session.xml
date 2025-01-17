@@ -2,21 +2,21 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="insertion_sort_list.mlw"/>
 <theory name="InsertionSort" proved="true">
  <goal name="Transitive.Trans" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="6"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="insert&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="43"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="49"/></proof>
   </goal>
   <goal name="insert&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="14"/></proof>
   </goal>
   <goal name="insert&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.120000" steps="26898"/></proof>
@@ -27,7 +27,7 @@
  </transf>
  </goal>
  <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
- <proof prover="0"><result status="valid" time="0.110000" steps="228"/></proof>
+ <proof prover="1"><result status="valid" time="0.110000" steps="385"/></proof>
  </goal>
 </theory>
 </file>

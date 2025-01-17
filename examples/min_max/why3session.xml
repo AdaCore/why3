@@ -2,81 +2,81 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="min_max.mlw"/>
 <theory name="Top" proved="true">
  <goal name="min_max&#39;vc" expl="VC for min_max" proved="true">
- <proof prover="2"><result status="valid" time="0.080000" steps="291"/></proof>
+ <proof prover="0"><result status="valid" time="0.080000" steps="262"/></proof>
  </goal>
  <goal name="a_better_min_max&#39;vc" expl="VC for a_better_min_max" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="a_better_min_max&#39;vc.0" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="2"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="2"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.2" expl="check modulo by zero" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="2"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="2"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="13"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="15"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.6" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="15"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="54"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="125"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="543"/></proof>
+  <proof prover="0"><result status="valid" time="0.120000" steps="555"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.9" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.000000" steps="62"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="71"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.10" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.000000" steps="55"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="63"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.11" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="68"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="76"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.12" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.000000" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="70"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.13" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="70"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.14" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="68"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="76"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.15" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="21655"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="120"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="250"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.408187" steps="39182"/></proof>
   </goal>
   <goal name="a_better_min_max&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="126"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="208"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="divide_and_conquer&#39;vc" expl="VC for divide_and_conquer" proved="true">
- <proof prover="2"><result status="valid" time="0.370000" steps="989"/></proof>
+ <proof prover="0"><result status="valid" time="0.184611" steps="803"/></proof>
  </goal>
  <goal name="a_similar_min_max&#39;vc" expl="VC for a_similar_min_max" proved="true">
- <proof prover="2"><result status="valid" time="0.020000" steps="11"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="3"/></proof>
  </goal>
 </theory>
 </file>

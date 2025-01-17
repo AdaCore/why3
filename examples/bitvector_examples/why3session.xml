@@ -2,13 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bitvector_examples.mlw"/>
 <theory name="Test_proofinuse" proved="true">
  <goal name="shift_is_div&#39;vc" expl="VC for shift_is_div" proved="true">
- <proof prover="1"><result status="valid" time="0.060000" steps="438"/></proof>
+ <proof prover="0"><result status="valid" time="0.060000" steps="1730"/></proof>
  </goal>
  <goal name="mask&#39;vc" expl="VC for mask" proved="true">
  <proof prover="4"><result status="valid" time="0.020000" steps="12247"/></proof>
@@ -16,7 +16,7 @@
  <goal name="testVariant&#39;vc" expl="VC for testVariant" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="testVariant&#39;vc.0" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.120000" steps="628"/></proof>
+  <proof prover="0"><result status="valid" time="0.120000" steps="1522"/></proof>
   </goal>
  </transf>
  </goal>
@@ -150,10 +150,10 @@
  <proof prover="4"><result status="valid" time="0.010000" steps="8052"/></proof>
  </goal>
  <goal name="to_int_ule" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="152"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="22"/></proof>
  </goal>
  <goal name="to_int_ult" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="152"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="22"/></proof>
  </goal>
  <goal name="bv32_bounds_0" proved="true">
  <proof prover="4"><result status="valid" time="0.010000" steps="9158"/></proof>
@@ -182,10 +182,10 @@
   <proof prover="4"><result status="valid" time="0.020000" steps="11744"/></proof>
   </goal>
   <goal name="add&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.130000" steps="530"/></proof>
+  <proof prover="0"><result status="valid" time="0.130000" steps="192"/></proof>
   </goal>
   <goal name="add&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.170000" steps="654"/></proof>
+  <proof prover="0" timelimit="5" memlimit="2000"><result status="valid" time="0.022669" steps="196"/></proof>
   </goal>
   <goal name="add&#39;vc.8" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.131922" steps="29730"/></proof>

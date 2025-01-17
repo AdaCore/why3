@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="380_doc_trans.mlw"/>
 <theory name="Apply">
@@ -20,10 +20,10 @@
  <goal name="G" proved="true">
  <transf name="apply" proved="true" arg1="transitivity" arg2="with" arg3="c">
   <goal name="G.0" expl="apply premises" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
   <goal name="G.1" expl="apply premises" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
@@ -34,13 +34,13 @@
  <goal name="G" proved="true">
  <transf name="apply" proved="true" arg1="t" arg2="with" arg3="c,0">
   <goal name="G.0" expl="apply premises" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
   <goal name="G.1" expl="apply premises" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
   <goal name="G.2" expl="apply premises" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="5"/></proof>
   </goal>
  </transf>
  </goal>

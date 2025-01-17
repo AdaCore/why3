@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="longest_increasing_subsequence.mlw"/>
 <theory name="Backtracking" proved="true">
@@ -34,14 +34,14 @@
   <goal name="liss&#39;vc.7" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="iss" arg2="in" arg3="Ensures4">
    <goal name="liss&#39;vc.7.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.016919" steps="46"/></proof>
+   <proof prover="3"><result status="valid" time="0.016919" steps="46"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="liss&#39;vc.8" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="iss" arg2="in" arg3="Ensures4">
    <goal name="liss&#39;vc.8.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.411449" steps="4569"/></proof>
+   <proof prover="3"><result status="valid" time="0.516796" steps="8987"/></proof>
    </goal>
   </transf>
   </goal>
@@ -63,10 +63,10 @@
         <goal name="liss&#39;vc.9.0.0.0.0.1.0" expl="asserted formula" proved="true">
         <transf name="assert" proved="true" arg1="(s&#39;[1..][0] = j)">
          <goal name="liss&#39;vc.9.0.0.0.0.1.0.0" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.061128" steps="365"/></proof>
+         <proof prover="3"><result status="valid" time="0.061128" steps="388"/></proof>
          </goal>
          <goal name="liss&#39;vc.9.0.0.0.0.1.0.1" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.905885" steps="9686"/></proof>
+         <proof prover="3"><result status="valid" time="0.503907" steps="7506"/></proof>
          </goal>
         </transf>
         </goal>
@@ -103,7 +103,7 @@
      <goal name="liss&#39;vc.13.0.0.0" expl="loop invariant preservation" proved="true">
      <transf name="case" proved="true" arg1="(k &lt; j)">
       <goal name="liss&#39;vc.13.0.0.0.0" expl="true case (loop invariant preservation)" proved="true">
-      <proof prover="0"><result status="valid" time="0.049421" steps="185"/></proof>
+      <proof prover="3"><result status="valid" time="0.049421" steps="188"/></proof>
       </goal>
       <goal name="liss&#39;vc.13.0.0.0.1" expl="false case (loop invariant preservation)" proved="true">
       <transf name="assert" proved="true" arg1="(length s&#39;[1..] &lt;= length s[1..])">
@@ -113,7 +113,7 @@
         <proof prover="1"><result status="valid" time="0.097431" steps="12544"/></proof>
         </goal>
         <goal name="liss&#39;vc.13.0.0.0.1.0.1" expl="asserted formula" proved="true">
-        <proof prover="0" timelimit="1"><result status="valid" time="0.088027" steps="733"/></proof>
+        <proof prover="3" timelimit="1"><result status="valid" time="0.088027" steps="622"/></proof>
         </goal>
        </transf>
        </goal>
@@ -161,7 +161,7 @@
     <goal name="liss&#39;vc.21.1.0" expl="asserted formula" proved="true">
     <transf name="unfold" proved="true" arg1="iss" arg2="in" arg3="H2">
      <goal name="liss&#39;vc.21.1.0.0" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.026686" steps="48"/></proof>
+     <proof prover="3"><result status="valid" time="0.026686" steps="50"/></proof>
      </goal>
     </transf>
     </goal>

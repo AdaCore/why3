@@ -2,27 +2,31 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="36" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="insertion_sort_naive.mlw"/>
 <theory name="InsertionSortNaive" proved="true">
  <goal name="sort&#39;vc" expl="VC for sort" proved="true">
- <proof prover="0"><result status="valid" time="1.530000" steps="948"/></proof>
+ <proof prover="1" timelimit="36"><result status="valid" time="1.530000" steps="13993"/></proof>
  </goal>
 </theory>
 <theory name="InsertionSortNaiveGen" proved="true">
  <goal name="sort&#39;vc" expl="VC for sort" proved="true">
- <proof prover="0"><result status="valid" time="0.950000" steps="1647"/></proof>
+ <proof prover="0"><result status="valid" time="0.568777" steps="1647"/></proof>
+ <proof prover="1"><result status="timeout" time="5.000000" steps="55677"/></proof>
  </goal>
 </theory>
 <theory name="InsertionSortParam" proved="true">
  <goal name="sort&#39;vc" expl="VC for sort" proved="true">
- <proof prover="0"><result status="valid" time="0.900000" steps="1573"/></proof>
+ <proof prover="0"><result status="valid" time="0.544631" steps="1573"/></proof>
+ <proof prover="1"><result status="timeout" time="5.000000" steps="42370"/></proof>
  </goal>
 </theory>
 <theory name="InsertionSortParamBad" proved="true">
  <goal name="sort&#39;vc" expl="VC for sort" proved="true">
- <proof prover="0"><result status="valid" time="0.850000" steps="2330"/></proof>
+ <proof prover="0"><result status="valid" time="0.581942" steps="2330"/></proof>
+ <proof prover="1"><result status="timeout" time="5.000000" steps="33621"/></proof>
  </goal>
 </theory>
 </file>

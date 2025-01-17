@@ -9,13 +9,12 @@
 <prover id="4" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="BacktrackArray.mlw"/>
 <theory name="Impl" proved="true">
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="7"><result status="valid" time="0.358461" steps="5200"/></proof>
+ <proof prover="7" timelimit="5"><result status="valid" time="0.358461" steps="5200"/></proof>
  </goal>
  <goal name="add_event&#39;vc" expl="VC for add_event" proved="true">
  <proof prover="0"><result status="valid" time="0.030000" steps="33776"/></proof>
@@ -41,7 +40,7 @@
   <proof prover="4"><result status="valid" time="1.954647" steps="4576405"/></proof>
   </goal>
   <goal name="resize_for&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.200000" steps="1451"/></proof>
+  <proof prover="7"><result status="valid" time="0.073505" steps="651"/></proof>
   </goal>
   <goal name="resize_for&#39;vc.7" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.050000" steps="112382"/></proof>
@@ -65,7 +64,7 @@
   <proof prover="0"><result status="valid" time="0.010000" steps="85839"/></proof>
   </goal>
   <goal name="resize_for&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.190000" steps="1327"/></proof>
+  <proof prover="7"><result status="valid" time="0.190000" steps="673"/></proof>
   </goal>
   <goal name="resize_for&#39;vc.15" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.030000" steps="112488"/></proof>
@@ -221,7 +220,7 @@
     <proof prover="1"><result status="valid" time="0.100000"/></proof>
     </goal>
     <goal name="iadd&#39;vc.8.0.1" expl="VC for iadd" proved="true">
-    <proof prover="8"><result status="valid" time="0.080000" steps="749"/></proof>
+    <proof prover="7"><result status="valid" time="0.080000" steps="654"/></proof>
     </goal>
     <goal name="iadd&#39;vc.8.0.2" expl="VC for iadd" proved="true">
     <proof prover="1"><result status="valid" time="0.230000"/></proof>
@@ -350,7 +349,7 @@
   <proof prover="0"><result status="valid" time="0.020000" steps="88503"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.100000" steps="1046"/></proof>
+  <proof prover="7"><result status="valid" time="0.100000" steps="540"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.10" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.150000"/></proof>
@@ -394,13 +393,13 @@
   <proof prover="2"><result status="valid" time="0.160000" steps="31327"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.22" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.040000" steps="185"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000" steps="180"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.23" expl="unreachable point" proved="true">
   <proof prover="2"><result status="valid" time="0.200000" steps="37842"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.24" expl="index in array bounds" proved="true">
-  <proof prover="8"><result status="valid" time="0.030000" steps="201"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000" steps="196"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.25" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.030000" steps="84717"/></proof>
@@ -415,7 +414,7 @@
   <proof prover="0"><result status="valid" time="0.040000" steps="88181"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.070000" steps="592"/></proof>
+  <proof prover="7"><result status="valid" time="0.070000" steps="554"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.30" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.100000"/></proof>
@@ -473,7 +472,7 @@
   <proof prover="0"><result status="valid" time="0.030000" steps="87277"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.47" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.060000" steps="497"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000" steps="465"/></proof>
   </goal>
   <goal name="backtrack&#39;vc.48" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.070000" steps="160960"/></proof>

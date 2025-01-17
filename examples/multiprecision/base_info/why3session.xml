@@ -5,7 +5,7 @@
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="4" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="base_info.mlw"/>
 <theory name="BaseInfo" proved="true">
@@ -145,10 +145,10 @@
    <proof prover="1"><result status="valid" time="0.120000" steps="10407"/></proof>
    </goal>
    <goal name="pow_compat&#39;vc.3.2" expl="VC for pow_compat" proved="true">
-   <proof prover="4"><result status="valid" time="0.010000" steps="29"/></proof>
+   <proof prover="3"><result status="valid" time="0.010000" steps="73"/></proof>
    </goal>
    <goal name="pow_compat&#39;vc.3.3" expl="VC for pow_compat" proved="true">
-   <proof prover="4"><result status="valid" time="0.010000" steps="29"/></proof>
+   <proof prover="3"><result status="valid" time="0.010000" steps="75"/></proof>
    </goal>
    <goal name="pow_compat&#39;vc.3.4" expl="VC for pow_compat" proved="true">
    <proof prover="1"><result status="valid" time="0.060000" steps="10377"/></proof>
@@ -172,7 +172,7 @@
   <proof prover="1"><result status="valid" time="0.120000" steps="11140"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.060000" steps="124"/></proof>
+  <proof prover="3"><result status="valid" time="0.060000" steps="340"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -183,7 +183,7 @@
    <proof prover="1"><result status="valid" time="0.189863" steps="14520"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.3.2" expl="VC for wmpn_get_base_info" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="31"/></proof>
+   <proof prover="3"><result status="valid" time="0.020000" steps="85"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.3.3" expl="VC for wmpn_get_base_info" proved="true">
    <proof prover="1"><result status="valid" time="0.030000" steps="7641"/></proof>
@@ -205,10 +205,10 @@
   <goal name="wmpn_get_base_info&#39;vc.6" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_get_base_info&#39;vc.6.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="37"/></proof>
+   <proof prover="3"><result status="valid" time="0.040000" steps="724"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.6.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="35"/></proof>
+   <proof prover="3"><result status="valid" time="0.020000" steps="39"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.6.2" expl="assertion" proved="true">
    <proof prover="1"><result status="valid" time="0.040000" steps="7650"/></proof>
@@ -219,7 +219,7 @@
   </transf>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.7" expl="integer overflow" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="39"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="316"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.8" expl="integer overflow" proved="true">
   <proof prover="1"><result status="valid" time="0.130000" steps="12441"/></proof>
@@ -228,10 +228,10 @@
   <proof prover="2"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="43"/></proof>
+  <proof prover="3"><result status="valid" time="0.040000" steps="379"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="45"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="408"/></proof>
   </goal>
   <goal name="wmpn_get_base_info&#39;vc.12" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -245,7 +245,7 @@
    <proof prover="1"><result status="valid" time="0.060000" steps="7665"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.12.3" expl="VC for wmpn_get_base_info" proved="true">
-   <proof prover="4"><result status="valid" time="0.050000" steps="38"/></proof>
+   <proof prover="3"><result status="valid" time="0.050000" steps="699"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.12.4" expl="VC for wmpn_get_base_info" proved="true">
    <proof prover="1"><result status="valid" time="0.060000" steps="9123"/></proof>
@@ -270,7 +270,7 @@
    <proof prover="1" timelimit="5" memlimit="2000"><result status="valid" time="0.445693" steps="50430"/></proof>
    </goal>
    <goal name="wmpn_get_base_info&#39;vc.13.5" expl="VC for wmpn_get_base_info" proved="true">
-   <proof prover="4" timelimit="5" memlimit="2000"><result status="valid" time="1.010000" steps="277"/></proof>
+   <proof prover="3" timelimit="5" memlimit="2000"><result status="valid" time="0.664755" steps="20162"/></proof>
    </goal>
   </transf>
   </goal>
@@ -305,10 +305,10 @@
   <goal name="wmpn_limb_size_in_base_2&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.0" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="31"/></proof>
+   <proof prover="3"><result status="valid" time="0.020000" steps="38"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.1" expl="assertion" proved="true">
-   <proof prover="4"><result status="valid" time="0.020000" steps="31"/></proof>
+   <proof prover="3"><result status="valid" time="0.020000" steps="40"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.2" expl="VC for wmpn_limb_size_in_base_2" proved="true">
    <proof prover="1"><result status="valid" time="0.060000" steps="6569"/></proof>
@@ -317,13 +317,13 @@
    <proof prover="1"><result status="valid" time="0.050000" steps="6567"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.4" expl="VC for wmpn_limb_size_in_base_2" proved="true">
-   <proof prover="4"><result status="valid" time="0.030000" steps="36"/></proof>
+   <proof prover="3"><result status="valid" time="0.030000" steps="157"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.5" expl="VC for wmpn_limb_size_in_base_2" proved="true">
    <proof prover="1"><result status="valid" time="0.080000" steps="7973"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.6" expl="VC for wmpn_limb_size_in_base_2" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="39"/></proof>
+   <proof prover="3"><result status="valid" time="0.040000" steps="387"/></proof>
    </goal>
    <goal name="wmpn_limb_size_in_base_2&#39;vc.3.7" expl="VC for wmpn_limb_size_in_base_2" proved="true">
    <proof prover="1"><result status="valid" time="0.060000" steps="8045"/></proof>

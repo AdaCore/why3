@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="split_string.mlw"/>
 <theory name="SplitString" proved="true">
@@ -54,7 +54,7 @@
   <proof prover="3"><result status="valid" time="0.022147" steps="10520"/></proof>
   </goal>
   <goal name="split_string&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.283311" steps="1672"/></proof>
+  <proof prover="4"><result status="valid" time="0.098555" steps="1397"/></proof>
   </goal>
   <goal name="split_string&#39;vc.13" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.052437" steps="101281"/></proof>
@@ -66,10 +66,10 @@
   <proof prover="3"><result status="valid" time="0.040443" steps="55466"/></proof>
   </goal>
   <goal name="split_string&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.274553" steps="2653"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.274553" steps="2616"/></proof>
   </goal>
   <goal name="split_string&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.021337" steps="33"/></proof>
+  <proof prover="4"><result status="valid" time="0.021337" steps="33"/></proof>
   </goal>
   <goal name="split_string&#39;vc.18" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="3.799281" steps="258920"/></proof>
@@ -81,7 +81,7 @@
   <proof prover="3"><result status="valid" time="0.062629" steps="97797"/></proof>
   </goal>
   <goal name="split_string&#39;vc.21" expl="loop invariant preservation" proved="true">
-  <proof prover="0" timelimit="5"><result status="valid" time="0.395341" steps="3735"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.236999" steps="3554"/></proof>
   </goal>
   <goal name="split_string&#39;vc.22" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.029652" steps="36779"/></proof>
@@ -99,8 +99,8 @@
   <proof prover="3"><result status="valid" time="0.053497" steps="93891"/></proof>
   </goal>
   <goal name="split_string&#39;vc.27" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.065083" steps="25"/></proof>
   <proof prover="3"><result status="valid" time="0.056946" steps="94363"/></proof>
+  <proof prover="4"><result status="valid" time="0.065083" steps="26"/></proof>
   </goal>
   <goal name="split_string&#39;vc.28" expl="loop invariant preservation" proved="true">
   <proof prover="3"><result status="valid" time="0.061993" steps="95819"/></proof>
@@ -124,7 +124,7 @@
   <proof prover="3"><result status="valid" time="0.056633" steps="93102"/></proof>
   </goal>
   <goal name="split_string&#39;vc.35" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.072079" steps="332"/></proof>
+  <proof prover="4"><result status="valid" time="0.072079" steps="385"/></proof>
   </goal>
   <goal name="split_string&#39;vc.36" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.045011" steps="7334"/></proof>
@@ -178,7 +178,7 @@
   <proof prover="3"><result status="valid" time="0.039962" steps="10839"/></proof>
   </goal>
   <goal name="split_string&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="0" timelimit="60"><result status="valid" time="14.794960" steps="129761"/></proof>
+  <proof prover="4" timelimit="60"><result status="valid" time="0.153406" steps="1729"/></proof>
   </goal>
   <goal name="split_string&#39;vc.14" expl="integer overflow" proved="true">
   <proof prover="3"><result status="valid" time="0.066537" steps="114171"/></proof>
@@ -206,7 +206,7 @@
     <proof prover="3"><result status="valid" time="0.198406" steps="347591"/></proof>
     </goal>
     <goal name="split_string&#39;vc.19.1.1" expl="false case (postcondition)" proved="true">
-    <proof prover="0"><result status="valid" time="0.244248" steps="1259"/></proof>
+    <proof prover="4"><result status="valid" time="0.082758" steps="1273"/></proof>
     </goal>
    </transf>
    </goal>
@@ -236,7 +236,7 @@
   <goal name="split_string&#39;vc.27" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="split_string&#39;vc.27.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0" timelimit="30"><result status="valid" time="2.065399" steps="17446"/></proof>
+   <proof prover="4" timelimit="30"><result status="valid" time="4.051569" steps="71837"/></proof>
    </goal>
   </transf>
   </goal>
@@ -275,7 +275,7 @@
   <goal name="split_string&#39;vc.35" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="split_string&#39;vc.35.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="0.045440" steps="68"/></proof>
+   <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="0.045440" steps="68"/></proof>
    </goal>
   </transf>
   </goal>
@@ -305,10 +305,10 @@
   <proof prover="3"><result status="valid" time="0.048567" steps="112502"/></proof>
   </goal>
   <goal name="split_string&#39;vc.43" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.140543" steps="206"/></proof>
+  <proof prover="4"><result status="valid" time="0.022979" steps="205"/></proof>
   </goal>
   <goal name="split_string&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.127207" steps="843"/></proof>
+  <proof prover="4"><result status="valid" time="0.127207" steps="862"/></proof>
   </goal>
   <goal name="split_string&#39;vc.45" expl="postcondition" proved="true">
   <proof prover="1" timelimit="1"><result status="valid" time="0.441338" steps="70290"/></proof>

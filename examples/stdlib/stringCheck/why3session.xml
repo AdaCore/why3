@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="stringCheck.mlw"/>
@@ -45,7 +45,7 @@
  </goal>
  <goal name="String.le_trans" proved="true">
  <proof prover="0" timelimit="200"><result status="valid" time="0.020000" steps="885"/></proof>
- <proof prover="2"><result status="valid" time="0.000000" steps="14"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="16"/></proof>
  </goal>
  <goal name="String.at_out_of_range" proved="true">
  <proof prover="4"><result status="valid" time="0.020000" steps="2417"/></proof>

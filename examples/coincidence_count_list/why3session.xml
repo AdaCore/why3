@@ -2,14 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="10" steplimit="0" memlimit="4000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="coincidence_count_list.mlw"/>
 <theory name="CoincidenceCount" proved="true">
  <goal name="Transitive.Trans" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="4"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="3"/></proof>
  </goal>
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
  <transf name="split_vc" proved="true" >
@@ -45,7 +44,7 @@
    <goal name="coincidence_count&#39;vc.9.0" expl="postcondition" proved="true">
    <transf name="split_all_full" proved="true" >
     <goal name="coincidence_count&#39;vc.9.0.0" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="2.545932" steps="17581"/></proof>
+    <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="4.880861" steps="66882"/></proof>
     </goal>
    </transf>
    </goal>
@@ -59,18 +58,18 @@
  <proof prover="2"><result status="valid" time="0.020000" steps="5970"/></proof>
  </goal>
  <goal name="Transitive.Trans" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="6"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="8"/></proof>
  </goal>
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
- <proof prover="3"><result status="valid" time="2.009107" steps="14703"/></proof>
+ <proof prover="0"><result status="valid" time="1.148355" steps="23502"/></proof>
  </goal>
 </theory>
 <theory name="CoincidenceCountList" proved="true">
  <goal name="Transitive.Trans" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="4"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="3"/></proof>
  </goal>
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
- <proof prover="3"><result status="valid" time="0.290000" steps="3143"/></proof>
+ <proof prover="0"><result status="valid" time="0.147693" steps="3171"/></proof>
  </goal>
 </theory>
 </file>

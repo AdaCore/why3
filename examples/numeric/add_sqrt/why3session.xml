@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.5.4" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="add_sqrt.mlw"/>
 <theory name="AdditionSqrtSingle" proved="true">
@@ -12,16 +12,16 @@
   <transf name="assert" proved="true" arg1="let t = to_real a +. to_real (usqrt b) in
 abs (to_real result -. t) &lt;=. (eps *. abs t)">
    <goal name="add_sqrt&#39;vc.0.0" expl="asserted formula" proved="true">
-   <proof prover="1"><result status="valid" time="0.192795" steps="859"/></proof>
+   <proof prover="0"><result status="valid" time="0.045541" steps="826"/></proof>
    </goal>
    <goal name="add_sqrt&#39;vc.0.1" expl="postcondition" proved="true">
    <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. to_real (usqrt b)))
 &lt;=. (eps *. abs (to_real a +. to_real (usqrt b)))">
     <goal name="add_sqrt&#39;vc.0.1.0" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.048223" steps="133"/></proof>
+    <proof prover="0"><result status="valid" time="0.017132" steps="130"/></proof>
     </goal>
     <goal name="add_sqrt&#39;vc.0.1.1" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.086509" steps="124"/></proof>
+    <proof prover="0"><result status="valid" time="0.016955" steps="123"/></proof>
     </goal>
    </transf>
    </goal>
@@ -37,16 +37,16 @@ abs (to_real result -. t) &lt;=. (eps *. abs t)">
   <transf name="assert" proved="true" arg1="let t = to_real a +. to_real (usqrt b) in
 abs (to_real result -. t) &lt;=. (eps *. abs t)">
    <goal name="add_sqrt&#39;vc.0.0" expl="asserted formula" proved="true">
-   <proof prover="1"><result status="valid" time="0.042929" steps="859"/></proof>
+   <proof prover="0"><result status="valid" time="0.044572" steps="826"/></proof>
    </goal>
    <goal name="add_sqrt&#39;vc.0.1" expl="postcondition" proved="true">
    <transf name="assert" proved="true" arg1="abs (to_real result -. (to_real a +. to_real (usqrt b)))
 &lt;=. (eps *. abs (to_real a +. to_real (usqrt b)))">
     <goal name="add_sqrt&#39;vc.0.1.0" expl="asserted formula" proved="true">
-    <proof prover="1"><result status="valid" time="0.091382" steps="133"/></proof>
+    <proof prover="0"><result status="valid" time="0.016516" steps="130"/></proof>
     </goal>
     <goal name="add_sqrt&#39;vc.0.1.1" expl="postcondition" proved="true">
-    <proof prover="1"><result status="valid" time="0.046502" steps="124"/></proof>
+    <proof prover="0"><result status="valid" time="0.016058" steps="123"/></proof>
     </goal>
    </transf>
    </goal>

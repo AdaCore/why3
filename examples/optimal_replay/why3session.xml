@@ -6,67 +6,68 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="optimal_replay.mlw"/>
 <theory name="OptimalReplay" proved="true">
  <goal name="n&#39;vc" expl="VC for n" proved="true">
- <proof prover="4"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="5" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
  <goal name="distance&#39;vc" expl="VC for distance" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="distance&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="4"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="2"/></proof>
   </goal>
   <goal name="distance&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="6"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="4"/></proof>
   </goal>
   <goal name="distance&#39;vc.2" expl="array creation size" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="4"/></proof>
   </goal>
   <goal name="distance&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="32"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="40"/></proof>
   </goal>
   <goal name="distance&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="21"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="32"/></proof>
   </goal>
   <goal name="distance&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="55"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="76"/></proof>
   </goal>
   <goal name="distance&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="31"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="82"/></proof>
   </goal>
   <goal name="distance&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="32"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="56"/></proof>
   </goal>
   <goal name="distance&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="35"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="48"/></proof>
   </goal>
   <goal name="distance&#39;vc.9" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="39"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="60"/></proof>
   </goal>
   <goal name="distance&#39;vc.10" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="43"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="62"/></proof>
   </goal>
   <goal name="distance&#39;vc.11" expl="loop variant decrease" proved="true">
   <proof prover="3"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="distance&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="83"/></proof>
+  <proof prover="5"><result status="timeout" time="5.000000" steps="16476"/></proof>
+  <proof prover="7"><result status="valid" time="0.022707" steps="83"/></proof>
   </goal>
   <goal name="distance&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.040000"/></proof>
   <proof prover="3"><result status="valid" time="0.050000"/></proof>
   </goal>
   <goal name="distance&#39;vc.14" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="41"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="62"/></proof>
   </goal>
   <goal name="distance&#39;vc.15" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.010000" steps="41"/></proof>
+  <proof prover="5"><result status="valid" time="0.010000" steps="48"/></proof>
   </goal>
   <goal name="distance&#39;vc.16" expl="index in array bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="47"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="48"/></proof>
   </goal>
   <goal name="distance&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.040000"/></proof>
@@ -94,10 +95,10 @@
   <proof prover="3"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="distance&#39;vc.21" expl="assertion" proved="true">
-  <proof prover="7" timelimit="36"><result status="valid" time="0.000000" steps="33"/></proof>
+  <proof prover="5" timelimit="36"><result status="valid" time="0.000000" steps="51"/></proof>
   </goal>
   <goal name="distance&#39;vc.22" expl="out of loop bounds" proved="true">
-  <proof prover="7"><result status="valid" time="0.020000" steps="14"/></proof>
+  <proof prover="5"><result status="valid" time="0.020000" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
