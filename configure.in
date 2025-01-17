@@ -727,11 +727,7 @@ elif test "$found_ocamlgraph" = no; then
 fi
 
 if test "$enable_hypothesis_selection" != no; then
-   META_OCAMLGRAPH="ocamlgraph"
    enable_hypothesis_selection=yes
-else
-   META_OCAMLGRAPH=
-   OCAMLGRAPHLIB=
 fi
 
 if test "$enable_stackify" = no; then
@@ -755,8 +751,11 @@ else
 fi
 
 if test "$enable_stackify" != no; then
-   META_OCAMLGRAPH="ocamlgraph"
    enable_stackify=yes
+fi
+
+if test "$enable_hypothesis_selection" != no -o "$enable_stackify" != no; then
+   META_OCAMLGRAPH="ocamlgraph"
 else
    META_OCAMLGRAPH=
    OCAMLGRAPHLIB=
