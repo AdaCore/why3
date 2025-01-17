@@ -202,10 +202,10 @@ if test "$OCAMLC" = no ; then
    AC_MSG_ERROR([cannot find ocamlc.])
 fi
 AC_MSG_CHECKING([ocaml os type])
-OCAML_OS_TYPE=$(OCAMLC -config-var os_type)
+OCAML_OS_TYPE=$($OCAMLC -config-var os_type)
 AC_MSG_RESULT([$OCAML_OS_TYPE])
 
-AC_PROG_CC([ $(OCAMLC -config-var c_compiler) gcc cl.exe clang ])
+AC_PROG_CC([ "$($OCAMLC -config-var c_compiler)" gcc cl.exe clang ])
 AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
