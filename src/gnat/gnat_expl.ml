@@ -46,6 +46,8 @@ type check_kind =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -114,6 +116,8 @@ let is_warning_kind r =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -231,6 +235,8 @@ let check_kind_from_string s =
    | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
    | "VC_ASSERT_STEP"               -> VC_Assert_Step
    | "VC_RAISE"                     -> VC_Raise
+   | "VC_UNEXPECTED_PROGRAM_EXIT"   -> VC_Unexpected_Program_Exit
+   | "VC_PROGRAM_EXIT_POST"         -> VC_Program_Exit_Post
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
@@ -304,6 +310,8 @@ let check_kind_to_ada kind =
    | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
    | VC_Assert_Step               -> "VC_ASSERT_STEP"
    | VC_Raise                     -> "VC_RAISE"
+   | VC_Unexpected_Program_Exit   -> "VC_UNEXPECTED_PROGRAM_EXIT"
+   | VC_Program_Exit_Post         -> "VC_PROGRAM_EXIT_POST"
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
@@ -372,6 +380,8 @@ let check_kind_to_string kind =
    | VC_Assert_Premise            -> "assert_premise"
    | VC_Assert_Step               -> "assert_step"
    | VC_Raise                     -> "raise"
+   | VC_Unexpected_Program_Exit   -> "unexpected_program_exit"
+   | VC_Program_Exit_Post         -> "program_exit_post"
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
