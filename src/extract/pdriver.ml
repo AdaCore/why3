@@ -228,9 +228,9 @@ let load_driver whyconf_main env file extra_files =
   let add_module { mor_name = (loc,q); mor_rules = mrl } =
     let f,id = let l = List.rev q in List.rev (List.tl l),List.hd l in
     (* This should work if pdrivers are used only for extraction *)
-    let m = mod_impl env (Loc.try3 ~loc read_module env f id) in
+    let m = Loc.try3 ~loc read_module env f id in
     qualid := q;
-    List.iter (add_local_module m) mrl
+    List.iter (add_local_module m.mod_impl) mrl
   in
   List.iter add_theory f.fe_th_rules;
   List.iter add_module f.fe_mo_rules;

@@ -1040,7 +1040,7 @@ match pa.proof_state with
                (Session_itp.find_th d.cont.controller_session parid) ) )
      in
      let env = d.cont.controller_env in
-     let known_map = pm.Pmodule.mod_theory.Theory.th_known in
+     let known_map = pm.Pmodule.mod_intf.mod_theory.Theory.th_known in
      let result = Pp.string_of print_prover_answer res.pr_answer in
      let selected_model = Option.value ~default:Model_parser.empty_model
          (Check_ce.last_nonempty_model ~env ~known_map res.pr_models) in

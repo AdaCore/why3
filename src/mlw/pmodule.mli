@@ -87,13 +87,17 @@ and mod_inst = {
   mi_df  : prop_kind;
 }
 
-type pmodule := pmodule0
+type pmodule = private {
+  mod_inst : mod_inst;
+  mod_intf : pmodule0;
+  mod_impl : pmodule0;
+}
 
 val empty_mod_inst: pmodule -> mod_inst
 
 (** {2 Module under construction} *)
 
-type pmodule_uc = private {
+type pmodule_uc0 = private {
   muc_theory : theory_uc;
   muc_units  : mod_unit list;
   muc_import : namespace list;
@@ -102,6 +106,11 @@ type pmodule_uc = private {
   muc_local  : Sid.t;
   muc_used   : Sid.t;
   muc_env    : Env.env;
+}
+
+type pmodule_uc = private {
+  muc_intf : pmodule_uc0;
+  muc_impl : pmodule_uc0;
 }
 
 val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
@@ -143,8 +152,6 @@ val add_meta : pmodule_uc -> meta -> meta_arg list -> pmodule_uc
 val add_pdecl : ?warn:bool -> vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
 (** [add_pdecl ~vc m d] adds declaration [d] in module [m].
     If [vc] is [true], VC is computed and added to [m]. *)
-
-val mod_impl : Env.env -> pmodule -> pmodule
 
 val close_module_with_intf : pmodule_uc -> pmodule -> pmodule * pmodule
 

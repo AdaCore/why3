@@ -405,13 +405,13 @@ let select_ce env th models =
           (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
       if !opt_rac_only_giant then
         let res =
-          Check_ce.models_from_giant_step ~limits ?verb_lvl:!opt_ce_log_verbosity rac env pm models
+          Check_ce.models_from_giant_step ~limits ?verb_lvl:!opt_ce_log_verbosity rac env pm.mod_intf models
         in Option.bind (Check_ce.best_giant_step_result res)
           (fun (m, r) -> Some (m, Result r))
       else
         let res =
            Check_ce.models_from_rac ~limits ?verb_lvl:!opt_ce_log_verbosity
-           rac env pm models
+           rac env pm.mod_intf models
         in Option.bind (Check_ce.best_rac_result res)
           (fun (m, r) -> Some (m, Classification r))
   | exception Not_found -> None

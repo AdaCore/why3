@@ -304,7 +304,7 @@ let read_channel env path file c =
   Typing.close_module loc;
   let mm = Typing.close_file () in
   if path = [] && Debug.test_flag debug then begin
-    let add_m _ m modm = Ident.Mid.add m.mod_theory.Theory.th_name m modm in
+    let add_m _ m modm = Ident.Mid.add m.mod_intf.mod_theory.Theory.th_name m modm in
     let print_m _ m = Pmodule.print_module Format.err_formatter m in
     Ident.Mid.iter print_m (Mstr.fold add_m mm Ident.Mid.empty)
   end;

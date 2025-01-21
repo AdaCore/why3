@@ -393,7 +393,7 @@ let built_in_modules () =
 
 let add_builtin_mo env (Builtin_module {path; name; types; values}) =
   let open Pmodule in
-  let pm = read_module env path name in
+  let pm = (read_module env path name).mod_intf in
   List.iter
     (fun (id, r) ->
       let its =

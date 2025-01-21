@@ -272,7 +272,7 @@ let arg_loc ~default = function
   | PAt _ -> default
   | PAr id -> id.id_loc
 
-let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
+let rec type_expr (Pmodule.{muc_intf = {muc_theory = tuc}} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
   | PEany -> Eany, []
   | PEbox e -> let e = type_prog ~loc muc ctx e in Ebox e, []
@@ -290,7 +290,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
               | Qident id -> id.id_str in
             Mstr.find nm ctx.hdls with Not_found ->
         try let sl = Typing.string_list_of_qualid q in
-            let ns = List.hd muc.Pmodule.muc_import in
+            let ns = List.hd muc.Pmodule.muc_intf.Pmodule.muc_import in
             hs_of_xs (Pmodule.ns_find_xs ns sl)
         with Not_found ->
           Loc.errorm ~loc:(qloc q) "[coma typing] \
@@ -394,7 +394,7 @@ and type_prog ?loc muc ctx d =
   e
 
 and type_defn_list muc ctx flat dl =
-  let tuc = muc.Pmodule.muc_theory in
+  let tuc = muc.Pmodule.muc_intf.Pmodule.muc_theory in
   let ctx_full, dl =
     Lists.map_fold_left
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
