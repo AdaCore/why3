@@ -1777,7 +1777,7 @@ end
 type slice = {
   env              : Env.env;
   path             : Env.pathname;
-  mutable file     : pmodule Mstr.t;
+  mutable file     : Pmodule.mlw_file;
   mutable muc      : pmodule_uc option;
   mutable muc_intf : pmodule option
 }
