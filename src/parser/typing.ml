@@ -1779,7 +1779,7 @@ type slice = {
   path             : Env.pathname;
   mutable file     : Pmodule.mlw_file;
   mutable muc      : pmodule_uc option;
-  mutable muc_intf : pmodule option
+  mutable muc_intf : pmodule0 option
 }
 
 let state = (Stack.create () : slice Stack.t)

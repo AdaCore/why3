@@ -163,7 +163,7 @@ let ns_find_rs ns s = match ns_find_prog_symbol ns s with
 
 (** {2 Module} *)
 
-type pmodule = {
+type pmodule0 = {
   mod_theory : theory;        (* pure theory *)
   mod_units  : mod_unit list; (* module declarations *)
   mod_export : namespace;     (* exported namespace *)
@@ -174,13 +174,13 @@ type pmodule = {
 
 and mod_unit =
   | Udecl  of pdecl
-  | Uuse   of pmodule
+  | Uuse   of pmodule0
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
   | Uscope of string * mod_unit list
 
 and mod_inst = {
-  mi_mod : pmodule;
+  mi_mod : pmodule0;
   mi_ty  : ity Mts.t;
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
@@ -1728,7 +1728,7 @@ let close_module_with_intf muc intf =
 
 (** {2 WhyML language} *)
 
-type mlw_file = pmodule Mstr.t
+type mlw_file = pmodule0 Mstr.t
 
 let convert mm =
   let convert m = m.mod_theory in

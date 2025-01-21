@@ -707,7 +707,7 @@ let fold_premises f (premises: premises) init =
 
 type env = {
   why_env  : Env.env;
-  pmodule  : Pmodule.pmodule;
+  pmodule  : Pmodule.pmodule0;
   funenv   : (cexp * rec_defn list option) Mrs.t;
   tvenv    : Ty.ty Mtv.t;
   vsenv    : value Mvs.t;

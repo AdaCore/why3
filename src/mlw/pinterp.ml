@@ -256,7 +256,7 @@ type builtin = Builtin_module of {
   path: string list;
   name: string;
   types: (string * (Pdecl.known_map -> itysymbol -> unit)) list;
-  values: Pmodule.pmodule -> (string * (rsymbol -> value list -> value)) list;
+  values: Pmodule.pmodule0 -> (string * (rsymbol -> value list -> value)) list;
 }
 
 let dummy_type (_:Pdecl.known_map) (_:itysymbol) = ()

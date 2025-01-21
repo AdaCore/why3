@@ -211,7 +211,7 @@ val fold_premises : ('a -> Term.term -> 'a) -> premises -> 'a -> 'a
 
 type env = {
   why_env  : Env.env;
-  pmodule  : Pmodule.pmodule;
+  pmodule  : Pmodule.pmodule0;
   funenv   : (Expr.cexp * Expr.rec_defn list option) Expr.Mrs.t;
   (** local functions *)
   tvenv    : Ty.ty Ty.Mtv.t;
@@ -228,7 +228,7 @@ type env = {
 (** The parts of the execution environment in {!Pinterp} which are relevant for
    {!Rac}. *)
 
-val mk_empty_env : Env.env -> Pmodule.pmodule -> env
+val mk_empty_env : Env.env -> Pmodule.pmodule0 -> env
 
 val get_vs : env -> Term.Mvs.key -> Value.value
 

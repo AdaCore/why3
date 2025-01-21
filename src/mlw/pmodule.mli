@@ -58,7 +58,7 @@ exception IncompatibleNotation of string
 
 (** {2 Module} *)
 
-type pmodule = private {
+type pmodule0 = private {
   mod_theory : theory;        (* pure theory *)
   mod_units  : mod_unit list; (* module declarations *)
   mod_export : namespace;     (* exported namespace *)
@@ -69,13 +69,13 @@ type pmodule = private {
 
 and mod_unit =
   | Udecl  of pdecl
-  | Uuse   of pmodule
+  | Uuse   of pmodule0
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
   | Uscope of string * mod_unit list
 
 and mod_inst = {
-  mi_mod : pmodule;
+  mi_mod : pmodule0;
   mi_ty  : ity Mts.t;
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
@@ -86,6 +86,8 @@ and mod_inst = {
   mi_xs  : xsymbol Mxs.t;
   mi_df  : prop_kind;
 }
+
+type pmodule := pmodule0
 
 val empty_mod_inst: pmodule -> mod_inst
 

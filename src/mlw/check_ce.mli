@@ -141,7 +141,7 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     following functions help selecting one counterexample. *)
 
 val models_from_rac : limits:Call_provers.resource_limits ->
-?verb_lvl:int -> ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+?verb_lvl:int -> ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule0 ->
 (Call_provers.prover_answer * model) list -> (model * rac_result * rac_result * classification) list
 
 (** Execute small and giant-step RAC on the models, and compute the classification.
@@ -156,7 +156,7 @@ val models_from_rac : limits:Call_provers.resource_limits ->
 
 val models_from_giant_step :
   limits:Call_provers.resource_limits -> ?verb_lvl:int ->
-  ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+  ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule0 ->
   (Call_provers.prover_answer * model) list ->
   (model * rac_result) list
 (** Execute only the giant-step RAC. The returned [rac_result] contains a trace of the
