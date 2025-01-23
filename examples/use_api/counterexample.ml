@@ -158,7 +158,7 @@ let mlw_file =
 
 let pm =
   let pms = Typing.type_mlw_file env [] "myfile.mlw" mlw_file in
-  Wstdlib.Mstr.find "" pms
+  (Wstdlib.Mstr.find "" pms).Pmodule.mod_intf
 
 let task =
   match Task.split_theory pm.Pmodule.mod_theory None None with

@@ -39,22 +39,22 @@ let int_module : Pmodule.pmodule =
   Pmodule.read_module env ["int"] "Int"
 
 let ge_int : Term.lsymbol =
-  Theory.ns_find_ls int_module.Pmodule.mod_theory.Theory.th_export
+  Theory.ns_find_ls int_module.Pmodule.mod_intf.Pmodule.mod_theory.Theory.th_export
     [Ident.op_infix ">="]
 
 let ref_module : Pmodule.pmodule =
   Pmodule.read_module env ["ref"] "Ref"
 
 let ref_type : Ity.itysymbol =
-  Pmodule.ns_find_its ref_module.Pmodule.mod_export ["ref"]
+  Pmodule.ns_find_its ref_module.Pmodule.mod_intf.Pmodule.mod_export ["ref"]
 
 (* the "ref" function *)
 let ref_fun : Expr.rsymbol =
-  Pmodule.ns_find_rs ref_module.Pmodule.mod_export ["ref"]
+  Pmodule.ns_find_rs ref_module.Pmodule.mod_intf.Pmodule.mod_export ["ref"]
 
 (* the "!" function *)
 let get_fun : Expr.rsymbol =
-  Pmodule.ns_find_rs ref_module.Pmodule.mod_export [Ident.op_prefix "!"]
+  Pmodule.ns_find_rs ref_module.Pmodule.mod_intf.Pmodule.mod_export [Ident.op_prefix "!"]
 
 (* END{code2_import} *)
 
@@ -109,7 +109,7 @@ let mod2 =
 
 (* BEGIN{checkingvcs} *)
 let my_tasks : Task.task list =
-  Task.split_theory mod2.Pmodule.mod_theory None None
+  Task.split_theory mod2.Pmodule.mod_intf.Pmodule.mod_theory None None
 
 open Format
 
