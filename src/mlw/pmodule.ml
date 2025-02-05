@@ -231,7 +231,7 @@ let empty_module env n p = {
 }
 
 let close_module, restore_module =
-  let h = Hid.create 17 in
+  let h = Wid.create 17 in
   (fun uc ->
      let th = close_theory uc.muc_theory in (* catches errors *)
      let m = { mod_theory = th;
@@ -240,9 +240,9 @@ let close_module, restore_module =
                mod_known  = uc.muc_known;
                mod_local  = uc.muc_local;
                mod_used   = uc.muc_used; } in
-     Hid.add h th.th_name m;
+     Wid.set h th.th_name m;
      m),
-  (fun th -> Hid.find h th.th_name)
+  (fun th -> Wid.find h th.th_name)
 
 let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
@@ -1487,7 +1487,7 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
 
 let impl_cl = empty_clones' Sid.empty
 
-let mod_table = Hid.create 17
+let mod_table = Wid.create 17
 
 let theory_add_clone = Theory.add_clone_internal ()
 
@@ -1517,7 +1517,7 @@ let decl_impl uc d =
   | _ -> uc
 
 let need_copy m =
-  Sid.exists (fun id -> Hid.mem mod_table id) m.mod_theory.th_used
+  Sid.exists (fun id -> Wid.mem mod_table id) m.mod_theory.th_used
 
 let pdecl_impl inst uc d =
   let uc = clone_pdecl None inst impl_cl uc d in
@@ -1578,13 +1578,13 @@ and mod_impl' e m =
 
 and mod_impl e m =
   let id = m.mod_theory.th_name in
-  try Hid.find mod_table id with
+  try Wid.find mod_table id with
   | Not_found ->
      if not (need_copy m)
      then m
      else begin
          let m = mod_impl' e m in
-         Hid.add mod_table id m;
+         Wid.set mod_table id m;
          m
        end
 
@@ -1653,8 +1653,8 @@ let mod_impl_register e m mimpl inst =
   let mimpl' = clone_export' mimpl' m inst impl_cl in
   let mimpl' = close_scope mimpl' ~import:false in
   let mimpl' = close_module mimpl' in
-  Hid.add mod_table mimpl.mod_theory.th_name mimpl';
-  Hid.add mod_table m.mod_theory.th_name mimpl'
+  Wid.set mod_table mimpl.mod_theory.th_name mimpl';
+  Wid.set mod_table m.mod_theory.th_name mimpl'
 
 (** {2 WhyML language} *)
 
