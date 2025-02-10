@@ -469,7 +469,7 @@ module Why = struct
     let task_filename = match Sys.getenv_opt "WHY3RACTASKDIR" with
       | Some temp_dir when Debug.test_flag debug_rac_check_term_result ->
           let task = Trans.apply cnf.elim_eps task in
-          let filename = Filename.temp_file ~temp_dir "gnatwhy3-task" ".why" in
+          let filename = Filename.temp_file ~temp_dir "why3-task" ".why" in
           let out = open_out filename in
           fprintf (formatter_of_out_channel out) "%a@." Pretty.print_task task;
           close_out out;

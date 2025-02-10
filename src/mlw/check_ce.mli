@@ -102,17 +102,17 @@ type classification = verdict * Log.exec_log
 (** The result of a classification based on normal and giant-step RAC execution
     is comprised of a verdict itself and the log of the relevant execution. *)
 
-val report_verdict : ?check_ce:bool -> Env.env -> classification Pp.pp
+val report_verdict : Env.env -> classification Pp.pp
 (** Describe a verdict in a short sentence. *)
 
 val print_classification_log_or_model :
   ?verb_lvl:int -> json:bool ->
   print_attrs:bool -> (model * classification) Pp.pp
-(** Print classification log or the model when the model is bad or incomplete *)
+(** Print classification log or the model when the model is bad or the verdict
+    is INCOMPLETE *)
 
 val print_model_classification :
-  ?verb_lvl:int -> json:bool -> ?check_ce:bool -> Env.env ->
-  (model * classification) Pp.pp
+  ?verb_lvl:int -> json:bool -> Env.env -> (model * classification) Pp.pp
 (** Print the classification with the classification log or model. *)
 
 val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
@@ -132,12 +132,40 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     counterexamples ({!recfield:Call_provers.prover_result.pr_models}). The
     following functions help selecting one counterexample. *)
 
-type strategy_from_rac =
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
-(** Type of strategies to select a model from the RAC execution results.*)
+val models_from_rac : limits:Call_provers.resource_limits ->
+?verb_lvl:int -> ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+(Call_provers.prover_answer * model) list -> (model * rac_result * rac_result * classification) list
 
-val best_non_empty_giant_step_rac_result : strategy_from_rac
+(** Execute small and giant-step RAC on the models, and compute the classification.
+    The computed [classification] is based on the results of the normal and giant
+    step RAC executions, and contains the relevant execution logs. This log can be
+    used to explain the classification.
+    The returned [model] list contains the prover supplide models, where we update
+    the values to those that have been computed by the small-step RAC. The [model]
+    is provided as an easier to manipulate object than the log, but it might contain
+    several inconsistencies; in particular, only the [me_concrete_value] fields of the
+    model are guaranteed to be updated. *)
+
+val models_from_giant_step :
+  limits:Call_provers.resource_limits -> ?verb_lvl:int ->
+  ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+  (Call_provers.prover_answer * model) list ->
+  (model * rac_result) list
+(** Execute only the giant-step RAC. The returned [rac_result] contains a trace of the
+    execution of the RAC, and can be used for displaying to the user or to further elaborate
+    the counterexample.  As a helper mechanism, we also return a new [model]. See the
+    discussion on [models_from_rac] for a more in-depth explanation. *)
+
+val best_rac_result : (model * rac_result * rac_result * classification) list -> (model * classification) option
+(** Select a model based on the classification (itself based on the normal and
+    giant-step RAC executions). The [rac_result] are just discarded, as the classification
+    is calculated at the previous stage.
+
+    The first good model is selected (i.e. with verdict {!const:verdict.NC},
+    {!const:verdict.SW}, or {!const:verdict.NC_SW}, if any).
+    *)
+
+val best_giant_step_result : (model * rac_result) list -> (model * rac_result) option
 (** Select the best non empty model based on the result of the giant-step RAC
     execution, with the following classification:
     RAC_done (Res_fail _ , _) > RAC_done (Res_normal, _)
@@ -146,59 +174,11 @@ val best_non_empty_giant_step_rac_result : strategy_from_rac
                               > RAC_not_done _
     *)
 
-val last_non_empty_model : strategy_from_rac
-(** Select the last non empty model. *)
+val last_nonempty_model : (Call_provers.prover_answer * model) list -> model option
+(** Select the last non-empty model from the list of models. Helper function for the
+    cases where counterexample checking has not been requested. *)
 
-val get_rac_results :
-  limits:Call_provers.resource_limits -> ?verb_lvl:int ->
-  ?compute_term:compute_term ->
-  ?only_giant_step:bool ->
-  rac -> Env.env -> Pmodule.pmodule ->
-  (Call_provers.prover_answer * model) list ->
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list
-(** Given a list of models, return the list of these models together with the
-    results of the execution of normal and giant-step RAC.
-    When called with [~only_giant_step:true], executes only the giant-step RAC.*)
-
-val select_model_from_verdict :
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
-  (model * classification) option
-(** Select a model based on the classification (itself based on the normal and
-    giant-step RAC executions).
-    The first good model is selected.*)
-
-val select_model_from_giant_step_rac_results :
-  ?strategy:strategy_from_rac ->
-  (int * Call_provers.prover_answer * model * rac_result * rac_result) list ->
-  (model * rac_result) option
-(** Select a model based on the giant-step RAC execution results.
-    By default, the strategy is [last_non_empty_model]. *)
-
-val select_model :
-  limits:Call_provers.resource_limits -> ?verb_lvl:int ->
-  ?compute_term:compute_term ->
-  check_ce:bool ->
-  rac -> Env.env -> Pmodule.pmodule ->
-  (Call_provers.prover_answer * model) list -> (model * classification) option
-(** Select one of the given models.
-    When counterexample checking is enabled, the first good model is selected
-    (i.e. with verdict {!const:verdict.NC}, {!const:verdict.SW}, or
-    {!const:verdict.NC_SW}, if any).
-    When counterexample checking is disabled, the last non-empty model is selected.
-    The RAC reduce configuration [rac] is used only when counterexample checking is
-    enabled.
-
-    When counterexample checking is enabled, gives the same result as
-    [select_model_from_verdict] called with the result of [get_rac_results].*)
-
-val select_model_last_non_empty :
-  (Call_provers.prover_answer * model) list -> model option
-(** Select the last, non-empty model in the incremental list of models.
-
-    This is a compatiblity function for the behaviour before 2020, and gives
-    the same result as [select_model ~check_ce:false]. *)
-
-(**/**)
+(** {Debugging flags} *)
 
 val debug_check_ce_rac_results : Debug.flag
 (** Print information about the models returned by the solver and the

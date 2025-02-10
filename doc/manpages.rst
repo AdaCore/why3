@@ -965,7 +965,8 @@ from failing proof attempts, for provers that are able to produce a
 *counter-model* of the proof task. Why3 attempts to turn this
 counter-model into values for the free variables of the original Why3
 input. Currently, this is supported for CVC4 prover version at least
-1.5, CVC5, and Z3 prover version at least 4.4.0.
+1.5, CVC5, Z3 prover version at least 4.4.0 and Alt-Ergo version at
+least 2.6.0.
 
 The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
