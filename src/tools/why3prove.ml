@@ -32,18 +32,13 @@ let opt_metas = ref []
 (* Option for printing counterexamples with JSON formatting *)
 let opt_json = ref false
 let opt_check_ce_model = ref false
+let opt_rac_only_giant = ref false
 let opt_rac_prover = ref None
 let opt_rac_timelimit = ref None
 let opt_rac_memlimit = ref None
 let opt_rac_steplimit = ref None
 let opt_ce_log_verbosity = ref None
 let opt_sub_goals = ref []
-
-let debug_print_original_model = Debug.register_info_flag "print-original-model"
-    ~desc:"Print original counterexample model when --check-ce"
-
-let debug_print_derived_model = Debug.register_info_flag "print-derived-model"
-    ~desc:"Print derived counterexample model when --check-ce"
 
 let add_opt_file x =
   let tlist = Queue.create () in
@@ -183,6 +178,8 @@ let option_list =
     KLong "check-ce", Hnd0 (fun () -> opt_check_ce_model := true),
     " check counterexamples using runtime assertion checking\n\
      (RAC)";
+    KLong "rac-only-giant", Hnd0 (fun () -> opt_rac_only_giant := true),
+    " only use giant-step RAC for counterexample checking (with --check-ce)";
     KLong "rac-prover", Hnd1 (AString, fun s -> opt_rac_prover := Some s),
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, space-\n\
@@ -318,9 +315,8 @@ let output_task drv fname _tname th task dir =
   Driver.print_task drv (formatter_of_out_channel cout) task;
   close_out cout
 
-(** Warning: when the json option is used, the counterexample model is taken from
-    res (i.e., it is the prover supplied model, printed through Call Prover). Otherwise,
-    the model is taken from ce (i.e., it is the model that went through the RAC pipeline)*)
+type ce_classification_or_result = Classification of Check_ce.classification | Result of Check_ce.rac_result | Not_checked
+
 let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
   if json then
     begin
@@ -343,10 +339,24 @@ let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
             "goal_name", String goal_name;
             "explanations", List (List.map (fun s -> String s) expls)
           ] in
+      let cex (m, cl) =
+        Record [
+          "model", Model_parser.json_model m;
+          "classification",
+          match cl with
+          | Classification (v, _) -> String (Check_ce.string_of_verdict v)
+          | Result r -> begin match r with
+                        | Check_ce.RAC_not_done s -> String (Format.asprintf "RAC_not_done: %s" s)
+                        | Check_ce.RAC_done (s, _) -> String (Check_ce.string_of_rac_result_state s)
+                        end
+          | Not_checked -> String "not-checked"
+        ]
+      in
       print_json fmt
         (Record [
              "term", term;
-             "prover-result", Call_provers.json_prover_result res
+             "prover-result", Call_provers.json_prover_result res;
+              "counterexample", List (Option.to_list (Option.map cex ce))
            ])
     end
   else
@@ -364,8 +374,19 @@ let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
       fprintf fmt "@\n@[<hov2>Prover result is: %a.@]"
         (Call_provers.print_prover_result ~json:false) res;
       Option.iter
-        (Check_ce.print_model_classification ~json
-           ?verb_lvl:!opt_ce_log_verbosity ~check_ce:!opt_check_ce_model env fmt)
+        (fun ce ->
+          match ce with
+          | m, Not_checked ->
+             assert (not !opt_check_ce_model);
+             fprintf fmt
+               ("The@ following@ counterexample@ model@ has@ not@ been@ \
+                 verified@ (missing@ option@ --check-ce)@.");
+             fprintf fmt "@\n%a" (Model_parser.print_model ~print_attrs:(Debug.test_flag Call_provers.debug_attrs)) m
+          | m, Classification c ->
+             (Check_ce.print_model_classification ~json:false
+                ?verb_lvl:!opt_ce_log_verbosity env fmt (m, c))
+          | _, Result r ->
+             (Check_ce.print_rac_result ?verb_lvl:!opt_ce_log_verbosity fmt r))
         ce;
       fprintf fmt "@\n"
     end
@@ -373,47 +394,38 @@ let print_result json fmt (fname, loc, goal_name, expls, res, ce) =
 let unproved = ref false
 
 let select_ce env th models =
-  if models <> [] then
-    match Pmodule.restore_module th with
-    | pm ->
-        let main = Whyconf.get_main config in
-        let limit_time = Whyconf.timelimit main in
-        let limit_time = Opt.fold (fun _ s -> s) limit_time !opt_rac_timelimit in
-        let limit_mem = Whyconf.memlimit main in
-        let limit_mem = Opt.fold (fun _ s -> s) limit_mem !opt_rac_memlimit in
-        let limit_steps = Opt.fold (fun _ s -> s) 0 !opt_rac_steplimit in
-        let limits = Call_provers.{ limit_time ; limit_mem ; limit_steps } in
-        let why_prover =
-          match !opt_rac_prover with
-          | None -> None
-          | Some p -> Some(p,limits)
-        in
-        let rac = Pinterp.mk_rac ~ignore_incomplete:false
-            (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
-        Check_ce.select_model ~limits ?verb_lvl:!opt_ce_log_verbosity
-          ~check_ce:!opt_check_ce_model rac env pm models
-    | exception Not_found -> None
-  else None
-
-let debug_print_model_attrs = Debug.lookup_flag "print_model_attrs"
-
-(** TODO rewrite this old function *)
-let print_other_models (m, (c, log)) =
-  let print_model fmt m =
-    let print_attrs = Debug.test_flag debug_print_model_attrs in
-    Model_parser.print_model fmt m ~print_attrs
-  in
-  ( match c with
-    | Check_ce.(NC | SW | NC_SW | BAD_CE _) ->
-        if Debug.test_flag debug_print_original_model then
-          printf "@[<v>Original model:@\n%a@]@\n@." print_model m;
-    | _ -> () );
-  ( match c with
-    | Check_ce.(NC | SW | NC_SW) ->
-        if Debug.test_flag debug_print_derived_model then
-          printf "@[<v>Derived model:@\n%a@]@\n@." print_model
-            (Check_ce.model_of_exec_log ~original_model:m log)
-    | _ -> () )
+  match models with
+  | [] -> None
+  | (_,m) :: _ ->
+  if not !opt_check_ce_model then Some (m, Not_checked) else
+  match Pmodule.restore_module th with
+  | pm ->
+      let main = Whyconf.get_main config in
+      let limit_time = Whyconf.timelimit main in
+      let limit_time = Opt.fold (fun _ s -> s) limit_time !opt_rac_timelimit in
+      let limit_mem = Whyconf.memlimit main in
+      let limit_mem = Opt.fold (fun _ s -> s) limit_mem !opt_rac_memlimit in
+      let limit_steps = Opt.fold (fun _ s -> s) 0 !opt_rac_steplimit in
+      let limits = Call_provers.{ limit_time ; limit_mem ; limit_steps } in
+      let why_prover =
+        match !opt_rac_prover with
+        | None -> None
+        | Some p -> Some(p,limits)
+      in
+      let rac = Pinterp.mk_rac ~ignore_incomplete:false
+          (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+      if !opt_rac_only_giant then
+        let res =
+          Check_ce.models_from_giant_step ~limits ?verb_lvl:!opt_ce_log_verbosity rac env pm models
+        in Option.bind (Check_ce.best_giant_step_result res)
+          (fun (m, r) -> Some (m, Result r))
+      else
+        let res =
+           Check_ce.models_from_rac ~limits ?verb_lvl:!opt_ce_log_verbosity
+           rac env pm models
+        in Option.bind (Check_ce.best_rac_result res)
+          (fun (m, r) -> Some (m, Classification r))
+  | exception Not_found -> None
 
 let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
   if really_do_task task then
@@ -428,13 +440,18 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
           Driver.prove_task ~command ~config ~limits drv task
         in
         let res = wait_on_call call in
-        let ce = select_ce env th res.pr_models in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
-        printf "%a@." (print_result !opt_json)
-          (fname, t.Term.t_loc, goal_name, expls, res, ce);
-        Option.iter print_other_models ce;
+        let ce =
+        if !opt_check_ce_model then select_ce env th res.pr_models
+          (* Option.iter print_other_models ce; WIP 30 Gennaio: remove? *)
+        else
+          Option.bind (Check_ce.last_nonempty_model res.pr_models)
+            (fun m -> Some (m, Not_checked))
+        in
+          printf "%a@." (print_result !opt_json)
+            (fname, t.Term.t_loc, goal_name, expls, res, ce);
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task
