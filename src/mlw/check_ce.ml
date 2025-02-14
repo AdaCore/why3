@@ -688,8 +688,8 @@ and get_record pm m lsymb args =
   let exception NotRecord in
   begin try
     let ls_ty =
-      begin match (Option.get lsymb.ls_value).ty_node with
-      | Ty.Tyapp (ts, _) -> ts
+      begin match lsymb.ls_value with
+      | Some {ty_node = Ty.Tyapp (ts, _); _} -> ts
       | _ -> raise NotRecord
       end
     in
