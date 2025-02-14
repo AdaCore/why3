@@ -76,7 +76,7 @@ val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 val oracle_of_model : Pmodule.pmodule -> Model_parser.model -> Pinterp_core.oracle
 (** Create an oracle from a (prover model-derived) candidate counterexample. *)
 
-val model_of_exec_log : original_model:model -> Log.exec_log -> model
+val model_of_exec_log : Pmodule.pmodule -> original_model:model -> Log.exec_log -> model
 (** [model_of_exec_log ~original_model log)] populates a {!Model_parser.model} from an
    execution log [log] *)
 
