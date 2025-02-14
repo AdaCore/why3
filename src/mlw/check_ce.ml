@@ -924,8 +924,8 @@ let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
           me_lsymbol = dummy_ls;
           me_kind = Other;
           me_value = dummy_term;
-          me_location = None;
-          me_attrs = Sattr.empty}
+          me_location = loc;
+          me_attrs = id.id_attrs}
   else None
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
