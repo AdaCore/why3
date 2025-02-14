@@ -577,7 +577,7 @@ let concrete_of_constant c ty =
       | _ -> assert false
       end
       in
-      let sign,mant,exp = Number.compute_float r fp in
+      let sign,exp,mant = Number.compute_float r fp in
       let float_sign = {bv_value = BigInt.of_int (if sign then 1 else 0);
                   bv_length = 1;
                   bv_verbatim = if sign then "1" else "0"} in
