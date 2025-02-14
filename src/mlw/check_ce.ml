@@ -585,7 +585,7 @@ let concrete_of_constant c ty =
                  bv_length = fp.fp_exponent_digits;
                  bv_verbatim = BigInt.to_string exp} in
       let float_mant = {bv_value = mant;
-                  bv_length = fp.fp_significand_digits;
+                  bv_length = fp.fp_significand_digits - 1;
                   bv_verbatim = BigInt.to_string mant} in
       let t_concrete_float_const v =
         Const (
