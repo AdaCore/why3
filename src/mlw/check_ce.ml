@@ -713,6 +713,7 @@ and get_record pm m lsymb args =
       | _ -> raise NotRecord
       end
     in
+(*
     if
       List.for_all2
         (fun ls t ->
@@ -721,7 +722,8 @@ and get_record pm m lsymb args =
            | None -> false)
         fields args
     then
-      let fields_args = List.map (concrete_term_of_term pm m) args in
+*)
+    let fields_args = List.map (concrete_term_of_term pm m) args in
       let fields_values =
         List.combine
           (List.map (fun ls ->
@@ -737,8 +739,10 @@ and get_record pm m lsymb args =
             fields_args
       in
       Some (Record fields_values)
+(*
     else
       raise NotRecord
+*)
     with NotRecord -> None
   end
 and get_opt_record pm env vs t' = None
