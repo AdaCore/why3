@@ -561,16 +561,48 @@ let concrete_string_from_vs vs =
 let concrete_of_ls ls =
   ls.ls_name.id_string
 
-let concrete_of_constant c = (match c with
-| Constant.ConstInt Number.{ il_kind; il_int } ->
-  Const (Integer {int_value=Number.{il_kind; il_int};
-                  int_verbatim= BigInt.to_string il_int })
-| Constant.ConstReal rconst ->
-  Const (Real
-  {real_value = rconst;
-   real_verbatim = (asprintf
-                    "%a" (Number.(print_real_constant full_support)) rconst)})
-| Constant.ConstStr s -> Const (String s))
+let concrete_of_constant c ty =
+  match c with
+  | Constant.ConstInt Number.{ il_kind; il_int } ->
+    Const (Integer {int_value=Number.{il_kind; il_int};
+                    int_verbatim= BigInt.to_string il_int })
+  | Constant.ConstReal rconst when Ty.ty_equal ty Ty.ty_real ->
+    Const (Real {real_value = rconst;
+                 real_verbatim = (asprintf
+                      "%a" (Number.(print_real_constant full_support)) rconst)})
+  | Constant.ConstReal ({rl_kind; rl_real} as r) -> (* Then it is a float *)
+      let ts = match ty.ty_node with | Ty.Tyapp (ts, _) -> ts | _ -> assert false in
+      let fp  = begin match ts.ts_def with
+      | Float fp -> fp
+      | _ -> assert false
+      end
+      in
+      let sign,mant,exp = Number.compute_float r fp in
+      let float_sign = {bv_value = BigInt.of_int (if sign then 1 else 0);
+                  bv_length = 1;
+                  bv_verbatim = if sign then "1" else "0"} in
+      let float_exp = {bv_value = exp;
+                 bv_length = fp.fp_exponent_digits;
+                 bv_verbatim = BigInt.to_string exp} in
+      let float_mant = {bv_value = mant;
+                  bv_length = fp.fp_significand_digits;
+                  bv_verbatim = BigInt.to_string mant} in
+      let t_concrete_float_const v =
+        Const (
+          Float {
+            float_exp_size = fp.fp_exponent_digits;
+            float_significand_size = fp.fp_significand_digits;
+            float_val = v
+          })
+      in
+      t_concrete_float_const
+                  (Float_number {
+                    float_sign;
+                    float_exp;
+                    float_mant;
+                    float_hex= "" (* TODO *)
+                  })
+  | Constant.ConstStr s -> Const (String s)
 
 (* Also converts some concrete epsilon terms (was previously done in model_parser):
    - when it represents a record,
@@ -580,7 +612,7 @@ let concrete_of_constant c = (match c with
 let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs.t) =
   function tm ->
     match tm.t_node with
-    | Term.Tconst c -> concrete_of_constant c
+    | Term.Tconst c -> concrete_of_constant c (Option.get tm.t_ty)
     | Term.Tvar v -> (try Mvs.find v m with Not_found -> concrete_var_from_vs v)
     | Term.Tapp (lsymb, ts) ->
       if ls_equal lsymb Term.fs_bool_true then Const (Boolean true)
@@ -612,6 +644,7 @@ let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs
           | None ->
             let vstring = concrete_string_from_vs vs in
             let t'_concrete = concrete_term_of_term pm (Mvs.add vs (Var vstring) m) t' in
+            (* TODO an epsilon at this stage is probably an error *)
             Epsilon (vstring, t'_concrete)
           end
         end
@@ -702,7 +735,7 @@ and get_record pm m lsymb args =
       Some (Record fields_values)
     else
       raise NotRecord
-    with _ -> None
+    with NotRecord -> None
   end
 and get_opt_record pm env vs t' = None
  (*  (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
@@ -813,7 +846,7 @@ let rec concrete_of_cexp (pm:Pmodule.pmodule)
 
 and concrete_of_expr (pm:Pmodule.pmodule) (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
   match e.e_node with
-| Econst c -> concrete_of_constant c
+| Econst c -> concrete_of_constant c (Ity.ty_of_ity e.e_ity)
 | Evar v -> (Mpv.find_def (Var (concrete_string_from_vs v.pv_vs)) v mpv)
 | Eexec (cexp, _) -> concrete_of_cexp pm mpv mv cexp
 | Eassign _ -> failwith "Cannot convert assign expr to model value"
@@ -832,7 +865,7 @@ and concrete_of_expr (pm:Pmodule.pmodule) (mpv : concrete_syntax_term Mpv.t) (mv
 let rec model_value pm v =
   let open Value in
   match v_desc v with
-  | Vnum i -> concrete_of_constant (Constant.ConstInt Number.{ il_kind = ILitUnk; il_int = i })
+  | Vnum i -> concrete_of_constant (Constant.ConstInt Number.{ il_kind = ILitUnk; il_int = i }) Ty.ty_int
   | Vstring s -> Const (String s)
   | Vbool b -> Const (Boolean b)
   | Vproj (ls, v) -> Proj ((id_name ls.ls_name), model_value pm v)
@@ -868,11 +901,11 @@ let rec model_value pm v =
   | Vreal r ->
     let dummy_real = Number.real_literal ~radix:10 ~neg:false ~int:"42" ~frac:"" ~exp:None in
     Const (Real {real_value = dummy_real ; real_verbatim = (asprintf "%a" Big_real.print_real r)})
-  | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert real to model value"
+  | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert float to model value"
 
-(* let model_value v =
+(* let model_value pm v =
   Format.printf ">>>> value: %a@." print_value v;
-  let the_concrete_term = model_value v in
+  let the_concrete_term = model_value pm v in
   Format.printf "<<<< concrete_term: %a@." print_concrete_term the_concrete_term;
   the_concrete_term *)
 
