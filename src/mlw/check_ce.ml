@@ -562,6 +562,8 @@ let concrete_of_ls ls =
   ls.ls_name.id_string
 
 let concrete_of_constant c ty =
+  let open Ty in
+  let open Number in
   match c with
   | Constant.ConstInt Number.{ il_kind; il_int } ->
     Const (Integer {int_value=Number.{il_kind; il_int};
@@ -570,8 +572,8 @@ let concrete_of_constant c ty =
     Const (Real {real_value = rconst;
                  real_verbatim = (asprintf
                       "%a" (Number.(print_real_constant full_support)) rconst)})
-  | Constant.ConstReal ({rl_kind; rl_real} as r) -> (* Then it is a float *)
-      let ts = match ty.ty_node with | Ty.Tyapp (ts, _) -> ts | _ -> assert false in
+  | Constant.ConstReal (Number.{rl_kind; rl_real} as r) -> (* Then it is a float *)
+      let ts = match ty.ty_node with | Tyapp (ts, _) -> ts | _ -> assert false in
       let fp  = begin match ts.ts_def with
       | Float fp -> fp
       | _ -> assert false
@@ -687,45 +689,43 @@ and get_record pm m lsymb args =
      The names for the record fields are obtained from the pmodule *)
   let exception NotRecord in
   begin try
-    let ls_ty =
+    let ls_ts =
       begin match lsymb.ls_value with
-      | Some {ty_node = Ty.Tyapp (ts, _); _} -> ts
+      | Some Ty.{ty_node = Tyapp (ts, _); _} -> ts
       | _ -> raise NotRecord
       end
     in
-    let rec find_record_fields (l:Pdecl.its_defn list) =
+    let rec find_record_fields (l:Decl.data_decl list) =
       begin match l with
-        | (d :: rest) ->
-            if Ty.ts_equal d.itd_its.its_ts ls_ty then
-              match d.itd_constructors with
-              | [_] -> d.itd_fields
+        | ((ts,constructors) :: rest) ->
+            if Ty.ts_equal ts ls_ts then
+              match constructors with
+              | [(_,l)] -> l
               | _ -> raise NotRecord
             else find_record_fields rest
       | [] -> raise NotRecord
       end
     in
-    let pdecl = Mid.find lsymb.ls_name pm.mod_known in
-    let lsymb_of_rs rs =
-      begin match rs.rs_logic with
-      | RLls ls -> ls
-      | _ -> raise NotRecord
-      end
-    in
+    let decl = Mid.find lsymb.ls_name pm.Pmodule.mod_theory.Theory.th_known in
     let fields =
-      begin match pdecl.Pdecl.pd_node with
-      | PDtype l -> List.map lsymb_of_rs (find_record_fields l)
+      begin match decl.Decl.d_node with
+      | Decl.Ddata l -> find_record_fields l
       | _ -> raise NotRecord
       end
     in
     if
       List.for_all2
-        (fun ls t -> Option.equal (Ty.ty_equal) ls.ls_value t.t_ty)
+        (fun ls t ->
+           match ls with
+           | Some ls -> Option.equal (Ty.ty_equal) ls.ls_value t.t_ty
+           | None -> false)
         fields args
     then
       let fields_args = List.map (concrete_term_of_term pm m) args in
       let fields_values =
         List.combine
           (List.map (fun ls ->
+               let ls = Option.get ls in
             (* FIXME It would be better to always use the qualified name but
                currently it impacts the AdaCore testsuite too much since the model
                trace attribute is expected to be used as a name, and even when
