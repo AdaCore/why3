@@ -695,8 +695,12 @@ and get_record pm m lsymb args =
     in
     let rec find_record_fields (l:Pdecl.its_defn list) =
       begin match l with
-      | (d :: rest) -> if Ty.ts_equal d.itd_its.its_ts ls_ty then d.itd_fields
-                       else find_record_fields rest
+        | (d :: rest) ->
+            if Ty.ts_equal d.itd_its.its_ts ls_ty then
+              match d.itd_constructors with
+              | [_] -> d.itd_fields
+              | _ -> raise NotRecord
+            else find_record_fields rest
       | [] -> raise NotRecord
       end
     in
