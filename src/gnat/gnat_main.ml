@@ -186,13 +186,10 @@ let maybe_giant_step_rac ctr parent models =
     let check_term = Rac.Why.mk_check_term_lit cnf env ~why_prover () in
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
-    let rac_results = Check_ce.get_rac_results  ~limits:rac_limits ~compute_term
-        ~only_giant_step:true rac env pm models in
-    let models = List.map (fun (_,_,m,_,s) -> (m,s)) rac_results in
+    let models = Check_ce.models_from_giant_step  ~limits:rac_limits ~compute_term
+        rac env pm models in
     List.map (fun model ->
     match model with
-    | (m, _) when not Gnat_config.giant_step_rac ->
-        (Gnat_counterexamples.post_clean#model m, None)
     | (m, Check_ce.RAC_not_done reason) -> (
         if Gnat_config.debug then Loc.warning warn_gnat_rac_not_done "%s@." reason;
         (Gnat_counterexamples.post_clean#model m, None)
@@ -201,7 +198,6 @@ let maybe_giant_step_rac ctr parent models =
         let res = Check_ce.RAC_done (res_state, res_log) in
         Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
           (Check_ce.print_rac_result ?verb_lvl:None) res;
-        let m = Check_ce.model_of_exec_log ~original_model:m res_log in
         let m = Gnat_counterexamples.post_clean#model m in
         (* Format.eprintf "Model of exec log:@ %a@." (Model_parser.print_model ~print_attrs:false) m; *)
         (m, Some res))
