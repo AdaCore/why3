@@ -6,8 +6,7 @@
 <prover id="1" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Vampire" version="4.2.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="9" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="14" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -529,10 +528,10 @@
    <proof prover="10"><result status="valid" time="0.124741" steps="32160"/></proof>
    </goal>
    <goal name="remove_products&#39;vc.14.2" expl="assertion" proved="true">
-   <proof prover="9"><result status="valid" time="0.140000" steps="97"/></proof>
+   <proof prover="5"><result status="valid" time="0.066243" steps="1443"/></proof>
    </goal>
    <goal name="remove_products&#39;vc.14.3" expl="VC for remove_products" proved="true">
-   <proof prover="9"><result status="valid" time="1.547595" steps="437"/></proof>
+   <proof prover="5"><result status="valid" time="0.621423" steps="16493"/></proof>
    </goal>
   </transf>
   </goal>
@@ -552,14 +551,14 @@
      <proof prover="16"><result status="valid" time="0.102296" steps="879"/></proof>
      </goal>
      <goal name="remove_products&#39;vc.15.0.0.3" expl="assertion" proved="true">
-     <proof prover="9"><result status="valid" time="0.857071" steps="444"/></proof>
+     <proof prover="5"><result status="valid" time="0.427364" steps="6906"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
    <goal name="remove_products&#39;vc.15.1" expl="VC for remove_products" proved="true">
-   <proof prover="0"><result status="valid" time="1.360000" steps="762"/></proof>
+   <proof prover="0"><result status="valid" time="0.608898" steps="762"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1007,7 +1006,7 @@
     <proof prover="10"><result status="valid" time="0.136728" steps="32575"/></proof>
     </goal>
     <goal name="remove_products&#39;vc.57.0.3" expl="precondition" proved="true">
-    <proof prover="9"><result status="valid" time="0.170000" steps="120"/></proof>
+    <proof prover="5"><result status="valid" time="0.109477" steps="1578"/></proof>
     </goal>
     <goal name="remove_products&#39;vc.57.0.4" expl="precondition" proved="true">
     <transf name="unfold" proved="true" arg1="not_marked_impl_next_not_marked_partial" arg2="in" arg3="Requires8">
@@ -1064,7 +1063,7 @@
    <proof prover="16"><result status="valid" time="0.083356" steps="278"/></proof>
    </goal>
    <goal name="remove_products&#39;vc.65.4" expl="VC for remove_products" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="84"/></proof>
+   <proof prover="5"><result status="valid" time="0.060404" steps="824"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1081,7 +1080,7 @@
     <goal name="remove_products&#39;vc.66.2.0" expl="VC for remove_products" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="remove_products&#39;vc.66.2.0.0" expl="VC for remove_products" proved="true">
-     <proof prover="7"><result status="valid" time="0.513681" steps="4938"/></proof>
+     <proof prover="5"><result status="valid" time="0.346161" steps="6426"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2291,7 +2290,7 @@
   <goal name="euler_sieve&#39;vc.25" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="euler_sieve&#39;vc.25.0" expl="assertion" proved="true">
-   <proof prover="9"><result status="valid" time="0.070000" steps="69"/></proof>
+   <proof prover="5"><result status="valid" time="0.036197" steps="546"/></proof>
    </goal>
    <goal name="euler_sieve&#39;vc.25.1" expl="VC for euler_sieve" proved="true">
    <proof prover="15"><result status="valid" time="0.077490" steps="209901"/></proof>
@@ -2654,7 +2653,7 @@
     <proof prover="15"><result status="valid" time="0.119158" steps="303038"/></proof>
     </goal>
     <goal name="euler_sieve&#39;vc.76.0.4" expl="loop invariant preservation" proved="true">
-    <proof prover="9"><result status="valid" time="1.036037" steps="416"/></proof>
+    <proof prover="5"><result status="valid" time="0.553564" steps="4502"/></proof>
     </goal>
     <goal name="euler_sieve&#39;vc.76.0.5" expl="loop invariant preservation" proved="true">
     <transf name="case" proved="true" arg1="(i &lt;&gt; p)">
@@ -3052,7 +3051,7 @@
     <proof prover="14"><result status="valid" time="0.530068" steps="67747"/></proof>
     </goal>
     <goal name="euler_sieve&#39;vc.118.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="9"><result status="valid" time="5.381771" steps="1445"/></proof>
+    <proof prover="5"><result status="valid" time="1.783672" steps="28031"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3668,7 +3667,7 @@
     <proof prover="10"><result status="valid" time="0.429832" steps="80419"/></proof>
     </goal>
     <goal name="euler_sieve&#39;vc.208.1.1" expl="false case (loop invariant preservation)" proved="true">
-    <proof prover="9"><result status="valid" time="2.860000" steps="1395"/></proof>
+    <proof prover="5"><result status="valid" time="1.291497" steps="21300"/></proof>
     </goal>
    </transf>
    </goal>

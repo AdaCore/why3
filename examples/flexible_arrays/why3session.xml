@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="flexible_arrays.mlw"/>
@@ -21,7 +21,7 @@
  <proof prover="3"><result status="valid" time="0.030000" steps="19878"/></proof>
  </goal>
  <goal name="cons_tree&#39;vc" expl="VC for cons_tree" proved="true">
- <proof prover="2"><result status="valid" time="0.150000" steps="1804"/></proof>
+ <proof prover="0"><result status="valid" time="0.150000" steps="1164"/></proof>
  </goal>
  <goal name="tail_tree&#39;vc" expl="VC for tail_tree" proved="true">
  <proof prover="1"><result status="valid" time="1.177677" steps="89403"/></proof>

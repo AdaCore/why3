@@ -2,28 +2,32 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ProverTest.mlw"/>
 <theory name="Impl" proved="true">
  <goal name="imply&#39;vc" expl="VC for imply" proved="true">
- <proof prover="3"><result status="valid" time="0.240000" steps="1033"/></proof>
+ <proof prover="0"><result status="valid" time="0.389955" steps="8486"/></proof>
  </goal>
  <goal name="equiv&#39;vc" expl="VC for equiv" proved="true">
- <proof prover="3"><result status="valid" time="0.400000" steps="2071"/></proof>
+ <proof prover="0"><result status="valid" time="0.195476" steps="3414"/></proof>
  </goal>
  <goal name="drinker&#39;vc" expl="VC for drinker" proved="true">
- <proof prover="3"><result status="valid" time="1.300000" steps="6183"/></proof>
+ <proof prover="0"><result status="timeout" time="5.000000" steps="72116"/></proof>
+ <proof prover="2"><result status="valid" time="0.719833" steps="6183"/></proof>
  </goal>
  <goal name="group&#39;vc" expl="VC for group" proved="true">
  <proof prover="1"><result status="valid" time="0.380000"/></proof>
  </goal>
  <goal name="bidon1&#39;vc" expl="VC for bidon1" proved="true">
- <proof prover="3"><result status="valid" time="0.360000" steps="1551"/></proof>
+ <proof prover="0"><result status="timeout" time="5.000000" steps="42374"/></proof>
+ <proof prover="2"><result status="valid" time="0.231993" steps="1551"/></proof>
  </goal>
  <goal name="bidon2&#39;vc" expl="VC for bidon2" proved="true">
- <proof prover="3"><result status="valid" time="1.691776" steps="6312"/></proof>
+ <proof prover="0"><result status="timeout" time="5.000000" steps="65157"/></proof>
+ <proof prover="2"><result status="valid" time="0.870747" steps="6312"/></proof>
  </goal>
  <goal name="bidon3&#39;vc" expl="VC for bidon3" proved="true">
  <proof prover="1"><result status="valid" time="0.320000"/></proof>
@@ -32,10 +36,11 @@
  <proof prover="1"><result status="valid" time="0.330000"/></proof>
  </goal>
  <goal name="pierce&#39;vc" expl="VC for pierce" proved="true">
- <proof prover="3"><result status="valid" time="0.958905" steps="3429"/></proof>
+ <proof prover="0"><result status="timeout" time="5.000000" steps="65167"/></proof>
+ <proof prover="2"><result status="valid" time="0.494103" steps="3429"/></proof>
  </goal>
  <goal name="generate&#39;vc" expl="VC for generate" proved="true">
- <proof prover="3"><result status="valid" time="0.230000" steps="876"/></proof>
+ <proof prover="0"><result status="valid" time="0.725214" steps="11034"/></proof>
  </goal>
  <goal name="zenon5&#39;vc" expl="VC for zenon5" proved="true">
  <proof prover="1"><result status="valid" time="0.310000"/></proof>
@@ -47,7 +52,7 @@
  <proof prover="1"><result status="valid" time="0.440000"/></proof>
  </goal>
  <goal name="test&#39;vc" expl="VC for test" proved="true">
- <proof prover="3"><result status="valid" time="0.130000" steps="10"/></proof>
+ <proof prover="0"><result status="valid" time="0.130000" steps="8"/></proof>
  </goal>
 </theory>
 </file>

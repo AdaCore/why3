@@ -2,14 +2,13 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="fibonacci.mlw"/>
 <theory name="FibonacciTest" proved="true">
@@ -22,9 +21,9 @@
  <proof prover="7" timelimit="5"><result status="valid" time="0.010000" steps="1445"/></proof>
  </goal>
  <goal name="not_isfib_2_2" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="5"/></proof>
  <proof prover="4" timelimit="5"><result status="valid" time="0.000000" steps="376"/></proof>
  <proof prover="7" timelimit="5"><result status="valid" time="0.010000" steps="251"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="FibonacciLinear" proved="true">
@@ -36,29 +35,29 @@
  <goal name="sum_fib&#39;vc" expl="VC for sum_fib" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sum_fib&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.016279" steps="200"/></proof>
+  <proof prover="8"><result status="valid" time="0.016279" steps="204"/></proof>
   </goal>
   <goal name="sum_fib&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020231" steps="159"/></proof>
+  <proof prover="8"><result status="valid" time="0.020231" steps="164"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="sum_pow&#39;vc" expl="VC for sum_pow" proved="true">
  <transf name="split_all_full" proved="true" >
   <goal name="sum_pow&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.000000" steps="5"/></proof>
+  <proof prover="8" timelimit="1"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="sum_pow&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="16"/></proof>
   </goal>
   <goal name="sum_pow&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.010000" steps="19"/></proof>
+  <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="29"/></proof>
   </goal>
   <goal name="sum_pow&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.020000" steps="936"/></proof>
   </goal>
   <goal name="sum_pow&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="27"/></proof>
   </goal>
  </transf>
  </goal>
@@ -79,7 +78,7 @@
  <goal name="sum_fib_acc&#39;vc" expl="VC for sum_fib_acc" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="sum_fib_acc&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.026073" steps="213"/></proof>
+  <proof prover="8"><result status="valid" time="0.026073" steps="218"/></proof>
   </goal>
   <goal name="sum_fib_acc&#39;vc.1" expl="variant decrease" proved="true">
   <transf name="split_vc" proved="true" >
@@ -87,24 +86,24 @@
    <proof prover="2"><result status="valid" time="0.020000" steps="11503"/></proof>
    </goal>
    <goal name="sum_fib_acc&#39;vc.1.1" expl="variant decrease" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000" steps="103"/></proof>
+   <proof prover="8"><result status="valid" time="0.030000" steps="108"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sum_fib_acc&#39;vc.2" expl="precondition" proved="true">
   <transf name="assert" proved="true" arg1="(mem n l)">
    <goal name="sum_fib_acc&#39;vc.2.0" expl="asserted formula" proved="true">
-   <proof prover="6"><result status="valid" time="0.010000" steps="10"/></proof>
+   <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="11"/></proof>
    </goal>
    <goal name="sum_fib_acc&#39;vc.2.1" expl="precondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.010000" steps="12"/></proof>
+   <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="12"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="sum_fib_acc&#39;vc.3" expl="assertion" proved="true">
   <transf name="assert" proved="true" arg1="(u = x1 - 2 \/ mem u x)">
    <goal name="sum_fib_acc&#39;vc.3.0" expl="asserted formula" proved="true">
-   <proof prover="6"><result status="valid" time="0.010000" steps="12"/></proof>
+   <proof prover="8" timelimit="1"><result status="valid" time="0.010000" steps="12"/></proof>
    </goal>
    <goal name="sum_fib_acc&#39;vc.3.1" expl="assertion" proved="true">
    <transf name="destruct" proved="true" arg1="h">
@@ -162,10 +161,10 @@
  <proof prover="7"><result status="valid" time="0.010000" steps="2439"/></proof>
  </goal>
  <goal name="fib&#39;vc" expl="VC for fib" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="4"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="9"/></proof>
  </goal>
  <goal name="test42&#39;vc" expl="VC for test42" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
 </theory>
 <theory name="FibRecNoGhost" proved="true">
@@ -183,7 +182,7 @@
 </theory>
 <theory name="Zeckendorf" proved="true">
  <goal name="fib_nonneg&#39;vc" expl="VC for fib_nonneg" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="17"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="109"/></proof>
  </goal>
  <goal name="fib_increasing&#39;vc" expl="VC for fib_increasing" proved="true">
  <proof prover="7"><result status="valid" time="0.010000" steps="2380"/></proof>
@@ -282,64 +281,65 @@
 </theory>
 <theory name="Mat22" proved="true">
  <goal name="Assoc" proved="true">
- <proof prover="3"><result status="valid" time="0.030000" steps="2"/></proof>
+ <proof prover="8"><result status="valid" time="0.030000" steps="346"/></proof>
  </goal>
  <goal name="Unit_def_l" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="14"/></proof>
  </goal>
  <goal name="Unit_def_r" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="13"/></proof>
  </goal>
 </theory>
 <theory name="FibonacciLogarithmic" proved="true">
  <goal name="logfib&#39;vc" expl="VC for logfib" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="logfib&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="8"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="logfib&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="6"/></proof>
+  <proof prover="8"><result status="valid" time="0.010000" steps="3"/></proof>
   </goal>
   <goal name="logfib&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="8"><result status="valid" time="0.010000" steps="31"/></proof>
   </goal>
   <goal name="logfib&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="3"/></proof>
+  <proof prover="8"><result status="valid" time="0.010000" steps="0"/></proof>
   </goal>
   <goal name="logfib&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="7"/></proof>
+  <proof prover="8"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="logfib&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="8"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="logfib&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="8"><result status="valid" time="0.000000" steps="11"/></proof>
   </goal>
   <goal name="logfib&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.427068" steps="93"/></proof>
+  <proof prover="3"><result status="valid" time="0.195871" steps="93"/></proof>
+  <proof prover="8"><result status="timeout" time="5.000000" steps="2438"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="fib_m&#39;vc" expl="VC for fib_m" proved="true">
- <proof prover="6"><result status="valid" time="0.100000" steps="1018"/></proof>
+ <proof prover="8" timelimit="1"><result status="valid" time="0.100000" steps="804"/></proof>
  </goal>
  <goal name="fibo&#39;vc" expl="VC for fibo" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="7"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="60"/></proof>
  </goal>
  <goal name="test0&#39;vc" expl="VC for test0" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
  <goal name="test7&#39;vc" expl="VC for test7" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
  <goal name="test42&#39;vc" expl="VC for test42" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
  <goal name="test2014&#39;vc" expl="VC for test2014" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="8"><result status="valid" time="0.000000" steps="5"/></proof>
  </goal>
 </theory>
 <theory name="FibSquare" proved="true">

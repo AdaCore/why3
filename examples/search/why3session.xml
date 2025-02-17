@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="search.mlw"/>
 <theory name="Path" proved="true">
@@ -96,16 +96,16 @@
     <goal name="bfs&#39;vc.16.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="shorter_path" arg2="with" arg3="t,n">
      <goal name="bfs&#39;vc.16.0.0.0" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.012880" steps="12"/></proof>
      <proof prover="1"><result status="valid" time="0.091121" steps="9185"/></proof>
      <proof prover="2"><result status="valid" time="0.110920" steps="5900"/></proof>
      <proof prover="3"><result status="valid" time="0.017973" steps="3463"/></proof>
+     <proof prover="4"><result status="valid" time="0.012880" steps="12"/></proof>
      </goal>
      <goal name="bfs&#39;vc.16.0.0.1" expl="apply premises" proved="true">
-     <proof prover="0"><result status="valid" time="0.015100" steps="14"/></proof>
      <proof prover="1"><result status="valid" time="0.109160" steps="10088"/></proof>
      <proof prover="2"><result status="valid" time="0.129142" steps="6592"/></proof>
      <proof prover="3"><result status="valid" time="0.039671" steps="40889"/></proof>
+     <proof prover="4"><result status="valid" time="0.015100" steps="14"/></proof>
      </goal>
     </transf>
     </goal>

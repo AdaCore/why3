@@ -127,7 +127,7 @@ let () = printf "@[On task 1, CVC4,1.7 answers %a@."
 
 let () = printf "Model is %t@."
     (fun fmt ->
-       match Check_ce.select_model_last_non_empty
+       match Check_ce.last_nonempty_model
                 result1.Call_provers.pr_models with
        | Some m -> Json_base.print_json fmt (Model_parser.json_model m)
        | None -> fprintf fmt "unavailable")
@@ -180,10 +180,11 @@ let () =
   let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+  let results = Check_ce.models_from_rac ~limits rac env pm models in
   let model, clsf = Opt.get_exn (Failure "No good model found")
-      (Check_ce.select_model ~limits ~check_ce:true rac env pm models) in
+       (Check_ce.best_rac_result results) in
   printf "%a@." (Check_ce.print_model_classification env
-                   ~check_ce:true ?verb_lvl:None ~json:false) (model, clsf)
+                   ?verb_lvl:None ~json:false) (model, clsf)
 (* END{check_ce} *)
 
 let () = print_endline "\n== RAC execute giant steps\n"
@@ -193,10 +194,9 @@ let () =
   let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
     (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
-  let rac_results = Check_ce.get_rac_results ~limits ~only_giant_step:true
+  let rac_results = Check_ce.models_from_giant_step ~limits
     rac env pm models in
-  let strategy = Check_ce.best_non_empty_giant_step_rac_result in
   let _,res = Opt.get_exn (Failure "No good model found")
-    (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
+    (Check_ce.best_giant_step_result rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

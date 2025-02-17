@@ -4,11 +4,9 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.5.2" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="4" name="Alt-Ergo" version="2.5.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.5.4" alternative="FPA" timelimit="5" steplimit="0" memlimit="2000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sum.mlw"/>
 <theory name="SumSingle" proved="true">
@@ -18,7 +16,7 @@
  <goal name="usum&#39;vc" expl="VC for usum" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.034162" steps="468"/></proof>
+  <proof prover="2"><result status="valid" time="0.034162" steps="458"/></proof>
   </goal>
   <goal name="usum&#39;vc.1" expl="loop invariant preservation" proved="true">
   <transf name="inline_trivial" proved="true" >
@@ -37,7 +35,7 @@
      <proof prover="6"><result status="valid" time="0.007478" steps="10404"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.2" expl="apply premises" proved="true">
-     <proof prover="4"><result status="valid" time="0.100965" steps="855"/></proof>
+     <proof prover="2" memlimit="1000"><result status="valid" time="0.100965" steps="827"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.3" expl="apply premises" proved="true">
      <proof prover="5"><result status="valid" time="0.067664" steps="17765"/></proof>
@@ -52,7 +50,7 @@
      <proof prover="6"><result status="valid" time="0.008951" steps="10358"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.7" expl="apply premises" proved="true">
-     <proof prover="4"><result status="valid" time="0.028957" steps="93"/></proof>
+     <proof prover="2" memlimit="1000"><result status="valid" time="0.028957" steps="91"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.8" expl="apply premises" proved="true">
      <proof prover="6"><result status="valid" time="0.003570" steps="10354"/></proof>
@@ -60,20 +58,20 @@
     </transf>
     </goal>
     <goal name="usum&#39;vc.1.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="7"><result status="valid" time="0.220338" steps="1533"/></proof>
+    <proof prover="2"><result status="valid" time="0.220338" steps="1568"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="usum&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.053225" steps="125"/></proof>
+  <proof prover="2"><result status="valid" time="0.053225" steps="127"/></proof>
   </goal>
   <goal name="usum&#39;vc.3" expl="VC for usum" proved="true">
-  <proof prover="7"><result status="valid" time="0.062505" steps="86"/></proof>
+  <proof prover="2"><result status="valid" time="0.062505" steps="86"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="usum&#39;vc.3.0" expl="postcondition" proved="true">
-   <proof prover="7"><result status="valid" time="0.048376" steps="86"/></proof>
+   <proof prover="2"><result status="valid" time="0.048376" steps="86"/></proof>
    </goal>
   </transf>
   </goal>
@@ -82,15 +80,15 @@
  <goal name="usum_rec&#39;vc" expl="VC for usum_rec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="7"><result status="valid" time="0.051186" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.051186" steps="88"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.051579" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.051579" steps="88"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="usum_rec&#39;vc.2.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.031844" steps="441"/></proof>
+   <proof prover="2"><result status="valid" time="0.031844" steps="457"/></proof>
    </goal>
    <goal name="usum_rec&#39;vc.2.1" expl="postcondition" proved="true">
    <transf name="inline_trivial" proved="true" >
@@ -111,7 +109,7 @@
       <proof prover="5"><result status="valid" time="0.068672" steps="17819"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.2" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.071513" steps="468"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.071513" steps="475"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.3" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.008893" steps="10397"/></proof>
@@ -123,10 +121,10 @@
       <proof prover="6"><result status="valid" time="0.010460" steps="10377"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.6" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.030007" steps="93"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.030007" steps="92"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.7" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.028360" steps="93"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.028360" steps="92"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.8" expl="apply premises" proved="true">
       <proof prover="1"><result status="valid" time="0.044777" steps="10088"/></proof>
@@ -134,7 +132,7 @@
      </transf>
      </goal>
      <goal name="usum_rec&#39;vc.2.1.0.1" expl="postcondition" proved="true">
-     <proof prover="7"><result status="valid" time="0.241551" steps="1543"/></proof>
+     <proof prover="2"><result status="valid" time="0.241551" steps="1619"/></proof>
      </goal>
     </transf>
     </goal>
@@ -147,7 +145,7 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.051935" steps="86"/></proof>
+  <proof prover="2"><result status="valid" time="0.051935" steps="85"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
@@ -165,34 +163,34 @@
       <goal name="example1&#39;vc.1.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="sum_single_error_propagation" arg2="with" arg3="f, abs_real_fun f">
        <goal name="example1&#39;vc.1.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.061286" steps="655"/></proof>
+       <proof prover="2"><result status="valid" time="0.061286" steps="662"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.092140" steps="1538"/></proof>
+       <proof prover="2"><result status="valid" time="0.092140" steps="736"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.068011" steps="97"/></proof>
+       <proof prover="2"><result status="valid" time="0.068011" steps="95"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.064263" steps="273"/></proof>
+       <proof prover="2"><result status="valid" time="0.064263" steps="273"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.043990" steps="89"/></proof>
+       <proof prover="2"><result status="valid" time="0.043990" steps="88"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example1&#39;vc.1.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="7"><result status="valid" time="0.031842" steps="101"/></proof>
+      <proof prover="2"><result status="valid" time="0.031842" steps="100"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="example1&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="7"><result status="valid" time="0.044346" steps="101"/></proof>
+     <proof prover="2"><result status="valid" time="0.044346" steps="100"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.1.0.1" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.040926" steps="101"/></proof>
+    <proof prover="2"><result status="valid" time="0.040926" steps="100"/></proof>
     </goal>
    </transf>
    </goal>
@@ -203,12 +201,12 @@
 </theory>
 <theory name="SumDouble" proved="true">
  <goal name="sum_of_fun_le_sum_of_abs_fun&#39;vc" expl="VC for sum_of_fun_le_sum_of_abs_fun" proved="true">
- <proof prover="7"><result status="valid" time="3.065759" steps="26094"/></proof>
+ <proof prover="2"><result status="valid" time="0.840504" steps="15772"/></proof>
  </goal>
  <goal name="usum&#39;vc" expl="VC for usum" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="7"><result status="valid" time="0.044292" steps="473"/></proof>
+  <proof prover="2"><result status="valid" time="0.044292" steps="458"/></proof>
   </goal>
   <goal name="usum&#39;vc.1" expl="loop invariant preservation" proved="true">
   <transf name="inline_trivial" proved="true" >
@@ -221,7 +219,7 @@
     <goal name="usum&#39;vc.1.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="s1,(f @ i)">
      <goal name="usum&#39;vc.1.0.0.0" expl="apply premises" proved="true">
-     <proof prover="4"><result status="valid" time="0.023670" steps="100"/></proof>
+     <proof prover="2" memlimit="1000"><result status="valid" time="0.023670" steps="99"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.1" expl="apply premises" proved="true">
      <proof prover="6"><result status="valid" time="0.007352" steps="10412"/></proof>
@@ -245,37 +243,37 @@
      <proof prover="1"><result status="valid" time="0.045388" steps="10091"/></proof>
      </goal>
      <goal name="usum&#39;vc.1.0.0.8" expl="apply premises" proved="true">
-     <proof prover="4"><result status="valid" time="0.024249" steps="93"/></proof>
+     <proof prover="2" memlimit="1000"><result status="valid" time="0.024249" steps="91"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="usum&#39;vc.1.0.1" expl="loop invariant preservation" proved="true">
-    <proof prover="7"><result status="valid" time="0.214830" steps="1531"/></proof>
+    <proof prover="2"><result status="valid" time="0.214830" steps="1568"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="usum&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.080165" steps="125"/></proof>
+  <proof prover="2"><result status="valid" time="0.080165" steps="127"/></proof>
   </goal>
   <goal name="usum&#39;vc.3" expl="VC for usum" proved="true">
-  <proof prover="7"><result status="valid" time="0.059429" steps="86"/></proof>
+  <proof prover="2"><result status="valid" time="0.059429" steps="86"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="usum_rec&#39;vc" expl="VC for usum_rec" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="usum_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="7"><result status="valid" time="0.071763" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.071763" steps="88"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.060039" steps="88"/></proof>
+  <proof prover="2"><result status="valid" time="0.060039" steps="88"/></proof>
   </goal>
   <goal name="usum_rec&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="usum_rec&#39;vc.2.0" expl="postcondition" proved="true">
-   <proof prover="7"><result status="valid" time="0.120517" steps="472"/></proof>
+   <proof prover="2"><result status="valid" time="0.120517" steps="457"/></proof>
    </goal>
    <goal name="usum_rec&#39;vc.2.1" expl="postcondition" proved="true">
    <transf name="inline_trivial" proved="true" >
@@ -296,22 +294,22 @@
       <proof prover="5"><result status="valid" time="0.079130" steps="17819"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.2" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.073816" steps="466"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.073816" steps="475"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.3" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.032913" steps="101"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.032913" steps="101"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.4" expl="apply premises" proved="true">
       <proof prover="5"><result status="valid" time="0.091759" steps="18200"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.5" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.037012" steps="93"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.037012" steps="92"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.6" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.007651" steps="10385"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.7" expl="apply premises" proved="true">
-      <proof prover="4"><result status="valid" time="0.031995" steps="93"/></proof>
+      <proof prover="2" memlimit="1000"><result status="valid" time="0.031995" steps="92"/></proof>
       </goal>
       <goal name="usum_rec&#39;vc.2.1.0.0.8" expl="apply premises" proved="true">
       <proof prover="6"><result status="valid" time="0.007954" steps="10381"/></proof>
@@ -319,7 +317,7 @@
      </transf>
      </goal>
      <goal name="usum_rec&#39;vc.2.1.0.1" expl="postcondition" proved="true">
-     <proof prover="7"><result status="valid" time="0.223455" steps="1493"/></proof>
+     <proof prover="2"><result status="valid" time="0.223455" steps="1619"/></proof>
      </goal>
     </transf>
     </goal>
@@ -332,7 +330,7 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.057153" steps="86"/></proof>
+  <proof prover="2"><result status="valid" time="0.057153" steps="85"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="postcondition" proved="true">
   <transf name="inline_trivial" proved="true" >
@@ -350,34 +348,34 @@
       <goal name="example1&#39;vc.1.0.0.0.0" expl="asserted formula" proved="true">
       <transf name="apply" proved="true" arg1="sum_double_error_propagation" arg2="with" arg3="f, abs_real_fun f">
        <goal name="example1&#39;vc.1.0.0.0.0.0" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.061058" steps="655"/></proof>
+       <proof prover="2"><result status="valid" time="0.061058" steps="662"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.089933" steps="1629"/></proof>
+       <proof prover="2"><result status="valid" time="0.089933" steps="736"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.2" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.063734" steps="97"/></proof>
+       <proof prover="2"><result status="valid" time="0.063734" steps="95"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.3" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.071667" steps="273"/></proof>
+       <proof prover="2"><result status="valid" time="0.071667" steps="273"/></proof>
        </goal>
        <goal name="example1&#39;vc.1.0.0.0.0.4" expl="apply premises" proved="true">
-       <proof prover="7"><result status="valid" time="0.049998" steps="89"/></proof>
+       <proof prover="2"><result status="valid" time="0.049998" steps="88"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example1&#39;vc.1.0.0.0.1" expl="asserted formula" proved="true">
-      <proof prover="7"><result status="valid" time="0.037307" steps="101"/></proof>
+      <proof prover="2"><result status="valid" time="0.037307" steps="100"/></proof>
       </goal>
      </transf>
      </goal>
      <goal name="example1&#39;vc.1.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="7"><result status="valid" time="0.035820" steps="101"/></proof>
+     <proof prover="2"><result status="valid" time="0.035820" steps="100"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.1.0.1" expl="postcondition" proved="true">
-    <proof prover="7"><result status="valid" time="0.037716" steps="101"/></proof>
+    <proof prover="2"><result status="valid" time="0.037716" steps="100"/></proof>
     </goal>
    </transf>
    </goal>

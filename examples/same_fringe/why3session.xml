@@ -2,30 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="same_fringe.mlw"/>
 <theory name="SameFringe" proved="true">
  <goal name="enum&#39;vc" expl="VC for enum" proved="true">
- <proof prover="2"><result status="valid" time="0.010000" steps="126"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="129"/></proof>
  </goal>
  <goal name="eq_enum&#39;vc" expl="VC for eq_enum" proved="true">
- <proof prover="2"><result status="valid" time="0.020000" steps="284"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="362"/></proof>
  </goal>
  <goal name="same_fringe&#39;vc" expl="VC for same_fringe" proved="true">
- <proof prover="2"><result status="valid" time="0.010000" steps="16"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="29"/></proof>
  </goal>
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
  <goal name="bench&#39;vc" expl="VC for bench" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
 </theory>
 <theory name="Test" proved="true">
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="0" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
 </theory>
 </file>

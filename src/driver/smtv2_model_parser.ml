@@ -371,8 +371,10 @@ module FromSexpToModel = struct
         let id = identifier sexp in
         match id with
         | Isymbol (Sprover n') | Iindexedsymbol (Sprover n', _) ->
+          (try
             let ty_sexp = get_type_from_prover_variable n' in
             Qannotident (id, sort ty_sexp)
+          with _ -> Qident id)
         | Isymbol _ | Iindexedsymbol _ -> Qident id)
 
   let arg = function
@@ -1601,211 +1603,6 @@ module FromModelToTerm = struct
         ((ls, oloc, attrs), (t', t'_concrete)))
       terms
 
-  let rec maybe_convert_epsilon_terms env (t, t_concrete) =
-    match t.t_node, t_concrete with
-    | Term.Tapp (ls, ts), Apply (ls_name, ts_concrete) ->
-      begin try
-        let ts' = List.combine ts ts_concrete in
-        let ts, ts_concrete =
-          List.split (List.map (maybe_convert_epsilon_terms env ) ts')
-        in
-        begin try
-          let fields = Mls.find ls env.record_fields in
-          if
-            List.for_all2
-              (fun ls t -> Option.equal (Ty.ty_equal) ls.ls_value t.t_ty)
-              fields ts
-          then
-            let fields_values =
-              List.combine
-                (List.map (fun ls ->
-                  (* FIXME It would be better to always use the qualified name but
-                     currently it impacts the AdaCore testsuite too much since the model
-                     trace attribute is expected to be used as a name, and even when
-                     no model trace is present, the qualified name forbids the recognition
-                     of the special field names __split_fields and __split_discrs. *)
-                  (* let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in *)
-                  Ident.(get_model_trace_string ~name:ls.ls_name.id_string ~attrs:ls.ls_name.id_attrs))
-                  fields)
-                ts_concrete
-            in
-            (t_app_infer ls ts, Record fields_values)
-          else
-            (t_app_infer ls ts, Apply (ls_name, ts_concrete))
-        with _ -> (t_app_infer ls ts, Apply (ls_name, ts_concrete))
-        end
-      with _e ->
-        error_concrete_syntax "Mismatch between term %a and concrete term %a:@\
-          arity of application function is not the same"
-          Pretty.print_term t
-          print_concrete_term t_concrete
-      end
-    | Term.Tif (b, t1, t2), If (b_concrete, t1_concrete, t2_concrete) ->
-        let b', b'_concrete = maybe_convert_epsilon_terms env (b,b_concrete) in
-        let t1',t1'_concrete = maybe_convert_epsilon_terms env (t1,t1_concrete) in
-        let t2',t2'_concrete = maybe_convert_epsilon_terms env (t2,t2_concrete) in
-        (t_if b' t1' t2', If (b'_concrete, t1'_concrete, t2'_concrete))
-    | Term.Teps tb, _ ->
-        begin match Term.t_open_lambda t with
-        | [], _, _ ->
-            begin match t_concrete with
-            | Epsilon (eps_x, eps_term) ->
-              let vs, t' = Term.t_open_bound tb in
-              begin match get_opt_record env (vs,eps_x) (t',eps_term) with
-              | None ->
-                begin match get_opt_coercion env (vs,eps_x) (t',eps_term) with
-                | None ->
-                  let t', t'_concrete = maybe_convert_epsilon_terms env (t',eps_term) in
-                  (t_eps_close vs t', Epsilon (eps_x, t'_concrete))
-                | Some (proj_name, v_proj) ->
-                  (t_eps_close vs t', Proj (proj_name,v_proj))
-                end
-              | Some fields_values -> (t_eps_close vs t', Record fields_values)
-              end
-            | Const (Float _) -> (t,t_concrete)
-            | _ ->
-              error_concrete_syntax "Unexpected concrete term %a for epsilon term %a"
-                print_concrete_term t_concrete
-                Pretty.print_term t
-            end
-        | [vs], trig, t' ->
-            begin match t_concrete with
-            | Function {args=[x]; body=t'_concrete} ->
-              begin match get_opt_fun_literal env (vs,x) (t',t'_concrete) with
-              | None ->
-                let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-                (t_lambda [vs] trig t', Function {args=[x]; body=t'_concrete})
-              | Some (elts,others) ->
-                (t_lambda [vs] trig t', FunctionLiteral {elts; others})
-              end
-            | _ ->
-              error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
-                print_concrete_term t_concrete
-                Pretty.print_term t
-            end
-        | vsl, trig, t' ->
-            begin match t_concrete with
-            | Function {args; body=t'_concrete} ->
-              let t', t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-              (t_lambda vsl trig t', Function {args; body=t'_concrete})
-            | _ ->
-              error_concrete_syntax "Unexpected concrete term %a for lambda term %a"
-                print_concrete_term t_concrete
-                Pretty.print_term t
-            end
-        end
-    | Term.Tquant (q, tq), Quant (q_concrete, vars_concrete, t_concrete) ->
-        let vsl, trig, t' = t_open_quant tq in
-        let t',t'_concrete = maybe_convert_epsilon_terms env (t',t_concrete) in
-        ( t_quant q (t_close_quant vsl trig t'),
-          Quant (q_concrete, vars_concrete, t'_concrete) )
-    | Term.Tbinop (op, t1, t2), Binop (op_concrete, t1_concrete, t2_concrete) ->
-        let t1,t1_concrete =
-          maybe_convert_epsilon_terms env (t1,t1_concrete) in
-        let t2,t2_concrete =
-          maybe_convert_epsilon_terms env (t2,t2_concrete) in
-        (t_binary op t1 t2, Binop (op_concrete, t1_concrete, t2_concrete))
-    | Term.Tnot t', Not t'_concrete ->
-        let t',t'_concrete =
-          maybe_convert_epsilon_terms env (t',t'_concrete) in
-        (t_not t', Not t'_concrete)
-    | _ -> (t, t_concrete)
-
-  and get_opt_record env (vs,vs_name) (t',t'_concrete) =
-    (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
-    with f1,...,fn the fields associated to type ty *)
-    let exception UnexpectedPattern in
-    let rec get_conjuncts (t',t'_concrete) =
-      match t'.t_node, t'_concrete with
-      | Tbinop (Tand, t1, t2), Binop (And, ct1, ct2) ->
-        (t1,ct1) :: (get_conjuncts (t2,ct2))
-      | _ -> [(t',t'_concrete)]
-    in
-    try
-      let expected_fields =
-        try Ty.Mty.find (vs.vs_ty) env.type_fields
-        with _ -> raise UnexpectedPattern
-      in
-      let list_of_fields_values =
-        List.fold_left
-          (fun acc (t,ct) ->
-            match t.t_node, ct with
-            | Tapp (ls, [proj;term_value]), Apply ("=", [cproj;cterm_value])
-                when ls_equal ls ps_equ -> (
-              match proj.t_node, cproj with
-              | Tapp (ls, [x]), Apply (ls_name, [Var vs_name'])
-                  when t_equal x (t_var vs) && vs_name = vs_name' ->
-                if List.mem ls expected_fields then
-                  let term_value', cterm_value' =
-                    maybe_convert_epsilon_terms env (term_value,cterm_value) in
-                  ((ls,ls_name),(term_value',cterm_value')) :: acc
-                else raise UnexpectedPattern
-              | _ -> raise UnexpectedPattern
-            )
-            | _ -> raise UnexpectedPattern
-          )
-          []
-          (get_conjuncts (t',t'_concrete))
-      in
-      if List.length expected_fields = List.length list_of_fields_values then
-        Some (List.map
-          (fun ((_,ls_name),(_,ct)) -> (ls_name,ct))
-          list_of_fields_values)
-      else
-        raise UnexpectedPattern
-    with UnexpectedPattern -> None
-
-  and get_opt_coercion env (vs,vs_name) (t',t'_concrete) =
-    (* special case for type coercions:
-     if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
-    Debug.dprintf debug "[get_opt_coercion] vs.vs_ty = %a@."
-      Pretty.print_ty_qualified vs.vs_ty;
-    let is_proj_for_ty ty ls =
-      match Ty.Mty.find_opt ty env.type_coercions with
-      | None -> false
-      | Some sls -> List.mem ls (Sls.elements sls)
-    in
-    match t'.t_node, t'_concrete with
-    | Tapp (ls, [proj;term_value]), Apply ("=", [cproj;cterm_value])
-        when ls_equal ls ps_equ -> (
-      match proj.t_node, cproj with
-      | Tapp (proj_ls, [x]), Apply (ls_name, [Var vs_name'])
-          when t_equal x (t_var vs) && vs_name = vs_name'
-               && is_proj_for_ty vs.vs_ty proj_ls ->
-        let _,concrete_proj_v =
-          maybe_convert_epsilon_terms env (term_value,cterm_value)
-        in
-        Some (ls_name, concrete_proj_v)
-      | _ -> None
-    )
-    | _ -> None
-
-  and get_opt_fun_literal env (vs,vs_name) (t',t'_concrete) =
-    (* Unfold a concrete term of the form:
-    if x = ct0 then ct1 else if x = ct0' then ct1' else ... else ct2
-    to the following result:
-    elts = [(ct0,ct1),(ct0',ct1')...]
-    others = ct2 *)
-    let rec unfold env (vs,vs_name) (t',t'_concrete) =
-      match t'.t_node, t'_concrete with
-      | Tif ({t_node = Tapp (ls, [x;t0])}, t1, t2), If (Apply ("=", [Var x'; ct0]), ct1, ct2)
-          when t_equal (t_var vs) x &&  x'=vs_name && ls_equal ls ps_equ ->
-        let (elts, others) = unfold env (vs,vs_name) (t2,ct2) in
-        let _,ct0' = maybe_convert_epsilon_terms env (t0,ct0) in
-        let _,ct1' = maybe_convert_epsilon_terms env (t1,ct1) in
-        ({ elts_index = ct0'; elts_value = ct1' } :: elts, others)
-      | _ ->
-        let _, t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-        ([], t'_concrete)
-    in
-    if t_v_occurs vs t' = 0 then
-      let _,t'_concrete = maybe_convert_epsilon_terms env (t',t'_concrete) in
-      Some ([],t'_concrete)
-    else
-      match unfold env (vs,vs_name) (t',t'_concrete) with
-      | [], _ -> None
-      | elts, others -> Some (elts,others)
-
   let clean env terms =
     Mstr.map_filter
       (fun ((ls, oloc, attr), (t, t_concrete)) ->
@@ -1814,12 +1611,6 @@ module FromModelToTerm = struct
         if Term.t_v_any (fun vs -> is_vs_in_prover_vars vs env.prover_vars) t
         then None
         else
-          (* convert some concrete epsilon terms:
-             - when it represents a record,
-             - when it represents the projection of a value
-             - when it represents a function that can be unfolded
-             to a function literal (used notably for arrays) *)
-          let (t, t_concrete) = maybe_convert_epsilon_terms env (t, t_concrete) in
           Some ((ls, oloc, attr), (t, t_concrete)))
       terms
 

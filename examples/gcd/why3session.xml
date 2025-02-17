@@ -2,12 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Coq" version="8.19.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="gcd.mlw"/>
@@ -15,16 +14,16 @@
  <goal name="euclid&#39;vc" expl="VC for euclid" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="euclid&#39;vc.0" expl="check modulo by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="0"/></proof>
   </goal>
   <goal name="euclid&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="24"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="111"/></proof>
   </goal>
   <goal name="euclid&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="6"><result status="valid" time="0.000000" steps="13"/></proof>
   </goal>
   <goal name="euclid&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="29"/></proof>
+  <proof prover="6"><result status="valid" time="0.030000" steps="54"/></proof>
   </goal>
  </transf>
  </goal>
@@ -36,87 +35,88 @@
 </theory>
 <theory name="BinaryGcd" proved="true">
  <goal name="even1" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="26"/></proof>
+ <proof prover="6"><result status="valid" time="0.010000" steps="30"/></proof>
  </goal>
  <goal name="odd1" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="30"/></proof>
+ <proof prover="6"><result status="valid" time="0.020000" steps="2567"/></proof>
  </goal>
  <goal name="div_nonneg" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="4"/></proof>
+ <proof prover="6"><result status="valid" time="0.010000" steps="9"/></proof>
  </goal>
  <goal name="gcd_even_even" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="12"/></proof>
+ <proof prover="6"><result status="valid" time="0.010000" steps="23"/></proof>
  </goal>
  <goal name="gcd_even_odd" proved="true">
  <proof prover="2"><path name="gcd_BinaryGcd_gcd_even_odd_2.v"/><result status="valid" time="0.280000"/></proof>
  </goal>
  <goal name="gcd_even_odd2" proved="true">
- <proof prover="0"><result status="valid" time="0.740000" steps="103"/></proof>
+ <proof prover="6"><result status="valid" time="0.026946" steps="265"/></proof>
  </goal>
  <goal name="odd_odd_div2" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="12"/></proof>
+ <proof prover="6"><result status="valid" time="0.127152" steps="3910"/></proof>
  </goal>
  <goal name="gcd_odd_odd&#39;vc" expl="VC for gcd_odd_odd" proved="true">
- <proof prover="0"><result status="valid" time="0.120000" steps="59"/></proof>
+ <proof prover="3"><result status="valid" time="0.070575" steps="59"/></proof>
+ <proof prover="6"><result status="timeout" time="5.000000" steps="4358"/></proof>
  </goal>
  <goal name="gcd_odd_odd2" proved="true">
- <proof prover="0"><result status="valid" time="0.970000" steps="104"/></proof>
+ <proof prover="6"><result status="valid" time="0.031288" steps="309"/></proof>
  </goal>
  <goal name="binary_gcd&#39;vc" expl="VC for binary_gcd" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="binary_gcd&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="8"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="14"/></proof>
+  <proof prover="6"><result status="valid" time="0.000000" steps="9"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="9"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.4" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.5" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="21"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="57"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="19"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="45"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.8" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.9" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="42"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="35"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.000000" steps="9"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.12" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.000000" steps="10"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.13" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="45"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="34"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.15" expl="check division by zero" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.16" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="38"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="37"/></proof>
   </goal>
   <goal name="binary_gcd&#39;vc.18" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -124,13 +124,13 @@
    <proof prover="4"><result status="valid" time="0.010000"/></proof>
    </goal>
    <goal name="binary_gcd&#39;vc.18.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.040000" steps="18"/></proof>
+   <proof prover="6"><result status="valid" time="0.040000" steps="34"/></proof>
    </goal>
    <goal name="binary_gcd&#39;vc.18.2" expl="postcondition" proved="true">
-   <proof prover="1"><result status="valid" time="0.040000" steps="548"/></proof>
+   <proof prover="6" timelimit="1"><result status="valid" time="0.040000" steps="61"/></proof>
    </goal>
    <goal name="binary_gcd&#39;vc.18.3" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="1.440000" steps="109"/></proof>
+   <proof prover="6"><result status="valid" time="0.022775" steps="230"/></proof>
    </goal>
    <goal name="binary_gcd&#39;vc.18.4" expl="postcondition" proved="true">
    <proof prover="5" timelimit="1"><result status="valid" time="0.700000"/></proof>

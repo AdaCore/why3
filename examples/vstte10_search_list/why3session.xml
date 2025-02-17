@@ -2,61 +2,61 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="0"/>
 <prover id="2" name="Coq" version="8.19.2" timelimit="5" steplimit="0" memlimit="0"/>
-<prover id="3" name="Alt-Ergo" version="2.1.0" timelimit="20" steplimit="0" memlimit="0"/>
 <prover id="6" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="0"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_search_list.mlw"/>
 <theory name="SearchingALinkedList" proved="true">
  <goal name="search&#39;vc" expl="VC for search" proved="true">
- <proof prover="3"><result status="valid" time="0.070000" steps="345"/></proof>
+ <proof prover="0"><result status="valid" time="0.070000" steps="496"/></proof>
  </goal>
  <goal name="search_list&#39;vc" expl="VC for search_list" proved="true">
+ <proof prover="0"><result status="valid" time="0.010000" steps="7"/></proof>
  <proof prover="1"><result status="valid" time="0.000000"/></proof>
- <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
  <proof prover="6"><result status="valid" time="0.000000"/></proof>
  </goal>
  <goal name="head&#39;vc" expl="VC for head" proved="true">
+ <proof prover="0"><result status="valid" time="0.000000" steps="34"/></proof>
  <proof prover="1"><result status="valid" time="0.010000"/></proof>
- <proof prover="3"><result status="valid" time="0.000000" steps="30"/></proof>
  <proof prover="6"><result status="valid" time="0.010000"/></proof>
  </goal>
  <goal name="tail&#39;vc" expl="VC for tail" proved="true">
+ <proof prover="0"><result status="valid" time="0.020000" steps="35"/></proof>
  <proof prover="1"><result status="valid" time="0.010000"/></proof>
- <proof prover="3"><result status="valid" time="0.020000" steps="30"/></proof>
  <proof prover="6"><result status="valid" time="0.020000"/></proof>
  </goal>
  <goal name="search_loop&#39;vc" expl="VC for search_loop" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="search_loop&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="9"/></proof>
   <proof prover="1"><result status="valid" time="0.010000"/></proof>
-  <proof prover="3"><result status="valid" time="0.010000" steps="11"/></proof>
   <proof prover="6"><result status="valid" time="0.000000"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="0"/></proof>
   <proof prover="1"><result status="valid" time="0.010000"/></proof>
-  <proof prover="3"><result status="valid" time="0.010000" steps="8"/></proof>
   <proof prover="6"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="0" timelimit="5"><result status="valid" time="0.010000" steps="2"/></proof>
   <proof prover="1" timelimit="20"><result status="valid" time="0.010000"/></proof>
-  <proof prover="3" timelimit="5"><result status="valid" time="0.010000" steps="14"/></proof>
   <proof prover="6"><result status="valid" time="0.000000"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.3" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.010000" steps="106"/></proof>
   <proof prover="1" memlimit="1000"><result status="valid" time="0.010000"/></proof>
-  <proof prover="3"><result status="valid" time="0.010000" steps="58"/></proof>
   </goal>
   <goal name="search_loop&#39;vc.4" expl="loop invariant preservation" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="search_loop&#39;vc.4.0" expl="VC for search_loop" proved="true">
+   <proof prover="0"><result status="valid" time="0.010000" steps="18"/></proof>
    <proof prover="1"><result status="valid" time="0.020000"/></proof>
-   <proof prover="3"><result status="valid" time="0.010000" steps="18"/></proof>
    <proof prover="6"><result status="valid" time="0.020000"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.1" expl="VC for search_loop" proved="true">
-   <proof prover="3"><result status="valid" time="0.020000" steps="50"/></proof>
+   <proof prover="0"><result status="valid" time="0.020000" steps="75"/></proof>
    </goal>
    <goal name="search_loop&#39;vc.4.2" expl="VC for search_loop" proved="true">
    <proof prover="2"><path name="vstte10_search_list_WP_SearchingALinkedList_WP_parameter_search_loop_3.v"/><result status="valid" time="0.279543"/></proof>

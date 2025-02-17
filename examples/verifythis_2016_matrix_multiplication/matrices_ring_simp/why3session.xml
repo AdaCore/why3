@@ -3,75 +3,77 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.0.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="matrices_ring_simp.mlw"/>
 <theory name="Symb" proved="true">
  <goal name="LOCAL.l_mdl_ok&#39;vc" expl="VC for l_mdl_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.030000" steps="112"/></proof>
+ <proof prover="2"><result status="valid" time="0.030000" steps="250"/></proof>
  </goal>
  <goal name="LOCAL.m_mdl_ok&#39;vc" expl="VC for m_mdl_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="39"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000" steps="61"/></proof>
  </goal>
  <goal name="LOCAL.lm_mdl_ok&#39;vc" expl="VC for lm_mdl_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.030000" steps="122"/></proof>
+ <proof prover="2"><result status="valid" time="0.030000" steps="200"/></proof>
  </goal>
  <goal name="LOCAL.lm_mdl_same&#39;vc" expl="VC for lm_mdl_same" proved="true">
- <proof prover="1"><result status="valid" time="0.060000" steps="179"/></proof>
+ <proof prover="2"><result status="valid" time="0.060000" steps="386"/></proof>
  </goal>
  <goal name="LOCAL.l_compare_zero&#39;vc" expl="VC for l_compare_zero" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="83"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="179"/></proof>
  </goal>
  <goal name="LOCAL.m_collapse_ok&#39;vc" expl="VC for m_collapse_ok" proved="true">
  <proof prover="0"><result status="valid" time="0.110000" steps="17250"/></proof>
  </goal>
  <goal name="LOCAL.lm_collapse_ok&#39;vc" expl="VC for lm_collapse_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.130000" steps="382"/></proof>
+ <proof prover="2"><result status="valid" time="0.130000" steps="689"/></proof>
  </goal>
  <goal name="LOCAL.cat_rev_ok&#39;vc" expl="VC for cat_rev_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.100000" steps="295"/></proof>
+ <proof prover="2"><result status="valid" time="0.100000" steps="732"/></proof>
  </goal>
  <goal name="LOCAL.lm_dump_ok&#39;vc" expl="VC for lm_dump_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.210000" steps="581"/></proof>
+ <proof prover="2"><result status="valid" time="0.061576" steps="920"/></proof>
  </goal>
  <goal name="LOCAL.lm_merge_ok&#39;vc" expl="VC for lm_merge_ok" proved="true">
- <proof prover="1" timelimit="5"><result status="valid" time="2.650000" steps="4960"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.325717" steps="4186"/></proof>
  </goal>
  <goal name="LOCAL.cat_ok&#39;vc" expl="VC for cat_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.160000" steps="490"/></proof>
+ <proof prover="2"><result status="valid" time="0.160000" steps="586"/></proof>
  </goal>
  <goal name="LOCAL.m_mul_ok&#39;vc" expl="VC for m_mul_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.090000" steps="267"/></proof>
+ <proof prover="2"><result status="valid" time="0.090000" steps="489"/></proof>
  </goal>
  <goal name="LOCAL.m_distribute_ok&#39;vc" expl="VC for m_distribute_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.110000" steps="364"/></proof>
+ <proof prover="2"><result status="valid" time="0.110000" steps="838"/></proof>
  </goal>
  <goal name="LOCAL.lm_distribute_ok&#39;vc" expl="VC for lm_distribute_ok" proved="true">
- <proof prover="1"><result status="valid" time="0.170000" steps="772"/></proof>
+ <proof prover="2"><result status="valid" time="0.170000" steps="986"/></proof>
  </goal>
  <goal name="LOCAL.lm_opp_ok&#39;vc" expl="VC for lm_opp_ok" proved="true">
- <proof prover="1" timelimit="5"><result status="valid" time="1.916256" steps="3039"/></proof>
+ <proof prover="2" timelimit="5"><result status="valid" time="0.658868" steps="13134"/></proof>
  </goal>
  <goal name="extends_rw" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="4"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="20"/></proof>
  </goal>
  <goal name="symb_env&#39;vc" expl="VC for symb_env" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="4"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="2"/></proof>
  </goal>
  <goal name="symb_reg&#39;vc" expl="VC for symb_reg" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="66"/></proof>
+ <proof prover="1"><result status="valid" time="0.016999" steps="87"/></proof>
+ <proof prover="2" timelimit="5"><result status="timeout" time="5.000000" steps="194603"/></proof>
  </goal>
  <goal name="symb_opp&#39;vc" expl="VC for symb_opp" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="37"/></proof>
+ <proof prover="2"><result status="valid" time="0.010000" steps="70"/></proof>
  </goal>
  <goal name="symb_add&#39;vc" expl="VC for symb_add" proved="true">
- <proof prover="1"><result status="valid" time="0.040000" steps="171"/></proof>
+ <proof prover="2"><result status="valid" time="0.040000" steps="417"/></proof>
  </goal>
  <goal name="symb_sub&#39;vc" expl="VC for symb_sub" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="52"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000" steps="84"/></proof>
  </goal>
  <goal name="symb_mul&#39;vc" expl="VC for symb_mul" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="70"/></proof>
+ <proof prover="2"><result status="valid" time="0.020000" steps="138"/></proof>
  </goal>
  <goal name="harness&#39;vc" expl="VC for harness" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -82,7 +84,7 @@
     <goal name="harness&#39;vc.0.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.0.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.020000" steps="61"/></proof>
+     <proof prover="2"><result status="valid" time="0.020000" steps="98"/></proof>
      </goal>
     </transf>
     </goal>
@@ -91,7 +93,7 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.030000" steps="141"/></proof>
+  <proof prover="2"><result status="valid" time="0.030000" steps="123"/></proof>
   </goal>
   <goal name="harness&#39;vc.2" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -100,7 +102,7 @@
     <goal name="harness&#39;vc.2.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.2.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.030000" steps="65"/></proof>
+     <proof prover="2"><result status="valid" time="0.030000" steps="122"/></proof>
      </goal>
     </transf>
     </goal>
@@ -109,13 +111,13 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="166"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="148"/></proof>
   </goal>
   <goal name="harness&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="41"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="64"/></proof>
   </goal>
   <goal name="harness&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="114"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="111"/></proof>
   </goal>
   <goal name="harness&#39;vc.6" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -124,7 +126,7 @@
     <goal name="harness&#39;vc.6.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.6.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.040000" steps="73"/></proof>
+     <proof prover="2"><result status="valid" time="0.040000" steps="169"/></proof>
      </goal>
     </transf>
     </goal>
@@ -133,7 +135,7 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.060000" steps="192"/></proof>
+  <proof prover="2"><result status="valid" time="0.060000" steps="181"/></proof>
   </goal>
   <goal name="harness&#39;vc.8" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -142,7 +144,7 @@
     <goal name="harness&#39;vc.8.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.8.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.040000" steps="76"/></proof>
+     <proof prover="2"><result status="valid" time="0.040000" steps="410"/></proof>
      </goal>
     </transf>
     </goal>
@@ -151,7 +153,7 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.060000" steps="200"/></proof>
+  <proof prover="2"><result status="valid" time="0.060000" steps="531"/></proof>
   </goal>
   <goal name="harness&#39;vc.10" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -160,7 +162,7 @@
     <goal name="harness&#39;vc.10.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.10.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.040000" steps="80"/></proof>
+     <proof prover="2"><result status="valid" time="0.040000" steps="233"/></proof>
      </goal>
     </transf>
     </goal>
@@ -169,13 +171,13 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.050000" steps="217"/></proof>
+  <proof prover="2"><result status="valid" time="0.050000" steps="210"/></proof>
   </goal>
   <goal name="harness&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="53"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="150"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="144"/></proof>
   </goal>
   <goal name="harness&#39;vc.14" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -184,7 +186,7 @@
     <goal name="harness&#39;vc.14.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.14.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.060000" steps="88"/></proof>
+     <proof prover="2"><result status="valid" time="0.060000" steps="290"/></proof>
      </goal>
     </transf>
     </goal>
@@ -193,7 +195,7 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.060000" steps="231"/></proof>
+  <proof prover="2"><result status="valid" time="0.060000" steps="236"/></proof>
   </goal>
   <goal name="harness&#39;vc.16" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -202,7 +204,7 @@
     <goal name="harness&#39;vc.16.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.16.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.060000" steps="92"/></proof>
+     <proof prover="2"><result status="valid" time="0.060000" steps="324"/></proof>
      </goal>
     </transf>
     </goal>
@@ -211,31 +213,31 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.070000" steps="254"/></proof>
+  <proof prover="2"><result status="valid" time="0.070000" steps="259"/></proof>
   </goal>
   <goal name="harness&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="62"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.19" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.080000" steps="268"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="656"/></proof>
   </goal>
   <goal name="harness&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="65"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.130000" steps="352"/></proof>
+  <proof prover="2"><result status="valid" time="0.130000" steps="816"/></proof>
   </goal>
   <goal name="harness&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="68"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.23" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.080000" steps="268"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="282"/></proof>
   </goal>
   <goal name="harness&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="71"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.290000" steps="692"/></proof>
+  <proof prover="2"><result status="valid" time="0.102666" steps="1089"/></proof>
   </goal>
   <goal name="harness&#39;vc.26" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -244,7 +246,7 @@
     <goal name="harness&#39;vc.26.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.26.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.080000" steps="110"/></proof>
+     <proof prover="2"><result status="valid" time="0.080000" steps="514"/></proof>
      </goal>
     </transf>
     </goal>
@@ -253,7 +255,7 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="223"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="203"/></proof>
   </goal>
   <goal name="harness&#39;vc.28" expl="precondition" proved="true">
   <transf name="compute_specified" proved="true" >
@@ -262,7 +264,7 @@
     <goal name="harness&#39;vc.28.0.0" expl="precondition" proved="true">
     <transf name="compute_specified" proved="true" >
      <goal name="harness&#39;vc.28.0.0.0" expl="precondition" proved="true">
-     <proof prover="1"><result status="valid" time="0.110000" steps="114"/></proof>
+     <proof prover="2"><result status="valid" time="0.110000" steps="551"/></proof>
      </goal>
     </transf>
     </goal>
@@ -271,13 +273,13 @@
   </transf>
   </goal>
   <goal name="harness&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="232"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="206"/></proof>
   </goal>
   <goal name="harness&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="80"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="66"/></proof>
   </goal>
   <goal name="harness&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.080000" steps="316"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="341"/></proof>
   </goal>
   <goal name="harness&#39;vc.32" expl="assertion" proved="true">
   <transf name="compute_specified" proved="true" >

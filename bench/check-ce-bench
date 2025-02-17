@@ -303,6 +303,10 @@ for file in $files; do
           z3steps=100000
           z3stepsrac=$z3steps
           ;;
+      "call-val-function")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
       "falseCE")
           skipae=yes
           altergosteps=7500
@@ -326,6 +330,10 @@ for file in $files; do
           ;;
       "jlamp0_poly")
           skipae=yes
+          ;;
+      "let_function_logic")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "lists")
           skipae=yes
@@ -366,6 +374,10 @@ for file in $files; do
       "threshold")
           z3steps=500000
           z3stepsrac=$z3steps
+          ;;
+      "val_function")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "while_mono")
           skipae=yes
