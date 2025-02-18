@@ -1,6 +1,5 @@
 (** {1 Unbounded floating-point numbers}
 
-
 See also {h <a href="https://inria.hal.science/hal-04343157">this report</a>}
 
 *)
@@ -11,20 +10,20 @@ module UFloat
   use real.Abs
   use ieee_float.RoundingMode
 
-  type t
+  type u
 
-  val function uround mode real : t
-  val function to_real t : real
-  val function of_int int : t
+  val function uround mode real : u
+  val function to_real u : real
+  val function of_int int : u
   axiom to_real_of_int : forall x [of_int x]. to_real (of_int x) = from_int x
 
-  val function uzero : t
+  val function uzero : u
   axiom uzero_spec : to_real uzero = 0.0
 
-  val function uone : t
+  val function uone : u
   axiom uone_spec : to_real uone = 1.0
 
-  val function utwo : t
+  val function utwo : u
   axiom utwo_spec : to_real utwo = 2.0
 
   constant eps:real
@@ -36,7 +35,7 @@ module UFloat
   meta "inline:no" function eps
   meta "inline:no" function eta
 
-  let function uadd (x y:t) : t
+  let function uadd (x y:u) : u
     (* TODO: Do we want the two first assertions in our context ?
       We only use them to prove the addition lemma *)
     ensures { abs (to_real result -. (to_real x +. to_real y)) <=. abs (to_real x) }
@@ -47,7 +46,11 @@ module UFloat
     }
   = uround RNE (to_real x +. to_real y)
 
-  let function usub (x y:t) : t
+  let lemma uadd_zero (x:u)
+    ensures { uadd uzero x = uadd x uzero = x }
+  = ()
+
+  let function usub (x y:u) : u
     (* TODO: Do we want the two first assertions in our context ?
       We only use them to prove the addition lemma *)
     ensures { abs (to_real result -. (to_real x -. to_real y)) <=. abs (to_real x) }
@@ -58,14 +61,14 @@ module UFloat
     }
   = uround RNE (to_real x -. to_real y)
 
-  let function umul (x y:t) : t
+  let function umul (x y:u) : u
     ensures {
       abs (to_real result -. (to_real x *. to_real y))
         <=. abs (to_real x *. to_real y) *. eps +. eta
     }
   = uround RNE (to_real x *. to_real y)
 
-  let function udiv (x y:t) : t
+  let function udiv (x y:u) : u
     requires { to_real y <> 0. }
     ensures {
       abs (to_real result -. (to_real x /. to_real y))
@@ -73,72 +76,72 @@ module UFloat
     }
   = uround RNE (to_real x /. to_real y)
 
-  let function uminus (x:t) : t
+  let function uminus (x:u) : u
     ensures { to_real result = -. (to_real x) }
   = uround RNE (-. (to_real x))
 
-  predicate is_exact (uop : t -> t -> t) (x y :t)
+  predicate is_exact (uop : u -> u -> u) (x y :u)
 
   (* Exact division but can still underflow, giving eta as error *)
-  let function udiv_exact (x y:t) : t
+  let function udiv_exact (x y:u) : u
     requires { to_real y <> 0. }
     requires { is_exact udiv x y }
     ensures { abs (to_real result -. (to_real x /. to_real y)) <=. eta }
   = uround RNE (to_real x /. to_real y)
 
   (** Infix operators *)
-  let function ( ++. ) (x:t) (y:t) : t = uadd x y
-  let function ( --. ) (x:t) (y:t) : t = usub x y
-  let function ( **. ) (x:t) (y:t) : t = umul x y
+  let function ( ++. ) (x:u) (y:u) : u = uadd x y
+  let function ( --. ) (x:u) (y:u) : u = usub x y
+  let function ( **. ) (x:u) (y:u) : u = umul x y
   (* Why3 doesn't support abbreviations so we need to add the requires *)
-  let function ( //. ) (x:t) (y:t) : t
+  let function ( //. ) (x:u) (y:u) : u
     requires { to_real y <> 0. }
   = udiv x y
-  let function ( --._ ) (x:t) : t = uminus x
-  let function ( ///. ) (x:t) (y:t) : t
+  let function ( --._ ) (x:u) : u = uminus x
+  let function ( ///. ) (x:u) (y:u) : u
     requires { to_real y <> 0. }
     requires { is_exact udiv x y }
   = udiv_exact x y
 
   (* Some constants *)
-  constant u0:t
+  constant u0:u
   axiom to_real_u0 : to_real u0 = 0.0
-  constant u1:t
+  constant u1:u
   axiom to_real_u1 : to_real u1 = 1.0
-  constant u2:t
+  constant u2:u
   axiom to_real_u2 : to_real u2 = 2.0
-  constant u4:t
+  constant u4:u
   axiom to_real_u4 : to_real u4 = 4.0
-  constant u8:t
+  constant u8:u
   axiom to_real_u8 : to_real u8 = 8.0
-  constant u16:t
+  constant u16:u
   axiom to_real_u16 : to_real u16 = 16.0
-  constant u32:t
+  constant u32:u
   axiom to_real_u32 : to_real u32 = 32.0
-  constant u64:t
+  constant u64:u
   axiom to_real_u64 : to_real u64 = 64.0
-  constant u128:t
+  constant u128:u
   axiom to_real_u128 : to_real u128 = 128.0
-  constant u256:t
+  constant u256:u
   axiom to_real_u256 : to_real u256 = 256.0
-  constant u512:t
+  constant u512:u
   axiom to_real_u512 : to_real u512 = 512.0
-  constant u1024:t
+  constant u1024:u
   axiom to_real_u1024 : to_real u1024 = 1024.0
-  constant u2048:t
+  constant u2048:u
   axiom to_real_u2048 : to_real u2048 = 2048.0
-  constant u4096:t
+  constant u4096:u
   axiom to_real_u4096 : to_real u4096 = 4096.0
-  constant u8192:t
+  constant u8192:u
   axiom to_real_u8192 : to_real u8192 = 8192.0
-  constant u16384:t
+  constant u16384:u
   axiom to_real_u16384 : to_real u16384 = 16384.0
-  constant u32768:t
+  constant u32768:u
   axiom to_real_u32768 : to_real u32768 = 32768.0
-  constant u65536:t
+  constant u65536:u
   axiom to_real_u65536 : to_real u65536 = 65536.0
 
-  predicate is_positive_power_of_2 (x:t) =
+  predicate is_positive_power_of_2 (x:u) =
     x = u1 \/ x = u2 || x = u4 || x = u8 || x = u16 || x = u32 || x = u64
     || x = u128 \/ x = u256 || x = u4096 || x = u8192 || x = u16384 || x = u32768
     || x = u65536
@@ -150,17 +153,15 @@ end
 (** {2 Single-precision unbounded floats} *)
 module USingle
   use real.RealInfix
-
   type usingle
-
-  constant eps:real = 0x1p-24 /. (1. +. 0x1p-24)
-  constant eta:real = 0x1p-150
+  constant eps : real = 0x1p-24 /. (1. +. 0x1p-24)
+  constant eta : real = 0x1p-150
 
   clone export UFloat with
-    type t = usingle,
+    type u = usingle,
     constant eps = eps,
     constant eta = eta,
-    axiom.
+    axiom .
 end
 
 
@@ -168,15 +169,14 @@ end
 module UDouble
   use real.RealInfix
   type udouble
-
-  constant eps:real = 0x1p-53 /. (1. +. 0x1p-53)
-  constant eta:real = 0x1p-1075
+  constant eps : real = 0x1p-53 /. (1. +. 0x1p-53)
+  constant eta : real = 0x1p-1075
 
   clone export UFloat with
-    type t = udouble,
+    type u = udouble,
     constant eps = eps,
     constant eta = eta,
-    axiom.
+    axiom .
 end
 
 (* Helper lemmas to help the proof of propagation lemmas *)
@@ -383,7 +383,7 @@ module USingleLemmas
   use real.Abs
   use USingle
 
-  let lemma uadd_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost uadd_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -445,7 +445,7 @@ module USingleLemmas
         y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let lemma usub_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost usub_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -468,7 +468,7 @@ module USingleLemmas
 
   use HelperLemmas
 
-  let lemma umul_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost umul_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -501,7 +501,7 @@ module USingleLemmas
 
   use real.ExpLog
 
-  let lemma log_single_error_propagation (logx_f x_f : usingle)
+  let ghost log_single_error_propagation (logx_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -524,7 +524,7 @@ module USingleLemmas
     <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_single_error_propagation (log2x_f x_f : usingle)
+  let ghost log2_single_error_propagation (log2x_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -547,7 +547,7 @@ module USingleLemmas
     <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log10_single_error_propagation (log10x_f x_f : usingle)
+  let ghost log10_single_error_propagation (log10x_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -570,7 +570,7 @@ module USingleLemmas
     <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma exp_single_error_propagation (expx_f x_f : usingle)
+  let ghost exp_single_error_propagation (expx_f x_f : usingle)
         (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -606,7 +606,7 @@ module USingleLemmas
 
   use real.Trigonometry
 
-  let lemma sin_single_error_propagation (sinx_f x_f : usingle)
+  let ghost sin_single_error_propagation (sinx_f x_f : usingle)
         (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -626,7 +626,7 @@ module USingleLemmas
   <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let lemma cos_single_error_propagation (cosx_f x_f : usingle)
+  let ghost cos_single_error_propagation (cosx_f x_f : usingle)
         (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -652,7 +652,7 @@ module USingleLemmas
 
   function real_fun (f:int -> usingle) : int -> real = fun i -> to_real (f i)
 
-  let lemma sum_single_error_propagation (x : usingle)
+  let ghost sum_single_error_propagation (x : usingle)
                 (f : int -> usingle) (f_exact f_factor f_factor' : int -> real) (n:int)
                 (sum_rel sum_abs f_rel f_abs : real)
     requires {
@@ -683,7 +683,7 @@ module USingleLemmas
   }
 
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
-  let lemma udiv_exact_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs : real)
+  let ghost udiv_exact_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -738,7 +738,7 @@ module UDoubleLemmas
   use real.Abs
   use UDouble
 
-  let lemma uadd_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost uadd_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -800,7 +800,7 @@ module UDoubleLemmas
         y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let lemma usub_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost usub_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -823,7 +823,8 @@ module UDoubleLemmas
 
   use HelperLemmas
 
-  let lemma umul_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let ghost umul_double_error_propagation (x_f y_f r : udouble)
+     (x x_factor x_rel x_abs : real) (y y_factor y_rel y_abs : real) : unit
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -856,7 +857,7 @@ module UDoubleLemmas
 
   use real.ExpLog
 
-  let lemma log_double_error_propagation (logx_f x_f : udouble)
+  let ghost log_double_error_propagation (logx_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -879,7 +880,7 @@ module UDoubleLemmas
     <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_double_error_propagation (log2x_f x_f : udouble)
+  let ghost log2_double_error_propagation (log2x_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -887,7 +888,7 @@ module UDoubleLemmas
        <=. log_rel *. abs (log2 (to_real x_f)) +. log_abs
     }
     requires { 0. <. x_exact <=. x_factor }
-    requires { 0. <. (x_exact -. x_rel *. x_factor -. x_abs) }
+    requires { 0. <. x_exact -. x_rel *. x_factor -. x_abs }
     requires { 0. <=. log_rel }
     ensures {
       abs (to_real log2x_f -. log2 (x_exact))
@@ -902,7 +903,24 @@ module UDoubleLemmas
     <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log10_double_error_propagation (log10x_f x_f : udouble)
+  let ghost log2_double_error_propagation_simple (log2x_f x_f : udouble)
+        (x_exact log_rel x_rel : real)
+    requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_exact }
+    requires {
+      abs (to_real log2x_f -. log2(to_real x_f))
+       <=. log_rel *. abs (log2 (to_real x_f))
+    }
+    requires { 0. <. x_exact }
+    requires { x_rel <. 1.0 }
+    requires { 0. <=. log_rel }
+    ensures {
+      abs (to_real log2x_f -. log2 x_exact)
+        <=. log_rel *. abs (log2 x_exact) -. log2 (1. -. x_rel) *. (1. +. log_rel)
+    }
+  =
+  log2_double_error_propagation log2x_f x_f x_exact x_exact log_rel 0.0 x_rel 0.0
+
+  let ghost log10_double_error_propagation (log10x_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -925,7 +943,7 @@ module UDoubleLemmas
     <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma exp_double_error_propagation (expx_f x_f : udouble)
+  let ghost exp_double_error_propagation (expx_f x_f : udouble)
         (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -961,7 +979,7 @@ module UDoubleLemmas
 
   use real.Trigonometry
 
-  let lemma sin_double_error_propagation (sinx_f x_f : udouble)
+  let ghost sin_double_error_propagation (sinx_f x_f : udouble)
         (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -981,7 +999,7 @@ module UDoubleLemmas
   <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let lemma cos_double_error_propagation (cosx_f x_f : udouble)
+  let ghost cos_double_error_propagation (cosx_f x_f : udouble)
         (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -1007,7 +1025,7 @@ module UDoubleLemmas
 
   function real_fun (f:int -> udouble) : int -> real = fun i -> to_real (f i)
 
-  let lemma sum_double_error_propagation (x : udouble)
+  let ghost sum_double_error_propagation (x : udouble)
                 (f : int -> udouble) (f_exact f_factor f_factor' : int -> real) (n:int)
                 (sum_rel sum_abs f_rel f_abs : real)
     requires {
@@ -1038,7 +1056,7 @@ module UDoubleLemmas
   }
 
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
-  let lemma udiv_exact_single_error_propagation (x_f y_f r: udouble) (x x_factor x_rel x_abs : real)
+  let ghost udiv_exact_double_error_propagation (x_f y_f r: udouble) (x x_factor x_rel x_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
