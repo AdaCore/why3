@@ -492,7 +492,8 @@ let read_vc_labels acc s =
         | Some Gp_Already_Proved ->
            b.already_proved <- true
         | Some Gp_Inlined ->
-          if b.extra_node = None then b.inline <- Some (-1)
+          if b.inline <> None then ()
+          else if b.extra_node = None then b.inline <- Some (-1)
           else b.inline <- b.extra_node
         | None ->
             ()
