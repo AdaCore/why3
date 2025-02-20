@@ -42,7 +42,7 @@ void show_time() {
   }
 }
 
-void wallclock_timelimit_reached() {
+void wallclock_timelimit_reached(int sig) {
   fprintf(stderr,
           "Why3cpulimit: wallclock timelimit %d reached, killing command\n",
           wallclock_timelimit);
