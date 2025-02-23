@@ -45,7 +45,6 @@ type filter_prover
 val read_opt_prover : string -> filter_prover
 val prover_of_filter_prover : config -> filter_prover -> Why3.Whyconf.prover
 val provers_of_filter_prover : config -> filter_prover -> Why3.Whyconf.Sprover.t
-val print_filter_prover : Format.formatter -> filter_prover -> unit
 
 type filters
 
