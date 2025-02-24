@@ -565,8 +565,8 @@ let concrete_of_constant c ty =
   let open Ty in
   let open Number in
   match c with
-  | Constant.ConstInt Number.{ il_kind; il_int } ->
-    Const (Integer {int_value=Number.{il_kind; il_int};
+  | Constant.ConstInt (Number.{ il_kind; il_int } as int_value) ->
+    Const (Integer {int_value;
                     int_verbatim= BigInt.to_string il_int })
   | Constant.ConstReal rconst when Ty.ty_equal ty Ty.ty_real ->
     Const (Real {real_value = rconst;
