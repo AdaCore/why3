@@ -182,10 +182,10 @@ let rec print_concrete_term fmt ct =
       print_concrete_term t1
       print_concrete_term t2
   | Epsilon (eps_vs,eps_t) ->
-    fprintf fmt "epsilon %s.@ %a" eps_vs print_concrete_term eps_t
+    fprintf fmt "(epsilon %s.@ %a)" eps_vs print_concrete_term eps_t
   | Quant (quant,quant_vars,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
-    fprintf fmt "@[<hov 1>%s %a.@ %a@]" quant_string
+    fprintf fmt "@[<hov 1>(%s %a.@ %a)@]" quant_string
       (Pp.print_list Pp.comma Pp.print_string) quant_vars
       print_concrete_term quant_t
   | Binop (op,t1,t2) ->
@@ -195,7 +195,7 @@ let rec print_concrete_term fmt ct =
       | Implies -> "->"
       | Iff -> "<->"
     in
-    fprintf fmt "@[%a %s@ %a@]"
+    fprintf fmt "@[(%a %s@ %a)@]"
       print_concrete_term t1
       op_string
       print_concrete_term t2
