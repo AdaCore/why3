@@ -214,7 +214,7 @@ let rec print_concrete_term fmt ct =
       (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
       print_others others
   | Function {args; body} ->
-    fprintf fmt "@[<hov 1>fun %a ->@ %a@]"
+    fprintf fmt "@[<hov 1>(fun %a ->@ %a)@]"
       (Pp.print_list Pp.space Pp.print_string) args
       print_concrete_term body
   | Record fields_values ->

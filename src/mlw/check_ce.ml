@@ -565,14 +565,14 @@ let concrete_of_constant c ty =
   let open Ty in
   let open Number in
   match c with
-  | Constant.ConstInt (Number.{ il_kind; il_int } as int_value) ->
+  | Constant.ConstInt (Number.{ il_kind = _; il_int } as int_value) ->
     Const (Integer {int_value;
                     int_verbatim= BigInt.to_string il_int })
   | Constant.ConstReal rconst when Ty.ty_equal ty Ty.ty_real ->
     Const (Real {real_value = rconst;
                  real_verbatim = (asprintf
                       "%a" (Number.(print_real_constant full_support)) rconst)})
-  | Constant.ConstReal (Number.{rl_kind; rl_real} as r) -> (* Then it is a float *)
+  | Constant.ConstReal r -> (* Then it is a float *)
       let ts = match ty.ty_node with | Tyapp (ts, _) -> ts | _ -> assert false in
       let fp  = begin match ts.ts_def with
       | Float fp -> fp
@@ -650,7 +650,7 @@ let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs
             Epsilon (vstring, t'_concrete)
           end
         end
-      | [vs], trig, t' ->
+      | [vs], _trig, t' ->
         begin match get_opt_coercion pm m vs t' with
         | Some (proj_name, v_proj) -> Proj (proj_name,v_proj)
         | None ->
@@ -662,7 +662,7 @@ let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs
             Function {args=[vstring]; body=t'_concrete}
           end
         end
-      | vsl, trig, t' ->
+      | vsl, _trig, t' ->
         let concrete_vars = List.map concrete_string_from_vs vsl in
         let updated_map =
           List.fold_left2 (fun acc v cv ->
@@ -687,13 +687,12 @@ let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs
 and get_record pm m lsymb args =
   (* Gets the list of record field and value from a term of the form `record'mk t1 ... tn`
      The names for the record fields are obtained from the pmodule *)
-  let exception NotRecord in
-  begin try
+  if Strings.has_suffix lsymb.ls_name.id_string "'mk" then
+    (* it MUST be a record *)
     let ls_ts =
-      begin match lsymb.ls_value with
+      match lsymb.ls_value with
       | Some Ty.{ty_node = Tyapp (ts, _); _} -> ts
-      | _ -> raise NotRecord
-      end
+      | _ -> raise (Decl.UnexpectedProjOrConstr lsymb)
     in
     let rec find_record_fields (l:Decl.data_decl list) =
       begin match l with
@@ -701,16 +700,16 @@ and get_record pm m lsymb args =
             if Ty.ts_equal ts ls_ts then
               match constructors with
               | [(_,l)] -> l
-              | _ -> raise NotRecord
+              | _ -> raise (Decl.BadRecordCons(lsymb,ls_ts))
             else find_record_fields rest
-      | [] -> raise NotRecord
+      | [] -> raise (Decl.BadRecordCons(lsymb,ls_ts))
       end
     in
     let decl = Mid.find lsymb.ls_name pm.Pmodule.mod_theory.Theory.th_known in
     let fields =
       begin match decl.Decl.d_node with
       | Decl.Ddata l -> find_record_fields l
-      | _ -> raise NotRecord
+      | _ -> raise(Decl.BadRecordCons(lsymb,ls_ts))
       end
     in
 (*
@@ -739,13 +738,9 @@ and get_record pm m lsymb args =
             fields_args
       in
       Some (Record fields_values)
-(*
-    else
-      raise NotRecord
-*)
-    with NotRecord -> None
-  end
-and get_opt_record pm env vs t' = None
+  else None
+
+and get_opt_record _pm _env _vs _t' = None
  (*  (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
   with f1,...,fn the fields associated to type ty *)
   let exception UnexpectedPattern in
