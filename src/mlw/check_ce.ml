@@ -1161,8 +1161,25 @@ let best_giant_step_result = fun models ->
   let not_empty (m,_) = not (Model_parser.is_model_empty m) in
   List.nth_opt (List.sort compare (List.filter not_empty models)) 0
 
-let last_nonempty_model = fun models ->
+let last_nonempty_model pm models =
   let not_empty (_,m) = not (Model_parser.is_model_empty m) in
   let models = List.filter not_empty models in
   let models = List.rev models in
-  Option.map (fun (_,m) -> m) (List.nth_opt models 0)
+  let all_elems m =
+    List.map (fun me -> {me with me_concrete_value =
+                                 concrete_term_of_term pm Mvs.empty me.me_value})
+      (get_model_elements m)
+  in
+  let add_me_to_file f line me = 
+      Wstdlib.Mint.change (function None -> Some [me] | Some l -> Some (me :: l)) line f in
+  let add_me_to_files files_map me =
+    match Option.map Loc.get me.me_location with
+    | Some (file,line,_,_,_) ->
+        Wstdlib.Mstr.change (function
+        | None   -> Some (Wstdlib.Mint.singleton line [me])
+        | Some m -> Some (add_me_to_file m line me)) file files_map
+    | None -> files_map in
+  let extract_terms m =
+  List.fold_left add_me_to_files Wstdlib.Mstr.empty (all_elems m)
+  in
+  Option.map (fun (_,m) -> set_model_files m (extract_terms m)) (List.nth_opt models 0)

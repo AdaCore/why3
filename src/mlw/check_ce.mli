@@ -174,8 +174,9 @@ val best_giant_step_result : (model * rac_result) list -> (model * rac_result) o
                               > RAC_not_done _
     *)
 
-val last_nonempty_model : (Call_provers.prover_answer * model) list -> model option
-(** Select the last non-empty model from the list of models. Helper function for the
+val last_nonempty_model : Pmodule.pmodule -> (Call_provers.prover_answer * model) list -> model option
+(** Select the last non-empty model from the list of models, and builds
+    concrete terms based on the terms it contains. Helper function for the
     cases where counterexample checking has not been requested. *)
 
 (** {Debugging flags} *)

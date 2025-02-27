@@ -445,9 +445,9 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         let ce =
         if !opt_check_ce_model then select_ce env th res.pr_models
-          (* Option.iter print_other_models ce; WIP 30 Gennaio: remove? *)
         else
-          Option.bind (Check_ce.last_nonempty_model res.pr_models)
+          Option.bind
+            (Check_ce.last_nonempty_model (Pmodule.restore_module th) res.pr_models)
             (fun m -> Some (m, Not_checked))
         in
           printf "%a@." (print_result !opt_json)
