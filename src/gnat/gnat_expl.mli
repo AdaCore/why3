@@ -50,6 +50,8 @@ type check_kind =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
