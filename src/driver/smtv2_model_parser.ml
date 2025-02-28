@@ -209,7 +209,7 @@ module FromSexpToModel = struct
   let constant_bv_bin = function
     | Atom s -> (
         try
-          let s' = Strings.remove_prefix "#b" s in
+          let s' = Strings.remove_prefix ~prefix:"#b" s in
           let constant_bv_value = BigInt.of_string ("0b" ^ s') in
           let constant_bv_length = String.length s' in
           { constant_bv_value; constant_bv_length; constant_bv_verbatim = s }
@@ -219,7 +219,7 @@ module FromSexpToModel = struct
   let constant_bv_hex = function
     | Atom s -> (
         try
-          let s' = Strings.remove_prefix "#x" s in
+          let s' = Strings.remove_prefix ~prefix:"#x" s in
           let constant_bv_value = BigInt.of_string ("0x" ^ s') in
           let constant_bv_length = String.length s' * 4 in
           { constant_bv_value; constant_bv_length; constant_bv_verbatim = s }
@@ -229,7 +229,7 @@ module FromSexpToModel = struct
   let constant_bv_dec = function
     | List [ Atom "_"; Atom n; l ] as sexp -> (
         try
-          let constant_bv_value = BigInt.of_string (Strings.remove_prefix "bv" n) in
+          let constant_bv_value = BigInt.of_string (Strings.remove_prefix ~prefix:"bv" n) in
           let constant_bv_length = int l in
           { constant_bv_value; constant_bv_length; constant_bv_verbatim = string_of_sexp sexp }
         with _ -> error sexp "constant_bv_dec")
@@ -346,7 +346,7 @@ module FromSexpToModel = struct
     (* should not be useful anymore for CVC5, but still useful for
        CVC4 and Z3 *)
     let opt_name =
-      if Strings.has_prefix "@" name || Strings.has_prefix "." name then
+      if Strings.has_prefix ~prefix:"@" name || Strings.has_prefix ~prefix:"." name then
         try
           let left = String.index name '_' + 1 in
           let right = String.rindex name '_' in
@@ -503,7 +503,7 @@ module FromModelToTerm = struct
 
   let error fmt =
     Format.kasprintf (fun msg -> raise (E_parsing msg)) fmt
-  let error_concrete_syntax fmt =
+  let _error_concrete_syntax fmt =
     Format.kasprintf (fun msg -> raise (E_concrete_syntax msg)) fmt
 
   type env = {
@@ -513,11 +513,11 @@ module FromModelToTerm = struct
     constructors : lsymbol Mstr.t;
     (* List of record fields for each constructor symbol
        from [pinfo.Printer.record_fields]. *)
-    record_fields : Term.lsymbol list Mls.t;
+    _record_fields : Term.lsymbol list Mls.t;
     (* List of fields for each record type from [pinfo.Printer.type_fields]. *)
-    type_fields : Term.lsymbol list Ty.Mty.t;
+    _type_fields : Term.lsymbol list Ty.Mty.t;
     (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
-    type_coercions : Term.Sls.t Ty.Mty.t;
+    _type_coercions : Term.Sls.t Ty.Mty.t;
     (* Function definitions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
     mutable prover_fun_defs : Term.term Mstr.t;
@@ -744,7 +744,7 @@ module FromModelToTerm = struct
               Example in 32bits: significand is 23 bits, and the hexadecimal
               representation will have a multiple of 4 bits (ie 24). So, we need to
               multiply by two to account the difference. *)
-          if Strings.has_prefix "#b" mant.bv_verbatim then
+          if Strings.has_prefix ~prefix:"#b" mant.bv_verbatim then
             let adjust = 4 - (mant.bv_length mod 4) in
             if adjust = 4 then mant.bv_value (* No adjustment needed *)
             else BigInt.mul (BigInt.pow_int_pos 2 adjust) mant.bv_value
@@ -792,11 +792,11 @@ module FromModelToTerm = struct
 
   let constant_to_term env c =
     match c with
-    | Cint {constant_int_value= int_value; constant_int_verbatim= int_verbatim} ->
+    | Cint {constant_int_value= int_value; constant_int_verbatim= _int_verbatim} ->
       t_const (Constant.ConstInt int_value) Ty.ty_int
-    | Creal { constant_real_value= real_value; constant_real_verbatim= real_verbatim } ->
+    | Creal { constant_real_value= real_value; constant_real_verbatim= _real_verbatim } ->
       t_const (Constant.ConstReal real_value) Ty.ty_real
-    | Cfraction { constant_frac_num; constant_frac_den; constant_frac_verbatim } -> (
+    | Cfraction { constant_frac_num; constant_frac_den; constant_frac_verbatim = _ } -> (
         try
           let t = t_const (Constant.ConstReal constant_frac_num.constant_real_value) Ty.ty_real in
           let t' = t_const (Constant.ConstReal constant_frac_den.constant_real_value) Ty.ty_real in
@@ -808,7 +808,7 @@ module FromModelToTerm = struct
         with _ ->
           error "Could not interpret constant %a as a fraction@." print_constant
             c)
-    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim } ->
+    | Cbitvector { constant_bv_value; constant_bv_length; constant_bv_verbatim = _ } ->
         let ty = smt_sort_to_ty env (Sbitvec constant_bv_length) in
         t_const (Constant.int_const constant_bv_value) ty
     | Cfloat fp -> (
@@ -819,7 +819,7 @@ module FromModelToTerm = struct
         let float_lib = "Float" ^ string_of_int (exp_size + significand_size) in
         try
           (* general case *)
-          let neg, s1, s2, exp, (bv_sign,bv_exp,bv_mant), hex =
+          let neg, s1, s2, exp, (_bv_sign,_bv_exp,_bv_mant), _hex =
             float_of_binary fp.const_float_val
           in
             t_const
@@ -1275,7 +1275,7 @@ module FromModelToTerm = struct
             if t_equal t1' t2' then t_true
             else  t_app_infer ls [ t1'; t2' ])
     | Term.Tapp (ls, ts) ->
-        let ts = 
+        let ts =
           List.map
             (eval_term env ~eval_prover_var seen_prover_vars terms) ts
         in
@@ -1500,9 +1500,9 @@ module FromModelToTerm = struct
         prover_vars = Mstr.empty;
         bound_vars = Mstr.empty;
         constructors = pinfo.Printer.constructors;
-        record_fields = pinfo.Printer.record_fields;
-        type_fields = pinfo.Printer.type_fields;
-        type_coercions = pinfo.Printer.type_coercions;
+        _record_fields = pinfo.Printer.record_fields;
+        _type_fields = pinfo.Printer.type_fields;
+        _type_coercions = pinfo.Printer.type_coercions;
         type_sorts = pinfo.Printer.type_sorts;
         inferred_types = [];
         eval_prover_vars = Mvs.empty;
@@ -1660,7 +1660,7 @@ let parse pinfo input =
                   Ident.Sattr.union attrs
                     (Mstr.find_def Ident.Sattr.empty n pinfo.Printer.set_str) in
                     (* Concrete terms are computed in check_ce.ml *)
-                create_model_element ~value:t ~concrete_value:(Epsilon ("undefined", (Const (Boolean true))))
+                create_model_element ~value:t ~concrete_value:concrete_undefined
                   ~oloc ~attrs ~lsymbol:ls)
               terms))
 

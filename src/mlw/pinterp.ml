@@ -631,7 +631,7 @@ let try_eval_ensures ctx posts =
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
 (******************************************************************************)
 
-let is_ignore_id id = Strings.has_prefix "_" id.id_string
+let is_ignore_id id = Strings.has_prefix ~prefix:"_" id.id_string
 
 (** A partial value generator with a string as a description. *)
 type value_gen = string * (unit -> value option)
@@ -1422,7 +1422,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
     (* Module [Expr] adds a precondition "DECR f" to each recursive function
        "f", which is not defined in the context of Pinterp. TODO? *)
     let not_DECR = function
-      | {t_node= Tapp (f, _)} -> not (Strings.has_prefix "DECR " f.ls_name.id_string)
+      | {t_node= Tapp (f, _)} -> not (Strings.has_prefix ~prefix:"DECR " f.ls_name.id_string)
       | _ -> true in
     if ctx.do_rac then (
       let desc = asprintf "of `%a`" print_rs rs in

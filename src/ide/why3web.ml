@@ -60,20 +60,20 @@ let decode s =
 (* TODO make it cleaner and less inefficient with adapted functions *)
 let interp_request args =
   match args with
-  | args when Strings.has_prefix "reload" args -> Reload_req
-  | args when Strings.has_prefix "list-provers" args ->
+  | args when Strings.has_prefix ~prefix:"reload" args -> Reload_req
+  | args when Strings.has_prefix ~prefix:"list-provers" args ->
       Command_req (root_node,"list-provers")
-  | args when Strings.has_prefix "command=" args ->
-      let com = Strings.remove_prefix "command=" args in
+  | args when Strings.has_prefix ~prefix:"command=" args ->
+      let com = Strings.remove_prefix ~prefix:"command=" args in
       (match (Strings.bounded_split ',' com 2) with
       | n :: com :: [] ->
           Command_req (int_of_string n, com)
       | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
-  | args when Strings.has_prefix "gettask_" args ->
+  | args when Strings.has_prefix ~prefix:"gettask_" args ->
      let c = false in
      let show_uses_clones_metas = false in
      let loc = true in
-     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),c,show_uses_clones_metas,loc)
+     Get_task (int_of_string (Strings.remove_prefix ~prefix:"gettask_" args),c,show_uses_clones_metas,loc)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =

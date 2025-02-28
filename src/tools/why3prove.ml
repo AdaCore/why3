@@ -114,11 +114,11 @@ let add_sub_goal s =
       with _ -> failure "Missing file" in
     let l =
       try
-        let s = Strings.remove_prefix ":" (Re.Str.matched_group 2 s) in
+        let s = Strings.remove_prefix ~prefix:":" (Re.Str.matched_group 2 s) in
         Some (int_of_string s)
       with Not_found -> None | Failure _ -> failure "Invalid line number" in
     let e =
-      try Some (Strings.remove_prefix "@" (Re.Str.matched_group 3 s))
+      try Some (Strings.remove_prefix ~prefix:"@" (Re.Str.matched_group 3 s))
       with Not_found -> None in
     opt_sub_goals := (f,l,e) :: !opt_sub_goals )
   else

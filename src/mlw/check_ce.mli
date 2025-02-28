@@ -66,6 +66,12 @@ val string_of_rac_result_state : rac_result_state -> string
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
+val print_dbg_rac_result_model :
+  print_normal:bool ->
+  print_giant:bool ->
+  int option ->
+  (int * 'a * 'b * rac_result * rac_result) Pp.pp
+
 val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 (** Execute a call to the program function given by the [rsymbol] using normal
     or giant-step RAC, using the given model as an oracle for program parameters
