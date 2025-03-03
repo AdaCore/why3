@@ -121,14 +121,14 @@ let result1 : Call_provers.prover_result =
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
-(* prints CVC4 answer *)
-let () = printf "@[On task 1, CVC4,1.7 answers %a@."
+(* Prints CVC4 answer. *)
+let () = printf "@[On task2, CVC4,1.7 answers %a@."
     (Call_provers.print_prover_result ?json:None) result1
 
-let () = printf "Model is %t@."
+let () = printf "@[A candidate counterexample obtained from the prover is@\n%t@]@."
     (fun fmt ->
-       match Check_ce.last_nonempty_model
-                result1.Call_provers.pr_models with
+       match Check_ce.last_nonempty_model (Task.task_known task2)
+               result1.Call_provers.pr_models with
        | Some m -> Json_base.print_json fmt (Model_parser.json_model m)
        | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)

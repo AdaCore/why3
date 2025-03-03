@@ -16,11 +16,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ =>
-              if (infix = {to_int => 3} bOUND_VARIABLE_3933) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -45,11 +41,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ =>
-              if (infix = {to_int => 3} bOUND_VARIABLE_4863) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -79,12 +71,12 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 11:
-    two :  = "undefined"
+    two :  = <UNDEFINED>
   Line 14:
-    three :  = "undefined"
+    three :  = <UNDEFINED>
   Line 50:
-    a :  = "undefined"
-    a :  = "undefined"
+    a :  = <UNDEFINED>
+    a :  = <UNDEFINED>
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
@@ -104,11 +96,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ =>
-              if (infix = {to_int => 3} bOUND_VARIABLE_5113) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:

@@ -726,9 +726,9 @@ let locate_exe =
   Hstr.fold (fun p fullpath acc ->
       let lp = String.length p in
       if lp >= ln &&
-         Strings.has_prefix name p &&
+         Strings.has_prefix ~prefix:name p &&
          (lp = ln ||
-            (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix "exe" p || has_suffix "bat" p)) ||
+            (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix ~suffix:"exe" p || has_suffix ~suffix:"bat" p)) ||
             (p.[ln] = '-' && lp >= ln + 2 && '0' <= p.[ln + 1] && p.[ln + 1] <= '9')) then
         fullpath :: acc
       else acc) (Lazy.force binaries) []

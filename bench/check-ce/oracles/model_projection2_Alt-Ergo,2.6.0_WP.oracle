@@ -19,14 +19,14 @@ The following counterexample model could not be verified
   (both RAC fatal rac error: missing value for global `to_array`):
 File model_projection2.mlw:
   Line 12:
-    get : poly_map int int -> int -> int = fun _arg_03 _arg_13 -> 1
+    get : poly_map int int -> int -> int = (fun _arg_01 _arg_11 -> 1)
   Line 16:
     i : int = 0
-    x :  = "undefined"
+    x :  = <UNDEFINED>
   Line 24:
     i :  = 0
     result :  = Tuple0
-    x :  = "undefined"
+    x :  = <UNDEFINED>
 
 Warning: Error while interpreting to_array: No lsymbol found for qualified identifier (Qident (Isymbol store))
 
@@ -54,12 +54,12 @@ File int.mlw:
     one = 1
 File model_projection2.mlw:
   Line 12:
-    get = fun (_arg_09:poly_map int int) (_arg_18:int) -> 41
+    get = fun (_arg_04:poly_map int int) (_arg_14:int) -> 41
   Line 25:
     x = UNDEFINED
     x = UNDEFINED
     Execution of main function `g2` with env:
-      get = fun (_arg_09:poly_map int int) (_arg_18:int) -> 41
+      get = fun (_arg_04:poly_map int int) (_arg_14:int) -> 41
       x = UNDEFINED
       zero = 0
       one = 1

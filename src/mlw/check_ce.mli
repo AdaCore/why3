@@ -66,6 +66,12 @@ val string_of_rac_result_state : rac_result_state -> string
 val print_rac_result : ?verb_lvl:int -> rac_result Pp.pp
 (** Print the result state of a RAC execution with the execution log *)
 
+val print_dbg_rac_result_model :
+  print_normal:bool ->
+  print_giant:bool ->
+  int option ->
+  (int * 'a * 'b * rac_result * rac_result) Pp.pp
+
 val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 (** Execute a call to the program function given by the [rsymbol] using normal
     or giant-step RAC, using the given model as an oracle for program parameters
@@ -73,12 +79,12 @@ val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 
 (** {2 Conversions with models }*)
 
-val oracle_of_model : Pmodule.pmodule -> Model_parser.model -> Pinterp_core.oracle
+val oracle_of_model : Pdecl.known_map -> Model_parser.model -> Pinterp_core.oracle
 (** Create an oracle from a (prover model-derived) candidate counterexample. *)
 
-val model_of_exec_log : original_model:model -> Log.exec_log -> model
-(** [model_of_exec_log ~original_model log)] populates a {!Model_parser.model} from an
-   execution log [log] *)
+val model_of_exec_log : known_map:(Decl.decl Ident.Mid.t) -> prover_model:model -> Log.exec_log -> model
+(** [model_of_exec_log ~known_map ~prover_model log] populates a {!Model_parser.model} from an
+   execution log [log], using information about record declaration from [known_map] *)
 
 (* val find_ls : Theory.theory -> Loc.position -> Term.lsymbol *)
 
@@ -174,8 +180,9 @@ val best_giant_step_result : (model * rac_result) list -> (model * rac_result) o
                               > RAC_not_done _
     *)
 
-val last_nonempty_model : (Call_provers.prover_answer * model) list -> model option
-(** Select the last non-empty model from the list of models. Helper function for the
+val last_nonempty_model : (Decl.known_map) -> (Call_provers.prover_answer * model) list -> model option
+(** Select the last non-empty model from the list of models, and builds
+    concrete terms based on the terms it contains. Helper function for the
     cases where counterexample checking has not been requested. *)
 
 (** {Debugging flags} *)

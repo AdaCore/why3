@@ -16,10 +16,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ => if (infix = {to_int => 3} _arg_16) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -44,10 +41,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ => if (infix = {to_int => 3} _arg_113) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -74,10 +68,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ => if (infix = {to_int => 3} _arg_118) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:
@@ -106,10 +97,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|_ => if (infix = {to_int => 3} _arg_125) then 3 else 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
     two : t = {to_int => 2}
   Line 14:

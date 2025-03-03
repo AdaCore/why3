@@ -366,14 +366,14 @@ let model_vc_post_attr = create_attribute "model_vc_post"
 let create_model_trace_attr s = create_attribute ("model_trace:" ^ s)
 
 let is_model_trace_attr a =
-  Strings.has_prefix "model_trace:" a.attr_string
+  Strings.has_prefix ~prefix:"model_trace:" a.attr_string
 
 let is_written_attr a =
-  Strings.has_prefix "vc:written:" a.attr_string
+  Strings.has_prefix ~prefix:"vc:written:" a.attr_string
 
 let eid_attribute_prefix = "eid:"
 
-let is_eid_attr a = Strings.has_prefix eid_attribute_prefix a.attr_string
+let is_eid_attr a = Strings.has_prefix ~prefix:eid_attribute_prefix a.attr_string
 
 let create_loc_attr prefix loc =
   let f,bl,bc,el,ec = Loc.get loc in
@@ -382,7 +382,7 @@ let create_loc_attr prefix loc =
   create_attribute s
 
 let get_loc_attr prefix attr =
-  match Strings.remove_prefix (prefix^":") attr.attr_string with
+  match Strings.remove_prefix ~prefix:(prefix^":") attr.attr_string with
   | exception Not_found -> None
   | str -> match Strings.bounded_split ':' str 5 with
     | [stline; stcol; endline; endcol; file] ->
@@ -427,7 +427,7 @@ let get_eid_attr =
   search_attribute_value
     (fun a ->
       try
-        let i = Strings.remove_prefix eid_attribute_prefix a.attr_string in
+        let i = Strings.remove_prefix ~prefix:eid_attribute_prefix a.attr_string in
         Some (int_of_string i)
       with Not_found -> None)
 
@@ -503,17 +503,17 @@ let extract_field attr =
 
 (* Attributes used to name hypothesis *)
 let is_hyp_name_attr a =
-  Strings.has_prefix "hyp_name:" a.attr_string
+  Strings.has_prefix ~prefix:"hyp_name:" a.attr_string
 
 let get_hyp_name ~attrs =
-  try Some (Strings.remove_prefix "hyp_name:"
+  try Some (Strings.remove_prefix ~prefix:"hyp_name:"
               (Sattr.choose (Sattr.filter is_hyp_name_attr attrs)).attr_string)
   with Not_found -> None
 
 (* Functions for working with ITP attributes *)
 
 let is_name_attr a =
-  Strings.has_prefix "name:" a.attr_string
+  Strings.has_prefix ~prefix:"name:" a.attr_string
 
 let get_name_attr ~attrs =
   try Some (Sattr.choose (Sattr.filter is_name_attr attrs))

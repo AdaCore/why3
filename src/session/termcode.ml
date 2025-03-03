@@ -42,7 +42,7 @@ let collect_expls attr =
            | [] -> acc
            | p :: r ->
               try
-                let s = Strings.remove_prefix p attr in s :: acc
+                let s = Strings.remove_prefix ~prefix:p attr in s :: acc
               with Not_found -> aux r
        in aux !expl_prefixes)
     attr

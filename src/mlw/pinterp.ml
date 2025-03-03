@@ -573,7 +573,18 @@ let value_of_constant ty c =
   match c with
   | ConstInt i -> value ty (Vnum i.Number.il_int)
   | ConstStr s -> string_value s
-  | ConstReal _ -> failwith "not implemented: value_of_term real"
+  | ConstReal r ->
+      (* ConstReal can be float or real *)
+      if ty_equal ty ty_real then
+        let p, q = compute_fraction r.Number.rl_real in
+        let sp, sq = BigInt.to_string p, BigInt.to_string q in
+        try value ty_real (Vreal (Big_real.real_from_fraction sp sq))
+        with Mlmpfr_wrapper.Not_Implemented ->
+          failwith "mlmpfr wrapper is not implemented"
+      else
+        let c = Constant.ConstReal r in
+        let s = Format.asprintf "%a" Constant.print_def c in
+        value ty (Vfloat (Mlmpfr_wrapper.make_from_str s))
 
 let value_of_term ctx t =
   let rec aux t =
@@ -620,7 +631,7 @@ let try_eval_ensures ctx posts =
 (*            GET AND REGISTER VALUES FOR VARIABLES AND CALL RESULTS          *)
 (******************************************************************************)
 
-let is_ignore_id id = Strings.has_prefix "_" id.id_string
+let is_ignore_id id = Strings.has_prefix ~prefix:"_" id.id_string
 
 (** A partial value generator with a string as a description. *)
 type value_gen = string * (unit -> value option)
@@ -942,21 +953,12 @@ and exec_expr' ctx e =
       Debug.dprintf debug_trace_exec "[interp] reading var %s from env -> %a@\n"
         pvs.pv_vs.vs_name.id_string print_value v ;
       Normal v
-  | Econst (Constant.ConstInt c) ->
-      Normal (value (ty_of_ity e.e_ity) (Vnum (big_int_of_const c)))
-  | Econst (Constant.ConstReal r) ->
-      (* ConstReal can be float or real *)
-      if ity_equal e.e_ity ity_real then
-        let p, q = compute_fraction r.Number.rl_real in
-        let sp, sq = BigInt.to_string p, BigInt.to_string q in
-        try Normal (value ty_real (Vreal (Big_real.real_from_fraction sp sq)))
-        with Mlmpfr_wrapper.Not_Implemented ->
-          fatal_rac_error ctx.env.log_uc "mlmpfr wrapper is not implemented"
-      else
-        let c = Constant.ConstReal r in
-        let s = Format.asprintf "%a" Constant.print_def c in
-        Normal (value (ty_of_ity e.e_ity) (Vfloat (Mlmpfr_wrapper.make_from_str s)))
-  | Econst (Constant.ConstStr s) -> Normal (value ty_str (Vstring s))
+  | Econst c ->
+      begin try
+        Normal (value_of_constant (ty_of_ity e.e_ity) c)
+      with _ -> fatal_rac_error ctx.env.log_uc "mlmpfr wrapper is not implemented"
+      end
+      (* Normal (value (ty_of_ity e.e_ity) (Vnum (big_int_of_const c))) *)
   | Eexec (ce, cty) -> begin
       (* TODO (When) do we have to check the contracts in cty? When ce <> Capp? *)
       match ce.c_node with
@@ -1420,7 +1422,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
     (* Module [Expr] adds a precondition "DECR f" to each recursive function
        "f", which is not defined in the context of Pinterp. TODO? *)
     let not_DECR = function
-      | {t_node= Tapp (f, _)} -> not (Strings.has_prefix "DECR " f.ls_name.id_string)
+      | {t_node= Tapp (f, _)} -> not (Strings.has_prefix ~prefix:"DECR " f.ls_name.id_string)
       | _ -> true in
     if ctx.do_rac then (
       let desc = asprintf "of `%a`" print_rs rs in

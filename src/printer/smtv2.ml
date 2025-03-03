@@ -859,9 +859,9 @@ let print_constructor_decl info is_record fmt (ls,args) =
                   let field_trace =
                     try
                       let attr = Sattr.choose (Sattr.filter (fun l ->
-                        Strings.has_prefix "model_trace:" l.attr_string)
+                        Strings.has_prefix ~prefix:"model_trace:" l.attr_string)
                         pr.ls_name.id_attrs) in
-                      Strings.remove_prefix "model_trace:" attr.attr_string
+                      Strings.remove_prefix ~prefix:"model_trace:" attr.attr_string
                     with
                       Not_found -> ""
                   in
@@ -882,7 +882,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
 
   info.constr_proj_id <-
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
-  if Strings.has_suffix "'mk" ls.ls_name.id_string then
+  if Strings.has_suffix ~suffix:"'mk" ls.ls_name.id_string then
     begin try
       let args = List.map Option.get args in
       info.record_fields <- Mls.add ls args info.record_fields

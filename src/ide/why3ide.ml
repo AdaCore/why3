@@ -384,12 +384,12 @@ let erase_loc_all_view () =
 let update_label_change (label : GMisc.label) =
   let s = label#text in
   erase_loc_all_view ();
-  if not (Strings.has_prefix "*" s) then label#set_text ("*" ^ s)
+  if not (Strings.has_prefix ~prefix:"*" s) then label#set_text ("*" ^ s)
 
 (* Update name of the tab when the label is saved. Removes * prefix *)
 let update_label_saved (label : GMisc.label) =
   let s = label#text in
-  if Strings.has_prefix "*" s then
+  if Strings.has_prefix ~prefix:"*" s then
     label#set_text (String.sub s 1 (String.length s - 1))
 
 let make_sources_editable b =
@@ -822,8 +822,8 @@ let print_message ~kind ~notif_kind fmt =
       let buf = message_zone#buffer in
       if kind > 0 then (
         if
-          Strings.ends_with notif_kind "error"
-          || Strings.ends_with notif_kind "Error"
+          Strings.has_suffix ~suffix:"error" notif_kind
+          || Strings.has_suffix ~suffix:"Error" notif_kind
         then
           buf#insert ~tags:[ !message_zone_error_tag ] (s ^ "\n")
         else
@@ -2575,7 +2575,7 @@ let init_completion provers transformations strategies commands =
   (* Remove counterexample provers from the menu *)
   let menu_provers =
     List.filter
-      (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
+      (fun (_, _, s) -> not (Strings.has_suffix ~suffix:"counterexamples" s))
       provers_sorted
   in
   List.iter (add_submenu_prover provers_factory context_factory) menu_provers;

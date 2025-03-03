@@ -123,7 +123,7 @@ and concrete_syntax_funlit =
 and concrete_syntax_fun = { args : string list; body : concrete_syntax_term; }
 
 (** Concrete term *)
-and concrete_syntax_term =
+and concrete_syntax_term = private
   | Var of string
   (** Variable of the given name *)
   | Const of concrete_syntax_constant
@@ -155,12 +155,31 @@ and concrete_syntax_term =
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
+
 (** Helper functions to create concrete terms *)
 
-val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
+val concrete_const : concrete_syntax_constant -> concrete_syntax_term
+val concrete_var : string -> concrete_syntax_term
+val concrete_apply : string -> concrete_syntax_term list -> concrete_syntax_term
+val concrete_if : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_let : string -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_record : (string * concrete_syntax_term) list -> concrete_syntax_term
+val concrete_proj : string -> concrete_syntax_term -> concrete_syntax_term
+val concrete_epsilon : string -> concrete_syntax_term -> concrete_syntax_term
+val concrete_function_literal : concrete_syntax_funlit_elts list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_function : string list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_binop: concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_not: concrete_syntax_term -> concrete_syntax_term
+
+val concrete_undefined : concrete_syntax_term
+val is_concrete_undefined : concrete_syntax_term -> bool
+
+val concrete_string_from_vs : Term.vsymbol -> string
+(*val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term*)
 val concrete_const_bool : bool -> concrete_syntax_term
 val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
-val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
 val subst_concrete_term :
   concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term
 val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term

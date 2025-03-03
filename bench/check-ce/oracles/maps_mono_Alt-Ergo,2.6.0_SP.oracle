@@ -19,8 +19,8 @@ The following counterexample model could not be verified
   (concrete RAC terminated because Postcondition of `set` cannot be evaluated, abstract RAC fatal rac error: missing value for return value of call to set at "bench/check-ce/maps_mono.mlw", line 47, characters 9-29):
 File maps_mono.mlw:
   Line 44:
-    x :  = {contents = "undefined"}
-    x :  = {contents = "undefined"}
+    x :  = {contents = <UNDEFINED>}
+    x :  = {contents = <UNDEFINED>}
 
 Warning: Error while interpreting x: No variable in bound_vars matching qualified identifier (Qident (Isymbol getqtresultqtunused))
 
@@ -47,8 +47,8 @@ The following counterexample model could not be verified
   (concrete RAC fatal rac error: an undefined argument was passed to (@), abstract RAC fatal rac error: missing value for return value of call to get at "bench/check-ce/maps_mono.mlw", line 53, characters 27-46):
 File maps_mono.mlw:
   Line 50:
-    x :  = {contents = "undefined"}
-    x :  = {contents = "undefined"}
+    x :  = {contents = <UNDEFINED>}
+    x :  = {contents = <UNDEFINED>}
 
 Warning: Error while interpreting x: No variable in bound_vars matching qualified identifier (Qident (Isymbol x0))
 
@@ -79,8 +79,8 @@ The following counterexample model could not be verified
   (concrete RAC fatal rac error: an undefined argument was passed to (@), abstract RAC fatal rac error: missing value for return value of call to get at "bench/check-ce/maps_mono.mlw", line 58, characters 13-30):
 File maps_mono.mlw:
   Line 55:
-    x :  = {contents = "undefined"}
-    x :  = {contents = "undefined"}
+    x :  = {contents = <UNDEFINED>}
+    x :  = {contents = <UNDEFINED>}
 
 Warning: Error while interpreting setqtresultqtunused: No lsymbol found for qualified identifier (Qident (Isymbol store))
 
@@ -103,8 +103,8 @@ The following counterexample model could not be verified
   (concrete RAC terminated because Postcondition of `set` cannot be evaluated, abstract RAC fatal rac error: missing value for return value of call to set at "bench/check-ce/maps_mono.mlw", line 65, characters 9-29):
 File maps_mono.mlw:
   Line 62:
-    x :  = {contents = "undefined"}
-    x :  = {contents = "undefined"}
+    x :  = {contents = <UNDEFINED>}
+    x :  = {contents = <UNDEFINED>}
 
 Warning: Error while interpreting setqtresultqtunused: No lsymbol found for qualified identifier (Qident (Isymbol store))
 
@@ -127,8 +127,8 @@ The following counterexample model could not be verified
   (concrete RAC terminated because Postcondition of `set1` cannot be evaluated, abstract RAC fatal rac error: missing value for return value of call to set1 at "bench/check-ce/maps_mono.mlw", line 70, characters 9-33):
 File maps_mono.mlw:
   Line 67:
-    x :  = {contents = "undefined"}
-    x :  = {contents = "undefined"}
+    x :  = {contents = <UNDEFINED>}
+    x :  = {contents = <UNDEFINED>}
 
 Warning: Error while interpreting t: No lsymbol found for qualified identifier (Qident (Isymbol store))
 
@@ -157,6 +157,6 @@ File maps_mono.mlw:
   Line 78:
     i :  = 0
     i : int = 0
-    t :  = "undefined"
-    t :  = "undefined"
+    t :  = <UNDEFINED>
+    t :  = <UNDEFINED>
 
