@@ -112,7 +112,7 @@ let update_info_labels lsname cur_attrs t ls =
     (* Change attributes labels with "at:" to located
        "at:[label]:loc:filename:line" *)
     Sattr.fold (fun attr acc ->
-        if Strings.has_prefix "at:" attr.attr_string then
+        if Strings.has_prefix ~prefix:"at:" attr.attr_string then
           let (f, l, _, _, _) =
             match t.t_loc with
             | None -> Loc.get (Option.value ~default:Loc.dummy_position ls.ls_name.id_loc)
@@ -121,7 +121,7 @@ let update_info_labels lsname cur_attrs t ls =
           let attr = create_attribute (attr.attr_string ^ ":loc:" ^ f ^ ":" ^ (string_of_int l)) in
           Sattr.add attr acc
         else
-          if Strings.has_prefix "branch_id=" attr.attr_string then
+          if Strings.has_prefix ~prefix:"branch_id=" attr.attr_string then
             Sattr.add attr acc
           else
             acc

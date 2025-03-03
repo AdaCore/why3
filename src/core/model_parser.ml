@@ -174,17 +174,17 @@ let rec print_concrete_term fmt ct =
       print_concrete_term t2
   | Apply (f,[]) -> pp_print_string fmt f
   | Apply (f,ctl) ->
-    fprintf fmt "@[(%s@ %a)@]" f (Pp.print_list Pp.space print_concrete_term) ctl
+    fprintf fmt "@[Apply(%s,@ %a)@]" f (Pp.print_list Pp.space print_concrete_term) ctl
   | If (b,t1,t2) ->
     fprintf fmt "@[if %a@ then %a@ else %a@]"
       print_concrete_term b
       print_concrete_term t1
       print_concrete_term t2
   | Epsilon (eps_vs,eps_t) ->
-    fprintf fmt "epsilon %s.@ %a" eps_vs print_concrete_term eps_t
+    fprintf fmt "(epsilon %s.@ %a)" eps_vs print_concrete_term eps_t
   | Quant (quant,quant_vars,quant_t) ->
     let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
-    fprintf fmt "@[<hov 1>%s %a.@ %a@]" quant_string
+    fprintf fmt "@[<hov 1>(%s %a.@ %a)@]" quant_string
       (Pp.print_list Pp.comma Pp.print_string) quant_vars
       print_concrete_term quant_t
   | Binop (op,t1,t2) ->
@@ -194,7 +194,7 @@ let rec print_concrete_term fmt ct =
       | Implies -> "->"
       | Iff -> "<->"
     in
-    fprintf fmt "@[%a %s@ %a@]"
+    fprintf fmt "@[(%a %s@ %a)@]"
       print_concrete_term t1
       op_string
       print_concrete_term t2
@@ -213,7 +213,7 @@ let rec print_concrete_term fmt ct =
       (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
       print_others others
   | Function {args; body} ->
-    fprintf fmt "@[<hov 1>fun %a ->@ %a@]"
+    fprintf fmt "@[<hov 1>(fun %a ->@ %a)@]"
       (Pp.print_list Pp.space Pp.print_string) args
       print_concrete_term body
   | Record fields_values ->
@@ -230,18 +230,58 @@ let rec print_concrete_term fmt ct =
 
 (* Helper functions for concrete terms *)
 
-let concrete_var_from_vs vs =
-  Var (Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
+let concrete_undefined = Epsilon("_", (Const (Boolean true)))
+
+let is_concrete_undefined t =
+  match t with
+  | Epsilon("_", Const (Boolean true)) -> true
+  | _ -> false
+
+let concrete_const c = Const c
+
+let concrete_var s = Var s
+
+let concrete_apply symb l =
+  if Strings.has_suffix ~suffix:"'mk" symb then failwith ("concrete_apply with " ^ symb);
+  Apply(symb,l)
+
+let concrete_if t1 t2 t3 = If(t1,t2,t3)
+
+let concrete_let v t1 t2 = Let ([(v, t1)], t2)
+
+let concrete_record l = Record l
+
+let concrete_proj s t = Proj(s,t)
+
+let concrete_epsilon v t = Epsilon(v,t)
+
+let concrete_function_literal l o = FunctionLiteral { elts = l; others = o }
+
+let concrete_function args body = Function {args; body}
+
+let concrete_quant q l t = Quant(q,l,t)
+
+let concrete_binop op t1 t2 = Binop(op,t1,t2)
+
+let concrete_not t = Not t
+
+let concrete_string_from_vs vs =
+  Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs
+
+(*
+let concrete_var_from_vs vs = Var (concrete_string_from_vs vs)
+*)
+
 let concrete_const_bool b = Const (Boolean b)
 let concrete_apply_from_ls ls ts =
   let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in
-  Apply (ls_name, ts)
-let concrete_apply_equ t1 t2 = Apply ("=", [t1;t2])
+  concrete_apply ls_name ts
+let concrete_equ t1 t2 = concrete_apply "=" [t1;t2]
 let rec subst_concrete_term subst t =
   match t with
   | Var v -> (try Mstr.find v subst with _ -> t)
   | Const _ -> t
-  | Apply (f, ctl) -> Apply (f, List.map (subst_concrete_term subst) ctl)
+  | Apply (f, ctl) -> concrete_apply f (List.map (subst_concrete_term subst) ctl)
   | If (cb,ct1,ct2) ->
     If (subst_concrete_term subst cb,
         subst_concrete_term subst ct1,
@@ -992,7 +1032,7 @@ let while_loop_kind vc_attrs var_loc =
     a.attr_string = "expl:loop variant decrease" in
   if Sattr.exists is_inv_pres vc_attrs then
     let loop_loc =
-      let is_while a = Strings.has_prefix "loop:" a.attr_string in
+      let is_while a = Strings.has_prefix ~prefix:"loop:" a.attr_string in
       let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
       Scanf.sscanf attr.attr_string "loop:%[^:]:%d:%d:%d:%d"
         Loc.user_position in
@@ -1215,7 +1255,7 @@ class clean = object (self)
     Some (Not v)
   method apply s vs =
     opt_bind_all (List.map self#value vs) @@ fun vs ->
-    Some (Apply (s, vs))
+    Some (concrete_apply s vs)
   method cond b t1 t2 =
     Option.bind (self#value b) @@ fun b ->
     Option.bind (self#value t1) @@ fun t1 ->

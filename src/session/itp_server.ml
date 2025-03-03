@@ -1036,9 +1036,15 @@ match pa.proof_state with
 | Some res ->
    begin
      let open Call_provers in
+     let pm =
+       Pmodule.restore_module
+         (Theory.restore_theory
+            (Session_itp.theory_name
+               (Session_itp.find_th d.cont.controller_session parid) ) )
+     in
      let result = Pp.string_of print_prover_answer res.pr_answer in
      let selected_model = Option.value ~default:Model_parser.empty_model
-         (Check_ce.last_nonempty_model res.pr_models) in
+         (Check_ce.last_nonempty_model pm res.pr_models) in
      let ce_result =
        Pp.string_of (Model_parser.print_model ~print_attrs)
          selected_model in

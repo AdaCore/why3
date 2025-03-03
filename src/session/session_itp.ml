@@ -1302,7 +1302,7 @@ let rec read_global_buffer gs ch =
   let g_shape = input_line ch in
   if g_shape <> "" then
     begin
-      if not (Strings.has_prefix "(*" g_shape) then
+      if not (Strings.has_prefix ~prefix:"(*" g_shape) then
         Termcode.Gshape.add_shape_g gs g_shape;
       read_global_buffer gs ch
     end

@@ -1117,14 +1117,14 @@ let ty_app_arg ts ix ty = match ty.ty_node with
   | _ -> kasprintf failwith "@[<h>ty_arg: not a type application of %a: %a@]"
            print_ts ts print_ty ty
 
-let t_undefined ty =
-  t_eps_close (create_vsymbol (id_fresh "undefined") ty) t_true
+let t_undefined str ty =
+  t_eps_close (create_vsymbol (id_fresh str) ty) t_true
 
 let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) list * term =
   let ty = ty_inst ty_mt (v_ty v) in
   match v_desc v with
   | Vundefined ->
-      vsenv, t_undefined ty
+      vsenv, t_undefined "vundefined" ty
   | Vnum i ->
       if ty_equal ty ty_int || is_range_ty ty then
         vsenv, t_const (Constant.int_const i) ty
@@ -1141,7 +1141,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       Option.iter (ty_equal_check ty) t.t_ty;
       vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
-      vsenv, t_undefined ty
+      vsenv, t_undefined "vreal_vfloat" ty
   | Vproj (ls, x) ->
       (* TERM: epsilon v. rs v = x *)
       let vs = create_vsymbol (id_fresh "v") ty in
@@ -1213,7 +1213,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
         let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
         let t_length = t_nat_const (Array.length arr) in
         let ty_elt = ty_app_arg ts_array 0 ty in
-        let t0 = fs_app ls_make [t_length; t_undefined ty_elt] ty in
+        let t0 = fs_app ls_make [t_length; t_undefined "varray_others" ty_elt] ty in
         let rec loop vsenv sofar ix =
           if ix = Array.length arr then vsenv, sofar
           else

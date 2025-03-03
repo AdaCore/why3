@@ -466,7 +466,7 @@ val check_variant : rac -> Ident.Sattr.elt -> Loc.position option ->
 
 (** {2 Auxiliaries} *)
 
-val t_undefined : Ty.ty -> Term.term
+val t_undefined : string -> Ty.ty -> Term.term
 
 val ty_app_arg : Ty.tysymbol -> int -> Ty.ty -> Ty.ty
 (** [ty_app_arg ts n ty] returns the [n]-th argument of the type application of

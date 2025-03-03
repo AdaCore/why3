@@ -440,7 +440,7 @@ and analyze_cexp muc st regions (c : cexp) : domain_elt * cexp =
             | _ -> failwith "projection applied to more than one arg")
         | None ->
             (* check if r is a record constructor *)
-            if Strings.has_suffix "'mk" r.rs_name.id_string then
+            if Strings.has_suffix ~suffix:"'mk" r.rs_name.id_string then
               Union (c.c_cty.cty_result, List.map (fun x -> find regions x (Variable (FreshNames.pv st x x))) args)
             else Bot
       in

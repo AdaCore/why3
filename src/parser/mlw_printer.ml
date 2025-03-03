@@ -519,8 +519,8 @@ let pp_partial = pp_bool ~true_:"partial " ~false_:""
 
 let term_hyp_name = function
   | {term_loc= loc; term_desc= Tattr (ATstr {Ident.attr_string= attr; _}, t)}
-    when Strings.has_prefix "hyp_name:" attr ->
-      Some loc, " " ^ Strings.remove_prefix "hyp_name:" attr, t
+    when Strings.has_prefix ~prefix:"hyp_name:" attr ->
+      Some loc, " " ^ Strings.remove_prefix ~prefix:"hyp_name:" attr, t
   | t -> None, "", t
 
 let attr_equals at1 at2 =
@@ -767,7 +767,7 @@ and pp_expr ~attr =
         fprintf fmt "@[%a in@ %a@]" (pp_exn ~attr) (id, pty, mask)
           (pp_expr ~attr).marked e
     | Eoptexn (id, _mask, e) when
-        List.exists (fun s -> Strings.ends_with id.id_str s)
+        List.exists (fun s -> Strings.has_suffix ~suffix:s id.id_str)
           Ptree_helpers.[return_id; break_id; continue_id]
         && marker id.id_loc = None ->
         (* Syntactic sugar *)

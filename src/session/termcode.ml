@@ -41,7 +41,7 @@ let match_prefix prefix attr =
       (fun attr acc ->
          try
            let attr = attr.Ident.attr_string in
-           let s = Strings.remove_prefix prefix attr in
+           let s = Strings.remove_prefix ~prefix attr in
            s :: acc
          with Not_found -> acc
       ) attr []

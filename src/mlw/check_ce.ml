@@ -555,9 +555,6 @@ let id_name {id_string= name; id_attrs= attrs} =
   Ident.(get_model_trace_string ~name ~attrs)
   (* Ident.get_model_trace_string ~name ~attrs *)
 
-let concrete_string_from_vs vs =
-  Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs
-
 let concrete_of_ls ls =
   ls.ls_name.id_string
 
@@ -565,14 +562,14 @@ let concrete_of_constant c ty =
   let open Ty in
   let open Number in
   match c with
-  | Constant.ConstInt Number.{ il_kind; il_int } ->
-    Const (Integer {int_value=Number.{il_kind; il_int};
+  | Constant.ConstInt (Number.{ il_kind = _; il_int } as int_value) ->
+    concrete_const (Integer {int_value;
                     int_verbatim= BigInt.to_string il_int })
   | Constant.ConstReal rconst when Ty.ty_equal ty Ty.ty_real ->
-    Const (Real {real_value = rconst;
+    concrete_const (Real {real_value = rconst;
                  real_verbatim = (asprintf
                       "%a" (Number.(print_real_constant full_support)) rconst)})
-  | Constant.ConstReal (Number.{rl_kind; rl_real} as r) -> (* Then it is a float *)
+  | Constant.ConstReal r -> (* Then it is a float *)
       let ts = match ty.ty_node with | Tyapp (ts, _) -> ts | _ -> assert false in
       let fp  = begin match ts.ts_def with
       | Float fp -> fp
@@ -590,7 +587,7 @@ let concrete_of_constant c ty =
                   bv_length = fp.fp_significand_digits - 1;
                   bv_verbatim = BigInt.to_string mant} in
       let t_concrete_float_const v =
-        Const (
+        concrete_const (
           Float {
             float_exp_size = fp.fp_exponent_digits;
             float_significand_size = fp.fp_significand_digits;
@@ -604,7 +601,7 @@ let concrete_of_constant c ty =
                     float_mant;
                     float_hex= "" (* TODO *)
                   })
-  | Constant.ConstStr s -> Const (String s)
+  | Constant.ConstStr s -> concrete_const (String s)
 
 (* Also converts some concrete epsilon terms (was previously done in model_parser):
    - when it represents a record,
@@ -615,102 +612,108 @@ let rec concrete_term_of_term (pm:Pmodule.pmodule) (m : concrete_syntax_term Mvs
   function tm ->
     match tm.t_node with
     | Term.Tconst c -> concrete_of_constant c (Option.get tm.t_ty)
-    | Term.Tvar v -> (try Mvs.find v m with Not_found -> concrete_var_from_vs v)
+    | Term.Tvar v -> (try Mvs.find v m with Not_found -> concrete_var (concrete_string_from_vs v))
     | Term.Tapp (lsymb, ts) ->
-      if ls_equal lsymb Term.fs_bool_true then Const (Boolean true)
-      else if ls_equal lsymb Term.fs_bool_false then Const (Boolean false)
+      if ls_equal lsymb Term.fs_bool_true then concrete_const (Boolean true)
+      else if ls_equal lsymb Term.fs_bool_false then concrete_const (Boolean false)
       else
       begin match get_record pm m lsymb ts with
       | Some t -> t
       | None ->
         let ts_concrete = List.map (concrete_term_of_term pm m) ts in
         let ls_name = concrete_of_ls lsymb in
-        Apply (ls_name, ts_concrete)
+        concrete_apply ls_name ts_concrete
       end
-    | Term.Tif (tif, t1, t2) -> If (concrete_term_of_term pm m tif, concrete_term_of_term pm m t1, concrete_term_of_term pm m t2)
+    | Term.Tif (tif, t1, t2) ->
+        concrete_if (concrete_term_of_term pm m tif) (concrete_term_of_term pm m t1)
+          (concrete_term_of_term pm m t2)
     | Term.Tlet (t, bo) ->
       let v, bo = t_open_bound bo in
       let vstring = concrete_string_from_vs v in
-      let updated_m = Mvs.add v (Var vstring) m in
-      Let ([(vstring, concrete_term_of_term pm updated_m bo)], concrete_term_of_term pm updated_m t)
+      let updated_m = Mvs.add v (concrete_var vstring) m in
+      concrete_let vstring (concrete_term_of_term pm updated_m bo)
+        (concrete_term_of_term pm updated_m t)
     | Term.Teps t ->
       begin match Term.t_open_lambda tm with
       | [], _, _ ->
         (* | Epsilon (eps_x, eps_term) -> *)
         let vs, t' = Term.t_open_bound t in
         begin match get_opt_record pm m vs t' with
-        | Some fields_values -> Record fields_values
+        | Some fields_values -> concrete_record fields_values
         | None ->
           begin match get_opt_coercion pm m vs t' with
-          | Some (proj_name, v_proj) -> Proj (proj_name,v_proj)
+          | Some (proj_name, v_proj) -> concrete_proj proj_name v_proj
           | None ->
             let vstring = concrete_string_from_vs vs in
-            let t'_concrete = concrete_term_of_term pm (Mvs.add vs (Var vstring) m) t' in
+            let t'_concrete = concrete_term_of_term pm (Mvs.add vs (concrete_var vstring) m) t' in
             (* TODO an epsilon at this stage is probably an error *)
-            Epsilon (vstring, t'_concrete)
+            concrete_epsilon  vstring t'_concrete
           end
         end
-      | [vs], trig, t' ->
+      | [vs], _trig, t' ->
         begin match get_opt_coercion pm m vs t' with
-        | Some (proj_name, v_proj) -> Proj (proj_name,v_proj)
+        | Some (proj_name, v_proj) -> concrete_proj proj_name v_proj
         | None ->
           begin match get_opt_fun_literal pm m vs t' with
-          | Some (elts,others) -> FunctionLiteral {elts; others}
+            | Some (elts,others) ->
+                concrete_function_literal elts others
           | None ->
             let vstring = concrete_string_from_vs vs in
-            let t'_concrete = concrete_term_of_term pm (Mvs.add vs (Var vstring) m) t' in
-            Function {args=[vstring]; body=t'_concrete}
+            let t'_concrete = concrete_term_of_term pm (Mvs.add vs (concrete_var vstring) m) t' in
+            concrete_function [vstring] t'_concrete
           end
         end
-      | vsl, trig, t' ->
+      | vsl, _trig, t' ->
         let concrete_vars = List.map concrete_string_from_vs vsl in
         let updated_map =
           List.fold_left2 (fun acc v cv ->
-            Mvs.add v (Var cv) acc) m vsl concrete_vars
+            Mvs.add v (concrete_var cv) acc) m vsl concrete_vars
         in
         let t'_concrete = concrete_term_of_term pm updated_map t' in
-        Function {args=concrete_vars; body=t'_concrete}
+        concrete_function concrete_vars t'_concrete
       end
     | Term.Tquant (quant, tq) -> let vs,_, t = t_open_quant tq in
-      let quantifier = match quant with
-        | Term.Tforall -> Forall
-        | Term.Texists -> Exists
-      in Quant (quantifier, List.map (fun v -> concrete_string_from_vs v) vs, concrete_term_of_term pm m t)
+        let quantifier = match quant with
+          | Term.Tforall -> Forall
+          | Term.Texists -> Exists
+        in
+        concrete_quant quantifier (List.map (fun v -> concrete_string_from_vs v) vs)
+          (concrete_term_of_term pm m t)
     | Term.Tbinop (op, t1, t2) ->
       let op = match op with Tand -> And | Tor -> Or | Timplies -> Implies | Tiff -> Iff in
-      Binop (op, concrete_term_of_term pm m t1, concrete_term_of_term pm m t2)
-    | Term.Tnot t -> Not (concrete_term_of_term pm m t)
-    | Term.Ttrue -> Const (Boolean true)
-    | Term.Tfalse -> Const (Boolean false)
+      concrete_binop op (concrete_term_of_term pm m t1) (concrete_term_of_term pm m t2)
+    | Term.Tnot t -> concrete_not (concrete_term_of_term pm m t)
+    | Term.Ttrue -> concrete_const (Boolean true)
+    | Term.Tfalse -> concrete_const (Boolean false)
     | Term.Tcase (_, _) -> failwith "Cannot convert pattern-matching term to model value"
 
 and get_record pm m lsymb args =
   (* Gets the list of record field and value from a term of the form `record'mk t1 ... tn`
      The names for the record fields are obtained from the pmodule *)
-  let exception NotRecord in
-  begin try
+  if Strings.has_suffix ~suffix:"'mk" lsymb.ls_name.id_string then begin
+    (* it MUST be a record *)
     let ls_ts =
-      begin match lsymb.ls_value with
+      match lsymb.ls_value with
       | Some Ty.{ty_node = Tyapp (ts, _); _} -> ts
-      | _ -> raise NotRecord
-      end
+      | _ -> raise (Decl.UnexpectedProjOrConstr lsymb)
     in
+
     let rec find_record_fields (l:Decl.data_decl list) =
       begin match l with
         | ((ts,constructors) :: rest) ->
             if Ty.ts_equal ts ls_ts then
               match constructors with
               | [(_,l)] -> l
-              | _ -> raise NotRecord
+              | _ -> raise (Decl.BadRecordCons(lsymb,ls_ts))
             else find_record_fields rest
-      | [] -> raise NotRecord
+      | [] -> raise (Decl.BadRecordCons(lsymb,ls_ts))
       end
     in
     let decl = Mid.find lsymb.ls_name pm.Pmodule.mod_theory.Theory.th_known in
     let fields =
       begin match decl.Decl.d_node with
       | Decl.Ddata l -> find_record_fields l
-      | _ -> raise NotRecord
+      | _ -> raise(Decl.BadRecordCons(lsymb,ls_ts))
       end
     in
 (*
@@ -738,14 +741,11 @@ and get_record pm m lsymb args =
             fields)
             fields_args
       in
-      Some (Record fields_values)
-(*
-    else
-      raise NotRecord
-*)
-    with NotRecord -> None
-  end
-and get_opt_record pm env vs t' = None
+      Some (concrete_record fields_values)
+    end
+  else None
+
+and get_opt_record _pm _env _vs _t' = None
  (*  (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
   with f1,...,fn the fields associated to type ty *)
   let exception UnexpectedPattern in
@@ -789,7 +789,7 @@ and get_opt_coercion pm env vs t =
    if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
   Debug.dprintf debug_concrete_term "[get_opt_coercion] vs.vs_ty = %a@."
     Pretty.print_ty_qualified vs.vs_ty;
-  let is_proj_for_ty ty ls = true
+  let is_proj_for_ty _ty _ls = true
     (*
     We don't have access to a table of projections at this stage?
     match Ty.Mty.find_opt ty env.type_coercions with
@@ -846,8 +846,8 @@ let rec concrete_of_cexp (pm:Pmodule.pmodule)
   (c:cexp) : concrete_syntax_term =
   match c.c_node with
 | Capp (rs, pvsymbols) ->
-  let get_pv pv = Mpv.find_def (Var (concrete_string_from_vs pv.pv_vs)) pv mpv in
-  Apply (id_name rs.rs_name, List.map get_pv pvsymbols)
+    let get_pv pv = Mpv.find_def (concrete_var (concrete_string_from_vs pv.pv_vs)) pv mpv in
+    concrete_apply (id_name rs.rs_name) (List.map get_pv pvsymbols)
 | Cpur (_, _) -> failwith "Cannot convert Cpur to model value"
 | Cfun e -> concrete_of_expr pm mpv mv e
 | Cany -> failwith "Cannot convert Cany to model value"
@@ -855,60 +855,62 @@ let rec concrete_of_cexp (pm:Pmodule.pmodule)
 and concrete_of_expr (pm:Pmodule.pmodule) (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
   match e.e_node with
 | Econst c -> concrete_of_constant c (Ity.ty_of_ity e.e_ity)
-| Evar v -> (Mpv.find_def (Var (concrete_string_from_vs v.pv_vs)) v mpv)
+| Evar v -> (Mpv.find_def (concrete_var (concrete_string_from_vs v.pv_vs)) v mpv)
 | Eexec (cexp, _) -> concrete_of_cexp pm mpv mv cexp
-| Eassign _ -> failwith "Cannot convert assign expr to model value"
-| Elet (_, _) -> failwith "Cannot convert let expr to model value"
-| Eif (e, e1, e2) -> If (concrete_of_expr pm mpv mv e, concrete_of_expr pm mpv mv e1, concrete_of_expr pm mpv mv e2)
-| Ematch (_, _, _) -> failwith "Cannot convert match expr to model value"
-| Ewhile (_, _, _, _) -> failwith "Cannot convert while expr to model value"
-| Efor (_, _, _, _, _) -> failwith "Cannot convert for expr to model value"
-| Eraise (_, _) ->  failwith "Cannot convert raise expr to model value"
-| Eexn (_, _) -> failwith "Cannot convert exn expr to model value"
-| Eassert (_, _) -> failwith "Cannot convert assert expr to model value"
-| Eghost _ -> failwith "Cannot convert ghost expr to model value"
+| Eassign _ -> failwith "Cannot convert assign expr to concrete term"
+| Elet (_, _) -> failwith "Cannot convert let expr to concrete term"
+| Eif (e, e1, e2) ->
+    concrete_if (concrete_of_expr pm mpv mv e)
+      (concrete_of_expr pm mpv mv e1) (concrete_of_expr pm mpv mv e2)
+| Ematch (_, _, _) -> failwith "Cannot convert match expr to concrete term"
+| Ewhile (_, _, _, _) -> failwith "Cannot convert while expr to concrete term"
+| Efor (_, _, _, _, _) -> failwith "Cannot convert for expr to concrete term"
+| Eraise (_, _) ->  failwith "Cannot convert raise expr to concrete term"
+| Eexn (_, _) -> failwith "Cannot convert exn expr to concrete term"
+| Eassert (_, _) -> failwith "Cannot convert assert expr to concrete term"
+| Eghost _ -> failwith "Cannot convert ghost expr to concrete term"
 | Epure t -> concrete_term_of_term pm mv t
-| Eabsurd -> failwith "Cannot convert absurd expr to model value"
+| Eabsurd -> failwith "Cannot convert absurd expr to concrete term"
 
-let rec model_value pm v =
+let rec value_to_concrete_term pm v =
   let open Value in
   match v_desc v with
   | Vnum i -> concrete_of_constant (Constant.ConstInt Number.{ il_kind = ILitUnk; il_int = i }) Ty.ty_int
-  | Vstring s -> Const (String s)
-  | Vbool b -> Const (Boolean b)
-  | Vproj (ls, v) -> Proj ((id_name ls.ls_name), model_value pm v)
+  | Vstring s -> concrete_const (String s)
+  | Vbool b -> concrete_const (Boolean b)
+  | Vproj (ls, v) -> concrete_proj (id_name ls.ls_name) (value_to_concrete_term pm v)
   | Varray a ->
     let aux i v = {
-      elts_index= Const (Integer {
+      elts_index= concrete_const (Integer {
                   int_value= Number.{il_kind = ILitUnk; il_int = BigInt.of_int i};
                   int_verbatim= string_of_int i });
-      elts_value= model_value pm v }
+      elts_value= value_to_concrete_term pm v }
     in
-    FunctionLiteral {
-    elts= List.mapi aux (Array.to_list a);
-    (* Others is not handled *)
-    others= Epsilon ("_", Const (Boolean true));
-    }
+    concrete_function_literal (List.mapi aux (Array.to_list a))
+      (* Others is not handled *)  concrete_undefined;
   | Vconstr (Some rs, frs, fs) -> (
-    let vs = List.map (fun f -> model_value pm (field_get f)) fs in
-    if Strings.has_suffix "'mk" rs.rs_name.id_string then
+    let vs = List.map (fun f -> value_to_concrete_term pm (field_get f)) fs in
+    if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
       (* same test for record-ness as in smtv2.ml *)
       let ns = List.map (fun rs -> id_name rs.rs_name) frs in
-      Record (List.combine ns vs)
+      concrete_record (List.combine ns vs)
     else
-      Apply (id_name rs.rs_name, vs) )
+      concrete_apply (id_name rs.rs_name) vs )
   | Vconstr (None, frs,fs) -> (* TODO if I understand correctly, this is a record as well *)
-    let vs = List.map (fun f -> model_value pm (field_get f)) fs in
+    let vs = List.map (fun f -> value_to_concrete_term pm (field_get f)) fs in
     let ns = List.map (fun rs -> id_name rs.rs_name) frs in
-    Record (List.combine ns vs)
+    concrete_record (List.combine ns vs)
   (* Why does the Vfun case happen? Also, I didn't see these values show up in the end *)
-  | Vfun (_vars, bvar, e) -> concrete_of_expr pm Mpv.empty (Mvs.of_list [bvar, Var (concrete_string_from_vs bvar)]) e
+  | Vfun (_vars, bvar, e) ->
+      concrete_of_expr pm Mpv.empty
+        (Mvs.of_list [bvar, concrete_var (concrete_string_from_vs bvar)]) e
   | Vpurefun _  -> failwith "Cannot convert pure fun to model value"
-  | Vundefined -> (Const (String "undefined"))
+  | Vundefined -> concrete_undefined
   | Vterm t -> concrete_term_of_term pm Mvs.empty t
   | Vreal r ->
     let dummy_real = Number.real_literal ~radix:10 ~neg:false ~int:"42" ~frac:"" ~exp:None in
-    Const (Real {real_value = dummy_real ; real_verbatim = (asprintf "%a" Big_real.print_real r)})
+    concrete_const
+      (Real {real_value = dummy_real ; real_verbatim = (asprintf "%a" Big_real.print_real r)})
   | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert float to model value"
 
 (* let model_value pm v =
@@ -926,9 +928,19 @@ let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
     (* Format.eprintf "crafting a me for id %s (attrs: %a)@." id.id_string Pretty.print_attrs id.id_attrs; *)
     let dummy_term = Term.t_true in
     let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-    Some {me_concrete_value; me_lsymbol = dummy_ls; me_kind = Other; me_value = dummy_term; me_location = None; me_attrs = Sattr.empty}
+    Some {me_concrete_value;
+          me_lsymbol = dummy_ls;
+          me_kind = Other;
+          me_value = dummy_term;
+          me_location = loc;
+          me_attrs = id.id_attrs}
   else None
 
+let debug_print_original_model = Debug.register_info_flag "print-original-model"
+    ~desc:"Print original counterexample model when --check-ce"
+
+let debug_print_derived_model = Debug.register_info_flag "print-derived-model"
+    ~desc:"Print derived counterexample model when --check-ce"
 
 (** Transform an interpretation log into a prover model.
     The Pmodule is only used to extract the names of record fields in the
@@ -946,10 +958,10 @@ let model_of_exec_log pm ~original_model log =
     element with the information we can extract from the log entry (in particular,
     we have no term and no lsymbol!)*)
     match search_model_element_for_id original_model ~loc id with
-  | Some me -> Some {me with me_concrete_value = model_value pm value}
+  | Some me -> Some {me with me_concrete_value = value_to_concrete_term pm value}
   | None ->
       model_element_of_unmatched_log_entry ~loc id
-        (model_value pm value) value.Pinterp_core.Value.v_ty
+        (value_to_concrete_term pm value) value.Pinterp_core.Value.v_ty
   in
   let me_of_log_entry e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
@@ -957,9 +969,14 @@ let model_of_exec_log pm ~original_model log =
         | Log.Val_assumed (id, v) ->
             Option.to_list (me_of_log_entry loc id v)
         | Log.Exec_failed (_, mid) ->
-            Mid.fold (fun id v l -> Option.to_list (me loc id v) @ l) mid []
-        | Log.Res_assumed (ors,v) -> (* Results are expected to have the special name "result"? TODO: make this match the model element kind *)
-            Option.to_list (Option.bind ors (fun rs -> (me loc (Ident.id_register (Ident.id_derive "result" rs.rs_name)) v)))
+            Mid.fold (fun id v l ->
+              Option.to_list (me_of_log_entry loc id v) @ l) mid []
+        | Log.Res_assumed (ors,v) ->
+          (* Results are expected to have the special name "result"?
+             TODO: make this match the model element kind *)
+            Option.to_list (Option.bind ors (fun rs ->
+              (me_of_log_entry loc (Ident.id_register
+              (Ident.id_derive "result" rs.rs_name)) v)))
         | _ -> [])
     | _ -> [] in
   let me_of_log_line e =
@@ -971,25 +988,159 @@ let model_of_exec_log pm ~original_model log =
   let model_files = (Wstdlib.Mstr.map_filter me_of_log_lines (Log.sort_log_by_loc log)) in
   set_model_files original_model model_files
 
-let select_model_from_verdict models =
-  let classified_models =
-    let add_verdict_and_rac_model (i,r,prover_model,normal_res,giant_res) =
-      (* Format.eprintf "The prover model is %a@." Json_base.print_json (Model_parser.json_model prover_model); *)
-      let model,verdict = match normal_res,giant_res with
-      | RAC_not_done reason, _ | _, RAC_not_done reason ->
-          prover_model, (INCOMPLETE reason, Log.empty_log)
-      | RAC_done (normal_state,normal_log), RAC_done (giant_state,giant_log) ->
-          let vc_term_loc = get_model_term_loc prover_model in
-          let vc_term_attrs = get_model_term_attrs prover_model in
-          let verdict =
-          classify ~vc_term_loc ~vc_term_attrs
-            ~normal_result:(normal_state,normal_log)
-            ~giant_step_result:(giant_state,giant_log)
-          in (model_of_exec_log ~original_model:prover_model normal_log), verdict
-          (* in prover_model, verdict *)
-      in
-      i,r,model,normal_res,giant_res,verdict in
-    List.map add_verdict_and_rac_model models in
+let get_rac_results ~limits ?verb_lvl ?compute_term
+    ?only_giant_step rac env pm models =
+  if rac.ignore_incomplete then
+    failwith "ignore incomplete must not be true for selecting models";
+  let compute_term =
+    match compute_term with
+    | None -> Rac.Why.mk_compute_term_lit env ()
+    | Some f -> f in
+  let env = mk_empty_env env pm in
+  let models = (* Keep at most one empty model *)
+    let found_empty = ref false in
+    let p (_prover_answer,m) =
+      if is_model_empty m then
+        if !found_empty then false
+        else (found_empty := true; true)
+      else true in
+    List.filter p models in
+  let rac_not_done_failure reason =
+    (RAC_not_done reason, RAC_not_done reason) in
+  let add_rac_result i (_prover_answer,m) =
+    Debug.dprintf debug_check_ce_rac_results "@[Check model %d (@[%a@])@]@." i
+      (Pp.print_option_or_default "NO LOC" Loc.pp_position)
+      (get_model_term_loc m);
+    let normal_res, giant_res = match get_model_term_loc m with
+    | None ->
+        rac_not_done_failure "no location annotation found in the term triggering the VC"
+    | Some loc ->
+        if Loc.equal loc Loc.dummy_position then
+          rac_not_done_failure "the term triggering the VC has a dummy location annotation"
+        else
+          begin
+            match find_rs env.pmodule loc with
+            | Some (RTrsymbol rs) ->
+                let rac_execute ~giant_steps rs model =
+                  let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
+                        ~oracle:(oracle_of_model env.pmodule model) ~compute_term
+                        ~limits () in
+                  rac_execute ctx rs
+                in
+                let print_attrs = Debug.test_flag Call_provers.debug_attrs in
+                Debug.dprintf debug_check_ce_rac_results
+                  "@[Checking model:@\n@[<hv2>%a@]@]@\n"
+                  (print_model ~print_attrs) m;
+                begin
+                let giant_state,giant_log = rac_execute ~giant_steps:true rs m in
+                match only_giant_step with
+                | None | Some false ->
+                    let normal_state,normal_log = rac_execute ~giant_steps:false rs m in
+                    RAC_done (normal_state,normal_log), RAC_done (giant_state,giant_log)
+                | Some true ->
+                    RAC_not_done "only_giant_step", RAC_done (giant_state,giant_log)
+                end
+            | Some (RTterm(pr,t)) ->
+                let cty = Expr.cty_from_formula t in
+                let name = pr.Decl.pr_name.id_string ^ "'goal" in
+                let rs = Expr.create_rsymbol (Ident.id_derive name pr.Decl.pr_name) cty in
+                let body =
+                  c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e_void
+                in
+                let env = { env with funenv = Mrs.add rs (body,None) env.funenv } in
+                let rac_execute ~giant_steps rs model =
+                  let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
+                        ~oracle:(oracle_of_model env.pmodule model) ~compute_term
+                        ~limits () in
+                  rac_execute ctx rs
+                in
+                let print_attrs = Debug.test_flag Call_provers.debug_attrs in
+                Debug.dprintf debug_check_ce_rac_results
+                  "@[Checking model:@\n@[<hv2>%a@]@]@\n"
+                  (print_model ~print_attrs) m;
+                begin
+                let state,log = rac_execute ~giant_steps:false rs m in
+                RAC_done (state,log), RAC_done (state,log)
+                end
+            | None ->
+                Format.kasprintf (fun s -> rac_not_done_failure s)
+                  "there is no program function to execute at %a"
+                  Loc.pp_position loc
+          end
+    in
+    Debug.dprintf debug_check_ce_rac_results "@[<v2>Results of RAC executions for model %d:%a@]@." i
+      (print_normal_and_giant_rac_results ?verb_lvl) (normal_res, giant_res);
+    m,normal_res,giant_res in
+  List.mapi add_rac_result models
+
+let models_from_rac ~limits ?verb_lvl ?compute_term rac env pm models =
+  let rac_results =
+    get_rac_results ~limits ?compute_term ?verb_lvl rac env pm models
+  in
+  let add_verdict_and_model_from_log (prover_model,normal_res,giant_res) =
+    let model,verdict = match normal_res,giant_res with
+    | RAC_not_done reason, _ | _, RAC_not_done reason ->
+        prover_model, (INCOMPLETE reason, Log.empty_log)
+    | RAC_done (normal_state,normal_log), RAC_done (giant_state,giant_log) ->
+        let vc_term_loc = get_model_term_loc prover_model in
+        let vc_term_attrs = get_model_term_attrs prover_model in
+        let verdict =
+        classify ~vc_term_loc ~vc_term_attrs
+          ~normal_result:(normal_state,normal_log)
+          ~giant_step_result:(giant_state,giant_log)
+        in
+        let derived_model = model_of_exec_log pm ~original_model:prover_model normal_log
+        in derived_model, verdict
+    in model,normal_res,giant_res,verdict
+  in
+  List.map add_verdict_and_model_from_log rac_results
+
+let models_from_giant_step ~limits ?verb_lvl ?compute_term rac env pmodule prover_models =
+  let add_model_from_giant_log (original_model,_normal_result,giant_result) =
+    match giant_result with
+    | RAC_done (_, log) ->
+        let derived_model = model_of_exec_log pmodule ~original_model log in
+        derived_model,giant_result
+    | RAC_not_done _ -> original_model,giant_result
+  in
+  let results = get_rac_results
+      ~limits ?compute_term ?verb_lvl ~only_giant_step:true
+      rac env pmodule prover_models
+  in
+  List.map add_model_from_giant_log results
+
+let best_rac_result = fun indexed_models ->
+  let indexed_models = List.mapi (fun i (m,n_res,g_res,v) -> i,m,n_res,g_res,v) indexed_models in
+  let first_good_model = fun indexed_models ->
+    let open Util in
+    let good_models, other_models =
+      let is_good (_,_,_,_,(s,_)) = match s with
+        | NC | SW | NC_SW -> true
+        | BAD_CE _ | INCOMPLETE _ -> false in
+      List.partition is_good indexed_models in
+    if good_models = [] then
+      (* No good models. Prioritize the last, non-empty model as it was done
+         before 2020, but penalize bad models. *)
+      let classification_index = function
+        | INCOMPLETE _ -> 0 | BAD_CE _ -> 1
+        | NC | SW | NC_SW -> assert false in
+      let compare = cmp [
+          cmptr (fun (_,_,_,_,(c,_)) -> classification_index c) (-);
+          cmptr (fun (i,_,_,_,_) -> -i) (-);
+        ] in
+      let not_empty (_,m,_,_,_) = not (Model_parser.is_model_empty m) in
+      let non_empty_models = (List.filter not_empty other_models) in
+          List.sort compare non_empty_models
+    else
+      let classification_index = function
+        | NC -> 0 | SW -> 1 | NC_SW -> 2
+        | INCOMPLETE _ | BAD_CE _ -> assert false in
+      let compare = cmp [
+          (* prefer NC > SW > NCSW > INCOMPLETE > BAD_CE *)
+          cmptr (fun (_,_,_,_,(c,_)) -> classification_index c) (-);
+        ] in
+      List.sort compare good_models
+  in
   let selected, selected_ix =
     match List.nth_opt (first_good_model indexed_models) 0 with
     | None -> None, None
@@ -1014,8 +1165,25 @@ let best_giant_step_result = fun models ->
   let not_empty (m,_) = not (Model_parser.is_model_empty m) in
   List.nth_opt (List.sort compare (List.filter not_empty models)) 0
 
-let last_nonempty_model = fun models ->
+let last_nonempty_model pm models =
   let not_empty (_,m) = not (Model_parser.is_model_empty m) in
   let models = List.filter not_empty models in
   let models = List.rev models in
-  Option.map (fun (_,m) -> m) (List.nth_opt models 0)
+  let all_elems m =
+    List.map (fun me -> {me with me_concrete_value =
+                                 concrete_term_of_term pm Mvs.empty me.me_value})
+      (get_model_elements m)
+  in
+  let add_me_to_file f line me = 
+      Wstdlib.Mint.change (function None -> Some [me] | Some l -> Some (me :: l)) line f in
+  let add_me_to_files files_map me =
+    match Option.map Loc.get me.me_location with
+    | Some (file,line,_,_,_) ->
+        Wstdlib.Mstr.change (function
+        | None   -> Some (Wstdlib.Mint.singleton line [me])
+        | Some m -> Some (add_me_to_file m line me)) file files_map
+    | None -> files_map in
+  let extract_terms m =
+  List.fold_left add_me_to_files Wstdlib.Mstr.empty (all_elems m)
+  in
+  Option.map (fun (_,m) -> set_model_files m (extract_terms m)) (List.nth_opt models 0)

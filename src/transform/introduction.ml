@@ -155,7 +155,7 @@ let add_unique_prefix s =
   pushed_attr_unique_prefixes := s :: !pushed_attr_unique_prefixes
 
 let pushed_attrs f =
-  let has_prefix a s = Strings.has_prefix s a.attr_string in
+  let has_prefix a s = Strings.has_prefix ~prefix:s a.attr_string in
   let attrs =
     Sattr.filter
       (fun a -> not (List.exists (has_prefix a) !pushed_attr_filtered_prefixes))

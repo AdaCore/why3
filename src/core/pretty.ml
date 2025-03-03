@@ -1111,7 +1111,7 @@ let () = Exn_printer.register
 (* New attribute for plugins (parsing of arguments of transformation when
    printing Ada, python or C *)
 let is_syntax_attr a =
-  Strings.has_prefix "syntax:" a.attr_string
+  Strings.has_prefix ~prefix:"syntax:" a.attr_string
 
 let get_syntax_attr ~attrs =
   try Some (Sattr.choose (Sattr.filter is_syntax_attr attrs))
