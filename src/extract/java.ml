@@ -49,8 +49,8 @@ let warn_default_method_redef =
 let search_attribute_prefix (attrs : Sattr.t) (prefix: string)
     : string option =
   let has_prefix (a : Ident.attribute) : string option =
-    if Strings.has_prefix prefix a.attr_string then
-      Some (Strings.remove_prefix prefix a.attr_string)
+    if Strings.has_prefix ~prefix a.attr_string then
+      Some (Strings.remove_prefix ~prefix a.attr_string)
     else
       None
   in

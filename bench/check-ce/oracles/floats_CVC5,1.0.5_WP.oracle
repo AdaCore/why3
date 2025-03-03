@@ -878,11 +878,11 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
 File ieee_float.mlw:
   Line 934:
-    zeroF :  = "undefined"
+    zeroF :  = <UNDEFINED>
 File floats.mlw:
   Line 55:
-    x :  = epsilon x20. (is_plus_infinity x20)
-    x : t1 = epsilon x21. (is_plus_infinity x21)
+    x :  = (epsilon x20. Apply(is_plus_infinity, x20))
+    x : t1 = (epsilon x21. Apply(is_plus_infinity, x21))
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC

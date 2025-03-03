@@ -265,7 +265,7 @@ and print_value' fmt v =
   | Vconstr (Some rs, fs, vs) ->
       if is_rs_tuple rs then
         fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
-      else if Strings.has_suffix "'mk" rs.rs_name.id_string then
+      else if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
         let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
@@ -654,7 +654,7 @@ module Log = struct
           try
             let rs_path,_,_ = Pmodule.restore_path rs.rs_name in
             let rs_path = Env.locate_library env rs_path in
-            Strings.has_prefix !Whyconf.stdlib_path rs_path
+            Strings.has_prefix ~prefix:!Whyconf.stdlib_path rs_path
           with
           | Not_found | Env.LibraryNotFound _
           | Env.AmbiguousPath _ | Invalid_argument _ -> false in
@@ -815,7 +815,7 @@ type cntr_ctx = {
 
 let describe_cntr_ctx ctx =
   asprintf "%s%a"
-    (Strings.remove_prefix "expl:" ctx.attr.attr_string)
+    (Strings.remove_prefix ~prefix:"expl:" ctx.attr.attr_string)
     (Pp.print_option (fun fmt -> fprintf fmt " %s")) ctx.desc
 
 let report_cntr_title fmt (ctx, msg) =
@@ -1176,7 +1176,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
             begin
               match rs_kind rs with
               | RKfunc -> t_app_from_constr rs fs
-              | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
+              | RKnone when Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string ->
                   t_eps_from_constr field_rss fs
               | _ -> kasprintf failwith "Cannot construct term for constructor \
                                         %a that is not a function" print_rs rs
