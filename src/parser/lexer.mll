@@ -224,7 +224,7 @@ rule token = parse
       let text = Lexing.lexeme lb in
       let fname = lb.Lexing.lex_curr_p.Lexing.pos_fname in
       (* TODO/FIXME: ad-hoc fix for TryWhy3/Str incompatibility *)
-      let s = if Strings.has_prefix "/trywhy3_input." fname
+      let s = if Strings.has_prefix ~prefix:"/trywhy3_input." fname
         then None
         else Report.report text !last checkpoint in
       (* Typing.close_file is supposedly done at the end of the file in

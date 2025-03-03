@@ -96,5 +96,5 @@ let post_clean = object (self)
       self#value (List.hd field_values)
     else match List.concat (List.map (for_field self) fs) with
       | [] -> None
-      | fs -> Some (Record fs)
+      | fs -> Some (concrete_record fs)
 end

@@ -13,8 +13,8 @@ The following counterexample model could not be verified
   (concrete RAC fatal rac error: an undefined argument was passed to (@), abstract RAC fatal rac error: missing value for return value of call to ([]) at "bench/check-ce/record_map.mlw", line 43, characters 2-15):
 File record_map.mlw:
   Line 40:
-    map_rec :  = "undefined"
-    map_rec :  = "undefined"
+    map_rec :  = <UNDEFINED>
+    map_rec :  = <UNDEFINED>
 
 Warning: Error while interpreting rec_map: No lsymbol found for qualified identifier (Qident (Isymbol store))
 
@@ -35,8 +35,8 @@ The following counterexample model could not be verified
   (concrete RAC fatal rac error: an undefined argument was passed to (@), abstract RAC fatal rac error: missing value for return value of call to ([]) at "bench/check-ce/record_map.mlw", line 48, characters 2-21):
 File record_map.mlw:
   Line 45:
-    rec_map :  = {f_map = "undefined"; g_bool = false}
-    rec_map :  = {f_map = "undefined"; g_bool = false}
+    rec_map :  = {f_map = <UNDEFINED>; g_bool = false}
+    rec_map :  = {f_map = <UNDEFINED>; g_bool = false}
 
 Warning: Error while interpreting rec_map: No variable in prover_vars matching qualified identifier (Qident (Isymbol (Sprover .k0)))
 

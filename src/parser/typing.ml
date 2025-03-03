@@ -1855,7 +1855,7 @@ let intf_mod_inst muc intf =
         let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
         { inst with mi_rs = Mrs.add rs rs' inst.mi_rs }
       with Not_found ->
-        if Strings.has_suffix "'lemma" rs.rs_name.id_string
+        if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
         then inst (* do not raise for let lemma induced by lemmas *)
         else raise (Symbol_not_found rs.rs_name) in
 
@@ -1916,7 +1916,7 @@ let close_module loc =
        let muc = clone_export muc mintf inst in
        let muc = close_scope ~import:false muc in
        let id_str =
-         Strings.remove_suffix "'impl" muc.muc_theory.uc_name.id_string in
+         Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.id_string in
        let id = id_fresh id_str in
        let m' = create_module slice.env ~path:slice.path id in
        let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in

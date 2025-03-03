@@ -675,7 +675,7 @@ let parallel = !opt_parallel
 
 let unit_name =
   let suffix = ".mlw" in
-  if Strings.ends_with filename suffix then
+  if Strings.has_suffix filename ~suffix then
     String.sub filename 0 (String.length filename - String.length suffix)
   else Filename.chop_extension filename
 

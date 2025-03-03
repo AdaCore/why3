@@ -511,13 +511,6 @@ module FromModelToTerm = struct
     why3_env : Env.env;
     (* Constructors from [pinfo.Printer.constructors]. *)
     constructors : lsymbol Mstr.t;
-    (* List of record fields for each constructor symbol
-       from [pinfo.Printer.record_fields]. *)
-    _record_fields : Term.lsymbol list Mls.t;
-    (* List of fields for each record type from [pinfo.Printer.type_fields]. *)
-    _type_fields : Term.lsymbol list Ty.Mty.t;
-    (* Set of coercions for each type from [pinfo.Printer.type_coercions]. *)
-    _type_coercions : Term.Sls.t Ty.Mty.t;
     (* Function definitions from the SMT model
        that are not in [pinfo.Printer.queried_terms]. *)
     mutable prover_fun_defs : Term.term Mstr.t;
@@ -1500,9 +1493,6 @@ module FromModelToTerm = struct
         prover_vars = Mstr.empty;
         bound_vars = Mstr.empty;
         constructors = pinfo.Printer.constructors;
-        _record_fields = pinfo.Printer.record_fields;
-        _type_fields = pinfo.Printer.type_fields;
-        _type_coercions = pinfo.Printer.type_coercions;
         type_sorts = pinfo.Printer.type_sorts;
         inferred_types = [];
         eval_prover_vars = Mvs.empty;
