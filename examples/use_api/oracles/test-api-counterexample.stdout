@@ -12,101 +12,102 @@ theory Task
   
 end
 
-On task 1, CVC4,1.7 answers Unknown (sat) (<hidden>s, <hidden> steps)
-Model is [{"filename": "myfile.my_ext",
-           "model":
-            [{"is_vc_line": false,
-              "line": "28",
-              "model_elements":
-               [{"attrs": ["model_trace:my_A"],
-                 "kind": "other",
-                 "location":
-                  {"end-char": 1,
-                   "end-line": 28,
-                   "file-name": "myfile.my_ext",
-                   "start-char": 0,
-                   "start-line": 28},
-                 "lsymbol":
-                  {"attrs": ["model_trace:my_A"],
-                   "loc":
-                    {"end-char": 1,
-                     "end-line": 28,
-                     "file-name": "myfile.my_ext",
-                     "start-char": 0,
-                     "start-line": 28},
-                   "name": "A"},
-                 "value":
-                  {"value_concrete_term": {"type": "Boolean", "val": true},
-                   "value_term": "Ttrue",
-                   "value_type": null}},
-                {"attrs": ["model_trace:my_A"],
-                 "kind": "other",
-                 "location":
-                  {"end-char": 1,
-                   "end-line": 28,
-                   "file-name": "myfile.my_ext",
-                   "start-char": 0,
-                   "start-line": 28},
-                 "lsymbol":
-                  {"attrs": ["model_trace:my_A"],
-                   "loc":
-                    {"end-char": 1,
-                     "end-line": 28,
-                     "file-name": "myfile.my_ext",
-                     "start-char": 0,
-                     "start-line": 28},
-                   "name": "A"},
-                 "value":
-                  {"value_concrete_term": {"type": "Boolean", "val": true},
-                   "value_term": "Ttrue",
-                   "value_type": null}}]}]},
-          {"filename": "myfile.my_ext2",
-           "model":
-            [{"is_vc_line": false,
-              "line": "101",
-              "model_elements":
-               [{"attrs": ["model_trace:my_B"],
-                 "kind": "other",
-                 "location":
-                  {"end-char": 1,
-                   "end-line": 101,
-                   "file-name": "myfile.my_ext2",
-                   "start-char": 0,
-                   "start-line": 101},
-                 "lsymbol":
-                  {"attrs": ["model_trace:my_B"],
-                   "loc":
-                    {"end-char": 1,
-                     "end-line": 101,
-                     "file-name": "myfile.my_ext2",
-                     "start-char": 0,
-                     "start-line": 101},
-                   "name": "B"},
-                 "value":
-                  {"value_concrete_term": {"type": "Boolean", "val": false},
-                   "value_term": "Tfalse",
-                   "value_type": null}},
-                {"attrs": ["model_trace:my_B"],
-                 "kind": "other",
-                 "location":
-                  {"end-char": 1,
-                   "end-line": 101,
-                   "file-name": "myfile.my_ext2",
-                   "start-char": 0,
-                   "start-line": 101},
-                 "lsymbol":
-                  {"attrs": ["model_trace:my_B"],
-                   "loc":
-                    {"end-char": 1,
-                     "end-line": 101,
-                     "file-name": "myfile.my_ext2",
-                     "start-char": 0,
-                     "start-line": 101},
-                   "name": "B"},
-                 "value":
-                  {"value_concrete_term": {"type": "Boolean", "val": false},
-                   "value_term": "Tfalse",
-                   "value_type": null}}]}]}]
+On task2, CVC4,1.7 answers Unknown (sat) (<hidden>s, <hidden> steps)
+A candidate counterexample obtained from the prover is
+[{"filename": "myfile.my_ext",
+  "model":
+   [{"is_vc_line": false,
+     "line": "28",
+     "model_elements":
+      [{"attrs": ["model_trace:my_A"],
+        "kind": "other",
+        "location":
+         {"end-char": 1,
+          "end-line": 28,
+          "file-name": "myfile.my_ext",
+          "start-char": 0,
+          "start-line": 28},
+        "lsymbol":
+         {"attrs": ["model_trace:my_A"],
+          "loc":
+           {"end-char": 1,
+            "end-line": 28,
+            "file-name": "myfile.my_ext",
+            "start-char": 0,
+            "start-line": 28},
+          "name": "A"},
+        "value":
+         {"value_concrete_term": {"type": "Boolean", "val": true},
+          "value_term": "Ttrue",
+          "value_type": null}},
+       {"attrs": ["model_trace:my_A"],
+        "kind": "other",
+        "location":
+         {"end-char": 1,
+          "end-line": 28,
+          "file-name": "myfile.my_ext",
+          "start-char": 0,
+          "start-line": 28},
+        "lsymbol":
+         {"attrs": ["model_trace:my_A"],
+          "loc":
+           {"end-char": 1,
+            "end-line": 28,
+            "file-name": "myfile.my_ext",
+            "start-char": 0,
+            "start-line": 28},
+          "name": "A"},
+        "value":
+         {"value_concrete_term": {"type": "Boolean", "val": true},
+          "value_term": "Ttrue",
+          "value_type": null}}]}]},
+ {"filename": "myfile.my_ext2",
+  "model":
+   [{"is_vc_line": false,
+     "line": "101",
+     "model_elements":
+      [{"attrs": ["model_trace:my_B"],
+        "kind": "other",
+        "location":
+         {"end-char": 1,
+          "end-line": 101,
+          "file-name": "myfile.my_ext2",
+          "start-char": 0,
+          "start-line": 101},
+        "lsymbol":
+         {"attrs": ["model_trace:my_B"],
+          "loc":
+           {"end-char": 1,
+            "end-line": 101,
+            "file-name": "myfile.my_ext2",
+            "start-char": 0,
+            "start-line": 101},
+          "name": "B"},
+        "value":
+         {"value_concrete_term": {"type": "Boolean", "val": false},
+          "value_term": "Tfalse",
+          "value_type": null}},
+       {"attrs": ["model_trace:my_B"],
+        "kind": "other",
+        "location":
+         {"end-char": 1,
+          "end-line": 101,
+          "file-name": "myfile.my_ext2",
+          "start-char": 0,
+          "start-line": 101},
+        "lsymbol":
+         {"attrs": ["model_trace:my_B"],
+          "loc":
+           {"end-char": 1,
+            "end-line": 101,
+            "file-name": "myfile.my_ext2",
+            "start-char": 0,
+            "start-line": 101},
+          "name": "B"},
+        "value":
+         {"value_concrete_term": {"type": "Boolean", "val": false},
+          "value_term": "Tfalse",
+          "value_type": null}}]}]}]
 
 == Check CE
 
