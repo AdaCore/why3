@@ -442,12 +442,13 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         let res = wait_on_call call in
         let t = task_goal_fmla task in
         let expls = Termcode.get_expls_fmla t in
+        let known_map = th.th_known in
         let goal_name = (task_goal task).Decl.pr_name.Ident.id_string in
         let ce =
         if !opt_check_ce_model then select_ce env th res.pr_models
         else
           Option.bind
-            (Check_ce.last_nonempty_model (Pmodule.restore_module th) res.pr_models)
+            (Check_ce.last_nonempty_model known_map res.pr_models)
             (fun m -> Some (m, Not_checked))
         in
           printf "%a@." (print_result !opt_json)
