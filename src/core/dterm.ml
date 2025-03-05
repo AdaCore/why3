@@ -724,9 +724,9 @@ let term ?(strict=true) ?(keep_loc=true) dt =
 
 let () = Exn_printer.register (fun fmt e -> match e with
   | TermExpected ->
-      Format.pp_print_string fmt "syntax error: term expected"
+      Format.pp_print_string fmt "term expected"
   | FmlaExpected ->
-      Format.pp_print_string fmt "syntax error: formula expected"
+      Format.pp_print_string fmt "formula expected"
   | DuplicateVar s ->
       Format.fprintf fmt "duplicate variable %s" s
   | UnboundVar s ->
