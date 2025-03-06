@@ -334,7 +334,7 @@ module Log = struct
     | Iter_loop of exec_mode
     | Exec_main of (rsymbol * value_or_invalid Mls.t * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
-    | Exec_failed of (string * value Mid.t)
+    | Exec_failed of (string * value_or_invalid Mrs.t * value_or_invalid Mls.t * value Mvs.t * value Mid.t)
     | Exec_ended
 
   type log_entry = {
@@ -381,8 +381,10 @@ module Log = struct
     let mrs = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) mrs in
     log_entry log_uc (Exec_main (rs,mls,mvs,mrs)) loc
 
-  let log_failed log_uc s mvs loc =
-    log_entry log_uc (Exec_failed (s,mvs)) loc
+  let log_failed log_uc s rsenv lsenv vsenv mvs loc =
+    let lsenv = Mls.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) lsenv in
+    let rsenv = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) rsenv in
+    log_entry log_uc (Exec_failed (s,rsenv,lsenv,vsenv,mvs)) loc
 
   let log_stucked log_uc s mvs loc =
     log_entry log_uc (Exec_stucked (s,mvs)) loc
@@ -465,9 +467,13 @@ module Log = struct
           (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
           (print_list vs2string) (Mvs.bindings mvs)
           (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
-    | Exec_failed (msg,mid) ->
-       fprintf fmt "@[<h2>Property failure at %s with:%a@]"
-         msg (print_list id2string) (Mid.bindings mid)
+    | Exec_failed (msg,mrs,mls,mvs,mid) ->
+       fprintf fmt "@[<h2>Property failure at %s with:%a%a%a%a@]"
+         msg
+         (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
+         (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
+         (print_list vs2string) (Mvs.bindings mvs)
+         (print_list id2string) (Mid.bindings mid)
     | Exec_stucked (msg,mid) ->
        fprintf fmt "@[<h2>Execution got stuck at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
@@ -556,11 +562,13 @@ module Log = struct
                                           (List.map (key_value vs2string) (Mvs.bindings mvs))]);
                 "globals", List (List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs))
               ]
-        | Exec_failed (reason,mid) ->
+        | Exec_failed (reason,mrs,mls,mvs,mid) ->
             Record [
                 "kind", String "FAILED";
                 "reason", String reason;
-                "state", List (List.map (key_value id2string) (Mid.bindings mid))
+                "state", List (List.concat [List.map (key_value id2string) (Mid.bindings mid);
+                                            List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs);
+                                            List.map (key_value_or_undefined ls2string) (Mls.bindings mls)])
               ]
         | Exec_stucked (reason,mid) ->
             Record [
@@ -791,7 +799,7 @@ let register_exec_main env rs =
     env.rsenv rs.rs_name.id_loc
 
 let register_failure env loc reason mvs =
-  Log.log_failed env.log_uc reason (Mid.map snapshot mvs) loc
+  Log.log_failed env.log_uc reason env.rsenv env.lsenv env.vsenv (Mid.map snapshot mvs) loc
 
 let register_stucked env loc reason mvs =
   Log.log_stucked env.log_uc reason (Mid.map snapshot mvs) loc
