@@ -963,14 +963,27 @@ let model_of_exec_log ~known_map ~prover_model log =
       model_element_of_unmatched_log_entry ~loc id
         (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty
   in
+  let filter_invalid_values =
+    function Pinterp_core.Log.Value v -> Some v
+    | Pinterp_core.Log.Invalid -> None
+  in
   let me_of_log_entry e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
         | Log.Val_assumed (id, v) ->
             Option.to_list (me_of_log_entry loc id v)
-        | Log.Exec_failed (_, mid) ->
-            Mid.fold (fun id v l ->
-              Option.to_list (me_of_log_entry loc id v) @ l) mid []
+        | Log.Exec_failed (_, mrs, mls, mvs, mid) ->
+            Mvs.fold (fun vs v l ->
+              Option.to_list (me_of_log_entry loc vs.vs_name v) @ l)
+            mvs
+            (Mls.fold (fun ls v l ->
+              Option.to_list (me_of_log_entry loc ls.ls_name v) @ l)
+            (Mls.map_filter filter_invalid_values mls)
+            (Mrs.fold (fun rs v l ->
+              Option.to_list (me_of_log_entry loc rs.rs_name v) @ l)
+            (Mrs.map_filter filter_invalid_values mrs)
+            (Mid.fold (fun id v l ->
+              Option.to_list (me_of_log_entry loc id v) @ l) mid [])))
         | Log.Res_assumed (ors,v) ->
           (* Results are expected to have the special name "result"?
              TODO: make this match the model element kind *)
