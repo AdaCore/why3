@@ -126,7 +126,9 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
   giant_step_result:rac_result_state * Log.exec_log ->
   classification
 (** Classify a counterexample based on the results of the normal and giant-step
-    RAC executions. *)
+    RAC executions. Returns the log of the RAC execution corresponding to the
+    classification (that is, giant in the case of a subcontract weakness, small-step
+    in the case of a non conformity) *)
 
 (* val is_vc_term : model -> (cntr_ctx * Term.term) -> bool
  * (\** [is_vc_term ~vc_term_loc ~vc_term_attrs fail] tests if the data [fail] from

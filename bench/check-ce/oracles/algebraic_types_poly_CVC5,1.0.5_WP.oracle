@@ -15,40 +15,34 @@ File "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22:
 Sub-goal Postcondition of goal proj_test'vc.
 Prover result is: Valid (985 steps).
 
-Warning: Error while interpreting tb2t: Type list.List.list M.
-int_type for sort (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))) and type list.
-List.list
-'a for term (Var (Qannotident (Isymbol Nil) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))))) do not match
-
-Warning: Error while interpreting x: Type list.List.list M.
-int_type for sort (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))) and type list.
-List.list
-'a for term (Var (Qannotident (Isymbol Nil) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))))) do not match
-
-Warning: Error while interpreting l: Cannot apply lsymbol list.List.Cons to terms (Integer 0, Nil: list 'a):
-Type mismatch between list.List.list M.int_type and list.List.list 'a
-Warning: Error while interpreting tb2t: Type list.List.list M.
-int_type for sort (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))) and type list.
-List.list
-'a for term (Var (Qannotident (Isymbol Nil) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))))) do not match
-
-Warning: Error while interpreting x: Type list.List.list M.
-int_type for sort (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))) and type list.
-List.list
-'a for term (Var (Qannotident (Isymbol Nil) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type))))) do not match
-
-Warning: Error while interpreting l: Cannot apply lsymbol list.List.Cons to terms (Integer 0, Nil: list 'a):
-Type mismatch between list.List.list M.int_type and list.List.list 'a
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
-- Selected model 1: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22)
 File "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22:
 Sub-goal Postcondition of goal proj_test'vc.
 Prover result is: Unknown (unknown + incomplete) (1235 steps).
-Sorry, we don't have a good counterexample for you :(
-
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_poly.mlw:
+  Line 29:
+    l = (Cons (Integer 0) Nil)
+    l = (Cons (Integer 0) Nil)
+    Execution of main function `proj_test` with env:
+      l = (Cons (Integer 0) Nil)
+      zero = 0
+      one = 1
+  Line 30:
+    Property failure at postcondition of `proj_test` with:
+      result = 0
 
