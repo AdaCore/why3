@@ -911,25 +911,25 @@ module FromModelToTerm = struct
     let th = Env.read_theory env.why3_env [ path ] theory in
     Theory.ns_find_ls th.Theory.th_export [ ident ]
 
-  let rec term_to_term env t =
+  let rec term_to_term env ty_s t =
     match t with
     | Tconst c -> constant_to_term env c
     | Tvar qid -> (
         try qual_id_to_term env qid
-        with NoArgConstructor -> apply_to_term env qid [])
+        with NoArgConstructor -> apply_to_term env ty_s qid [])
     | Tite (b, t1, t2) ->
-        let b' = term_to_term env b in
-        let t1' = term_to_term env t1 in
-        let t2' = term_to_term env t2 in
+        let b' = term_to_term env None b in
+        let t1' = term_to_term env ty_s t1 in
+        let t2' = term_to_term env ty_s t2 in
         t_if b' t1' t2'
-    | Tapply (qid, ts) -> apply_to_term env qid ts
+    | Tapply (qid, ts) -> apply_to_term env ty_s qid ts
     | Tarray (s1, s2, a) -> array_to_term env s1 s2 a
-    | Tasarray t -> asarray_to_term env t
-    | Tlet (bindings, t) -> let_to_term env bindings t
-    | Tforall (bindings, t) -> forall_to_term env bindings t
+    | Tasarray t -> asarray_to_term env ty_s t
+    | Tlet (bindings, t) -> let_to_term env ty_s bindings t
+    | Tforall (bindings, t) -> forall_to_term env ty_s bindings t
     | Tunparsed _ -> error "Could not interpret term %a@." print_term t
 
-  and apply_to_term env qid ts =
+  and apply_to_term env ty_s qid ts =
     let maybe_prover_fun_def env n ts' =
       try
         (* search if [n] is the name of a prover function definition *)
@@ -971,35 +971,37 @@ module FromModelToTerm = struct
             end
           end
       in
-      try t_app_infer ls ts'
-      with e ->
+      try t_app ls ts' ty_s
+      with _ ->
+        try t_app_infer ls ts'
+        with e ->
         error "@[Cannot apply lsymbol@ @[%a@] to terms@ @[(%a)@]:@ @[%a@]" Pretty.print_ls_qualified ls
           (Pp.print_list Pp.comma Pretty.print_term)
           ts' Exn_printer.exn_printer e
     in
     match (qid, ts) with
     | Qident (Isymbol (S "=")), [ t1; t2 ] ->
-        let t1' = term_to_term env t1 in
-        let t2' = term_to_term env t2 in
+        let t1' = term_to_term env ty_s t1 in
+        let t2' = term_to_term env ty_s t2 in
         t_equ t1' t2'
     | Qident (Isymbol (S "or")), hd :: tl ->
-        let hd = term_to_term env hd in
+        let hd = term_to_term env None hd in
         List.fold_left
           (fun t t' ->
-            let t' = term_to_term env t' in
+            let t' = term_to_term env None t' in
             ( t_binary Term.Tor t (Term.to_prop t')))
           (Term.to_prop hd)
           tl
     | Qident (Isymbol (S "and")), hd :: tl ->
-        let hd = term_to_term env hd in
+        let hd = term_to_term env None hd in
         List.fold_left
           (fun t t' ->
-            let t' = term_to_term env t' in
+            let t' = term_to_term env None t' in
             ( t_binary Term.Tand t (Term.to_prop t')))
           (Term.to_prop hd)
           tl
     | Qident (Isymbol (S "not")), [ t ] ->
-        let t = term_to_term env t in
+        let t = term_to_term env None t in
         t_not (Term.to_prop t)
     (*  In the general case, we first search if [n] corresponds to a known
         prover definition (in which case we apply a substitution), or a known
@@ -1007,14 +1009,15 @@ module FromModelToTerm = struct
         Otherwise, we can create a fresh lsymbol only for Qannotident cases, since
         Qident are not associated to an SMT sort. *)
     | Qident (Isymbol (S n)), ts | Qident (Isymbol (Sprover n)), ts ->
-        let ts' = List.map (term_to_term env) ts in
+        let ts' = List.map (term_to_term env None) ts in
         begin match maybe_prover_fun_def env n ts' with
         | Some t -> t
         | None -> maybe_known_ls_or_new ~opt_sort:None env n ts'
         end
     | Qannotident (Isymbol (S n), s), ts
     | Qannotident (Isymbol (Sprover n), s), ts ->
-      let ts' = List.map (term_to_term env) ts in
+      let ty_s = smt_sort_to_ty env s in
+      let ts' = List.map (term_to_term env (Some ty_s)) ts in
       begin match maybe_prover_fun_def env n ts' with
       | Some t -> t
       | None -> maybe_known_ls_or_new ~opt_sort:(Some s) env n ts'
@@ -1027,8 +1030,8 @@ module FromModelToTerm = struct
     let ty2 = smt_sort_to_ty env s2 in
     let vs_arg = create_vsymbol (Ident.id_fresh "x") ty1 in
     let mk_case key value t =
-      let key = term_to_term env key in
-      let value = term_to_term env value in
+      let key = term_to_term env (Some ty1) key in
+      let value = term_to_term env (Some ty2) value in
       if Ty.oty_equal key.t_ty (Some ty1) && Ty.oty_equal value.t_ty (Some ty2)
       then
          t_if (t_equ (t_var vs_arg) key) value t
@@ -1041,7 +1044,7 @@ module FromModelToTerm = struct
           (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
           value.t_ty print_sort s2
     in
-    let t_others = term_to_term env elts.array_others in
+    let t_others = term_to_term env (Some ty2) elts.array_others in
     let a =
       List.fold_left
         (fun acc (key, value) -> mk_case key value acc)
@@ -1051,7 +1054,7 @@ module FromModelToTerm = struct
     Pretty.forget_var vs_arg;
     t_lambda [ vs_arg ] [] a
 
-  and asarray_to_term env elt =
+  and asarray_to_term env _ty_s elt =
     match elt with
     | Tvar (Qident (Isymbol (S n)) | Qident (Isymbol (Sprover n))) -> begin
       match Mstr.find_opt n env.prover_fun_defs with
@@ -1060,27 +1063,28 @@ module FromModelToTerm = struct
     end
     | _ -> error "Cannot interpret the 'as-array' term"
 
-  and let_to_term env bindings t =
-    (* Recursively consume let bindings *)
+  and let_to_term env ty_s bindings t =
+    (* TODO the syntax in of Smtv2_model_defs_terms should be updated to keep track
+       of the type of the let-introduced term *)
     match bindings with
-    | [] -> term_to_term env t
+    | [] -> term_to_term env ty_s t
     | (sym,tt)::bindings ->
-      let body = term_to_term env tt in
+      let body = term_to_term env ty_s tt in
       match sym with | S str | Sprover str ->
       let vs = create_vsymbol (Ident.id_fresh str) (Option.get body.t_ty)
       in
       env.bound_vars <- Mstr.add str vs env.bound_vars;
-      let t = let_to_term env bindings t in
+      let t = let_to_term env None bindings t in
       t_let t (t_close_bound vs body)
-  and forall_to_term env bindings t =
+  and forall_to_term env ty_s bindings t =
     match bindings with
-    | [] -> term_to_term env t
+    | [] -> term_to_term env ty_s t
     | (sym,sort)::bindings ->
       match sym with | S str | Sprover str ->
       let vs = create_vsymbol (Ident.id_fresh str) (smt_sort_to_ty env sort)
       in
       env.bound_vars <- Mstr.add str vs env.bound_vars;
-      let t = forall_to_term env bindings t
+      let t = forall_to_term env ty_s bindings t
       in
       t_forall_close [vs] [] t
 
@@ -1101,7 +1105,7 @@ module FromModelToTerm = struct
       print_sort s
       (Pp.print_option_or_default "None" Pretty.print_ty_qualified)
       ty_s fmla;
-    let t' = term_to_term env t in
+    let t' = term_to_term env ty_s t in
     (* convert t' to a formula if the expected type of the result is None (fmla=true) *)
     let t' = if fmla then Term.to_prop t' else t' in
     if Option.equal Ty.ty_equal ty_s t'.t_ty then (
@@ -1266,13 +1270,13 @@ module FromModelToTerm = struct
             let t2' = eval_term env ~eval_prover_var seen_prover_vars terms t2
             in
             if t_equal t1' t2' then t_true
-            else  t_app_infer ls [ t1'; t2' ])
+            else  t_app ls [ t1'; t2' ] t.t_ty)
     | Term.Tapp (ls, ts) ->
         let ts =
           List.map
             (eval_term env ~eval_prover_var seen_prover_vars terms) ts
         in
-        t_app_infer ls ts
+        t_app ls ts t.t_ty
     | Term.Tif (b, t1, t2) ->
         let b' = eval_term env ~eval_prover_var seen_prover_vars terms b in
         if is_true env b' then
