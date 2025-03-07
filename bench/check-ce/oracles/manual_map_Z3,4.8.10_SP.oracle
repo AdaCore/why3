@@ -32,6 +32,12 @@ File manual_map.mlw:
       v = 3
   Line 5:
     Property failure at postcondition of `test_map` with:
+      zero = 0
+      one = 1
+      x = fun (x!0:int) -> if x!0 = 1 then 3 else 2
+      result = (fun y -> if pure { if y = x then True else False } then v
+                  else f y) with f = fun (x!0:int) ->
+                                      if x!0 = 1 then 3 else 2, x = 0, v = 3
       result = (fun y -> if pure { if y = x then True else False } then v
                   else f y) with f = fun (x!0:int) ->
                                       if x!0 = 1 then 3 else 2, x = 0, v = 3

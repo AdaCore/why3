@@ -44,6 +44,12 @@ File maps_poly.mlw:
              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3
   Line 8:
     Property failure at postcondition of `test_map` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
@@ -214,6 +220,36 @@ File maps_poly.mlw:
                                                                     else 2
   Line 14:
     Property failure at postcondition of `test_map_multidim1` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) ->
+                                  if x!0 = 0
+                                  then fun (x!01:int) ->
+                                        if x!01 = 6 then 8 else 5
+                                  else if x!0 = 1
+                                       then fun (x!01:int) ->
+                                             if x!01 = 0 then 3
+                                             else if x!01 = 6 then 7
+                                                  else if x!01 = 1 then 3
+                                                       else 2
+                                       else fun (x!01:int) -> 4, x = 0, v = fun
+                                                                    (x!0:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!0 = 0
+                                                                    then 3
+                                                                    else 
+                                                                    if 
+                                                                    x!0 = 6
+                                                                    then 7
+                                                                    else 
+                                                                    if 
+                                                                    x!0 = 1
+                                                                    then 3
+                                                                    else 2}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) ->
@@ -373,6 +409,30 @@ File maps_poly.mlw:
                                                                     else 5, x = 0, v = 3
   Line 19:
     Property failure at postcondition of `test_map_multidim2` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) ->
+                                  if x!0 = 0
+                                  then fun (x!01:int) ->
+                                        if x!01 = 0 then 6 else 5
+                                  else if x!0 = 1
+                                       then fun (x!01:int) ->
+                                             if x!01 = 1 then 3 else 2
+                                       else fun (x!01:int) -> 4, x = 0, v = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else f y) with f = fun
+                                                                    (x!0:
+                                                                    int) ->
+                                                                    if 
+                                                                    x!0 = 0
+                                                                    then 6
+                                                                    else 5, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) ->
@@ -441,6 +501,12 @@ File maps_poly.mlw:
              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3
   Line 26:
     Property failure at postcondition of `proj_map_test1` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
@@ -493,6 +559,13 @@ File maps_poly.mlw:
                                  if x!0 = 1 then True else False, x = 0, v = true
   Line 31:
     Property failure at postcondition of `proj_map_test2` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) ->
+                                  if x!0 = 1 then True else False, x = 0, v = true}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) ->
@@ -524,6 +597,9 @@ Unknown location:
 File maps_poly.mlw:
   Line 42:
     Property failure at postcondition of `t1'goal` with:
+      i = 0
+      t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
+      result = ()
       i = 0
       t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
 

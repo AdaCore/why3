@@ -16,7 +16,10 @@ The following counterexample model could not be verified
 File call-val-function.mlw:
   Line 6:
     result :  = 0
+    result :  = 0
     x :  = 0
+    x :  = 0
+    y :  = 0
   Line 8:
     y :  = 0
     y : int = 0
@@ -61,6 +64,11 @@ File call-val-function.mlw:
       _ = 1
   Line 28:
     Property failure at postcondition of `main1` with:
+      zero = 0
+      one = 1
+      f = fun (_arg_0:int) -> 43
+      y = 0
+      result = 44
       result = 44
 
 <check_ce:categorization>Categorizations of models:

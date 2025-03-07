@@ -88,6 +88,12 @@ File lib.mlw:
 File isqrt-S1.mlw:
   Line 10:
     Property failure at loop invariant init with:
+      zero = 0
+      one = 1
+      n = (- 1)
+      r = {contents= (- 1)}
+      y = {contents= 1}
+      z = {contents= 3}
       n = (- 1)
       r = {contents= (- 1)}
 
@@ -139,6 +145,12 @@ File lib.mlw:
 File isqrt-S2.mlw:
   Line 13:
     Property failure at loop invariant init with:
+      zero = 0
+      one = 1
+      n = 1
+      r = {contents= 1}
+      y = {contents= 1}
+      z = {contents= 3}
       r = {contents= 1}
       z = {contents= 3}
 
@@ -190,6 +202,12 @@ File lib.mlw:
 File isqrt-S3.mlw:
   Line 13:
     Property failure at loop invariant init with:
+      zero = 0
+      one = 1
+      n = 1
+      r = {contents= 1}
+      y = {contents= 1}
+      z = {contents= (-1)}
       r = {contents= 1}
       z = {contents= (-1)}
 
@@ -325,6 +343,12 @@ File isqrt-S4.mlw:
       i = 2
   Line 11:
     Property failure at loop invariant preservation with:
+      zero = 0
+      one = 1
+      n = 3
+      r = {contents= 2}
+      y = {contents= 14}
+      z = {contents= (-3)}
       r = {contents= 2}
       y = {contents= 14}
 
@@ -429,6 +453,12 @@ File isqrt-S5.mlw:
     result of `(:=)` = ()
   Line 11:
     Property failure at loop invariant preservation with:
+      zero = 0
+      one = 1
+      n = 2
+      r = {contents= 1}
+      y = {contents= 2}
+      z = {contents= 0}
       r = {contents= 1}
       y = {contents= 2}
 
@@ -581,6 +611,10 @@ File lib.mlw:
 File isqrt-S6.mlw:
   Line 5:
     Property failure at postcondition of `isqrt` with:
+      zero = 0
+      one = 1
+      n = 3
+      result = 2
       n = 3
       result = 2
 
@@ -641,6 +675,10 @@ File isqrt-S7.mlw:
     result of `(!)` = 1
   Line 5:
     Property failure at postcondition of `isqrt` with:
+      zero = 0
+      one = 1
+      n = 4
+      result = 1
       n = 4
       result = 1
 
@@ -724,6 +762,10 @@ File int.mlw:
 File isqrt-S8.mlw:
   Line 5:
     Property failure at postcondition of `isqrt` with:
+      zero = 0
+      one = 1
+      n = 0
+      result = (-1)
       n = 0
       result = (-1)
 
@@ -925,6 +967,14 @@ File isqrt-S9.mlw:
       i = 1
   Line 14:
     Property failure at loop variant decrease with:
+      zero = 0
+      one = 1
+      n = 3
+      r = {contents= 1}
+      y = {contents= 1}
+      z = {contents= (-1)}
+      r = {contents= 2}
+      n = 3
       n = 3
       r = {contents= 1}
       r = {contents= 2}
@@ -1031,6 +1081,13 @@ File isqrt-S10.mlw:
     result of `(:=)` = ()
   Line 14:
     Property failure at loop variant decrease with:
+      zero = 0
+      one = 1
+      n = 15
+      r = {contents= (- 6)}
+      y = {contents= 36}
+      z = {contents= 13}
+      r = {contents= (- 5)}
       r = {contents= (- 6)}
       r = {contents= (- 5)}
 

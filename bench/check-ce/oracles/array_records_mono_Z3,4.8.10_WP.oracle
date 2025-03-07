@@ -53,6 +53,21 @@ File array_records_mono.mlw:
            length= 0}
       i = (- 1)
     Property failure at precondition of `([])` with:
+      zero = 0
+      one = 1
+      a = {elts=
+           fun (x!0:int) ->
+            if x!0 = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk True 3 5;
+           length= 0}
+      i = (- 1)
+      a = {elts=
+           fun (x!0:int) ->
+            if x!0 = (- 1) then basic_record'mk True 3 5
+            else basic_record'mk True 3 5;
+           length= 0}
+      i = (- 1)
+      o = 69
       a = {elts=
            fun (x!0:int) ->
             if x!0 = (- 1) then basic_record'mk True 3 5

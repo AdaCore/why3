@@ -44,6 +44,11 @@ File record_map.mlw:
       arg = r'mk (- 1) True
   Line 41:
     Property failure at postcondition of `map_record_proj_test1` with:
+      zero = 0
+      one = 1
+      map_rec = fun (x:bool) ->
+                 if x = True then r'mk (- 1) True else r'mk 0 False
+      result = (- 1)
       result = (- 1)
 
 <check_ce:categorization>Categorizations of models:
@@ -92,6 +97,11 @@ File map.mlw:
 File record_map.mlw:
   Line 46:
     Property failure at postcondition of `record_map_proj_test2` with:
+      zero = 0
+      one = 1
+      rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
+                 g_bool= true}
+      result = (- 1)
       result = (- 1)
 
 <check_ce:categorization>Categorizations of models:
@@ -126,6 +136,11 @@ File record_map.mlw:
       one = 1
   Line 53:
     Property failure at postcondition of `record_map_proj_test3` with:
+      zero = 0
+      one = 1
+      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
+      rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      result = {f_map= fun (x:bool) -> 0; g_bool= true}
       re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
       result = {f_map= fun (x:bool) -> 0; g_bool= true}
 

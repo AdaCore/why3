@@ -45,6 +45,15 @@ File threshold.mlw:
       a = epsilon x:int32. int32'int x = (- 2147483648)
       b = epsilon x:int32. int32'int x = (- 1)
     Property failure at precondition of `(+)` with:
+      zero = 0
+      one = 1
+      min_int32 = (-2147483648)
+      max_int32 = 2147483647
+      a = epsilon x:int32. int32'int x = (- 2147483648)
+      b = epsilon x:int32. int32'int x = (- 1)
+      n = epsilon x:int32. int32'int x = (- 2147483648)
+      min = epsilon x:int32. int32'int x = (- 2147483648)
+      max = epsilon x:int32. int32'int x = (- 1)
       a = epsilon x:int32. int32'int x = (- 2147483648)
       b = epsilon x:int32. int32'int x = (- 1)
 
@@ -102,6 +111,14 @@ File threshold.mlw:
     result of `(<)` = true
   Line 9:
     Property failure at postcondition of `f` with:
+      zero = 0
+      one = 1
+      min_int32 = (-2147483648)
+      max_int32 = 2147483647
+      n = epsilon x:int32. int32'int x = (- 1)
+      min = epsilon x:int32. int32'int x = 0
+      max = epsilon x:int32. int32'int x = (- 1)
+      result = epsilon x:int32. int32'int x = 0
       min = epsilon x:int32. int32'int x = 0
       max = epsilon x:int32. int32'int x = (- 1)
       result = epsilon x:int32. int32'int x = 0
@@ -146,6 +163,13 @@ File threshold.mlw:
       a = (2147745792:t)
       b = (2147745792:t)
     Property failure at precondition of `u_add` with:
+      zero = 0
+      one = 1
+      a = (2147745792:t)
+      b = (2147745792:t)
+      n = (0:t)
+      min = (2147745792:t)
+      max = (2147745792:t)
       a = (2147745792:t)
       b = (2147745792:t)
 
@@ -196,6 +220,12 @@ File threshold.mlw:
     result of `u_lt` = true
   Line 27:
     Property failure at postcondition of `f1` with:
+      zero = 0
+      one = 1
+      n = (2:t)
+      min = (41943169:t)
+      max = (0:t)
+      result = (41943169:t)
       min = (41943169:t)
       max = (0:t)
       result = (41943169:t)

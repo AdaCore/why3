@@ -45,6 +45,11 @@ File test_result_ce_value2.mlw:
       _ = 10
   Line 13:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      a = {contents= (- 1)}
+      x = (- 1)
+      _ = ()
       a = {contents= (- 1)}
 
 <check_ce:categorization>Categorizations of models:
@@ -94,6 +99,11 @@ File test_result_ce_value2.mlw:
       _ = 10
   Line 15:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      a = {contents= 42}
+      x = 0
+      _ = ()
       a = {contents= 42}
 
 <check_ce:categorization>Categorizations of models:
@@ -152,5 +162,10 @@ File test_result_ce_value2.mlw:
       _ = 2
   Line 18:
     Property failure at postcondition of `test3` with:
+      zero = 0
+      one = 1
+      a = {contents= 42}
+      x = 99
+      result = ()
       a = {contents= 42}
 

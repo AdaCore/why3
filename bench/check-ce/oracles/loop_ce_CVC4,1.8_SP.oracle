@@ -113,6 +113,14 @@ File loop_ce.mlw:
       _ = 1
   Line 16:
     Property failure at loop invariant preservation with:
+      zero = 0
+      one = 1
+      a = {contents= 1}
+      b = {contents= 6}
+      _ = ()
+      _ = ()
+      _ = ()
+      _ = ()
       a = {contents= 1}
       b = {contents= 6}
 
@@ -160,6 +168,12 @@ File loop_ce.mlw:
       _ = 1
   Line 31:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      a = {contents= 0}
+      _ = ()
+      a = ref'mk (- 1)
+      a = {contents= (- 1)}
       a = {contents= 0}
       a = ref'mk (- 1)
 
@@ -203,6 +217,11 @@ File loop_ce.mlw:
     Normal execution of function `Tuple0` with args:
   Line 27:
     Property failure at postcondition of `g` with:
+      zero = 0
+      one = 1
+      a = {contents= 10}
+      a = {contents= 10}
+      result = ()
       a = {contents= 10}
       a = {contents= 10}
 

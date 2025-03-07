@@ -111,6 +111,17 @@ File maps_mono.mlw:
                                                                     int) -> 0
   Line 51:
     Property failure at postcondition of `test_map_multidim1` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 0
+                                  then fun (x2:int) ->
+                                        if x2 = 0 then 0 else 1
+                                  else fun (x2:int) -> 0, x = 0, v = fun (x1:
+                                                                    int) -> 0}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->
@@ -226,6 +237,14 @@ File maps_mono.mlw:
                                    else if x2 = 1 then True else False, x1 = 0, v1 = true
   Line 68:
     Property failure at postcondition of `proj_map_test2` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x1 then True else False } then v1
+              else f1 y) with f1 = fun (x2:int) ->
+                                    if x2 = 0 then True
+                                    else if x2 = 1 then True else False, x1 = 0, v1 = true}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x1 then True else False } then v1
               else f1 y) with f1 = fun (x2:int) ->
@@ -258,6 +277,9 @@ Unknown location:
 File maps_mono.mlw:
   Line 79:
     Property failure at postcondition of `t1'goal1` with:
+      i = 0
+      t = fun (x2:int) -> if x2 = 0 then 43 else 0
+      result = ()
       i = 0
       t = fun (x2:int) -> if x2 = 0 then 43 else 0
 

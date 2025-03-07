@@ -44,6 +44,15 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (bOUND_VARIABLE_385:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
+                else 127
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      a = epsilon x:byte. to_int x = 127
+      o = epsilon x:byte. to_int x = 1
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 
@@ -101,6 +110,16 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (bOUND_VARIABLE_384:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
+                else 127
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      a = {contents= epsilon x:byte. to_int x = 127}
+      o = epsilon x:byte. to_int x = 1
+      o = epsilon x:byte. to_int x = 127
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 
@@ -154,6 +173,16 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (bOUND_VARIABLE_475:byte) ->
+                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
+                else 127
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      b = {f= epsilon x:byte. to_int x = 127; g= true}
+      o = epsilon x:byte. to_int x = 1
+      o = epsilon x:byte. to_int x = 127
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 

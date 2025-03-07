@@ -74,8 +74,8 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (bOUND_VARIABLE_7894:int) (bOUND_VARIABLE_7904:int) -> 0
-      mod = fun (bOUND_VARIABLE_7894:int) (bOUND_VARIABLE_7904:int) -> 0
+      div = fun (bOUND_VARIABLE_7898:int) (bOUND_VARIABLE_7908:int) -> 0
+      mod = fun (bOUND_VARIABLE_7898:int) (bOUND_VARIABLE_7908:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = (- 1)
       zero = 0
@@ -191,6 +191,16 @@ File binary_search-B1.mlw:
       i = (-1)
   Line 15:
     Property failure at loop variant decrease with:
+      zero = 0
+      one = 1
+      div = fun (bOUND_VARIABLE_7898:int) (bOUND_VARIABLE_7908:int) -> 0
+      mod = fun (bOUND_VARIABLE_7898:int) (bOUND_VARIABLE_7908:int) -> 0
+      t = {length= 2; elts= fun (x:int) -> 0}
+      x = (- 1)
+      l = {contents= (-1)}
+      r = {contents= (-1)}
+      r = {contents= 1}
+      t = {length= 2; elts= fun (x:int) -> 0}
       t = {length= 2; elts= fun (x:int) -> 0}
       r = {contents= (-1)}
       r = {contents= 1}
@@ -204,8 +214,8 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B1.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (bOUND_VARIABLE_7114:int) (bOUND_VARIABLE_7124:int) -> 0
-      mod = fun (bOUND_VARIABLE_7114:int) (bOUND_VARIABLE_7124:int) -> 0
+      div = fun (bOUND_VARIABLE_7118:int) (bOUND_VARIABLE_7128:int) -> 0
+      mod = fun (bOUND_VARIABLE_7118:int) (bOUND_VARIABLE_7128:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
@@ -309,6 +319,16 @@ File binary_search-B1.mlw:
       i = 0
   Line 15:
     Property failure at loop variant decrease with:
+      zero = 0
+      one = 1
+      div = fun (bOUND_VARIABLE_7118:int) (bOUND_VARIABLE_7128:int) -> 0
+      mod = fun (bOUND_VARIABLE_7118:int) (bOUND_VARIABLE_7128:int) -> 0
+      t = {length= 2; elts= fun (x:int) -> 0}
+      x = 0
+      l = {contents= 0}
+      r = {contents= 1}
+      r = {contents= 1}
+      t = {length= 2; elts= fun (x:int) -> 0}
       t = {length= 2; elts= fun (x:int) -> 0}
       r = {contents= 1}
       r = {contents= 1}
@@ -328,8 +348,8 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B2.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (bOUND_VARIABLE_6714:int) (bOUND_VARIABLE_6724:int) -> 0
-      mod = fun (bOUND_VARIABLE_6714:int) (bOUND_VARIABLE_6724:int) -> 0
+      div = fun (bOUND_VARIABLE_6718:int) (bOUND_VARIABLE_6728:int) -> 0
+      mod = fun (bOUND_VARIABLE_6718:int) (bOUND_VARIABLE_6728:int) -> 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       zero = 0
@@ -494,6 +514,16 @@ File binary_search-B2.mlw:
       i = 0
   Line 15:
     Property failure at loop variant decrease with:
+      zero = 0
+      one = 1
+      div = fun (bOUND_VARIABLE_6718:int) (bOUND_VARIABLE_6728:int) -> 0
+      mod = fun (bOUND_VARIABLE_6718:int) (bOUND_VARIABLE_6728:int) -> 0
+      t = {length= 2; elts= fun (x:int) -> 0}
+      x = 0
+      l = {contents= 0}
+      r = {contents= 1}
+      r = {contents= 1}
+      l = {contents= 0}
       l = {contents= 0}
       r = {contents= 1}
       r = {contents= 1}
@@ -509,8 +539,8 @@ The program does not comply to the verification goal, for example during the
 File binary_search-B3.mlw:
   Line 3:
     Execution of main function `binary_search` with env:
-      div = fun (bOUND_VARIABLE_8454:int) (bOUND_VARIABLE_8464:int) -> 1
-      mod = fun (bOUND_VARIABLE_8454:int) (bOUND_VARIABLE_8464:int) -> 0
+      div = fun (bOUND_VARIABLE_8458:int) (bOUND_VARIABLE_8468:int) -> 1
+      mod = fun (bOUND_VARIABLE_8458:int) (bOUND_VARIABLE_8468:int) -> 0
       t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       x = 0
       zero = 0
@@ -626,6 +656,14 @@ File binary_search-B3.mlw:
       i = 0
   Line 14:
     Property failure at loop invariant preservation with:
+      zero = 0
+      one = 1
+      div = fun (bOUND_VARIABLE_8458:int) (bOUND_VARIABLE_8468:int) -> 1
+      mod = fun (bOUND_VARIABLE_8458:int) (bOUND_VARIABLE_8468:int) -> 0
+      t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
+      x = 0
+      l = {contents= (-1)}
+      r = {contents= 0}
       t = {length= 3; elts= fun (x:int) -> if x = 1 then 1 else 0}
       x = 0
       r = {contents= 0}
@@ -687,6 +725,11 @@ File binary_search-B4.mlw:
     result of `(!)` = 0
   Line 8:
     Property failure at postcondition of `binary_search` with:
+      zero = 0
+      one = 1
+      t = {length= 2; elts= fun (x:int) -> 0}
+      x = 0
+      result = 0
       t = {length= 2; elts= fun (x:int) -> 0}
       x = 0
       result = 0

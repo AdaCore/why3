@@ -30,6 +30,10 @@ Unknown location:
 File log-logic.mlw:
   Line 12:
     Property failure at postcondition of `g1'goal` with:
+      zero = 0
+      one = 1
+      a = 43
+      result = ()
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -66,6 +70,11 @@ Unknown location:
 File log-logic.mlw:
   Line 26:
     Property failure at postcondition of `g2'goal` with:
+      zero = 0
+      one = 1
+      a = 2
+      b = 0
+      result = ()
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -105,6 +114,12 @@ Unknown location:
 File log-logic.mlw:
   Line 37:
     Property failure at postcondition of `g3'goal` with:
+      zero = 0
+      one = 1
+      a = 2
+      b = 0
+      x = 0
+      result = ()
       x = 0
 
 <check_ce:categorization>Categorizations of models:
@@ -145,6 +160,12 @@ Unknown location:
 File log-logic.mlw:
   Line 53:
     Property failure at postcondition of `g4'goal` with:
+      zero = 0
+      one = 1
+      a = 0
+      b = 0
+      f = fun (_arg_1:int) -> 43
+      result = ()
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -171,12 +192,12 @@ File log-logic.mlw:
   Line 24:
     b = 0
   Line 64:
-    p = fun (_arg_12:int) -> _arg_12 = 0
+    p = fun (_arg_14:int) -> _arg_14 = 0
   Line 68:
     Execution of main function `g5'goal` with env:
       a = (- 1)
       b = 0
-      p = fun (_arg_12:int) -> _arg_12 = 0
+      p = fun (_arg_14:int) -> _arg_14 = 0
       zero = 0
       one = 1
 Unknown location:
@@ -184,6 +205,12 @@ Unknown location:
 File log-logic.mlw:
   Line 68:
     Property failure at postcondition of `g5'goal` with:
+      zero = 0
+      one = 1
+      a = (- 1)
+      b = 0
+      p = fun (_arg_14:int) -> _arg_14 = 0
+      result = ()
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -210,17 +237,17 @@ File log-logic.mlw:
   Line 24:
     b = 0
   Line 51:
-    f = fun (_arg_12:int) -> 0
+    f = fun (_arg_14:int) -> 0
   Line 64:
-    p = fun (_arg_12:int) -> true
+    p = fun (_arg_14:int) -> true
   Line 80:
     x = 0
     x = 0
     Execution of main function `g6'goal` with env:
       a = 43
       b = 0
-      f = fun (_arg_12:int) -> 0
-      p = fun (_arg_12:int) -> true
+      f = fun (_arg_14:int) -> 0
+      p = fun (_arg_14:int) -> true
       x = 0
       zero = 0
       one = 1
@@ -229,5 +256,13 @@ Unknown location:
 File log-logic.mlw:
   Line 80:
     Property failure at postcondition of `g6'goal` with:
+      zero = 0
+      one = 1
+      a = 43
+      b = 0
+      f = fun (_arg_14:int) -> 0
+      p = fun (_arg_14:int) -> true
+      x = 0
+      result = ()
       x = 0
 

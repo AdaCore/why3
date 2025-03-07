@@ -369,6 +369,48 @@ File rgf-R1.mlw:
                                                                   else 9}
       i = 1
     Property failure at precondition of `g` with:
+      zero = 0
+      one = 1
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
+                                                             if x!0 = 0
+                                                             then 400
+                                                             else if 
+                                                                  x!0 = 1
+                                                                  then (- 175)
+                                                                  else 9}
+      i = 1
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
+                                                             if x!0 = 0
+                                                             then 400
+                                                             else if 
+                                                                  x!0 = 1
+                                                                  then (- 175)
+                                                                  else 9}
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
+                                                             if x!0 = 0
+                                                             then 400
+                                                             else if 
+                                                                  x!0 = 1
+                                                                  then (- 175)
+                                                                  else 9}
+      i = {contents= 1}
+      _ = ()
+      _ = ()
+      _ = ()
+      o = 1
+      a = {length= 2;
+           elts=
+           fun (x!0:int) ->
+            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
@@ -705,6 +747,101 @@ File rgf-R4.mlw:
                                                                   else 27}
       i = 1
     Property failure at precondition of `g` with:
+      zero = 0
+      one = 1
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
+                                                        if x!0 = 0 then 0
+                                                        else if x!0 =
+                                                                (- 21188)
+                                                             then 19676
+                                                             else if 
+                                                                  x!0 =
+                                                                  (- 14351)
+                                                                  then 29950
+                                                                  else 
+                                                                  if 
+                                                                  x!0 =
+                                                                  (- 15809)
+                                                                  then 1769
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = 1
+                                                                  then 0
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = (- 1)
+                                                                  then (- 1)
+                                                                  else 27}
+      i = 1
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
+                                                        if x!0 = 0 then 0
+                                                        else if x!0 =
+                                                                (- 21188)
+                                                             then 19676
+                                                             else if 
+                                                                  x!0 =
+                                                                  (- 14351)
+                                                                  then 29950
+                                                                  else 
+                                                                  if 
+                                                                  x!0 =
+                                                                  (- 15809)
+                                                                  then 1769
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = 1
+                                                                  then 0
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = (- 1)
+                                                                  then (- 1)
+                                                                  else 27}
+      a = {length= 2;
+           elts=
+           (fun j -> if j = i then v
+              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
+                                                        if x!0 = 0 then 0
+                                                        else if x!0 =
+                                                                (- 21188)
+                                                             then 19676
+                                                             else if 
+                                                                  x!0 =
+                                                                  (- 14351)
+                                                                  then 29950
+                                                                  else 
+                                                                  if 
+                                                                  x!0 =
+                                                                  (- 15809)
+                                                                  then 1769
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = 1
+                                                                  then 0
+                                                                  else 
+                                                                  if 
+                                                                  x!0 = (- 1)
+                                                                  then (- 1)
+                                                                  else 27}
+      i = {contents= 1}
+      _ = ()
+      _ = ()
+      _ = ()
+      o = 1
+      a = {length= 2;
+           elts=
+           fun (x!0:int) ->
+            if x!0 = 0 then 0
+            else if x!0 = (- 21188) then 19676
+                 else if x!0 = (- 14351) then 29950
+                      else if x!0 = (- 15809) then 1769
+                           else if x!0 = 1 then 0
+                                else if x!0 = (- 1) then (- 1) else 27}
       a = {length= 2;
            elts=
            (fun j -> if j = i then v

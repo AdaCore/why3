@@ -48,6 +48,12 @@ File ref_ex_mono.mlw:
       _ = 0
   Line 10:
     Property failure at postcondition of `test_post` with:
+      zero = 0
+      one = 1
+      x = 1
+      y = {c= 0}
+      y = {c= 0}
+      result = ()
       x = 1
       y = {c= 0}
 
@@ -101,6 +107,12 @@ File ref_ex_mono.mlw:
       _ = (- 42)
   Line 16:
     Property failure at postcondition of `test_post2` with:
+      zero = 0
+      one = 1
+      x = 43
+      y = {c= 0}
+      y = {c= (- 42)}
+      result = ()
       x = 43
       y = {c= 0}
       y = {c= (- 42)}
@@ -155,6 +167,13 @@ File ref_ex_mono.mlw:
       _ = 1
   Line 27:
     Property failure at postcondition of `incr` with:
+      zero = 0
+      one = 1
+      y = {c= 0}
+      x23 = {c= 0}
+      x23 = {c= (- 2)}
+      y = {c= (- 1)}
+      result = ()
       x23 = {c= 0}
       x23 = {c= (- 2)}
       y = {c= (- 1)}

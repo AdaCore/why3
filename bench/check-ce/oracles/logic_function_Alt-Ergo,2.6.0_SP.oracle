@@ -33,6 +33,10 @@ File logic_function.mlw:
       one = 1
   Line 8:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      g = fun (_arg_0:int) -> 42
+      y = 0
       y = 0
 
 <check_ce:categorization>Categorizations of models:
@@ -59,20 +63,25 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 10:
-    h = fun (_arg_02:int) (_arg_12:bool) -> 42
+    h = fun (_arg_04:int) (_arg_14:bool) -> 42
   Line 12:
     y1 = 0
     y2 = false
     y1 = 0
     y2 = false
     Execution of main function `main_h` with env:
-      h = fun (_arg_02:int) (_arg_12:bool) -> 42
+      h = fun (_arg_04:int) (_arg_14:bool) -> 42
       y1 = 0
       y2 = false
       zero = 0
       one = 1
   Line 14:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      h = fun (_arg_04:int) (_arg_14:bool) -> 42
+      y1 = 0
+      y2 = false
       y1 = 0
       y2 = false
 
@@ -100,17 +109,21 @@ File int.mlw:
     one = 1
 File logic_function.mlw:
   Line 16:
-    f = fun (_arg_02:int) -> 0
+    f = fun (_arg_04:int) -> 0
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (_arg_02:int) -> 0
+      f = fun (_arg_04:int) -> 0
       y = 0
       zero = 0
       one = 1
   Line 21:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      f = fun (_arg_04:int) -> 0
+      y = 0
       y = 0
 
 <check_ce:categorization>Categorizations of models:
@@ -148,5 +161,10 @@ File logic_function.mlw:
       one = 1
   Line 22:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      f = fun (arg_0:int) -> if arg_0 = 1 then 0 else (- 1)
+      y = 0
+      _ = ()
       y = 0
 

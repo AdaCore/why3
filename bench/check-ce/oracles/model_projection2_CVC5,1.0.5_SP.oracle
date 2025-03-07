@@ -32,14 +32,14 @@ File int.mlw:
     one = 1
 File model_projection2.mlw:
   Line 12:
-    get = fun (_arg_13:poly_map int int) (_arg_23:int) -> 41
+    get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
   Line 14:
     to_array = fun (bOUND_VARIABLE_389:poly_map int int) -> fun (x:int) -> 0
   Line 25:
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     Execution of main function `g2` with env:
-      get = fun (_arg_13:poly_map int int) (_arg_23:int) -> 41
+      get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
       to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
                   fun (x:int) -> 0
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
@@ -47,5 +47,11 @@ File model_projection2.mlw:
       one = 1
   Line 26:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
+      to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
+                  fun (x:int) -> 0
+      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
 

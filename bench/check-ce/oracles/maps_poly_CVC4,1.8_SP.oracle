@@ -44,6 +44,12 @@ File maps_poly.mlw:
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 8:
     Property failure at postcondition of `test_map` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
@@ -98,6 +104,10 @@ File maps_poly.mlw:
     result of `(:=)` = ()
   Line 14:
     Property failure at postcondition of `test_map_multidim1` with:
+      zero = 0
+      one = 1
+      x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
+      result = ()
       x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
 
 <check_ce:categorization>Categorizations of models:
@@ -211,6 +221,24 @@ File maps_poly.mlw:
                                                                     int) -> 0, x = 0, v = 3
   Line 19:
     Property failure at postcondition of `test_map_multidim2` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1
+                                  then fun (x2:int) ->
+                                        if x2 = 1 then 3 else 0
+                                  else fun (x2:int) -> 0, x = 0, v = (fun y -> if pure { 
+                                                                    if 
+                                                                    y = x
+                                                                    then True
+                                                                    else False } then v
+                                                                    else 
+                                                                    f y) with f = fun
+                                                                    (x1:
+                                                                    int) -> 0, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->
@@ -273,6 +301,12 @@ File maps_poly.mlw:
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 26:
     Property failure at postcondition of `proj_map_test1` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
@@ -325,6 +359,13 @@ File maps_poly.mlw:
                                  if x1 = 1 then True else False, x = 0, v = true
   Line 31:
     Property failure at postcondition of `proj_map_test2` with:
+      zero = 0
+      one = 1
+      x = {contents=
+           (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x1:int) ->
+                                  if x1 = 1 then True else False, x = 0, v = true}
+      result = ()
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->
@@ -356,6 +397,9 @@ Unknown location:
 File maps_poly.mlw:
   Line 42:
     Property failure at postcondition of `t1'goal` with:
+      i = 0
+      t = fun (x1:int) -> if x1 = 0 then 43 else 0
+      result = ()
       i = 0
       t = fun (x1:int) -> if x1 = 0 then 43 else 0
 

@@ -32,7 +32,7 @@ File int.mlw:
     one = 1
 File model_projection2.mlw:
   Line 12:
-    get = fun (bOUND_VARIABLE_3222:poly_map int int) (bOUND_VARIABLE_3232:
+    get = fun (bOUND_VARIABLE_3224:poly_map int int) (bOUND_VARIABLE_3234:
            int) -> 41
   Line 14:
     to_array = fun (bOUND_VARIABLE_332:poly_map int int) -> fun (x:int) -> 0
@@ -40,7 +40,7 @@ File model_projection2.mlw:
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     Execution of main function `g2` with env:
-      get = fun (bOUND_VARIABLE_3222:poly_map int int) (bOUND_VARIABLE_3232:
+      get = fun (bOUND_VARIABLE_3224:poly_map int int) (bOUND_VARIABLE_3234:
              int) -> 41
       to_array = fun (bOUND_VARIABLE_332:poly_map int int) ->
                   fun (x:int) -> 0
@@ -49,5 +49,12 @@ File model_projection2.mlw:
       one = 1
   Line 26:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      get = fun (bOUND_VARIABLE_3224:poly_map int int) (bOUND_VARIABLE_3234:
+             int) -> 41
+      to_array = fun (bOUND_VARIABLE_332:poly_map int int) ->
+                  fun (x:int) -> 0
+      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
 

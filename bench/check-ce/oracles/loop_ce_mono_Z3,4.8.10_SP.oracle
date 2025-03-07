@@ -106,6 +106,14 @@ File loop_ce_mono.mlw:
       _ = 1
   Line 18:
     Property failure at loop invariant preservation with:
+      zero = 0
+      one = 1
+      a = {c= 1}
+      b = {c= 6}
+      _ = ()
+      _ = ()
+      _ = ()
+      _ = ()
       a = {c= 1}
       b = {c= 6}
 
@@ -153,6 +161,12 @@ File loop_ce_mono.mlw:
       _ = 1
   Line 35:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      a = {c1= 0}
+      _ = ()
+      a = t'mk1 (- 1)
+      a = {c1= (- 1)}
       a = {c1= 0}
       a = t'mk1 (- 1)
 
@@ -196,6 +210,11 @@ File loop_ce_mono.mlw:
     Normal execution of function `Tuple0` with args:
   Line 31:
     Property failure at postcondition of `g` with:
+      zero = 0
+      one = 1
+      a = {c1= 10}
+      a = {c1= 10}
+      result = ()
       a = {c1= 10}
       a = {c1= 10}
 

@@ -37,6 +37,14 @@ File map_of_algebraic.mlw:
            mem_access_address= fun (x:int) -> Freeable}
       x = {base_addr= 0; offset= (0:t)}
     Property failure at precondition of `load_val` with:
+      zero = 0
+      one = 1
+      m = {block_size= fun (x:int) -> (0:t);
+           mem_access_address= fun (x:int) -> Freeable}
+      x = {base_addr= 0; offset= (0:t)}
+      m = {block_size= fun (x:int) -> (0:t);
+           mem_access_address= fun (x:int) -> Freeable}
+      x = {base_addr= 0; offset= (0:t)}
       Writable = UNDEFINED
       m = {block_size= fun (x:int) -> (0:t);
            mem_access_address= fun (x:int) -> Freeable}

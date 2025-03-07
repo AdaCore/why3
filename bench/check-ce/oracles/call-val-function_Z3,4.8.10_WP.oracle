@@ -35,6 +35,10 @@ File call-val-function.mlw:
       _ = 1
   Line 9:
     Property failure at postcondition of `main` with:
+      zero = 0
+      one = 1
+      y = 0
+      result = 44
       result = 44
 
 <check_ce:categorization>Categorizations of models:
@@ -58,12 +62,12 @@ File int.mlw:
     one = 1
 File call-val-function.mlw:
   Line 20:
-    f = fun (x!01:int) -> if x!01 = 2 then 43 else 43
+    f = fun (x!02:int) -> if x!02 = 2 then 43 else 43
   Line 27:
     y = 2
     y = 2
     Execution of main function `main` with env:
-      f = fun (x!01:int) -> if x!01 = 2 then 43 else 43
+      f = fun (x!02:int) -> if x!02 = 2 then 43 else 43
       y = 2
       zero = 0
       one = 1
@@ -77,6 +81,11 @@ File call-val-function.mlw:
       _ = 1
   Line 28:
     Property failure at postcondition of `main1` with:
+      zero = 0
+      one = 1
+      f = fun (x!02:int) -> if x!02 = 2 then 43 else 43
+      y = 2
+      result = 44
       result = 44
 
 <check_ce:categorization>Categorizations of models:
@@ -116,5 +125,9 @@ File call-val-function.mlw:
       _ = 1
   Line 44:
     Property failure at postcondition of `main2` with:
+      zero = 0
+      one = 1
+      y = 42
+      result = 44
       result = 44
 

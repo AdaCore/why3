@@ -23,12 +23,12 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!01:byte) ->
-              if (if x!01 = (epsilon x:byte. to_int x = 1) then epsilon x:
+    to_int = fun (x!02:byte) ->
+              if (if x!02 = (epsilon x:byte. to_int x = 1) then epsilon x:
                   byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                  (epsilon x:byte. to_int x = 1)
               then 1
-              else if (if x!01 = (epsilon x:byte. to_int x = 1)
+              else if (if x!02 = (epsilon x:byte. to_int x = 1)
                        then epsilon x:byte. to_int x = 1 else epsilon x:byte.
                        to_int x = 127) =
                       (epsilon x:byte. to_int x = 127)
@@ -37,12 +37,12 @@ File jlamp_projections.mlw:
     a = epsilon x:byte. to_int x = 127
     a = epsilon x:byte. to_int x = 127
     Execution of main function `p3` with env:
-      to_int = fun (x!01:byte) ->
-                if (if x!01 = (epsilon x:byte. to_int x = 1) then epsilon x:
+      to_int = fun (x!02:byte) ->
+                if (if x!02 = (epsilon x:byte. to_int x = 1) then epsilon x:
                     byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                    (epsilon x:byte. to_int x = 1)
                 then 1
-                else if (if x!01 = (epsilon x:byte. to_int x = 1)
+                else if (if x!02 = (epsilon x:byte. to_int x = 1)
                          then epsilon x:byte. to_int x = 1 else epsilon x:
                          byte. to_int x = 127) =
                         (epsilon x:byte. to_int x = 127)
@@ -58,6 +58,22 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (x!02:byte) ->
+                if (if x!02 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                    byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
+                   (epsilon x:byte. to_int x = 1)
+                then 1
+                else if (if x!02 = (epsilon x:byte. to_int x = 1)
+                         then epsilon x:byte. to_int x = 1 else epsilon x:
+                         byte. to_int x = 127) =
+                        (epsilon x:byte. to_int x = 127)
+                     then 127 else 2
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      a = epsilon x:byte. to_int x = 127
+      o = epsilon x:byte. to_int x = 1
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 
@@ -86,16 +102,16 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!02:byte) ->
-              if x!02 = (epsilon x:byte. to_int x = 1) then 1
-              else if x!02 = (epsilon x:byte. to_int x = 127) then 127 else 1
+    to_int = fun (x!04:byte) ->
+              if x!04 = (epsilon x:byte. to_int x = 1) then 1
+              else if x!04 = (epsilon x:byte. to_int x = 127) then 127 else 1
   Line 41:
     a = {contents= epsilon x:byte. to_int x = 127}
     a = {contents= epsilon x:byte. to_int x = 127}
     Execution of main function `p3` with env:
-      to_int = fun (x!02:byte) ->
-                if x!02 = (epsilon x:byte. to_int x = 1) then 1
-                else if x!02 = (epsilon x:byte. to_int x = 127) then 127
+      to_int = fun (x!04:byte) ->
+                if x!04 = (epsilon x:byte. to_int x = 1) then 1
+                else if x!04 = (epsilon x:byte. to_int x = 127) then 127
                      else 1
       a = {contents= epsilon x:byte. to_int x = 127}
       zero = 0
@@ -116,6 +132,17 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (x!04:byte) ->
+                if x!04 = (epsilon x:byte. to_int x = 1) then 1
+                else if x!04 = (epsilon x:byte. to_int x = 127) then 127
+                     else 1
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      a = {contents= epsilon x:byte. to_int x = 127}
+      o = epsilon x:byte. to_int x = 1
+      o = epsilon x:byte. to_int x = 127
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 
@@ -144,12 +171,12 @@ File int.mlw:
     one = 1
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (x!03:byte) ->
-              if (if x!03 = (epsilon x:byte. to_int x = 1) then epsilon x:
+    to_int = fun (x!06:byte) ->
+              if (if x!06 = (epsilon x:byte. to_int x = 1) then epsilon x:
                   byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                  (epsilon x:byte. to_int x = 1)
               then 1
-              else if (if x!03 = (epsilon x:byte. to_int x = 1)
+              else if (if x!06 = (epsilon x:byte. to_int x = 1)
                        then epsilon x:byte. to_int x = 1 else epsilon x:byte.
                        to_int x = 127) =
                       (epsilon x:byte. to_int x = 127)
@@ -158,12 +185,12 @@ File jlamp_projections.mlw:
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     b = {f= epsilon x:byte. to_int x = 127; g= true}
     Execution of main function `p4` with env:
-      to_int = fun (x!03:byte) ->
-                if (if x!03 = (epsilon x:byte. to_int x = 1) then epsilon x:
+      to_int = fun (x!06:byte) ->
+                if (if x!06 = (epsilon x:byte. to_int x = 1) then epsilon x:
                     byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
                    (epsilon x:byte. to_int x = 1)
                 then 1
-                else if (if x!03 = (epsilon x:byte. to_int x = 1)
+                else if (if x!06 = (epsilon x:byte. to_int x = 1)
                          then epsilon x:byte. to_int x = 1 else epsilon x:
                          byte. to_int x = 127) =
                         (epsilon x:byte. to_int x = 127)
@@ -183,6 +210,23 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
+      zero = 0
+      one = 1
+      to_int = fun (x!06:byte) ->
+                if (if x!06 = (epsilon x:byte. to_int x = 1) then epsilon x:
+                    byte. to_int x = 1 else epsilon x:byte. to_int x = 127) =
+                   (epsilon x:byte. to_int x = 1)
+                then 1
+                else if (if x!06 = (epsilon x:byte. to_int x = 1)
+                         then epsilon x:byte. to_int x = 1 else epsilon x:
+                         byte. to_int x = 127) =
+                        (epsilon x:byte. to_int x = 127)
+                     then 127 else 3
+      x = epsilon x:byte. to_int x = 127
+      y = epsilon x:byte. to_int x = 1
+      b = {f= epsilon x:byte. to_int x = 127; g= true}
+      o = epsilon x:byte. to_int x = 1
+      o = epsilon x:byte. to_int x = 127
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
 

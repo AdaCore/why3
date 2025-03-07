@@ -45,6 +45,11 @@ File ref.mlw:
 File if_assign.mlw:
   Line 10:
     Property failure at postcondition of `f` with:
+      zero = 0
+      one = 1
+      x = {contents= 42}
+      _a = 0
+      result = 42
       result = 42
 
 <check_ce:categorization>Categorizations of models:
@@ -94,6 +99,11 @@ File ref.mlw:
 File if_assign.mlw:
   Line 16:
     Property failure at postcondition of `fTest1` with:
+      zero = 0
+      one = 1
+      x = {contents= 42}
+      a = 0
+      result = 42
       result = 42
 
 <check_ce:categorization>Categorizations of models:
@@ -135,6 +145,11 @@ File if_assign.mlw:
       y = 0
   Line 28:
     Property failure at assertion with:
+      zero = 0
+      one = 1
+      x = {contents= 42}
+      a = 0
+      _ = ()
       x = {contents= 42}
 
 File "bench/check-ce/if_assign.mlw", line 30, characters 23-30:
@@ -184,5 +199,10 @@ File if_assign.mlw:
       v = 18
   Line 25:
     Property failure at postcondition of `fTest2` with:
+      zero = 0
+      one = 1
+      x = {contents= 18}
+      a = (- 1)
+      result = 17
       result = 17
 

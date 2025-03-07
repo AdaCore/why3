@@ -41,6 +41,16 @@ File map_of_algebraic.mlw:
            fun (x!0:int) -> if x!0 = 2 then Freeable else Freeable}
       x = {base_addr= 2; offset= (0:t)}
     Property failure at precondition of `load_val` with:
+      zero = 0
+      one = 1
+      m = {block_size= fun (x!0:int) -> (0:t);
+           mem_access_address=
+           fun (x!0:int) -> if x!0 = 2 then Freeable else Freeable}
+      x = {base_addr= 2; offset= (0:t)}
+      m = {block_size= fun (x!0:int) -> (0:t);
+           mem_access_address=
+           fun (x!0:int) -> if x!0 = 2 then Freeable else Freeable}
+      x = {base_addr= 2; offset= (0:t)}
       Writable = UNDEFINED
       m = {block_size= fun (x!0:int) -> (0:t);
            mem_access_address=
