@@ -501,7 +501,7 @@ let rac_execute ctx rs =
         Pp.print_option_or_default "unknown location" Loc.pp_position in
       let reason = asprintf "%s at %a" reason print_oloc l in
       Res_stuck reason, Log.flush_log ctx.cntr_env.log_uc
-  | Cannot_decide (ctx,_terms,reason) ->
+  | Cannot_decide (ctx,_terms,reason) when not (Debug.test_flag Debug.stack_trace) ->
       let reason = sprintf "terminated because %s" reason in
       Res_incomplete reason, Log.flush_log ctx.cntr_env.log_uc
   | FatalRACError (log, x) when not (Debug.test_flag Debug.stack_trace) ->
@@ -558,12 +558,26 @@ let id_name {id_string= name; id_attrs= attrs} =
 let concrete_of_ls ls =
   ls.ls_name.id_string
 
+let concrete_bv_of_bigint bv_value bv_length =
+  let bv_verbatim = Format.asprintf "#b%a" (Number.print_in_base 2 (Some bv_length)) bv_value 
+  in {bv_value; bv_length; bv_verbatim}
+
 let concrete_of_constant c ty =
   let open Ty in
   let open Number in
   match c with
-  | Constant.ConstInt (Number.{ il_kind = _; il_int } as int_value) ->
+  | Constant.ConstInt (Number.{ il_kind = _; il_int } as int_value) when Ty.ty_equal ty Ty.ty_int ->
     concrete_const (Integer {int_value;
+                    int_verbatim= BigInt.to_string il_int })
+  | Constant.ConstInt (Number.{ il_kind = _; il_int } as int_value) (* Then it is a bitvector *) ->
+      let ts = match ty.ty_node with | Tyapp (ts, _) -> ts | _ -> assert false in
+      let _  = begin match ts.ts_def with
+      | Range r -> r
+      | _ -> assert false
+      end
+      in
+      (* FIXME Produce a BitVector if possible *)
+      concrete_const (Integer {int_value;
                     int_verbatim= BigInt.to_string il_int })
   | Constant.ConstReal rconst when Ty.ty_equal ty Ty.ty_real ->
     concrete_const (Real {real_value = rconst;
@@ -577,30 +591,18 @@ let concrete_of_constant c ty =
       end
       in
       let sign,exp,mant = Number.compute_float r fp in
-      let float_sign = {bv_value = BigInt.of_int (if sign then 1 else 0);
-                  bv_length = 1;
-                  bv_verbatim = if sign then "1" else "0"} in
-      let float_exp = {bv_value = exp;
-                 bv_length = fp.fp_exponent_digits;
-                 bv_verbatim = BigInt.to_string exp} in
-      let float_mant = {bv_value = mant;
-                  bv_length = fp.fp_significand_digits - 1;
-                  bv_verbatim = BigInt.to_string mant} in
-      let t_concrete_float_const v =
-        concrete_const (
-          Float {
-            float_exp_size = fp.fp_exponent_digits;
-            float_significand_size = fp.fp_significand_digits;
-            float_val = v
-          })
+      let float_sign = concrete_bv_of_bigint (BigInt.of_int (if sign then 1 else 0)) 1 in
+      let float_exp = concrete_bv_of_bigint exp fp.fp_exponent_digits in
+      let float_mant = concrete_bv_of_bigint mant (fp.fp_significand_digits - 1) in
+      let f = Float_number { float_sign; float_exp; float_mant;
+          float_hex= "" (* TODO *) }
       in
-      t_concrete_float_const
-                  (Float_number {
-                    float_sign;
-                    float_exp;
-                    float_mant;
-                    float_hex= "" (* TODO *)
-                  })
+      concrete_const (
+        Float {
+          float_exp_size = fp.fp_exponent_digits;
+          float_significand_size = fp.fp_significand_digits;
+          float_val = f
+        })
   | Constant.ConstStr s -> concrete_const (String s)
 
 (* Also converts some concrete epsilon terms (was previously done in model_parser):

@@ -757,13 +757,16 @@ let get_and_register_param ctx id ity =
   register_used_value ctx.env id.id_loc id value;
   value
 
-(* For globals, RAC_Stuck exceptions that indicate invalid model values are
+(* For globals, exceptions that indicate invalid model values are
    referred lazily until their value is required in RAC or in the task. *)
 let get_and_register_global check_model_variable ctx exec_expr id oexp post ity =
   let ctx_desc = asprintf "global `%a`" print_decoded id.id_string in
   let gens = [
     gen_model_variable ~check:check_model_variable ctx id ity;
     gen_eval_expr ctx exec_expr id oexp;
+    (* FIXME: Try to use the post of globally defined constants with ensure clauses
+    gen_from_post ctx post;
+    gen_type_default ~really:true ~posts:post ctx ity; *)
   ] in
   try
     let value = get_value' ctx.env.log_uc ctx_desc id.id_loc gens in
@@ -773,7 +776,7 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
       let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
       check_assume_posts ctx.rac cntr_ctx value post );
     lazy value
-  with FatalRACError _ | Cannot_evaluate _ | Stuck _ as e ->
+  with FatalRACError _ | Cannot_evaluate _ | Stuck _ | Cannot_decide _ as e ->
     (* We should not need to capture these exceptions if this function was not
        executed on logic constants and logic functions. *)
     lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
