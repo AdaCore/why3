@@ -1525,12 +1525,11 @@ let pdecl_impl inst uc d =
      List.fold_left decl_impl uc d.pd_pure
   | _ -> uc
 
-let rec mi_impl e mi =
+let transpose_inst cl1 cl2 mdest mi =
   let aux fold add empty findk findv m =
-    fold (fun k v m -> add (findk impl_cl k) (findv impl_cl v) m) m empty in
-  let mi_mod = mod_impl e mi.mi_mod in
+    fold (fun k v m -> try add (findk cl1 k) (findv cl2 v) m with Not_found -> m) m empty in
   {
-    mi_mod = mi_mod;
+    mi_mod = mdest;
     mi_ty = aux Mts.fold Mts.add Mts.empty cl_find_ts clone_ity mi.mi_ty;
     mi_ts = aux Mts.fold Mts.add Mts.empty cl_find_ts cl_find_its mi.mi_ts;
     mi_ls = aux Mls.fold Mls.add Mls.empty cl_find_ls cl_find_ls mi.mi_ls;
@@ -1542,6 +1541,10 @@ let rec mi_impl e mi =
     mi_xs = aux Mxs.fold Mxs.add Mxs.empty cl_find_xs cl_find_xs mi.mi_xs;
     mi_df = mi.mi_df;
   }
+
+let rec mi_impl e mi =
+  let mi_mod = mod_impl e mi.mi_mod in
+  transpose_inst impl_cl impl_cl mi_mod mi
 
 and unit_impl e inst uc = function
   | Udecl d -> pdecl_impl inst uc d
