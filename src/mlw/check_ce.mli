@@ -195,3 +195,6 @@ val debug_check_ce_rac_results : Debug.flag
 val debug_check_ce_categorization : Debug.flag
 (** Print the result of the categorization computed from the results of
     the concrete and abstract RAC executions. *)
+
+val warn_concrete_term : Loc.warning_id
+(** Warn about failures when creating a concrete counterexample *)
