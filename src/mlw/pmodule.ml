@@ -1542,6 +1542,13 @@ let transpose_inst cl1 cl2 mdest mi =
     mi_df = mi.mi_df;
   }
 
+let clone_meta_arg cl = function
+  | MAty ty -> MAty (clone_ty cl ty)
+  | MAts ts -> MAts (cl_find_ts cl ts)
+  | MAls ls -> MAls (cl_find_ls cl ls)
+  | MApr pr -> MApr (cl_find_pr cl pr)
+  | a -> a
+
 let rec mi_impl e mi =
   let mi_mod = mod_impl e mi.mi_mod in
   transpose_inst impl_cl impl_cl mi_mod mi
@@ -1551,12 +1558,7 @@ and unit_impl e inst uc = function
   | Uuse m -> use_export uc (mod_impl e m)
 
   | Umeta (m, al) ->
-     begin try add_meta uc m (List.map (function
-       | MAty ty -> MAty (clone_ty impl_cl ty)
-       | MAts ts -> MAts (cl_find_ts impl_cl ts)
-       | MAls ls -> MAls (cl_find_ls impl_cl ls)
-       | MApr pr -> MApr (cl_find_pr impl_cl pr)
-       | a -> a) al)
+     begin try add_meta uc m (List.map (clone_meta_arg impl_cl) al)
      with Not_found -> uc end
 
   | Uscope (n, ul) ->
@@ -1607,12 +1609,7 @@ let clone_export' ?loc uc m inst cl =
           mi_df = mi.mi_df}
         with Not_found -> uc end
     | Umeta (m,al) ->
-        begin try add_meta uc m (List.map (function
-          | MAty ty -> MAty (clone_ty cl ty)
-          | MAts ts -> MAts (cl_find_ts cl ts)
-          | MAls ls -> MAls (cl_find_ls cl ls)
-          | MApr pr -> MApr (cl_find_pr cl pr)
-          | a -> a) al)
+        begin try add_meta uc m (List.map (clone_meta_arg cl) al)
         with Not_found -> uc end
     | Uscope (n,ul) ->
         let uc = open_scope uc n in
