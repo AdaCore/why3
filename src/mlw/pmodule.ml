@@ -1592,6 +1592,21 @@ and mod_impl e m =
          m
        end
 
+let inst_of_clones m pk df cl =
+  let local id _ = Sid.mem id m.mod_local in
+  {
+    mi_mod = m;
+    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
+    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
+    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
+    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
+    mi_pk  = pk;
+    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
+    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
+    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
+    mi_df  = df
+  }
+
 let clone_export' ?loc uc m inst cl =
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl loc inst cl uc d
@@ -1616,18 +1631,7 @@ let clone_export' ?loc uc m inst cl =
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
   let uc = List.fold_left add_unit uc m.mod_units in
-  let local id _ = Sid.mem id m.mod_local in
-  let mi = {
-    mi_mod = m;
-    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
-    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
-    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
-    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
-    mi_pk  = inst.mi_pk;
-    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
-    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
-    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
-    mi_df  = inst.mi_df} in
+  let mi = inst_of_clones m inst.mi_pk inst.mi_df cl in
   add_clone uc mi
 
 let clone_export ?loc uc m inst =
