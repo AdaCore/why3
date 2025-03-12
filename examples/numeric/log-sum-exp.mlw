@@ -6,24 +6,19 @@ module RealHelpers
   use real.ExpLog
   use real.Abs
 
+  (** helper lemma: exp x <= 1 + 2x for 0 <= x <= 1*)
   let ghost exp_bound_1 (x:real)
     requires { 0.0 <= x <= 1.0 }
-    ensures { abs (2.0 * x - exp x) <= 1.0 }
-  = ()
+    ensures { exp x - 2.0 * x <= 1.0 }
+  = () (* proof is done using Rocq + Interval *)
 
   (** helper lemma: log(1+x) <= - log(1-x) *)
   let ghost log_1_minus_x (x:real)
     requires { 0.0 <= x < 1.0 }
     ensures { log (1.0 + x) <= - log (1.0 - x) }
   =
-    assert { exp (- log (1.0 - x)) = 1.0 / (1.0 - x)
-      by exp (- log (1.0 - x)) = 1.0 / (exp (log (1.0 - x))) };
-    assert {
-      1.0 + x <= 1.0 / (1.0 - x) by
-      (1.0 + x) * (1.0 - x) = 1.0 - x * x <= 1.0
-      so
-      1.0 + x = (1.0 + x) * (1.0 - x) / (1.0 - x) <= 1.0 / (1.0 - x)
-    }
+    assert { (1.0 + x) * (1.0 - x) = 1.0 - x * x <= 1.0 };
+    assert { log ((1.0 + x) * (1.0 - x)) <= log 1.0 }
 
 end
 
@@ -44,21 +39,21 @@ module RealSummations
     ensures { 0. <=. sum f a b }
   = if a < b then sum_pos f a (b - 1)
 
-  (** lemma: bounds on summations *)
+  (** Lemma: bounds on summations *)
   let rec ghost sum_bounds (min max:real) (f:int -> real) (a b:int)
     requires { a <= b /\ forall i. a <= i < b -> min <=. f i <=. max }
     variant { b - a }
     ensures { from_int (b-a) *. min <=. sum f a b <=. from_int (b-a) *. max }
   = if (a < b) then sum_bounds min max f a (b - 1)
 
-  (** lemma: summations of absolute values *)
+  (** Lemma: summations of absolute values *)
   let rec ghost sum_abs (f: int -> real) (a b: int)
     variant { b - a }
     requires { a <= b }
     ensures { abs (sum f a b) <=. sum (f_abs f) a b }
   = if a < b then sum_abs f a (b - 1)
 
-  (** lemma: summation of positive values is positive *)
+  (** Lemma: summation of positive values is positive *)
   let rec ghost sum_strictly_pos (f: int -> real) (a b:int)
     variant { b - a }
     requires { a < b }
@@ -66,7 +61,7 @@ module RealSummations
     ensures { 0. <. sum f a b }
   = if a < b-1 then sum_strictly_pos f a (b - 1)
 
-  (* lemma: summation of values with errors *)
+  (* Lemma: summation of values with errors *)
   let rec ghost sum_accuracy (rel_err abs_err:real) (f g:int -> real) (a b:int)
     requires { a <= b }
     requires { forall i. a <= i < b -> abs (g i -. f i) <=. abs (f i) *. rel_err +. abs_err }
@@ -102,12 +97,11 @@ let rec function u_sum (a: int -> udouble) (n: int) : udouble
 = if n <= 0 then uzero else uadd (u_sum a (n-1)) (a (n-1))
 
 
-(** accuracy theorem for summations *)
-
 use real.FromInt
 use real.Sum
 use RealSummations
 
+(** Accuracy theorem for summations *)
 let rec ghost u_sum_accuracy (a:int -> udouble) (n:int)
   requires { 0 <= n }
   variant { n  }
@@ -117,22 +111,22 @@ let rec ghost u_sum_accuracy (a:int -> udouble) (n:int)
 =
 if n <= 1 then (* base case, trivial *) return ();
 (* induction *)
-u_sum_accuracy a (n-1); (** recursive call to obtain induction hypothesis *)
+u_sum_accuracy a (n-1); (* recursive call to obtain induction hypothesis *)
 let exact_sum = sum (f_to_real a) 0 (n-1) in (* sum in real numbers *)
 let abs_sum = sum (f_abs_to_real a) 0 (n-1) in (* sum of absolute values *)
 begin ensures { abs exact_sum <=. abs_sum }
   sum_abs (f_to_real a) 0 (n-1);
 end;
-let psum : udouble = u_sum a (n-1) in      (* the previous sum, in udouble *)
-let res : udouble = uadd psum (a (n-1)) in (* the final sum, in udouble *)
+let psum : udouble = u_sum a (n-1) in        (* the previous sum, in udouble *)
+let res : udouble = uadd psum (a (n-1)) in   (* the final sum, in udouble *)
 let s : real = to_real psum in               (* the previous sum, in real *)
 let anm1 = to_real (a (n-1)) in              (* the last element as a real *)
 let delta = to_real res -. (s +. anm1) in    (* the difference to bound *)
 begin (* additional property (5) *)
   ensures { abs delta <=. eps *. (abs_sum +. from_int (n-1) *. abs anm1) }
-  if abs anm1 <=. eps *. abs_sum then (** case 1 of the proof, trivial *) () else
+  if abs anm1 <=. eps *. abs_sum then (* case 1 of the proof, trivial *) () else
   begin
-    (** case 2 of the proof *)
+    (* case 2 of the proof *)
     (* we know eps *. abs_sum <. abs anm1 *)
     assert { abs (s +. anm1) <=. abs (s -. exact_sum) +. abs abs_sum +. abs anm1 };
     assert { from_int (n-2) *. (eps *. abs_sum) <=. from_int (n-2) *. abs anm1 }
@@ -147,7 +141,7 @@ assert { abs (to_real (u_sum a n) -. sum (f_to_real a) 0 n)
 
 
 
-(* Corollary: bounds on sums *)
+(** Corollary: bounds on sums *)
 let ghost u_sum_constant_bounds (max:real) (a:int -> udouble) (n:int)
     requires { 0 <= n }
     requires { 0. <=. max }
@@ -269,7 +263,7 @@ use ufloat.UDouble
 use RealSummations
 use FloatSummations
 use UExpLog
-use RealHelpers as RH
+use RealHelpers as RealHelpers
 
   (** lemma: error propagation through log *)
   let ghost log_combine_err (x x_approx a b :real)
@@ -285,7 +279,8 @@ use RealHelpers as RH
     begin
       ensures { log x_approx -. log x <=. -. log (1.0 -. err) }
       assert { log x_approx <=. log (x *. (1. +. err)) };
-      RH.log_1_minus_x err;
+      (** invoke lemma on reals *)
+      RealHelpers.log_1_minus_x err;
     end;
     begin
       ensures { log x_approx -. log x >=. -. (-. log (1.0 -. err)) }
@@ -301,20 +296,15 @@ function f_exp (a:int -> udouble) : int -> real =
 function f_uexp (a: int -> udouble) : int -> udouble =
     fun i -> u_exp (a i)
 
-(** Sum of approximate exponentials
-    [u_sum_of_u_exp(a,n) = exp a(0) + ... + exp a(n-1)] *)
-function u_sum_of_u_exp (a: int -> udouble) (n:int) : udouble =
-  u_sum (f_uexp a) n
-
 (** The LSE function itself, exact computation
     [lse(a,n) = log (exp a(0) + ... + exp a(n-1))] *)
 function lse_exact (f : int -> udouble) (n : int) : real =
   log (sum (f_exp f) 0 n)
 
 function u_lse [@inline:trivial] (a: int -> udouble) (size:int) : udouble
-  = u_log (u_sum_of_u_exp a size)
+  = u_log (u_sum (f_uexp a) size)
 
-(** theorem: LSE accuracy *)
+(** First main theorem: LSE accuracy *)
 let ghost lse_accuracy (a:int -> udouble) (n:int) (a_max:real)
   requires { 1 <= n }
   requires { from_int (n-1) *. eps <=. 0x1p-2 }
@@ -408,11 +398,11 @@ module SLSE
 
  constant a_eps : real = eps *. (1.0 +. 4.0 *. sqr (1.0 +. eps)) /. 2.0
 
- (* Hypothesis for accuracy of g *)
+ (** Hypothesis for accuracy of g *)
   predicate g_hypothesis (rho:udouble) (a_max:real) =
    sqr (2.0 *. a_max +. abs (to_real rho)) *. (0.5 +. a_eps) +. 1.5 *. eta <=. exp_max_value
 
-  use ufloat.UDoubleLemmas as HL
+  use ufloat.UDoubleLemmas as UDoubleLemmas
 
   let ghost g_accuracy (x y rho : udouble) (a_max : real)
     requires { abs (to_real x) <=. a_max }
@@ -433,7 +423,7 @@ module SLSE
   begin ensures {
      abs (to_real u_a -. a) <=. 2. *. eps *. a'
   }
-    HL.usub_double_error_propagation (uadd x rho) y u_a
+    UDoubleLemmas.usub_double_error_propagation (uadd x rho) y u_a
       (to_real x +. to_real rho) (abs (to_real x +. to_real rho))
       eps 0.0 (to_real y) (abs (to_real y)) 0.0 0.0;
   end;
@@ -444,7 +434,7 @@ module SLSE
   begin ensures {
     abs (to_real u_b -. b) <=. 2.0 *. a_eps *. b' +. eta
   }
-    HL.umul_double_error_propagation u_a u_a u_b
+    UDoubleLemmas.umul_double_error_propagation u_a u_a u_b
       a a' (2. *. eps) 0.0 a a' (2. *. eps) 0.0
   end;
   let c = b /. 2.0 in
@@ -454,7 +444,7 @@ module SLSE
   begin ensures {
     abs (to_real u_c -. c) <=. a_eps *. c' +. 1.5 *. eta
   }
-    HL.udiv_exact_double_error_propagation u_b utwo u_c b b' (2.0 *. a_eps) eta
+    UDoubleLemmas.udiv_exact_double_error_propagation u_b utwo u_c b b' (2.0 *. a_eps) eta
   end;
   let d = -. c in
   let u_d = uminus u_c in
@@ -483,7 +473,7 @@ module SLSE
   begin ensures {
     abs (to_real u_e -. e) <=. error *. e
   }
-   HL.exp_double_error_propagation u_e u_d d d' exp_error 0.0 a_eps (1.5 *. eta);
+   UDoubleLemmas.exp_double_error_propagation u_e u_d d d' exp_error 0.0 a_eps (1.5 *. eta);
   end;
   assert { u_g x y rho = u_e };
   assert { g x y rho = e }
@@ -494,16 +484,18 @@ module SLSE
   use RealSummations
   use FloatSummations
 
-(* (gi a rho i) j = g (a i) (a j) rho *)
+(** (gi a rho i) j = g (a i) (a j) rho *)
 let ghost function gi (a:int -> udouble) (rho : udouble) (i : int) : int -> real =
    (fun j -> g (a i) (a j) rho)
 
-(* (h a n rho) i = log2 (g (a i) (a 0) rho + ... g (a i) (a (n-1)) rho) *)
+(** (h a n rho) i = log2 (g (a i) (a 0) rho + ... g (a i) (a (n-1)) rho) *)
 let ghost function h (a:int -> udouble) (n:int) (rho : udouble) : int -> real =
    (fun i -> log2 (sum (gi a rho i) 0 n))
 
+(** Mathematical SLSE *)
 let ghost function slse (a:int -> udouble) (n:int) (rho:udouble) = sum (h a n rho) 0 n
 
+(** Mathematical sum of absolute partial sums *)
 let ghost function abs_slse (a:int -> udouble) (n:int) (rho:udouble) = sum (f_abs (h a n rho)) 0 n
 
 let function u_gi (a:int -> udouble) (rho : udouble) (i : int) : int -> udouble =
@@ -514,8 +506,8 @@ let function u_h (a:int -> udouble) (n:int) (rho : udouble) : int -> udouble =
 
 let function u_slse (a:int -> udouble) (n:int) (rho:udouble) = u_sum (u_h a n rho) n
 
- (* Hypothesis for accuracy of slse *)
- function g_max_error (rho:udouble) (a_max:real) : real =
+(** Hypothesis for accuracy of slse *)
+function g_max_error (rho:udouble) (a_max:real) : real =
     exp_error
     +. (exp (a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) +. 1.5 *. eta) -. 1.0)
       *. (1.0 +. exp_error)
@@ -527,7 +519,6 @@ use RealHelpers as RealHelpers
    ensures { 0.0 <=. g_max_error rho a_max <=. 0x9p-4 }
  = begin ensures { 0.0 <=. g_max_error rho a_max }
      sqr_non_neg (2.0 *. a_max +. abs(to_real rho));
-     (* assert { 0.0 <=. a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) +. 1.5 *. eta  }      *)
    end;
    begin ensures { g_max_error rho a_max <=. 0x9p-4 }
     assert { a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) <=. 2.0 *. a_eps *. exp_max_value };
@@ -538,7 +529,7 @@ use RealHelpers as RealHelpers
     assert { a_eps <=. 0x6p-54 };
     assert { 2.0 *. a_eps *. exp_max_value +. 1.5 *. eta <=. 0x1p-41 };
     begin ensures { exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0 <=. 0x1p-40 }
-      (* invoke a lemma from Why3 stdlib for reals *)
+      (* invoke a lemma on reals *)
       RealHelpers.exp_bound_1 (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta)
     end;
     assert { (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0) *. (1.0 +. exp_error) <=. 0x1p-39 };
@@ -554,7 +545,7 @@ use RealHelpers as RealHelpers
 
 
 
-(** theorem: SLSE accuracy *)
+(** Second main theorem: SLSE accuracy *)
 let ghost slse_accuracy (a:int -> udouble) (n:int) (rho:udouble) (a_max:real)
   requires { 1 <= n }
   requires { from_int (n-1) *. eps <=. 0x1p-2 }
@@ -574,9 +565,9 @@ let ghost slse_accuracy (a:int -> udouble) (n:int) (rho:udouble) (a_max:real)
   end;
   let ggg = gg +. from_int (n-1) *. eps *. (1.0 +. gg) in
   begin ensures { ggg <. 1.0 }
-     assert { from_int (n-1) *. eps <=. 0x1p-2 }; (* 1/4 *)
+     assert { from_int (n-1) *. eps <=. 0x1p-2 };                 (* 1/4 *)
      gg_bounds rho a_max;
-     assert { 1.0 +. gg <=. 0x19p-4 }; (* 25 / 16 *)
+     assert { 1.0 +. gg <=. 0x19p-4 };                            (* 25 / 16 *)
      assert { from_int (n-1) *. eps *. (1.0 +. gg) <=. 0x19p-6 }; (* 25 / 64 *)
      assert { gg +. from_int (n-1) *. eps *. (1.0 +. gg) <=. 0x9p-4 +. 0x19p-6  }
   end;
@@ -611,7 +602,7 @@ let ghost slse_accuracy (a:int -> udouble) (n:int) (rho:udouble) (a_max:real)
           end
         end
       in
-      (* invoke Lemma 4 *)
+      (* invoke generalized accuracy for summations *)
       u_sum_accuracy_combine gg 0.0 (gi a rho i) (u_gi a rho i) n;
       assert { f_abs (gi a rho i) = gi a rho i };
       begin ensures { sum (gi a rho i) 0 n >. 0.0 }
@@ -621,7 +612,7 @@ let ghost slse_accuracy (a:int -> udouble) (n:int) (rho:udouble) (a_max:real)
          abs (to_real (u_sum (u_gi a rho i) n) -. sum (gi a rho i) 0 n) <=.
             ggg *. sum (gi a rho i) 0 n
         };
-      (* propagation through log2 *)
+      (* error propagation through log2 *)
       begin ensures { 0.0 <. to_real (u_sum (u_gi a rho i) n) }
         assert { to_real (u_sum (u_gi a rho i) n) >=. (1.0 -. ggg) *. sum (gi a rho i) 0 n };
         sum_strictly_pos (gi a rho i) 0 n;
@@ -644,17 +635,15 @@ let ghost slse_accuracy (a:int -> udouble) (n:int) (rho:udouble) (a_max:real)
                     by slse_hypothesis rho a_max n }
         end
       end;
-      HL.log2_double_error_propagation_simple
+      UDoubleLemmas.log2_double_error_propagation_simple
         (u_log2 (u_sum (u_gi a rho i) n))
         (u_sum (u_gi a rho i) n)
         (sum (gi a rho i) 0 n)
         log2_error
         ggg
   in
-  u_sum_accuracy_combine (* (rel_err abs_err : real)
-      (f : int -> real) (f': int -> udouble) (n:int) *)
-    log2_error
-    (-. log2 (1.0 -. ggg) *. (1.0 +. log2_error))
+  (* another invocation of generalized accuracy for summations *)
+  u_sum_accuracy_combine log2_error (-. log2 (1.0 -. ggg) *. (1.0 +. log2_error))
     (h a n rho) (u_h a n rho) n
 
 end
