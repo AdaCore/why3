@@ -1637,6 +1637,12 @@ let clone_export' ?loc uc m inst cl =
 let clone_export ?loc uc m inst =
   clone_export' ?loc uc m inst (cl_init m inst)
 
+let copy_module e ?(path=[]) id m =
+  let muc = create_module e ~path id in
+  let inst_axiom = { (empty_mod_inst m) with mi_df = Paxiom } in
+  let muc = clone_export muc m inst_axiom in
+  close_module muc
+
 exception InvalidUnit
 exception SymbolNotFound of string
 
@@ -1711,10 +1717,7 @@ let close_module_with_intf muc intf =
   let id_str =
     Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
   let id = { muc.muc_theory.uc_name with pre_name = id_str } in
-  let intf' = create_module muc.muc_env ~path:muc.muc_theory.uc_path id in
-  let inst_axiom = { (empty_mod_inst intf) with mi_df = Paxiom } in
-  let intf' = clone_export intf' intf inst_axiom in
-  let intf = close_module intf' in
+  let intf = copy_module muc.muc_env ~path:muc.muc_theory.uc_path id intf in
   let inst = intf_mod_inst muc intf in
   let mimpl = close_module muc in
   let mimpl' = mod_impl'' muc.muc_env mimpl in
