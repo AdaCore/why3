@@ -568,6 +568,7 @@ module Log = struct
                 "reason", String reason;
                 "state", List (List.concat [List.map (key_value id2string) (Mid.bindings mid);
                                             List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs);
+                                            List.map (key_value vs2string) (Mvs.bindings mvs);
                                             List.map (key_value_or_undefined ls2string) (Mls.bindings mls)])
               ]
         | Exec_stucked (reason,mid) ->

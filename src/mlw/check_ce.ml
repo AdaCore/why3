@@ -942,17 +942,14 @@ let rec value_to_concrete_term known_map v =
 (** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
     this function fills the missing information to create a model element *)
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
-  ignore loc;
-  if id.id_string <> "zero" && id.id_string <> "one" then
-    let dummy_term = Term.t_true in
-    let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-    Some {me_concrete_value;
-          me_lsymbol = dummy_ls;
-          me_kind = Other;
-          me_value = dummy_term;
-          me_location = loc;
-          me_attrs = id.id_attrs}
-  else None
+  let dummy_term = Term.t_true in
+  let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
+  {me_concrete_value;
+   me_lsymbol = dummy_ls;
+   me_kind = Other;
+   me_value = dummy_term;
+   me_location = loc;
+   me_attrs = id.id_attrs}
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
     ~desc:"Print original counterexample model when --check-ce"
@@ -979,8 +976,8 @@ let model_of_exec_log ~known_map ~prover_model log =
     match search_model_element_for_id prover_model ~loc id with
   | Some me -> Some {me with me_concrete_value = value_to_concrete_term known_map value}
   | None ->
-      model_element_of_unmatched_log_entry ~loc id
-        (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty
+      Some (model_element_of_unmatched_log_entry ~loc id
+        (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty)
     with Concrete_term_failure msg -> Loc.warning warn_concrete_term "%s" msg;
       None
   in
