@@ -1807,10 +1807,8 @@ let open_module ?intf ({id_str = nm; id_loc = loc} as id) =
   let slice = Stack.top state in
   if Mstr.mem nm slice.file then Loc.errorm ~loc
     "module %s is already defined in this file" nm;
-  let id = if intf = None
-           then create_user_id id
-           else id_user (nm ^ "'impl") loc in
-  let muc = create_module slice.env ~path:slice.path id in
+  let id = if intf = None then id else { id with id_str = nm ^ "'impl" } in
+  let muc = create_module slice.env ~path:slice.path (create_user_id id) in
   slice.muc <- Some muc;
   slice.muc_intf <- None;
   if Debug.test_noflag debug_parse_only then begin
@@ -1909,7 +1907,7 @@ let close_module loc =
        let muc = close_scope ~import:false muc in
        let id_str =
          Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
-       let id = id_fresh id_str in
+       let id = { muc.muc_theory.uc_name with pre_name = id_str } in
        let m' = create_module slice.env ~path:slice.path id in
        let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in
        let m' = clone_export m' mintf inst_axiom in
@@ -1918,7 +1916,7 @@ let close_module loc =
        let m = Loc.try1 ~loc close_module muc in
        (* Not sure about this *)
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m.mod_theory.th_name;
+         Glob.def ~kind:"theory" m'.mod_theory.th_name;
        slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file;
        mod_impl_register slice.env m' m inst;
        slice.file <- Mstr.add id_str m' slice.file
