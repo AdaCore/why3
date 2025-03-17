@@ -1913,12 +1913,11 @@ let close_module loc =
        let m' = clone_export m' mintf inst_axiom in
        let m' = close_module m' in
        let inst = intf_mod_inst muc m' in
-       let m = Loc.try1 ~loc close_module muc in
+       let m = Loc.try3 ~loc close_module_with_intf muc m' inst in
        (* Not sure about this *)
        if Debug.test_flag Glob.flag then
          Glob.def ~kind:"theory" m'.mod_theory.th_name;
        slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file;
-       mod_impl_register slice.env m' m inst;
        slice.file <- Mstr.add id_str m' slice.file
   end;
   slice.muc <- None;

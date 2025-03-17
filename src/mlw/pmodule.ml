@@ -1637,8 +1637,9 @@ let clone_export' ?loc uc m inst cl =
 let clone_export ?loc uc m inst =
   clone_export' ?loc uc m inst (cl_init m inst)
 
-let mod_impl_register e m mimpl inst =
-  let mimpl' = mod_impl'' e mimpl in
+let close_module_with_intf muc mintf inst =
+  let mimpl = close_module muc in
+  let mimpl' = mod_impl'' muc.muc_env mimpl in
   let mimpl' = open_scope mimpl' "some'scope" in
   let inst = {
       mi_mod = inst.mi_mod;
@@ -1652,12 +1653,13 @@ let mod_impl_register e m mimpl inst =
       mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
       mi_df = inst.mi_df
     } in
-  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
-  let mimpl' = clone_export' mimpl' m inst impl_cl in
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local mintf.mod_local;
+  let mimpl' = clone_export' mimpl' mintf inst impl_cl in
   let mimpl' = close_scope mimpl' ~import:false in
   let mimpl' = close_module mimpl' in
   Wid.set mod_table mimpl.mod_theory.th_name mimpl';
-  Wid.set mod_table m.mod_theory.th_name mimpl'
+  Wid.set mod_table mintf.mod_theory.th_name mimpl';
+  mimpl
 
 (** {2 WhyML language} *)
 
