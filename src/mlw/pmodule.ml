@@ -1702,21 +1702,20 @@ let intf_mod_inst muc intf =
   let ns_tuc = List.hd muc.muc_theory.uc_export in
   aux_units ns_muc ns_tuc (empty_mod_inst intf) intf.mod_units
 
-let close_module_with_intf muc mintf =
-  let inst = intf_mod_inst muc mintf in
+let close_module_with_intf muc intf =
+  let inst = intf_mod_inst muc intf in
   let muc =
-    open_scope muc (mintf.mod_theory.th_name.id_string^"'impl_of") in
-  let muc = clone_export muc mintf inst in
+    open_scope muc (intf.mod_theory.th_name.id_string^"'impl_of") in
+  let muc = clone_export muc intf inst in
   let muc = close_scope ~import:false muc in
   let id_str =
     Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
   let id = { muc.muc_theory.uc_name with pre_name = id_str } in
-  let m' = create_module muc.muc_env ~path:muc.muc_theory.uc_path id in
-  let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in
-  let m' = clone_export m' mintf inst_axiom in
-  let m' = close_module m' in
-  let inst = intf_mod_inst muc m' in
-  let mintf = m' in
+  let intf' = create_module muc.muc_env ~path:muc.muc_theory.uc_path id in
+  let inst_axiom = { (empty_mod_inst intf) with mi_df = Paxiom } in
+  let intf' = clone_export intf' intf inst_axiom in
+  let intf = close_module intf' in
+  let inst = intf_mod_inst muc intf in
   let mimpl = close_module muc in
   let mimpl' = mod_impl'' muc.muc_env mimpl in
   let inst = {
@@ -1731,14 +1730,14 @@ let close_module_with_intf muc mintf =
       mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
       mi_df = inst.mi_df
     } in
-  impl_cl.cl_local <- Sid.union impl_cl.cl_local mintf.mod_local;
+  impl_cl.cl_local <- Sid.union impl_cl.cl_local intf.mod_local;
   let mimpl' = open_scope mimpl' "some'scope" in
-  let mimpl' = clone_export' mimpl' mintf inst impl_cl in
+  let mimpl' = clone_export' mimpl' intf inst impl_cl in
   let mimpl' = close_scope mimpl' ~import:false in
   let mimpl' = close_module mimpl' in
   Wid.set mod_table mimpl.mod_theory.th_name mimpl';
-  Wid.set mod_table mintf.mod_theory.th_name mimpl';
-  mintf, mimpl
+  Wid.set mod_table intf.mod_theory.th_name mimpl';
+  intf, mimpl
 
 (** {2 WhyML language} *)
 
