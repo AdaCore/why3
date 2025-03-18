@@ -1709,38 +1709,22 @@ let intf_mod_inst muc intf =
   aux_units ns_muc ns_tuc (empty_mod_inst intf) intf.mod_units
 
 let close_module_with_intf muc intf =
-  let inst = intf_mod_inst muc intf in
-  let muc =
-    open_scope muc (intf.mod_theory.th_name.id_string^"'impl_of") in
-  let muc = clone_export muc intf inst in
-  let muc = close_scope ~import:false muc in
   let id_str =
     Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
   let id = { muc.muc_theory.uc_name with pre_name = id_str } in
   let intf = copy_module muc.muc_env ~path:muc.muc_theory.uc_path id intf in
-  let inst = intf_mod_inst muc intf in
   let mimpl = close_module muc in
-  let mimpl' = mod_impl'' muc.muc_env mimpl in
-  let inst = {
-      mi_mod = inst.mi_mod;
-      mi_ty = Mts.map (clone_ity impl_cl) inst.mi_ty;
-      mi_ts = Mts.map (cl_find_its impl_cl) inst.mi_ts;
-      mi_ls = Mls.map (cl_find_ls impl_cl) inst.mi_ls;
-      mi_pr = Mpr.map (cl_find_pr impl_cl) inst.mi_pr;
-      mi_pk = inst.mi_pk;
-      mi_pv = Mvs.map (cl_find_pv impl_cl) inst.mi_pv;
-      mi_rs = Mrs.map (cl_find_rs impl_cl) inst.mi_rs;
-      mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
-      mi_df = inst.mi_df
-    } in
-  impl_cl.cl_local <- Sid.union impl_cl.cl_local intf.mod_local;
-  let mimpl' = open_scope mimpl' "some'scope" in
-  let mimpl' = clone_export' mimpl' intf inst impl_cl in
-  let mimpl' = close_scope mimpl' ~import:false in
-  let mimpl' = close_module mimpl' in
+  let muc = mod_impl'' muc.muc_env mimpl in
+  let mimpl' =
+    let inst = intf_mod_inst muc intf in
+    let muc = open_scope muc (intf.mod_theory.th_name.id_string^"'impl_of") in
+    impl_cl.cl_local <- Sid.union impl_cl.cl_local inst.mi_mod.mod_local;
+    let muc = clone_export' muc intf inst impl_cl in
+    let muc = close_scope ~import:false muc in
+    close_module muc in
   Wid.set mod_table mimpl.mod_theory.th_name mimpl';
   Wid.set mod_table intf.mod_theory.th_name mimpl';
-  intf, mimpl
+  intf, mimpl'
 
 (** {2 WhyML language} *)
 
