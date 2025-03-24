@@ -167,15 +167,18 @@ let all_split_subp c subp =
    Gnat_checks.clear ()
 
 let maybe_giant_step_rac ctr parent models =
+  let th =
+    parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
+    Session_itp.theory_name |> Theory.restore_theory in
+  let pm = Pmodule.restore_module th in
   if not Gnat_config.giant_step_rac then
-    List.map (fun (_,a)-> (a, None)) models
+    begin match Check_ce.last_nonempty_model th.th_known models with
+    | None -> []
+    | Some m -> [(m, None)]
+    end
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
-    let pm =
-      parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
-      Session_itp.theory_name |> Theory.restore_theory |> Pmodule.restore_module
-    in
     let rac_limits = Call_provers.empty_limits in
     let rac_limits =
       match Option.map float_of_int Gnat_config.rac_timelimit with
