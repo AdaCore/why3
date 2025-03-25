@@ -946,7 +946,8 @@ let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
   let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
   {me_concrete_value;
    me_lsymbol = dummy_ls;
-   me_kind = Other;
+   (* TODO we should provide the Sattr of the VC term here *)
+   me_kind = Model_parser.compute_kind Ident.Sattr.empty loc id.id_attrs;
    me_value = dummy_term;
    me_location = loc;
    me_attrs = id.id_attrs}
@@ -974,7 +975,10 @@ let model_of_exec_log ~known_map ~prover_model log =
     we have no term and no lsymbol!)*)
     try
     match search_model_element_for_id prover_model ~loc id with
-  | Some me -> Some {me with me_concrete_value = value_to_concrete_term known_map value}
+  | Some me ->
+      Some {me with
+            me_concrete_value = value_to_concrete_term known_map value;
+            me_attrs = id.id_attrs}
   | None ->
       Some (model_element_of_unmatched_log_entry ~loc id
         (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty)
