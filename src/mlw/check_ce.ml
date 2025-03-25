@@ -981,7 +981,10 @@ let model_of_exec_log ~known_map ~prover_model log =
     we have no term and no lsymbol!)*)
     try
     match search_model_element_for_id prover_model ~loc id with
-  | Some me -> Some {me with me_concrete_value = value_to_concrete_term known_map value}
+  | Some me ->
+      Some {me with
+            me_concrete_value = value_to_concrete_term known_map value;
+            me_attrs = id.id_attrs}
   | None ->
       model_element_of_unmatched_log_entry ~loc id
         (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty
