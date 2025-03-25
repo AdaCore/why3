@@ -74,8 +74,6 @@ let make_board () =
 
 (* Solver *)
 
-open Why3extract
-
 let display_sol rows a =
   for i=0 to 8 do
     for j=0 to 8 do
