@@ -111,12 +111,12 @@ let alt_ergo : Whyconf.config_prover =
 (* END{getanyaltergo} *)
 
 (* BEGIN{getaltergo200} *)
-(* Specific version 2.5.4 of Alt-Ergo in the config file *)
+(* Specific version 2.6.0 of Alt-Ergo in the config file *)
 let _ : Whyconf.config_prover =
-  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.5.4" in
+  let fp = Whyconf.parse_filter_prover "Alt-Ergo,2.6.0" in
   let provers = Whyconf.filter_provers config fp in
   if Whyconf.Mprover.is_empty provers then begin
-      eprintf "Prover Alt-Ergo 2.5.4 not installed or not configured, using version %s instead@."
+      eprintf "Prover Alt-Ergo 2.6.0 not installed or not configured, using version %s instead@."
         Whyconf.(alt_ergo.prover.prover_version) ;
     alt_ergo (* we don't want to fail this time *)
   end else
