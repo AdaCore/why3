@@ -18,11 +18,9 @@ File 615.mlw:
     t = 0
     x = (- 1)
     Execution of main function `f` with env:
-      t = 0
-      x = (- 1)
+      { lsenv = []; vsenv = [ t = 0, x = (- 1) ]; rsenv = []; idenv = [] }
   Line 3:
-    Property failure at check with:
-      t = 0
-      x = (- 1)
-      x = (- 1)
+    Property failure at check with env:
+      { lsenv = []; vsenv = [ t = 0, x = (- 1) ]; rsenv = [];
+        idenv = [ x = (- 1) ] }
 

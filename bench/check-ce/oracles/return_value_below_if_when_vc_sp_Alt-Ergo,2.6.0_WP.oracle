@@ -20,20 +20,13 @@ File return_value_below_if_when_vc_sp.mlw:
     b = true
     y = 42
     Execution of main function `f` with env:
-      b = true
-      y = 42
+      { lsenv = []; vsenv = [ b = true, y = 42 ]; rsenv = []; idenv = [] }
   Line 8:
-    (giant-step) execution of unimplemented function `bool_neq`
-      x = 42
-      y = 0
+    (giant-step) execution of unimplemented function `bool_neq` with args:
+      [ x = 42, y = 0 ]
     result of `bool_neq` = true
   Line 7:
-    Property failure at postcondition of `f` with:
-      b = true
-      y = 42
-      result = true
-      True = UNDEFINED
-      b = true
-      y = 42
-      result = true
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ b = true, y = 42, result = true ]; rsenv = [];
+        idenv = [ True = UNDEFINED, b = true, y = 42, result = true ] }
 

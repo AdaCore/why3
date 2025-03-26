@@ -13,33 +13,28 @@ The program does not comply to the verification goal, for example during the
 File if_decision_branch.mlw:
   Line 8:
     Constant path_selector initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {sel_path= false}
-    path_selector = {sel_path= false}
+    (giant-step) execution of unimplemented function with args: []
+    result = { sel_path = false }
+    path_selector = { sel_path = false }
   Line 18:
     a = 5
     a = 5
     Execution of main function `f` with env:
-      path_selector = {sel_path= false}
-      a = 5
+      { lsenv = []; vsenv = [ path_selector = { sel_path = false }, a = 5 ];
+        rsenv = []; idenv = [] }
   Line 22:
-    Normal execution of function `(=)` with args:
-      x = 5
-      y = 1
+    Normal execution of function `(=)` with args: [ x = 5, y = 1 ]
     Normal execution of function `sel_path` with args:
-      arg = {sel_path= false}
+      [ arg = { sel_path = false } ]
   Line 25:
-    Normal execution of function `True` with args:
+    Normal execution of function `True` with args: []
   Line 27:
-    Normal execution of function `(=)` with args:
-      x = 5
-      y = 5
+    Normal execution of function `(=)` with args: [ x = 5, y = 5 ]
     Normal execution of function `sel_path` with args:
-      arg = {sel_path= true}
+      [ arg = { sel_path = true } ]
   Line 19:
-    Property failure at postcondition of `f` with:
-      path_selector = {sel_path= true}
-      a = 5
-      result = 15
-      result = 15
+    Property failure at postcondition of `f` with env:
+      { lsenv = [];
+        vsenv = [ path_selector = { sel_path = true }, a = 5, result = 15 ];
+        rsenv = []; idenv = [ result = 15 ] }
 

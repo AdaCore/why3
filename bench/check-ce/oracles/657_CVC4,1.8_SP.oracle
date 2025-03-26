@@ -15,17 +15,17 @@ File 657.mlw:
     i = (2147483648:t)
     i = (2147483648:t)
     Execution of main function `ok` with env:
-      i = (2147483648:t)
-    (giant-step) execution of unimplemented function `toBig`
-      _ = (2147483648:t)
+      { lsenv = []; vsenv = [ i = (2147483648:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `toBig` with args:
+      [ _ = (2147483648:t) ]
     result of `toBig` = (2147483648:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (2147483648:t1)
-    Property failure at precondition of `u` with:
-      i = (2147483648:t1)
-      i = (2147483648:t)
-      o = (2147483648:t1)
-      i = (2147483648:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (2147483648:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = [];
+        vsenv =
+          [ i = (2147483648:t1), i = (2147483648:t), o = (2147483648:t1) ];
+        rsenv = []; idenv = [ i = (2147483648:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -44,17 +44,17 @@ File 657.mlw:
     i = (1073741824:t)
     i = (1073741824:t)
     Execution of main function `ko` with env:
-      i = (1073741824:t)
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (1073741824:t)
+      { lsenv = []; vsenv = [ i = (1073741824:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (1073741824:t) ]
     result of `stoBig` = (1073741824:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (1073741824:t1)
-    Property failure at precondition of `u` with:
-      i = (1073741824:t1)
-      i = (1073741824:t)
-      o = (1073741824:t1)
-      i = (1073741824:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (1073741824:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = [];
+        vsenv =
+          [ i = (1073741824:t1), i = (1073741824:t), o = (1073741824:t1) ];
+        rsenv = []; idenv = [ i = (1073741824:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -73,13 +73,13 @@ File 657.mlw:
     i = (2147483648:t)
     i = (2147483648:t)
     Execution of main function `ko2` with env:
-      i = (2147483648:t)
+      { lsenv = []; vsenv = [ i = (2147483648:t) ]; rsenv = []; idenv = [] }
   Line 13:
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (2147483648:t)
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (2147483648:t) ]
     result of `stoBig` = (18446744071562067968:t1)
-    Property failure at postcondition of `ko2` with:
-      i = (2147483648:t)
-      result = (18446744071562067968:t1)
-      result = (18446744071562067968:t1)
+    Property failure at postcondition of `ko2` with env:
+      { lsenv = [];
+        vsenv = [ i = (2147483648:t), result = (18446744071562067968:t1) ];
+        rsenv = []; idenv = [ result = (18446744071562067968:t1) ] }
 

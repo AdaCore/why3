@@ -16,21 +16,20 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File array_mono.mlw:
   Line 35:
-    a = {elts= UNDEFINED; length= 0}
-    a = {elts= UNDEFINED; length= 0}
+    a = { elts = UNDEFINED; length = 0 }
+    a = { elts = UNDEFINED; length = 0 }
     Execution of main function `f1` with env:
-      a = {elts= UNDEFINED; length= 0}
+      { lsenv = []; vsenv = [ a = { elts = UNDEFINED; length = 0 } ];
+        rsenv = []; idenv = [] }
   Line 36:
-    (giant-step) execution of unimplemented function `([])`
-      a = {elts= UNDEFINED; length= 0}
-      i = 0
-    Property failure at precondition of `([])` with:
-      a = {elts= UNDEFINED; length= 0}
-      i = 0
-      a = {elts= UNDEFINED; length= 0}
-      o = 0
-      a = {elts= UNDEFINED; length= 0}
-      i = 0
+    (giant-step) execution of unimplemented function `([])` with args:
+      [ a = { elts = UNDEFINED; length = 0 }, i = 0 ]
+    Property failure at precondition of `([])` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { elts = UNDEFINED; length = 0 }, i = 0,
+            a = { elts = UNDEFINED; length = 0 }, o = 0 ]; rsenv = [];
+        idenv = [ a = { elts = UNDEFINED; length = 0 }, i = 0 ] }
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.

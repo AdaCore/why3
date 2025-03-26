@@ -22,28 +22,22 @@ The contracts of the following functions/loops are too weak :
 , for example during the following execution:
 File func_call1.mlw:
   Line 4:
-    z = {contents= 0}
+    z = { contents = 0 }
 Unknown location:
     _ = ()
 File func_call1.mlw:
   Line 13:
     _ = ()
     Execution of main function `f` with env:
-      z = {contents= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ z = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 15:
-    Giant-step execution of function `g` with args:
-      x = 2
-    z = {contents= 2}
+    Giant-step execution of function `g` with args: [ x = 2 ]
+    z = { contents = 2 }
     result of `g` = 3
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = 3
+    Normal execution of function `(+)` with args: [ _ = 3, _ = 3 ]
   Line 16:
-    Property failure at assertion with:
-      z = {contents= 2}
-      _ = ()
-      _ = ()
-      w = 6
-      z = {contents= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { contents = 2 }, _ = (), _ = (), w = 6 ];
+        rsenv = []; idenv = [ z = { contents = 2 } ] }
 

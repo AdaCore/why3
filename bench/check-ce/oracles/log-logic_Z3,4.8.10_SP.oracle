@@ -15,14 +15,13 @@ File log-logic.mlw:
     a = 43
   Line 12:
     Execution of main function `g1'goal` with env:
-      a = 43
+      { lsenv = [ a = 43 ]; vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 12:
-    Property failure at postcondition of `g1'goal` with:
-      a = 43
-      result = ()
+    Property failure at postcondition of `g1'goal` with env:
+      { lsenv = [ a = 43 ]; vsenv = [ result = () ]; rsenv = []; idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -43,16 +42,14 @@ File log-logic.mlw:
     b = 0
   Line 26:
     Execution of main function `g2'goal` with env:
-      a = 2
-      b = 0
+      { lsenv = [ a = 2, b = 0 ]; vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 26:
-    Property failure at postcondition of `g2'goal` with:
-      a = 2
-      b = 0
-      result = ()
+    Property failure at postcondition of `g2'goal` with env:
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ result = () ]; rsenv = [];
+        idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -75,19 +72,14 @@ File log-logic.mlw:
     x = 0
     x = 0
     Execution of main function `g3'goal` with env:
-      a = 2
-      b = 0
-      x = 0
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 37:
-    Property failure at postcondition of `g3'goal` with:
-      a = 2
-      b = 0
-      x = 0
-      result = ()
-      x = 0
+    Property failure at postcondition of `g3'goal` with env:
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ x = 0, result = () ]; rsenv = [];
+        idenv = [ x = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -110,18 +102,17 @@ File log-logic.mlw:
     f = fun (x!0:int) -> if x!0 = 2 then 43 else 43
   Line 53:
     Execution of main function `g4'goal` with env:
-      a = 2
-      b = 0
-      f = fun (x!0:int) -> if x!0 = 2 then 43 else 43
+      { lsenv =
+          [ a = 2, b = 0, f = fun (x!0:int) -> if x!0 = 2 then 43 else 43 ];
+        vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 53:
-    Property failure at postcondition of `g4'goal` with:
-      a = 2
-      b = 0
-      f = fun (x!0:int) -> if x!0 = 2 then 43 else 43
-      result = ()
+    Property failure at postcondition of `g4'goal` with env:
+      { lsenv =
+          [ a = 2, b = 0, f = fun (x!0:int) -> if x!0 = 2 then 43 else 43 ];
+        vsenv = [ result = () ]; rsenv = []; idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -159,21 +150,17 @@ File log-logic.mlw:
     x = 43
     x = 43
     Execution of main function `g6'goal` with env:
-      a = 0
-      b = 0
-      f = fun (x!0:int) -> if x!0 = 43 then 0 else 0
-      p = fun (x!0:int) -> if x!0 = 0 then True else True
-      x = 43
+      { lsenv =
+          [ a = 0, b = 0, f = fun (x!0:int) -> if x!0 = 43 then 0 else 0,
+            p = fun (x!0:int) -> if x!0 = 0 then True else True ];
+        vsenv = [ x = 43 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 80:
-    Property failure at postcondition of `g6'goal` with:
-      a = 0
-      b = 0
-      f = fun (x!0:int) -> if x!0 = 43 then 0 else 0
-      p = fun (x!0:int) -> if x!0 = 0 then True else True
-      x = 43
-      result = ()
-      x = 43
+    Property failure at postcondition of `g6'goal` with env:
+      { lsenv =
+          [ a = 0, b = 0, f = fun (x!0:int) -> if x!0 = 43 then 0 else 0,
+            p = fun (x!0:int) -> if x!0 = 0 then True else True ];
+        vsenv = [ x = 43, result = () ]; rsenv = []; idenv = [ x = 43 ] }
 

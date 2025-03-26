@@ -16,29 +16,23 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File func_call2.mlw:
   Line 4:
-    z = {contents= (- 1)}
+    z = { contents = (- 1) }
   Line 6:
     x = (- 1)
     x = (- 1)
     Execution of main function `g` with env:
-      z = {contents= (- 1)}
-      x = (- 1)
+      { lsenv = []; vsenv = [ z = { contents = (- 1) }, x = (- 1) ];
+        rsenv = []; idenv = [] }
   Line 10:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 1)}
-    Normal execution of function `(+)` with args:
-      _ = (- 1)
-      _ = 1
+      [ arg = { contents = (- 1) } ]
+    Normal execution of function `(+)` with args: [ _ = (- 1), _ = 1 ]
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = (- 1)
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = (- 1), _ = 1 ]
   Line 9:
-    Property failure at postcondition of `g` with:
-      z = {contents= 0}
-      x = (- 1)
-      z = {contents= (- 1)}
-      result = 0
-      x = (- 1)
-      result = 0
+    Property failure at postcondition of `g` with env:
+      { lsenv = [];
+        vsenv =
+          [ z = { contents = 0 }, x = (- 1), z = { contents = (- 1) },
+            result = 0 ]; rsenv = []; idenv = [ x = (- 1), result = 0 ] }
 

@@ -12,33 +12,36 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File record_map.mlw:
   Line 40:
-    map_rec = fun (x:bool) ->
-               if x = True then r'mk (- 1) True else r'mk 0 False
-    map_rec = fun (x:bool) ->
-               if x = True then r'mk (- 1) True else r'mk 0 False
+    map_rec =
+      fun (x:bool) -> if x = True then r'mk (- 1) True else r'mk 0 False
+    map_rec =
+      fun (x:bool) -> if x = True then r'mk (- 1) True else r'mk 0 False
     Execution of main function `map_record_proj_test1` with env:
-      map_rec = fun (x:bool) ->
-                 if x = True then r'mk (- 1) True else r'mk 0 False
+      { lsenv = [];
+        vsenv =
+          [ map_rec = fun (x:bool) ->
+                       if x = True then r'mk (- 1) True else r'mk 0 False ];
+        rsenv = []; idenv = [] }
   Line 43:
-    Normal execution of function `True` with args:
+    Normal execution of function `True` with args: []
     Normal execution of function `([])` with args:
-      f = fun (x:bool) -> if x = True then r'mk (- 1) True else r'mk 0 False
-      x = true
+      [ f = fun (x:bool) ->
+             if x = True then r'mk (- 1) True else r'mk 0 False, x = true ]
 File map.mlw:
   Line 17:
     Normal execution of function `(@)` with args:
-      u = fun (x:bool) -> if x = True then r'mk (- 1) True else r'mk 0 False
-      u = true
+      [ u = fun (x:bool) ->
+             if x = True then r'mk (- 1) True else r'mk 0 False, u = true ]
 File record_map.mlw:
   Line 43:
-    Normal execution of function `f` with args:
-      arg = r'mk (- 1) True
+    Normal execution of function `f` with args: [ arg = r'mk (- 1) True ]
   Line 41:
-    Property failure at postcondition of `map_record_proj_test1` with:
-      map_rec = fun (x:bool) ->
-                 if x = True then r'mk (- 1) True else r'mk 0 False
-      result = (- 1)
-      result = (- 1)
+    Property failure at postcondition of `map_record_proj_test1` with env:
+      { lsenv = [];
+        vsenv =
+          [ map_rec = fun (x:bool) ->
+                       if x = True then r'mk (- 1) True else r'mk 0 False,
+            result = (- 1) ]; rsenv = []; idenv = [ result = (- 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -54,33 +57,36 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File record_map.mlw:
   Line 45:
-    rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-               g_bool= true}
-    rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-               g_bool= true}
+    rec_map =
+      { f_map = fun (x:bool) -> if x = True then (- 1) else 0;
+        g_bool = true }
+    rec_map =
+      { f_map = fun (x:bool) -> if x = True then (- 1) else 0;
+        g_bool = true }
     Execution of main function `record_map_proj_test2` with env:
-      rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-                 g_bool= true}
+      { lsenv = [];
+        vsenv =
+          [ rec_map = { f_map = fun (x:bool) -> if x = True then (- 1) else 0;
+                        g_bool = true } ]; rsenv = []; idenv = [] }
   Line 48:
-    Normal execution of function `True` with args:
+    Normal execution of function `True` with args: []
     Normal execution of function `f_map` with args:
-      arg = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-             g_bool= true}
+      [ arg = { f_map = fun (x:bool) -> if x = True then (- 1) else 0;
+                g_bool = true } ]
     Normal execution of function `([])` with args:
-      f = fun (x:bool) -> if x = True then (- 1) else 0
-      x = true
+      [ f = fun (x:bool) -> if x = True then (- 1) else 0, x = true ]
 File map.mlw:
   Line 17:
     Normal execution of function `(@)` with args:
-      u = fun (x:bool) -> if x = True then (- 1) else 0
-      u = true
+      [ u = fun (x:bool) -> if x = True then (- 1) else 0, u = true ]
 File record_map.mlw:
   Line 46:
-    Property failure at postcondition of `record_map_proj_test2` with:
-      rec_map = {f_map= fun (x:bool) -> if x = True then (- 1) else 0;
-                 g_bool= true}
-      result = (- 1)
-      result = (- 1)
+    Property failure at postcondition of `record_map_proj_test2` with env:
+      { lsenv = [];
+        vsenv =
+          [ rec_map = { f_map = fun (x:bool) -> if x = True then (- 1) else 0;
+                        g_bool = true }, result = (- 1) ]; rsenv = [];
+        idenv = [ result = (- 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -96,18 +102,25 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File record_map.mlw:
   Line 50:
-    re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
+    re_rec_map = { f_map = fun (x:bool) -> 0; g_bool = false }
   Line 52:
-    rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
-    rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+    rec_map = { f_map = fun (x:bool) -> 0; g_bool = true }
+    rec_map = { f_map = fun (x:bool) -> 0; g_bool = true }
     Execution of main function `record_map_proj_test3` with env:
-      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
-      rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
+      { lsenv = [];
+        vsenv =
+          [ re_rec_map = { f_map = fun (x:bool) -> 0; g_bool = false },
+            rec_map = { f_map = fun (x:bool) -> 0; g_bool = true } ];
+        rsenv = []; idenv = [] }
   Line 53:
-    Property failure at postcondition of `record_map_proj_test3` with:
-      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
-      rec_map = {f_map= fun (x:bool) -> 0; g_bool= true}
-      result = {f_map= fun (x:bool) -> 0; g_bool= true}
-      re_rec_map = {f_map= fun (x:bool) -> 0; g_bool= false}
-      result = {f_map= fun (x:bool) -> 0; g_bool= true}
+    Property failure at postcondition of `record_map_proj_test3` with env:
+      { lsenv = [];
+        vsenv =
+          [ re_rec_map = { f_map = fun (x:bool) -> 0; g_bool = false },
+            rec_map = { f_map = fun (x:bool) -> 0; g_bool = true },
+            result = { f_map = fun (x:bool) -> 0; g_bool = true } ];
+        rsenv = [];
+        idenv =
+          [ re_rec_map = { f_map = fun (x:bool) -> 0; g_bool = false },
+            result = { f_map = fun (x:bool) -> 0; g_bool = true } ] }
 

@@ -18,15 +18,14 @@ File integers.mlw:
     x = 48
     x = 48
     Execution of main function `g_lab'goal` with env:
-      x = 48
+      { lsenv = []; vsenv = [ x = 48 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File integers.mlw:
   Line 5:
-    Property failure at postcondition of `g_lab'goal1` with:
-      x = 48
-      result = ()
-      x = 48
+    Property failure at postcondition of `g_lab'goal1` with env:
+      { lsenv = []; vsenv = [ x = 48, result = () ]; rsenv = [];
+        idenv = [ x = 48 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -48,15 +47,14 @@ File integers.mlw:
     x = 48
     x = 48
     Execution of main function `g_no_lab'goal` with env:
-      x = 48
+      { lsenv = []; vsenv = [ x = 48 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File integers.mlw:
   Line 7:
-    Property failure at postcondition of `g_no_lab'goal1` with:
-      x = 48
-      result = ()
-      x = 48
+    Property failure at postcondition of `g_no_lab'goal1` with env:
+      { lsenv = []; vsenv = [ x = 48, result = () ]; rsenv = [];
+        idenv = [ x = 48 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -80,17 +78,14 @@ File integers.mlw:
     x = 1
     x = 1
     Execution of main function `g2_lab'goal` with env:
-      g = 0
-      x = 1
+      { lsenv = [ g = 0 ]; vsenv = [ x = 1 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File integers.mlw:
   Line 11:
-    Property failure at postcondition of `g2_lab'goal1` with:
-      g = 0
-      x = 1
-      result = ()
-      x = 1
+    Property failure at postcondition of `g2_lab'goal1` with env:
+      { lsenv = [ g = 0 ]; vsenv = [ x = 1, result = () ]; rsenv = [];
+        idenv = [ x = 1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -126,34 +121,19 @@ File integers.mlw:
     x7 = 1
     x8 = 1
     Execution of main function `newgoal'goal` with env:
-      x8 = 1
-      x7 = 1
-      x6 = 1
-      x5 = 1
-      x4 = 1
-      x3 = 1
-      x2 = 1
-      x1 = 1
+      { lsenv = [];
+        vsenv =
+          [ x8 = 1, x7 = 1, x6 = 1, x5 = 1, x4 = 1, x3 = 1, x2 = 1, x1 = 1 ];
+        rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File integers.mlw:
   Line 22:
-    Property failure at postcondition of `newgoal'goal1` with:
-      x8 = 1
-      x7 = 1
-      x6 = 1
-      x5 = 1
-      x4 = 1
-      x3 = 1
-      x2 = 1
-      x1 = 1
-      result = ()
-      x8 = 1
-      x7 = 1
-      x6 = 1
-      x5 = 1
-      x4 = 1
-      x3 = 1
-      x2 = 1
-      x1 = 1
+    Property failure at postcondition of `newgoal'goal1` with env:
+      { lsenv = [];
+        vsenv =
+          [ x8 = 1, x7 = 1, x6 = 1, x5 = 1, x4 = 1, x3 = 1, x2 = 1, x1 = 1,
+            result = () ]; rsenv = [];
+        idenv =
+          [ x8 = 1, x7 = 1, x6 = 1, x5 = 1, x4 = 1, x3 = 1, x2 = 1, x1 = 1 ] }
 

@@ -15,23 +15,20 @@ File test_result_ce_value1.mlw:
     x = (- 1)
     x = (- 1)
     Execution of main function `test1` with env:
-      x = (- 1)
+      { lsenv = []; vsenv = [ x = (- 1) ]; rsenv = []; idenv = [] }
   Line 10:
-    (giant-step) execution of unimplemented function `id`
-      x = (- 1)
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = (- 1) ]
     result of `id` = 0
   Line 9:
-    (giant-step) execution of unimplemented function `id`
-      x = 0
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = 0 ]
     result of `id` = 41
-    Normal execution of function `(+)` with args:
-      _ = 41
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 41, _ = 1 ]
   Line 12:
-    Property failure at assertion with:
-      x = (- 1)
-      a = 42
-      a = 42
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = (- 1), a = 42 ]; rsenv = [];
+        idenv = [ a = 42 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -50,20 +47,17 @@ File test_result_ce_value1.mlw:
     x = (- 1)
     x = (- 1)
     Execution of main function `test1bis` with env:
-      x = (- 1)
+      { lsenv = []; vsenv = [ x = (- 1) ]; rsenv = []; idenv = [] }
   Line 15:
-    (giant-step) execution of unimplemented function `id`
-      x = (- 1)
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = (- 1) ]
     result of `id` = 0
-    (giant-step) execution of unimplemented function `id`
-      x = 0
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = 0 ]
     result of `id` = 41
-    Normal execution of function `(+)` with args:
-      _ = 41
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 41, _ = 1 ]
   Line 16:
-    Property failure at assertion with:
-      x = (- 1)
-      a = 42
-      a = 42
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = (- 1), a = 42 ]; rsenv = [];
+        idenv = [ a = 42 ] }
 

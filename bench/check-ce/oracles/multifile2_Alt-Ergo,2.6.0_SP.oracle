@@ -19,17 +19,14 @@ File multifile2.mlw:
     x = (- 2)
     x = (- 2)
     Execution of main function `f` with env:
-      x = (- 2)
+      { lsenv = []; vsenv = [ x = (- 2) ]; rsenv = []; idenv = [] }
   Line 9:
-    Giant-step execution of function `incr` with args:
-      x = (- 2)
+    Giant-step execution of function `incr` with args: [ x = (- 2) ]
     result of `incr` = 0
   Line 8:
-    Property failure at postcondition of `f` with:
-      x = (- 2)
-      result = 0
-      x = (- 2)
-      result = 0
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ x = (- 2), result = 0 ]; rsenv = [];
+        idenv = [ x = (- 2), result = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -51,37 +48,26 @@ File multifile2.mlw:
     x = 0
     x = 0
     Execution of main function `g` with env:
-      x = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 14:
-    Normal execution of function `incr` with args:
-      x = 0
+    Normal execution of function `incr` with args: [ x = 0 ]
 File multifile1.mlw:
   Line 11:
-    Normal execution of function `decr` with args:
-      x = 0
+    Normal execution of function `decr` with args: [ x = 0 ]
   Line 7:
-    Normal execution of function `(-)` with args:
-      x = 0
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 0, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = (-1) ]
 File multifile1.mlw:
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = (-1)
-      _ = 2
+    Normal execution of function `(+)` with args: [ _ = (-1), _ = 2 ]
 File multifile2.mlw:
   Line 13:
-    Property failure at postcondition of `g` with:
-      x = 0
-      result = 1
-      x = 0
-      result = 1
+    Property failure at postcondition of `g` with env:
+      { lsenv = []; vsenv = [ x = 0, result = 1 ]; rsenv = [];
+        idenv = [ x = 0, result = 1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -103,15 +89,13 @@ File multifile2.mlw:
     x = (- 3)
     x = (- 3)
     Execution of main function `h` with env:
-      x = (- 3)
+      { lsenv = []; vsenv = [ x = (- 3) ]; rsenv = []; idenv = [] }
   Line 19:
-    (giant-step) execution of unimplemented function `incr_val`
-      x = (- 3)
+    (giant-step) execution of unimplemented function `incr_val` with args:
+      [ x = (- 3) ]
     result of `incr_val` = 0
   Line 18:
-    Property failure at postcondition of `h` with:
-      x = (- 3)
-      result = 0
-      x = (- 3)
-      result = 0
+    Property failure at postcondition of `h` with env:
+      { lsenv = []; vsenv = [ x = (- 3), result = 0 ]; rsenv = [];
+        idenv = [ x = (- 3), result = 0 ] }
 

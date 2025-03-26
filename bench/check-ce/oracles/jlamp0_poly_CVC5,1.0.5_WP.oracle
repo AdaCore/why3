@@ -12,42 +12,36 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0_poly.mlw:
   Line 6:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 8:
-    b = {contents= 3}
-    b = {contents= 3}
+    b = { contents = 3 }
+    b = { contents = 3 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 3}
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 3 } ];
+        rsenv = []; idenv = [] }
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 3}
+    Normal execution of function `(!)` with args: [ r = { contents = 3 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      [ arg = { contents = 3 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 0}
+    Normal execution of function `(!)` with args: [ r = { contents = 0 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 3
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 3 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 3
+      [ r = { contents = 0 }, v = 3 ]
   Line 12:
-    Property failure at assertion with:
-      a = {contents= 3}
-      b = {contents= 3}
-      _ = ()
-      a = {contents= 3}
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 3 }, b = { contents = 3 }, _ = () ];
+        rsenv = []; idenv = [ a = { contents = 3 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -63,77 +57,61 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0_poly.mlw:
   Line 6:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 8:
-    b = {contents= 10}
-    b = {contents= 10}
+    b = { contents = 10 }
+    b = { contents = 10 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 10}
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 10 } ];
+        rsenv = []; idenv = [] }
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 10}
+    Normal execution of function `(!)` with args: [ r = { contents = 10 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 10}
+      [ arg = { contents = 10 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 0}
+    Normal execution of function `(!)` with args: [ r = { contents = 0 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 10
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 10 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 10
+      [ r = { contents = 0 }, v = 10 ]
   Line 13:
-    Normal execution of function `(!)` with args:
-      r = {contents= 10}
+    Normal execution of function `(!)` with args: [ r = { contents = 10 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 10}
+      [ arg = { contents = 10 } ]
 File jlamp0_poly.mlw:
   Line 13:
-    Normal execution of function `(>=)` with args:
-      x = 10
-      y = 10
-    Normal execution of function `(!)` with args:
-      r = {contents= 10}
+    Normal execution of function `(>=)` with args: [ x = 10, y = 10 ]
+    Normal execution of function `(!)` with args: [ r = { contents = 10 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 10}
+      [ arg = { contents = 10 } ]
 File jlamp0_poly.mlw:
   Line 13:
-    Normal execution of function `(-)` with args:
-      x = 10
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 10, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 10
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 10, _ = (-1) ]
 File jlamp0_poly.mlw:
   Line 13:
     Normal execution of function `(:=)` with args:
-      r = {contents= 10}
-      v = 9
+      [ r = { contents = 10 }, v = 9 ]
   Line 10:
-    Property failure at postcondition of `p1` with:
-      a = {contents= 9}
-      b = {contents= 10}
-      result = ()
-      a = {contents= 9}
+    Property failure at postcondition of `p1` with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 9 }, b = { contents = 10 }, result = () ];
+        rsenv = []; idenv = [ a = { contents = 9 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -149,55 +127,46 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0_poly.mlw:
   Line 6:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 8:
-    b = {contents= 5}
-    b = {contents= 5}
+    b = { contents = 5 }
+    b = { contents = 5 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 5}
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 5 } ];
+        rsenv = []; idenv = [] }
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 5}
+    Normal execution of function `(!)` with args: [ r = { contents = 5 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 5}
+      [ arg = { contents = 5 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 0}
+    Normal execution of function `(!)` with args: [ r = { contents = 0 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
 File jlamp0_poly.mlw:
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 5
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 5 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 5
+      [ r = { contents = 0 }, v = 5 ]
   Line 13:
-    Normal execution of function `(!)` with args:
-      r = {contents= 5}
+    Normal execution of function `(!)` with args: [ r = { contents = 5 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 5}
+      [ arg = { contents = 5 } ]
 File jlamp0_poly.mlw:
   Line 13:
-    Normal execution of function `(>=)` with args:
-      x = 5
-      y = 10
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(>=)` with args: [ x = 5, y = 10 ]
+    Normal execution of function `Tuple0` with args: []
   Line 10:
-    Property failure at postcondition of `p1` with:
-      a = {contents= 5}
-      b = {contents= 5}
-      result = ()
-      a = {contents= 5}
+    Property failure at postcondition of `p1` with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 5 }, b = { contents = 5 }, result = () ];
+        rsenv = []; idenv = [ a = { contents = 5 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -213,32 +182,30 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0_poly.mlw:
   Line 6:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 15:
     Constant c initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    c = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    c = { contents = 0 }
 Unknown location:
     _ = ()
 File jlamp0_poly.mlw:
   Line 17:
     _ = ()
     Execution of main function `p2` with env:
-      a = {contents= 0}
-      c = {contents= 0}
-      _ = ()
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 0 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 20:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 1
+      [ r = { contents = 0 }, v = 1 ]
   Line 22:
-    Property failure at loop invariant init with:
-      a = {contents= 0}
-      c = {contents= 1}
-      _ = ()
-      _ = ()
-      c = {contents= 1}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { contents = 0 }, c = { contents = 1 }, _ = (), _ = () ];
+        rsenv = []; idenv = [ c = { contents = 1 } ] }
 
 File "bench/check-ce/jlamp0_poly.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
@@ -271,29 +238,27 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp0_poly.mlw:
   Line 6:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 15:
-    c = {contents= 10}
+    c = { contents = 10 }
 Unknown location:
     _ = ()
 File jlamp0_poly.mlw:
   Line 17:
     _ = ()
     Execution of main function `p2` with env:
-      a = {contents= 0}
-      c = {contents= 10}
-      _ = ()
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 10 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 20:
     Normal execution of function `(:=)` with args:
-      r = {contents= 10}
-      v = 1
+      [ r = { contents = 10 }, v = 1 ]
   Line 22:
-    Property failure at loop invariant init with:
-      a = {contents= 0}
-      c = {contents= 1}
-      _ = ()
-      _ = ()
-      c = {contents= 1}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { contents = 0 }, c = { contents = 1 }, _ = (), _ = () ];
+        rsenv = []; idenv = [ c = { contents = 1 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

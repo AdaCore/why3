@@ -162,262 +162,219 @@ The program does not comply to the verification goal, for example during the
 File rgf-R1.mlw:
   Line 24:
     Execution of main function `f` with env:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
+      { lsenv = [];
+        vsenv =
+          [ a = { length = 2;
+                  elts =
+                    fun (x!0:int) ->
+                     if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ];
+        rsenv = []; idenv = [] }
   Line 32:
     Normal execution of function `length` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-    Normal execution of function `(-)` with args:
-      x = 2
-      y = 1
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ]
+    Normal execution of function `(-)` with args: [ x = 2, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 2
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 2, _ = (-1) ]
 File rgf-R1.mlw:
   Line 32:
-    Normal execution of function `int_ref` with args:
-      i = 1
+    Normal execution of function `int_ref` with args: [ i = 1 ]
 File lib.mlw:
   Line 12:
-    Normal execution of function `int_ref'mk` with args:
-      contents = 1
+    Normal execution of function `int_ref'mk` with args: [ contents = 1 ]
 File rgf-R1.mlw:
   Line 33:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 33:
-    Normal execution of function `(>=)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `(>=)` with args: [ x = 1, y = 1 ]
     Normal iteration of loop
   Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 36:
-    Normal execution of function `(-)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 1, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = (-1) ]
 File rgf-R1.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-      i = 0
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 },
+        i = 0 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9
-      u = 0
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9, 
+        u = 0 ]
 File rgf-R1.mlw:
   Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 },
+        i = 1 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9
-      u = 1
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9, 
+        u = 1 ]
 File rgf-R1.mlw:
   Line 36:
-    Normal execution of function `(<=)` with args:
-      x = (- 175)
-      y = 400
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(<=)` with args: [ x = (- 175), y = 400 ]
+    Normal execution of function `Tuple0` with args: []
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File rgf-R1.mlw:
   Line 39:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 39:
-    Normal execution of function `(=)` with args:
-      x = 1
-      y = 0
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(=)` with args: [ x = 1, y = 0 ]
+    Normal execution of function `Tuple0` with args: []
   Line 40:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 40:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 },
+        i = 1 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9
-      u = 1
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9, 
+        u = 1 ]
 File rgf-R1.mlw:
   Line 40:
-    Normal execution of function `(+)` with args:
-      _ = (- 175)
-      _ = 1
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(+)` with args: [ _ = (- 175), _ = 1 ]
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 40:
     Normal execution of function `([]<-)` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-      i = 1
-      v = (-174)
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 },
+        i = 1, v = (-174) ]
 File lib.mlw:
   Line 48:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ]
 File rgf-R1.mlw:
   Line 41:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R1.mlw:
   Line 41:
     Normal execution of function `g` with args:
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
-                                                             if x!0 = 0
-                                                             then 400
-                                                             else if 
-                                                                  x!0 = 1
-                                                                  then (- 175)
-                                                                  else 9}
-      i = 1
-    Property failure at precondition of `g` with:
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
-                                                             if x!0 = 0
-                                                             then 400
-                                                             else if 
-                                                                  x!0 = 1
-                                                                  then (- 175)
-                                                                  else 9}
-      i = 1
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
-                                                             if x!0 = 0
-                                                             then 400
-                                                             else if 
-                                                                  x!0 = 1
-                                                                  then (- 175)
-                                                                  else 9}
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
-                                                             if x!0 = 0
-                                                             then 400
-                                                             else if 
-                                                                  x!0 = 1
-                                                                  then (- 175)
-                                                                  else 9}
-      i = {contents= 1}
-      _ = ()
-      _ = ()
-      _ = ()
-      o = 1
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9}
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = (-174), elts1 = fun (x!0:int) ->
-                                                             if x!0 = 0
-                                                             then 400
-                                                             else if 
-                                                                  x!0 = 1
-                                                                  then (- 175)
-                                                                  else 9}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                  (-174), elts1 =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 },
+        i = 1 ]
+    Property failure at precondition of `g` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      (-174), elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 400
+                       else if x!0 = 1 then (- 175) else 9 }, i = 1,
+            a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      (-174), elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 400
+                       else if x!0 = 1 then (- 175) else 9 },
+            a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      (-174), elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 400
+                       else if x!0 = 1 then (- 175) else 9 },
+            i = { contents = 1 }, _ = (), _ = (), _ = (), o = 1,
+            a = { length = 2;
+                  elts =
+                    fun (x!0:int) ->
+                     if x!0 = 0 then 400 else if x!0 = 1 then (- 175) else 9 } ];
+        rsenv = [];
+        idenv =
+          [ a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      (-174), elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 400
+                       else if x!0 = 1 then (- 175) else 9 }, i = 1 ] }
 
 File "bench/check-ce/petiot2018/experiments/rgf-R1.mlw", line 41, characters 2-8:
 Sub-goal Precondition of goal f'vc.
@@ -455,412 +412,315 @@ The program does not comply to the verification goal, for example during the
 File rgf-R4.mlw:
   Line 24:
     Execution of main function `f` with env:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
+      { lsenv = [];
+        vsenv =
+          [ a = { length = 2;
+                  elts =
+                    fun (x!0:int) ->
+                     if x!0 = 0 then 0
+                     else if x!0 = (- 21188) then 19676
+                          else if x!0 = (- 14351) then 29950
+                               else if x!0 = (- 15809) then 1769
+                                    else if x!0 = 1 then 0
+                                         else if x!0 = (- 1) then (- 1)
+                                              else 27 } ]; rsenv = [];
+        idenv = [] }
   Line 32:
     Normal execution of function `length` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 0
-              else if x!0 = (- 21188) then 19676
-                   else if x!0 = (- 14351) then 29950
-                        else if x!0 = (- 15809) then 1769
-                             else if x!0 = 1 then 0
-                                  else if x!0 = (- 1) then (- 1) else 27}
-    Normal execution of function `(-)` with args:
-      x = 2
-      y = 1
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 } ]
+    Normal execution of function `(-)` with args: [ x = 2, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 2
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 2, _ = (-1) ]
 File rgf-R4.mlw:
   Line 32:
-    Normal execution of function `int_ref` with args:
-      i = 1
+    Normal execution of function `int_ref` with args: [ i = 1 ]
 File lib.mlw:
   Line 12:
-    Normal execution of function `int_ref'mk` with args:
-      contents = 1
+    Normal execution of function `int_ref'mk` with args: [ contents = 1 ]
 File rgf-R4.mlw:
   Line 33:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 33:
-    Normal execution of function `(>=)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `(>=)` with args: [ x = 1, y = 1 ]
     Normal iteration of loop
   Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 36:
-    Normal execution of function `(-)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 1, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = (-1) ]
 File rgf-R4.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
-      i = 0
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 0
+                 else if x!0 = (- 21188) then 19676
+                      else if x!0 = (- 14351) then 29950
+                           else if x!0 = (- 15809) then 1769
+                                else if x!0 = 1 then 0
+                                     else if x!0 = (- 1) then (- 1) else 27 },
+        i = 0 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 0
-              else if x!0 = (- 21188) then 19676
-                   else if x!0 = (- 14351) then 29950
-                        else if x!0 = (- 15809) then 1769
-                             else if x!0 = 1 then 0
-                                  else if x!0 = (- 1) then (- 1) else 27}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 0
-           else if x!0 = (- 21188) then 19676
-                else if x!0 = (- 14351) then 29950
-                     else if x!0 = (- 15809) then 1769
-                          else if x!0 = 1 then 0
-                               else if x!0 = (- 1) then (- 1) else 27
-      u = 0
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 0
+             else if x!0 = (- 21188) then 19676
+                  else if x!0 = (- 14351) then 29950
+                       else if x!0 = (- 15809) then 1769
+                            else if x!0 = 1 then 0
+                                 else if x!0 = (- 1) then (- 1) else 27,
+        u = 0 ]
 File rgf-R4.mlw:
   Line 36:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 36:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 0
+                 else if x!0 = (- 21188) then 19676
+                      else if x!0 = (- 14351) then 29950
+                           else if x!0 = (- 15809) then 1769
+                                else if x!0 = 1 then 0
+                                     else if x!0 = (- 1) then (- 1) else 27 },
+        i = 1 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 0
-              else if x!0 = (- 21188) then 19676
-                   else if x!0 = (- 14351) then 29950
-                        else if x!0 = (- 15809) then 1769
-                             else if x!0 = 1 then 0
-                                  else if x!0 = (- 1) then (- 1) else 27}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 0
-           else if x!0 = (- 21188) then 19676
-                else if x!0 = (- 14351) then 29950
-                     else if x!0 = (- 15809) then 1769
-                          else if x!0 = 1 then 0
-                               else if x!0 = (- 1) then (- 1) else 27
-      u = 1
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 0
+             else if x!0 = (- 21188) then 19676
+                  else if x!0 = (- 14351) then 29950
+                       else if x!0 = (- 15809) then 1769
+                            else if x!0 = 1 then 0
+                                 else if x!0 = (- 1) then (- 1) else 27,
+        u = 1 ]
 File rgf-R4.mlw:
   Line 36:
-    Normal execution of function `(<=)` with args:
-      x = 0
-      y = 0
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(<=)` with args: [ x = 0, y = 0 ]
+    Normal execution of function `Tuple0` with args: []
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File rgf-R4.mlw:
   Line 39:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 39:
-    Normal execution of function `(=)` with args:
-      x = 1
-      y = 0
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(=)` with args: [ x = 1, y = 0 ]
+    Normal execution of function `Tuple0` with args: []
   Line 40:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([])` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 0
+                 else if x!0 = (- 21188) then 19676
+                      else if x!0 = (- 14351) then 29950
+                           else if x!0 = (- 15809) then 1769
+                                else if x!0 = 1 then 0
+                                     else if x!0 = (- 1) then (- 1) else 27 },
+        i = 1 ]
 File lib.mlw:
   Line 43:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 0
-              else if x!0 = (- 21188) then 19676
-                   else if x!0 = (- 14351) then 29950
-                        else if x!0 = (- 15809) then 1769
-                             else if x!0 = 1 then 0
-                                  else if x!0 = (- 1) then (- 1) else 27}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 } ]
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then 0
-           else if x!0 = (- 21188) then 19676
-                else if x!0 = (- 14351) then 29950
-                     else if x!0 = (- 15809) then 1769
-                          else if x!0 = 1 then 0
-                               else if x!0 = (- 1) then (- 1) else 27
-      u = 1
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then 0
+             else if x!0 = (- 21188) then 19676
+                  else if x!0 = (- 14351) then 29950
+                       else if x!0 = (- 15809) then 1769
+                            else if x!0 = 1 then 0
+                                 else if x!0 = (- 1) then (- 1) else 27,
+        u = 1 ]
 File rgf-R4.mlw:
   Line 40:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 2
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 2 ]
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 40:
     Normal execution of function `([]<-)` with args:
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
-      i = 1
-      v = 2
+      [ a = { length = 2;
+              elts =
+                fun (x!0:int) ->
+                 if x!0 = 0 then 0
+                 else if x!0 = (- 21188) then 19676
+                      else if x!0 = (- 14351) then 29950
+                           else if x!0 = (- 15809) then 1769
+                                else if x!0 = 1 then 0
+                                     else if x!0 = (- 1) then (- 1) else 27 },
+        i = 1, v = 2 ]
 File lib.mlw:
   Line 48:
     Normal execution of function `elts` with args:
-      arg = {length= 2;
-             elts=
-             fun (x!0:int) ->
-              if x!0 = 0 then 0
-              else if x!0 = (- 21188) then 19676
-                   else if x!0 = (- 14351) then 29950
-                        else if x!0 = (- 15809) then 1769
-                             else if x!0 = 1 then 0
-                                  else if x!0 = (- 1) then (- 1) else 27}
+      [ arg = { length = 2;
+                elts =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 } ]
 File rgf-R4.mlw:
   Line 41:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File lib.mlw:
   Line 23:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File rgf-R4.mlw:
   Line 41:
     Normal execution of function `g` with args:
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
-                                                        if x!0 = 0 then 0
-                                                        else if x!0 =
-                                                                (- 21188)
-                                                             then 19676
-                                                             else if 
-                                                                  x!0 =
-                                                                  (- 14351)
-                                                                  then 29950
-                                                                  else 
-                                                                  if 
-                                                                  x!0 =
-                                                                  (- 15809)
-                                                                  then 1769
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = 1
-                                                                  then 0
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = (- 1)
-                                                                  then (- 1)
-                                                                  else 27}
-      i = 1
-    Property failure at precondition of `g` with:
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
-                                                        if x!0 = 0 then 0
-                                                        else if x!0 =
-                                                                (- 21188)
-                                                             then 19676
-                                                             else if 
-                                                                  x!0 =
-                                                                  (- 14351)
-                                                                  then 29950
-                                                                  else 
-                                                                  if 
-                                                                  x!0 =
-                                                                  (- 15809)
-                                                                  then 1769
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = 1
-                                                                  then 0
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = (- 1)
-                                                                  then (- 1)
-                                                                  else 27}
-      i = 1
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
-                                                        if x!0 = 0 then 0
-                                                        else if x!0 =
-                                                                (- 21188)
-                                                             then 19676
-                                                             else if 
-                                                                  x!0 =
-                                                                  (- 14351)
-                                                                  then 29950
-                                                                  else 
-                                                                  if 
-                                                                  x!0 =
-                                                                  (- 15809)
-                                                                  then 1769
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = 1
-                                                                  then 0
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = (- 1)
-                                                                  then (- 1)
-                                                                  else 27}
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
-                                                        if x!0 = 0 then 0
-                                                        else if x!0 =
-                                                                (- 21188)
-                                                             then 19676
-                                                             else if 
-                                                                  x!0 =
-                                                                  (- 14351)
-                                                                  then 29950
-                                                                  else 
-                                                                  if 
-                                                                  x!0 =
-                                                                  (- 15809)
-                                                                  then 1769
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = 1
-                                                                  then 0
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = (- 1)
-                                                                  then (- 1)
-                                                                  else 27}
-      i = {contents= 1}
-      _ = ()
-      _ = ()
-      _ = ()
-      o = 1
-      a = {length= 2;
-           elts=
-           fun (x!0:int) ->
-            if x!0 = 0 then 0
-            else if x!0 = (- 21188) then 19676
-                 else if x!0 = (- 14351) then 29950
-                      else if x!0 = (- 15809) then 1769
-                           else if x!0 = 1 then 0
-                                else if x!0 = (- 1) then (- 1) else 27}
-      a = {length= 2;
-           elts=
-           (fun j -> if j = i then v
-              else elts1 j) with i = 1, v = 2, elts1 = fun (x!0:int) ->
-                                                        if x!0 = 0 then 0
-                                                        else if x!0 =
-                                                                (- 21188)
-                                                             then 19676
-                                                             else if 
-                                                                  x!0 =
-                                                                  (- 14351)
-                                                                  then 29950
-                                                                  else 
-                                                                  if 
-                                                                  x!0 =
-                                                                  (- 15809)
-                                                                  then 1769
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = 1
-                                                                  then 0
-                                                                  else 
-                                                                  if 
-                                                                  x!0 = (- 1)
-                                                                  then (- 1)
-                                                                  else 27}
-      i = 1
+      [ a = { length = 2;
+              elts =
+                (fun j -> if j = i then v else elts1 j) with i = 1, v = 2,
+                  elts1 =
+                  fun (x!0:int) ->
+                   if x!0 = 0 then 0
+                   else if x!0 = (- 21188) then 19676
+                        else if x!0 = (- 14351) then 29950
+                             else if x!0 = (- 15809) then 1769
+                                  else if x!0 = 1 then 0
+                                       else if x!0 = (- 1) then (- 1) else 27 },
+        i = 1 ]
+    Property failure at precondition of `g` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      2, elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 0
+                       else if x!0 = (- 21188) then 19676
+                            else if x!0 = (- 14351) then 29950
+                                 else if x!0 = (- 15809) then 1769
+                                      else if x!0 = 1 then 0
+                                           else if x!0 = (- 1) then (- 1)
+                                                else 27 }, i = 1,
+            a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      2, elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 0
+                       else if x!0 = (- 21188) then 19676
+                            else if x!0 = (- 14351) then 29950
+                                 else if x!0 = (- 15809) then 1769
+                                      else if x!0 = 1 then 0
+                                           else if x!0 = (- 1) then (- 1)
+                                                else 27 },
+            a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      2, elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 0
+                       else if x!0 = (- 21188) then 19676
+                            else if x!0 = (- 14351) then 29950
+                                 else if x!0 = (- 15809) then 1769
+                                      else if x!0 = 1 then 0
+                                           else if x!0 = (- 1) then (- 1)
+                                                else 27 },
+            i = { contents = 1 }, _ = (), _ = (), _ = (), o = 1,
+            a = { length = 2;
+                  elts =
+                    fun (x!0:int) ->
+                     if x!0 = 0 then 0
+                     else if x!0 = (- 21188) then 19676
+                          else if x!0 = (- 14351) then 29950
+                               else if x!0 = (- 15809) then 1769
+                                    else if x!0 = 1 then 0
+                                         else if x!0 = (- 1) then (- 1)
+                                              else 27 } ]; rsenv = [];
+        idenv =
+          [ a = { length = 2;
+                  elts =
+                    (fun j -> if j = i then v else elts1 j) with i = 1, v =
+                      2, elts1 =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 0
+                       else if x!0 = (- 21188) then 19676
+                            else if x!0 = (- 14351) then 29950
+                                 else if x!0 = (- 15809) then 1769
+                                      else if x!0 = 1 then 0
+                                           else if x!0 = (- 1) then (- 1)
+                                                else 27 }, i = 1 ] }
 
 File "bench/check-ce/petiot2018/experiments/rgf-R4.mlw", line 41, characters 2-8:
 Sub-goal Precondition of goal f'vc.

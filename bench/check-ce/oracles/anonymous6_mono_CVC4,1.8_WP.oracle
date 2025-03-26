@@ -21,19 +21,15 @@ File anonymous6_mono.mlw:
   Line 7:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 8:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 9:
-    Giant-step execution of anonymous function with args:
-      z = {c= 0}
-    z = {c= 3}
+    Giant-step execution of anonymous function with args: [ z = { c = 0 } ]
+    z = { c = 3 }
     result = ()
   Line 10:
-    Property failure at assertion with:
-      _ = ()
-      z = {c= 3}
-      _ = ()
-      z = {c= 3}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), z = { c = 3 }, _ = () ]; rsenv = [];
+        idenv = [ z = { c = 3 } ] }
 

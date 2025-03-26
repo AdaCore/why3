@@ -16,25 +16,26 @@ The program does not comply to the verification goal, for example during the
 File records_label.mlw:
   Line 9:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {f= 0; g= false}
-    y = {f= 0; g= false}
+    (giant-step) execution of unimplemented function with args: []
+    result = { f = 0; g = false }
+    y = { f = 0; g = false }
   Line 11:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `record_old_test1` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 12:
-    Property failure at postcondition of `record_old_test1` with:
-      y = {f= 0; g= false}
-      x = {f= 6; g= false}
-      x = {f= 0; g= false}
-      y = {f= 0; g= false}
-      result = ()
-      x = {f= 6; g= false}
-      x = {f= 0; g= false}
-      y = {f= 0; g= false}
+    Property failure at postcondition of `record_old_test1` with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 6; g = false },
+            x = { f = 0; g = false }, y = { f = 0; g = false }, result = () ];
+        rsenv = [];
+        idenv =
+          [ x = { f = 6; g = false }, x = { f = 0; g = false },
+            y = { f = 0; g = false } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -54,27 +55,25 @@ The program does not comply to the verification goal, for example during the
 File records_label.mlw:
   Line 9:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {f= 0; g= false}
-    y = {f= 0; g= false}
+    (giant-step) execution of unimplemented function with args: []
+    result = { f = 0; g = false }
+    y = { f = 0; g = false }
   Line 16:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `record_at_test2` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 22:
-    Property failure at assertion with:
-      y = {f= 0; g= false}
-      x = {f= 12; g= false}
-      _ = ()
-      _ = ()
-      x = r'mk 0 False
-      x = r'mk 6 False
-      y = {f= 0; g= false}
-      x = {f= 12; g= false}
-      x = r'mk 0 False
-      x = r'mk 6 False
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 12; g = false }, _ = (),
+            _ = (), x = r'mk 0 False, x = r'mk 6 False ]; rsenv = [];
+        idenv =
+          [ y = { f = 0; g = false }, x = { f = 12; g = false },
+            x = r'mk 0 False, x = r'mk 6 False ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -94,22 +93,21 @@ The program does not comply to the verification goal, for example during the
 File records_label.mlw:
   Line 9:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {f= 0; g= false}
-    y = {f= 0; g= false}
+    (giant-step) execution of unimplemented function with args: []
+    result = { f = 0; g = false }
+    y = { f = 0; g = false }
   Line 24:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `several_hats` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 30:
-    Property failure at assertion with:
-      y = {f= 0; g= false}
-      x = {f= 6; g= false}
-      _ = ()
-      x = r'mk 0 False
-      x = r'mk 0 False
-      x = r'mk 0 False
-      x = r'mk 0 False
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 6; g = false }, _ = (),
+            x = r'mk 0 False, x = r'mk 0 False ]; rsenv = [];
+        idenv = [ x = r'mk 0 False, x = r'mk 0 False ] }
 

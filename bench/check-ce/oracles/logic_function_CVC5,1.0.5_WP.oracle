@@ -17,13 +17,12 @@ File logic_function.mlw:
     y = 0
     y = 0
     Execution of main function `main_g` with env:
-      g = fun (_arg_1:int) -> 42
-      y = 0
+      { lsenv = [ g = fun (_arg_1:int) -> 42 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [] }
   Line 8:
-    Property failure at assertion with:
-      g = fun (_arg_1:int) -> 42
-      y = 0
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ g = fun (_arg_1:int) -> 42 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [ y = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -46,16 +45,13 @@ File logic_function.mlw:
     y1 = 0
     y2 = true
     Execution of main function `main_h` with env:
-      h = fun (_arg_14:int) (_arg_24:bool) -> 42
-      y1 = 0
-      y2 = true
+      { lsenv = [ h = fun (_arg_14:int) (_arg_24:bool) -> 42 ];
+        vsenv = [ y1 = 0, y2 = true ]; rsenv = []; idenv = [] }
   Line 14:
-    Property failure at assertion with:
-      h = fun (_arg_14:int) (_arg_24:bool) -> 42
-      y1 = 0
-      y2 = true
-      y1 = 0
-      y2 = true
+    Property failure at assertion with env:
+      { lsenv = [ h = fun (_arg_14:int) (_arg_24:bool) -> 42 ];
+        vsenv = [ y1 = 0, y2 = true ]; rsenv = [];
+        idenv = [ y1 = 0, y2 = true ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -76,13 +72,12 @@ File logic_function.mlw:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (_arg_14:int) -> 0
-      y = 0
+      { lsenv = [ f = fun (_arg_14:int) -> 0 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [] }
   Line 21:
-    Property failure at assertion with:
-      f = fun (_arg_14:int) -> 0
-      y = 0
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ f = fun (_arg_14:int) -> 0 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [ y = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -103,12 +98,10 @@ File logic_function.mlw:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (_arg_14:int) -> if _arg_14 = 1 then 0 else (- 1)
-      y = 0
+      { lsenv = [ f = fun (_arg_14:int) -> if _arg_14 = 1 then 0 else (- 1) ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 22:
-    Property failure at assertion with:
-      f = fun (_arg_14:int) -> if _arg_14 = 1 then 0 else (- 1)
-      y = 0
-      _ = ()
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ f = fun (_arg_14:int) -> if _arg_14 = 1 then 0 else (- 1) ];
+        vsenv = [ y = 0, _ = () ]; rsenv = []; idenv = [ y = 0 ] }
 

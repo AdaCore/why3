@@ -16,12 +16,9 @@ File let_constant.mlw:
   Line 5:
     _ = ()
     Execution of main function `dummy` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 9:
-    Property failure at assertion with:
-      _ = ()
-      a = 25
-      b = 65
-      a = 25
-      b = 65
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), a = 25, b = 65 ]; rsenv = [];
+        idenv = [ a = 25, b = 65 ] }
 

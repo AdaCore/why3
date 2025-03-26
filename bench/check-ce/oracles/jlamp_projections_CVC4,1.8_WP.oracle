@@ -16,34 +16,39 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (bOUND_VARIABLE_385:byte) ->
-              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
-              else 127
+    to_int =
+      fun (bOUND_VARIABLE_385:byte) ->
+       if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1 else 127
   Line 28:
     a = epsilon x:byte. to_int x = 127
     a = epsilon x:byte. to_int x = 127
     Execution of main function `p3` with env:
-      to_int = fun (bOUND_VARIABLE_385:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
-                else 127
-      a = epsilon x:byte. to_int x = 127
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_385:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385
+                      then 1 else 127 ];
+        vsenv = [ a = epsilon x:byte. to_int x = 127 ]; rsenv = [];
+        idenv = [] }
   Line 29:
-    (giant-step) execution of unimplemented function `of_int`
-      x = 1
+    (giant-step) execution of unimplemented function `of_int` with args:
+      [ x = 1 ]
     result of `of_int` = epsilon x:byte. to_int x = 1
-    (giant-step) execution of unimplemented function `add`
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-    Property failure at precondition of `add` with:
-      to_int = fun (bOUND_VARIABLE_385:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
-                else 127
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-      a = epsilon x:byte. to_int x = 127
-      o = epsilon x:byte. to_int x = 1
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
+    (giant-step) execution of unimplemented function `add` with args:
+      [ x = epsilon x:byte. to_int x = 127,
+        y = epsilon x:byte. to_int x = 1 ]
+    Property failure at precondition of `add` with env:
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_385:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385
+                      then 1 else 127 ];
+        vsenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1,
+            a = epsilon x:byte. to_int x = 127,
+            o = epsilon x:byte. to_int x = 1 ]; rsenv = [];
+        idenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1 ] }
 
 File "bench/check-ce/jlamp_projections.mlw", line 42, characters 14-24:
 Sub-goal Precondition of goal p3'vc.
@@ -63,43 +68,48 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (bOUND_VARIABLE_384:byte) ->
-              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
-              else 127
+    to_int =
+      fun (bOUND_VARIABLE_384:byte) ->
+       if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1 else 127
   Line 41:
-    a = {contents= epsilon x:byte. to_int x = 127}
-    a = {contents= epsilon x:byte. to_int x = 127}
+    a = { contents = epsilon x:byte. to_int x = 127 }
+    a = { contents = epsilon x:byte. to_int x = 127 }
     Execution of main function `p3` with env:
-      to_int = fun (bOUND_VARIABLE_384:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
-                else 127
-      a = {contents= epsilon x:byte. to_int x = 127}
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_384:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384
+                      then 1 else 127 ];
+        vsenv = [ a = { contents = epsilon x:byte. to_int x = 127 } ];
+        rsenv = []; idenv = [] }
   Line 42:
-    (giant-step) execution of unimplemented function `of_int`
-      x = 1
+    (giant-step) execution of unimplemented function `of_int` with args:
+      [ x = 1 ]
     result of `of_int` = epsilon x:byte. to_int x = 1
     Normal execution of function `(!)` with args:
-      r = {contents= epsilon x:byte. to_int x = 127}
+      [ r = { contents = epsilon x:byte. to_int x = 127 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= epsilon x:byte. to_int x = 127}
+      [ arg = { contents = epsilon x:byte. to_int x = 127 } ]
 File jlamp_projections.mlw:
   Line 42:
-    (giant-step) execution of unimplemented function `add`
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-    Property failure at precondition of `add` with:
-      to_int = fun (bOUND_VARIABLE_384:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
-                else 127
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-      a = {contents= epsilon x:byte. to_int x = 127}
-      o = epsilon x:byte. to_int x = 1
-      o = epsilon x:byte. to_int x = 127
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
+    (giant-step) execution of unimplemented function `add` with args:
+      [ x = epsilon x:byte. to_int x = 127,
+        y = epsilon x:byte. to_int x = 1 ]
+    Property failure at precondition of `add` with env:
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_384:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384
+                      then 1 else 127 ];
+        vsenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1,
+            a = { contents = epsilon x:byte. to_int x = 127 },
+            o = epsilon x:byte. to_int x = 1,
+            o = epsilon x:byte. to_int x = 127 ]; rsenv = [];
+        idenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1 ] }
 
 File "bench/check-ce/jlamp_projections.mlw", line 54, characters 29-39:
 Sub-goal Precondition of goal p4'vc.
@@ -119,37 +129,42 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File jlamp_projections.mlw:
   Line 7:
-    to_int = fun (bOUND_VARIABLE_475:byte) ->
-              if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
-              else 127
+    to_int =
+      fun (bOUND_VARIABLE_475:byte) ->
+       if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1 else 127
   Line 53:
-    b = {f= epsilon x:byte. to_int x = 127; g= true}
-    b = {f= epsilon x:byte. to_int x = 127; g= true}
+    b = { f = epsilon x:byte. to_int x = 127; g = true }
+    b = { f = epsilon x:byte. to_int x = 127; g = true }
     Execution of main function `p4` with env:
-      to_int = fun (bOUND_VARIABLE_475:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
-                else 127
-      b = {f= epsilon x:byte. to_int x = 127; g= true}
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_475:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475
+                      then 1 else 127 ];
+        vsenv = [ b = { f = epsilon x:byte. to_int x = 127; g = true } ];
+        rsenv = []; idenv = [] }
   Line 54:
     Normal execution of function `g` with args:
-      arg = {f= epsilon x:byte. to_int x = 127; g= true}
-    (giant-step) execution of unimplemented function `of_int`
-      x = 1
+      [ arg = { f = epsilon x:byte. to_int x = 127; g = true } ]
+    (giant-step) execution of unimplemented function `of_int` with args:
+      [ x = 1 ]
     result of `of_int` = epsilon x:byte. to_int x = 1
     Normal execution of function `f` with args:
-      arg = {f= epsilon x:byte. to_int x = 127; g= true}
-    (giant-step) execution of unimplemented function `add`
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-    Property failure at precondition of `add` with:
-      to_int = fun (bOUND_VARIABLE_475:byte) ->
-                if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
-                else 127
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
-      b = {f= epsilon x:byte. to_int x = 127; g= true}
-      o = epsilon x:byte. to_int x = 1
-      o = epsilon x:byte. to_int x = 127
-      x = epsilon x:byte. to_int x = 127
-      y = epsilon x:byte. to_int x = 1
+      [ arg = { f = epsilon x:byte. to_int x = 127; g = true } ]
+    (giant-step) execution of unimplemented function `add` with args:
+      [ x = epsilon x:byte. to_int x = 127,
+        y = epsilon x:byte. to_int x = 1 ]
+    Property failure at precondition of `add` with env:
+      { lsenv =
+          [ to_int = fun (bOUND_VARIABLE_475:byte) ->
+                      if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475
+                      then 1 else 127 ];
+        vsenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1,
+            b = { f = epsilon x:byte. to_int x = 127; g = true },
+            o = epsilon x:byte. to_int x = 1,
+            o = epsilon x:byte. to_int x = 127 ]; rsenv = [];
+        idenv =
+          [ x = epsilon x:byte. to_int x = 127,
+            y = epsilon x:byte. to_int x = 1 ] }
 

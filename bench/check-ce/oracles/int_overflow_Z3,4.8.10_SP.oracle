@@ -19,15 +19,14 @@ File int_overflow.mlw:
     x = 0
     x = 0
     Execution of main function `test1'goal` with env:
-      x = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 9:
-    Property failure at postcondition of `test1'goal` with:
-      x = 0
-      result = ()
-      x = 0
+    Property failure at postcondition of `test1'goal` with env:
+      { lsenv = []; vsenv = [ x = 0, result = () ]; rsenv = [];
+        idenv = [ x = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -109,18 +108,14 @@ File int_overflow.mlw:
     x = 1
     y = 65535
     Execution of main function `test_overflow_int16'goal` with env:
-      y = 65535
-      x = 1
+      { lsenv = []; vsenv = [ y = 65535, x = 1 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 31:
-    Property failure at postcondition of `test_overflow_int16'goal` with:
-      y = 65535
-      x = 1
-      result = ()
-      y = 65535
-      x = 1
+    Property failure at postcondition of `test_overflow_int16'goal` with env:
+      { lsenv = []; vsenv = [ y = 65535, x = 1, result = () ]; rsenv = [];
+        idenv = [ y = 65535, x = 1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -168,18 +163,15 @@ File int_overflow.mlw:
     x = 1
     y = 65535
     Execution of main function `test_overflow_int16_bis'goal` with env:
-      y = 65535
-      x = 1
+      { lsenv = []; vsenv = [ y = 65535, x = 1 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 42:
-    Property failure at postcondition of `test_overflow_int16_bis'goal` with:
-      y = 65535
-      x = 1
-      result = ()
-      y = 65535
-      x = 1
+    Property failure at postcondition of `test_overflow_int16_bis'goal`
+      with env:
+      { lsenv = []; vsenv = [ y = 65535, x = 1, result = () ]; rsenv = [];
+        idenv = [ y = 65535, x = 1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -201,18 +193,15 @@ File int_overflow.mlw:
     x = 1
     y = 2147483647
     Execution of main function `test_overflow_int32'goal` with env:
-      y = 2147483647
-      x = 1
+      { lsenv = []; vsenv = [ y = 2147483647, x = 1 ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 49:
-    Property failure at postcondition of `test_overflow_int32'goal` with:
-      y = 2147483647
-      x = 1
-      result = ()
-      y = 2147483647
-      x = 1
+    Property failure at postcondition of `test_overflow_int32'goal` with env:
+      { lsenv = []; vsenv = [ y = 2147483647, x = 1, result = () ];
+        rsenv = []; idenv = [ y = 2147483647, x = 1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -234,18 +223,16 @@ File int_overflow.mlw:
     x = 1
     y = 2147483647
     Execution of main function `test_overflow_int32_bis'goal` with env:
-      y = 2147483647
-      x = 1
+      { lsenv = []; vsenv = [ y = 2147483647, x = 1 ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 54:
-    Property failure at postcondition of `test_overflow_int32_bis'goal` with:
-      y = 2147483647
-      x = 1
-      result = ()
-      y = 2147483647
-      x = 1
+    Property failure at postcondition of `test_overflow_int32_bis'goal`
+      with env:
+      { lsenv = []; vsenv = [ y = 2147483647, x = 1, result = () ];
+        rsenv = []; idenv = [ y = 2147483647, x = 1 ] }
 
 File "bench/check-ce/int_overflow.mlw", line 59, characters 88-108:
 Goal test_overflow_int32_bis_inline.

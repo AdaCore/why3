@@ -17,13 +17,10 @@ File recursive_model.mlw:
     i = 2
     i = 2
     Execution of main function `test` with env:
-      global = (S Z)
-      i = 2
+      { lsenv = []; vsenv = [ global = (S Z), i = 2 ]; rsenv = [];
+        idenv = [] }
   Line 10:
-    Property failure at assertion with:
-      global = (S Z)
-      i = 2
-      Z = UNDEFINED
-      global = (S Z)
-      i = 2
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ global = (S Z), i = 2 ]; rsenv = [];
+        idenv = [ Z = UNDEFINED, global = (S Z), i = 2 ] }
 

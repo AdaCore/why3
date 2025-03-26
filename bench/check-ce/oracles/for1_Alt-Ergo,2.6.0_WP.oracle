@@ -28,23 +28,21 @@ File for1.mlw:
   Line 3:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 5:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    Giant-step execution of function `ref` with args: [ contents = 0 ]
+    result of `ref` = { contents = 0 }
   Line 6:
     Giant-step iteration of loop
-    x = {contents= 0}
+    x = { contents = 0 }
     i = 2
   Line 10:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
   Line 4:
-    Property failure at postcondition of `f` with:
-      _ = ()
-      result = 0
-      result = 0
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ _ = (), result = 0 ]; rsenv = [];
+        idenv = [ result = 0 ] }
 
 File "bench/check-ce/for1.mlw", line 4, characters 12-22:
 Goal f'vc.

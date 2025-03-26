@@ -26,25 +26,29 @@ File threshold.mlw:
     min = epsilon x:int32. int32'int x = (- 2147483648)
     max = epsilon x:int32. int32'int x = (- 1)
     Execution of main function `f` with env:
-      n = epsilon x:int32. int32'int x = (- 2147483648)
-      min = epsilon x:int32. int32'int x = (- 2147483648)
-      max = epsilon x:int32. int32'int x = (- 1)
-      min_int32 = (-2147483648)
-      max_int32 = 2147483647
+      { lsenv = [];
+        vsenv =
+          [ n = epsilon x:int32. int32'int x = (- 2147483648),
+            min = epsilon x:int32. int32'int x = (- 2147483648),
+            max = epsilon x:int32. int32'int x = (- 1) ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv = [] }
   Line 11:
-    (giant-step) execution of unimplemented function `(+)`
-      a = epsilon x:int32. int32'int x = (- 2147483648)
-      b = epsilon x:int32. int32'int x = (- 1)
-    Property failure at precondition of `(+)` with:
-      min_int32 = (-2147483648)
-      max_int32 = 2147483647
-      a = epsilon x:int32. int32'int x = (- 2147483648)
-      b = epsilon x:int32. int32'int x = (- 1)
-      n = epsilon x:int32. int32'int x = (- 2147483648)
-      min = epsilon x:int32. int32'int x = (- 2147483648)
-      max = epsilon x:int32. int32'int x = (- 1)
-      a = epsilon x:int32. int32'int x = (- 2147483648)
-      b = epsilon x:int32. int32'int x = (- 1)
+    (giant-step) execution of unimplemented function `(+)` with args:
+      [ a = epsilon x:int32. int32'int x = (- 2147483648),
+        b = epsilon x:int32. int32'int x = (- 1) ]
+    Property failure at precondition of `(+)` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = epsilon x:int32. int32'int x = (- 2147483648),
+            b = epsilon x:int32. int32'int x = (- 1),
+            n = epsilon x:int32. int32'int x = (- 2147483648),
+            min = epsilon x:int32. int32'int x = (- 2147483648),
+            max = epsilon x:int32. int32'int x = (- 1) ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv =
+          [ a = epsilon x:int32. int32'int x = (- 2147483648),
+            b = epsilon x:int32. int32'int x = (- 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -74,36 +78,40 @@ File threshold.mlw:
     min = epsilon x:int32. int32'int x = 1
     max = epsilon x:int32. int32'int x = 0
     Execution of main function `f` with env:
-      n = epsilon x:int32. int32'int x = 1
-      min = epsilon x:int32. int32'int x = 1
-      max = epsilon x:int32. int32'int x = 0
-      min_int32 = (-2147483648)
-      max_int32 = 2147483647
+      { lsenv = [];
+        vsenv =
+          [ n = epsilon x:int32. int32'int x = 1,
+            min = epsilon x:int32. int32'int x = 1,
+            max = epsilon x:int32. int32'int x = 0 ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv = [] }
   Line 11:
-    (giant-step) execution of unimplemented function `(+)`
-      a = epsilon x:int32. int32'int x = 1
-      b = epsilon x:int32. int32'int x = 0
+    (giant-step) execution of unimplemented function `(+)` with args:
+      [ a = epsilon x:int32. int32'int x = 1,
+        b = epsilon x:int32. int32'int x = 0 ]
     result of `(+)` = epsilon x:int32. int32'int x = 1
   Line 12:
-    (giant-step) execution of unimplemented function `(<)`
-      a = epsilon x:int32. int32'int x = 1
-      b = epsilon x:int32. int32'int x = 1
+    (giant-step) execution of unimplemented function `(<)` with args:
+      [ a = epsilon x:int32. int32'int x = 1,
+        b = epsilon x:int32. int32'int x = 1 ]
     result of `(<)` = false
-    (giant-step) execution of unimplemented function `(>)`
-      a = epsilon x:int32. int32'int x = 1
-      b = epsilon x:int32. int32'int x = 0
+    (giant-step) execution of unimplemented function `(>)` with args:
+      [ a = epsilon x:int32. int32'int x = 1,
+        b = epsilon x:int32. int32'int x = 0 ]
     result of `(>)` = true
   Line 9:
-    Property failure at postcondition of `f` with:
-      min_int32 = (-2147483648)
-      max_int32 = 2147483647
-      n = epsilon x:int32. int32'int x = 1
-      min = epsilon x:int32. int32'int x = 1
-      max = epsilon x:int32. int32'int x = 0
-      result = epsilon x:int32. int32'int x = 0
-      min = epsilon x:int32. int32'int x = 1
-      max = epsilon x:int32. int32'int x = 0
-      result = epsilon x:int32. int32'int x = 0
+    Property failure at postcondition of `f` with env:
+      { lsenv = [];
+        vsenv =
+          [ n = epsilon x:int32. int32'int x = 1,
+            min = epsilon x:int32. int32'int x = 1,
+            max = epsilon x:int32. int32'int x = 0,
+            result = epsilon x:int32. int32'int x = 0 ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv =
+          [ min = epsilon x:int32. int32'int x = 1,
+            max = epsilon x:int32. int32'int x = 0,
+            result = epsilon x:int32. int32'int x = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -129,21 +137,18 @@ File threshold.mlw:
     min = (4294967295:t)
     max = (4294967295:t)
     Execution of main function `f` with env:
-      n = (0:t)
-      min = (4294967295:t)
-      max = (4294967295:t)
+      { lsenv = [];
+        vsenv = [ n = (0:t), min = (4294967295:t), max = (4294967295:t) ];
+        rsenv = []; idenv = [] }
   Line 30:
-    (giant-step) execution of unimplemented function `u_add`
-      a = (4294967295:t)
-      b = (4294967295:t)
-    Property failure at precondition of `u_add` with:
-      a = (4294967295:t)
-      b = (4294967295:t)
-      n = (0:t)
-      min = (4294967295:t)
-      max = (4294967295:t)
-      a = (4294967295:t)
-      b = (4294967295:t)
+    (giant-step) execution of unimplemented function `u_add` with args:
+      [ a = (4294967295:t), b = (4294967295:t) ]
+    Property failure at precondition of `u_add` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (4294967295:t), b = (4294967295:t), n = (0:t),
+            min = (4294967295:t), max = (4294967295:t) ]; rsenv = [];
+        idenv = [ a = (4294967295:t), b = (4294967295:t) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -169,30 +174,28 @@ File threshold.mlw:
     min = (2147483648:t)
     max = (2147483647:t)
     Execution of main function `f` with env:
-      n = (4294967295:t)
-      min = (2147483648:t)
-      max = (2147483647:t)
+      { lsenv = [];
+        vsenv =
+          [ n = (4294967295:t), min = (2147483648:t), max = (2147483647:t) ];
+        rsenv = []; idenv = [] }
   Line 30:
-    (giant-step) execution of unimplemented function `u_add`
-      a = (2147483648:t)
-      b = (2147483647:t)
+    (giant-step) execution of unimplemented function `u_add` with args:
+      [ a = (2147483648:t), b = (2147483647:t) ]
     result of `u_add` = (4294967295:t)
   Line 31:
-    (giant-step) execution of unimplemented function `u_lt`
-      a = (4294967295:t)
-      b = (2147483648:t)
+    (giant-step) execution of unimplemented function `u_lt` with args:
+      [ a = (4294967295:t), b = (2147483648:t) ]
     result of `u_lt` = false
-    (giant-step) execution of unimplemented function `u_gt`
-      a = (4294967295:t)
-      b = (2147483647:t)
+    (giant-step) execution of unimplemented function `u_gt` with args:
+      [ a = (4294967295:t), b = (2147483647:t) ]
     result of `u_gt` = true
   Line 27:
-    Property failure at postcondition of `f1` with:
-      n = (4294967295:t)
-      min = (2147483648:t)
-      max = (2147483647:t)
-      result = (2147483647:t)
-      min = (2147483648:t)
-      max = (2147483647:t)
-      result = (2147483647:t)
+    Property failure at postcondition of `f1` with env:
+      { lsenv = [];
+        vsenv =
+          [ n = (4294967295:t), min = (2147483648:t), max = (2147483647:t),
+            result = (2147483647:t) ]; rsenv = [];
+        idenv =
+          [ min = (2147483648:t), max = (2147483647:t),
+            result = (2147483647:t) ] }
 

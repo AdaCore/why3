@@ -15,17 +15,15 @@ File bv32_toBig.mlw:
     i = (0:t)
     i = (0:t)
     Execution of main function `ok` with env:
-      i = (0:t)
-    (giant-step) execution of unimplemented function `toBig`
-      _ = (0:t)
+      { lsenv = []; vsenv = [ i = (0:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `toBig` with args:
+      [ _ = (0:t) ]
     result of `toBig` = (0:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (0:t1)
-    Property failure at precondition of `u` with:
-      i = (0:t1)
-      i = (0:t)
-      o = (0:t1)
-      i = (0:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (0:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = []; vsenv = [ i = (0:t1), i = (0:t), o = (0:t1) ];
+        rsenv = []; idenv = [ i = (0:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -44,17 +42,18 @@ File bv32_toBig.mlw:
     i = (2147483660:t)
     i = (2147483660:t)
     Execution of main function `ko` with env:
-      i = (2147483660:t)
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (2147483660:t)
+      { lsenv = []; vsenv = [ i = (2147483660:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (2147483660:t) ]
     result of `stoBig` = (18446744071562067980:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (18446744071562067980:t1)
-    Property failure at precondition of `u` with:
-      i = (18446744071562067980:t1)
-      i = (2147483660:t)
-      o = (18446744071562067980:t1)
-      i = (18446744071562067980:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (18446744071562067980:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = [];
+        vsenv =
+          [ i = (18446744071562067980:t1), i = (2147483660:t),
+            o = (18446744071562067980:t1) ]; rsenv = [];
+        idenv = [ i = (18446744071562067980:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -73,13 +72,13 @@ File bv32_toBig.mlw:
     i = (2147483648:t)
     i = (2147483648:t)
     Execution of main function `ko2` with env:
-      i = (2147483648:t)
+      { lsenv = []; vsenv = [ i = (2147483648:t) ]; rsenv = []; idenv = [] }
   Line 13:
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (2147483648:t)
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (2147483648:t) ]
     result of `stoBig` = (18446744071562067968:t1)
-    Property failure at postcondition of `ko2` with:
-      i = (2147483648:t)
-      result = (18446744071562067968:t1)
-      result = (18446744071562067968:t1)
+    Property failure at postcondition of `ko2` with env:
+      { lsenv = [];
+        vsenv = [ i = (2147483648:t), result = (18446744071562067968:t1) ];
+        rsenv = []; idenv = [ result = (18446744071562067968:t1) ] }
 

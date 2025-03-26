@@ -15,14 +15,13 @@ File test_result_ce_value0.mlw:
     x = 0
     x = 0
     Execution of main function `test2` with env:
-      x = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 7:
-    (giant-step) execution of unimplemented function `id`
-      x = 0
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = 0 ]
     result of `id` = 42
   Line 8:
-    Property failure at assertion with:
-      x = 0
-      a = 42
-      a = 42
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 0, a = 42 ]; rsenv = [];
+        idenv = [ a = 42 ] }
 

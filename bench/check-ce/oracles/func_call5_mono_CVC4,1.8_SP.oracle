@@ -24,17 +24,14 @@ File func_call5_mono.mlw:
     x = 1
     x = 1
     Execution of main function `f1` with env:
-      x = 1
+      { lsenv = []; vsenv = [ x = 1 ]; rsenv = []; idenv = [] }
   Line 15:
-    Giant-step execution of function `g1` with args:
-      y = 1
-    result of `g1` = {c= 2}
+    Giant-step execution of function `g1` with args: [ y = 1 ]
+    result of `g1` = { c = 2 }
   Line 16:
-    Property failure at assertion with:
-      x = 1
-      z = {c= 2}
-      x = 1
-      z = {c= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 1, z = { c = 2 } ]; rsenv = [];
+        idenv = [ x = 1, z = { c = 2 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -53,20 +50,14 @@ File func_call5_mono.mlw:
     x = 0
     x = 0
     Execution of main function `f2` with env:
-      x = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 21:
-    Normal execution of function `g2` with args:
-      y = 0
+    Normal execution of function `g2` with args: [ y = 0 ]
   Line 18:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
-    Normal execution of function `t'mk` with args:
-      c = 1
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
+    Normal execution of function `t'mk` with args: [ c = 1 ]
   Line 22:
-    Property failure at assertion with:
-      x = 0
-      z = {c= 1}
-      x = 0
-      z = {c= 1}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 0, z = { c = 1 } ]; rsenv = [];
+        idenv = [ x = 0, z = { c = 1 } ] }
 

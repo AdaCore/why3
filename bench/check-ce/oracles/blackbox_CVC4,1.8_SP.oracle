@@ -15,35 +15,27 @@ File blackbox.mlw:
     g = fun (bOUND_VARIABLE_310:int) -> False
   Line 8:
     Constant t initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    t = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    t = { contents = 0 }
   Line 10:
     x = 0
     x = 0
     Execution of main function `main` with env:
-      g = fun (bOUND_VARIABLE_310:int) -> False
-      t = {contents= 0}
-      x = 0
+      { lsenv = [ g = fun (bOUND_VARIABLE_310:int) -> False ];
+        vsenv = [ t = { contents = 0 }, x = 0 ]; rsenv = []; idenv = [] }
   Line 12:
-    Normal execution of anonymous function with args:
+    Normal execution of anonymous function with args: []
   Line 14:
-    (giant-step) execution of unimplemented function `f`
-      y = 1
+    (giant-step) execution of unimplemented function `f` with args: [ y = 1 ]
     result of `f` = false
   Line 15:
-    Property failure at assertion with:
-      g = fun (bOUND_VARIABLE_310:int) -> False
-      t = {contents= 0}
-      x = 0
-      _ = ()
-      b = false
-      True = UNDEFINED
-      b = false
+    Property failure at assertion with env:
+      { lsenv = [ g = fun (bOUND_VARIABLE_310:int) -> False ];
+        vsenv = [ t = { contents = 0 }, x = 0, _ = (), b = false ];
+        rsenv = []; idenv = [ True = UNDEFINED, b = false ] }
 
 File "bench/check-ce/blackbox.mlw", line 13, characters 14-18:
 Sub-goal Postcondition of goal main'vc.
@@ -66,27 +58,22 @@ The program does not comply to the verification goal, or the contracts of the
 File blackbox.mlw:
   Line 8:
     Constant t initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    t = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    t = { contents = 0 }
   Line 10:
     x = 0
     x = 0
     Execution of main function `main` with env:
-      t = {contents= 0}
-      x = 0
+      { lsenv = []; vsenv = [ t = { contents = 0 }, x = 0 ]; rsenv = [];
+        idenv = [] }
   Line 12:
-    Giant-step execution of anonymous function with args:
+    Giant-step execution of anonymous function with args: []
     result = ()
   Line 17:
-    Property failure at assertion with:
-      t = {contents= 0}
-      x = 0
-      _ = ()
-      _ = ()
-      x = 0
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ t = { contents = 0 }, x = 0, _ = (), _ = () ];
+        rsenv = []; idenv = [ x = 0 ] }
 

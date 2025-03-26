@@ -15,21 +15,15 @@ File anonymous3.mlw:
     y = 0
     y = 0
     Execution of main function `g` with env:
-      y = 0
+      { lsenv = []; vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 8:
-    Normal execution of function `f` with args:
-      x = 0
+    Normal execution of function `f` with args: [ x = 0 ]
     Normal execution of function `(@)` with args:
-      u = (fun y -> y + x) with x = 0
-      u = 0
+      [ u = (fun y -> y + x) with x = 0, u = 0 ]
   Line 4:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 0
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 0 ]
   Line 7:
-    Property failure at postcondition of `g` with:
-      y = 0
-      result = 0
-      y = 0
-      result = 0
+    Property failure at postcondition of `g` with env:
+      { lsenv = []; vsenv = [ y = 0, result = 0 ]; rsenv = [];
+        idenv = [ y = 0, result = 0 ] }
 

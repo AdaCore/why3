@@ -22,37 +22,26 @@ File for_mono.mlw:
   Line 6:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 7:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 8:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 9:
     Giant-step iteration of loop
-    x1 = {c= 1}
-    x2 = {c= 400}
+    x1 = { c = 1 }
+    x2 = { c = 400 }
     i = 0
     Giant-step iteration of loop
   Line 11:
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
+    Normal execution of function `(=)` with args: [ x = 0, y = 0 ]
   Line 12:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = 1 ]
   Line 10:
-    Property failure at loop invariant preservation with:
-      _ = ()
-      x1 = {c= 2}
-      x2 = {c= 400}
-      i = 1
-      o = 1
-      o = 0
-      x1 = {c= 2}
-      i = 1
+    Property failure at loop invariant preservation with env:
+      { lsenv = [];
+        vsenv =
+          [ _ = (), x1 = { c = 2 }, x2 = { c = 400 }, i = 1, o = 1, o = 0 ];
+        rsenv = []; idenv = [ x1 = { c = 2 }, i = 1 ] }
 

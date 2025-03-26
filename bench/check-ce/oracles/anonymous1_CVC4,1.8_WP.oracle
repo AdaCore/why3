@@ -15,17 +15,12 @@ File anonymous1.mlw:
     x = (- 2)
     x = (- 2)
     Execution of main function `f` with env:
-      x = (- 2)
+      { lsenv = []; vsenv = [ x = (- 2) ]; rsenv = []; idenv = [] }
   Line 5:
-    Normal execution of function `h` with args:
-      y = (- 2)
-    Normal execution of function `(+)` with args:
-      _ = (- 2)
-      _ = 2
+    Normal execution of function `h` with args: [ y = (- 2) ]
+    Normal execution of function `(+)` with args: [ _ = (- 2), _ = 2 ]
   Line 6:
-    Property failure at assertion with:
-      x = (- 2)
-      w = 0
-      x = (- 2)
-      w = 0
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = (- 2), w = 0 ]; rsenv = [];
+        idenv = [ x = (- 2), w = 0 ] }
 

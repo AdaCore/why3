@@ -32,15 +32,22 @@ File model_projection2.mlw:
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
     Execution of main function `g2` with env:
-      get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
-      to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
-                  fun (x:int) -> 0
-      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+      { lsenv =
+          [ get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41,
+            to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
+                        fun (x:int) -> 0 ];
+        vsenv =
+          [ x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0) ];
+        rsenv = []; idenv = [] }
   Line 26:
-    Property failure at assertion with:
-      get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
-      to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
-                  fun (x:int) -> 0
-      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
-      x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
+    Property failure at assertion with env:
+      { lsenv =
+          [ get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41,
+            to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
+                        fun (x:int) -> 0 ];
+        vsenv =
+          [ x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0) ];
+        rsenv = [];
+        idenv =
+          [ x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0) ] }
 

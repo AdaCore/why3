@@ -28,16 +28,14 @@ File algebraic_types_mono.mlw:
     x = (B 0)
     x = (B 0)
     Execution of main function `g2'goal` with env:
-      x = (B 0)
+      { lsenv = []; vsenv = [ x = (B 0) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 10:
-    Property failure at postcondition of `g2'goal` with:
-      x = (B 0)
-      result = ()
-      A = UNDEFINED
-      x = (B 0)
+    Property failure at postcondition of `g2'goal` with env:
+      { lsenv = []; vsenv = [ x = (B 0), result = () ]; rsenv = [];
+        idenv = [ A = UNDEFINED, x = (B 0) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -56,15 +54,14 @@ File algebraic_types_mono.mlw:
     x = A
     x = A
     Execution of main function `g4'goal` with env:
-      x = A
+      { lsenv = []; vsenv = [ x = A ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 12:
-    Property failure at postcondition of `g4'goal` with:
-      x = A
-      result = ()
-      x = A
+    Property failure at postcondition of `g4'goal` with env:
+      { lsenv = []; vsenv = [ x = A, result = () ]; rsenv = [];
+        idenv = [ x = A ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -83,15 +80,14 @@ File algebraic_types_mono.mlw:
     x = (Au 0 1)
     x = (Au 0 1)
     Execution of main function `g5'goal` with env:
-      x = (Au 0 1)
+      { lsenv = []; vsenv = [ x = (Au 0 1) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 16:
-    Property failure at postcondition of `g5'goal` with:
-      x = (Au 0 1)
-      result = ()
-      x = (Au 0 1)
+    Property failure at postcondition of `g5'goal` with env:
+      { lsenv = []; vsenv = [ x = (Au 0 1), result = () ]; rsenv = [];
+        idenv = [ x = (Au 0 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -123,14 +119,12 @@ File algebraic_types_mono.mlw:
     l = (Cons 0 Nil)
     l = (Cons 0 Nil)
     Execution of main function `g7'goal` with env:
-      l = (Cons 0 Nil)
+      { lsenv = []; vsenv = [ l = (Cons 0 Nil) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 27:
-    Property failure at postcondition of `g7'goal` with:
-      l = (Cons 0 Nil)
-      result = ()
-      Nil = UNDEFINED
-      l = (Cons 0 Nil)
+    Property failure at postcondition of `g7'goal` with env:
+      { lsenv = []; vsenv = [ l = (Cons 0 Nil), result = () ]; rsenv = [];
+        idenv = [ Nil = UNDEFINED, l = (Cons 0 Nil) ] }
 

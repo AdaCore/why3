@@ -253,7 +253,7 @@ and print_value' fmt v =
   | Vfloat_mode m -> pp_print_string fmt (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
   | Vfun (mvs, vs, e) ->
-      fprintf fmt "@[<h>@[<v3>(fun %a -> %a)@]%a@]"
+      fprintf fmt "@[<hov 2>@[<hov 2>(fun %a ->@ %a)@]%a@]"
         print_vs vs print_expr e
         Pp.(let start = constant_formatted "@ with " in
             print_list_delim ~start ~sep:comma ~stop:nothing
@@ -264,25 +264,28 @@ and print_value' fmt v =
       fprintf fmt "{%a => %a}" print_ls ls print_value v
   | Vconstr (Some rs, fs, vs) ->
       if is_rs_tuple rs then
-        fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
+        match vs with
+        | [] -> fprintf fmt "()"
+        | _ ->
+            fprintf fmt "@[<hov 2>( %a )@]" (Pp.print_list Pp.comma print_field) vs
       else if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
-        let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
-        fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
+        let print_field fmt (rs, v) = fprintf fmt "@[<hov 2>%a =@ %a@]" print_rs rs print_field v in
+        fprintf fmt "@[<hov 2>{ %a }@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
       else if vs = [] then
         print_rs fmt rs
       else
-        fprintf fmt "@[<h>(%a%a)@]" print_rs rs
+        fprintf fmt "@[<hov 2>(%a%a)@]" print_rs rs
           Pp.(print_list_pre space print_value) (List.map field_get vs)
   | Vconstr (None, fs, vs) ->
-      let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
-      fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
+      let print_field fmt (rs, v) = fprintf fmt "@[<hov 2>%a =@ %a@]" print_rs rs print_field v in
+      fprintf fmt "@[<hov 2>{ %a }@]" (Pp.print_list Pp.semi print_field)
         (List.combine fs vs)
   | Varray a ->
       fprintf fmt "@[[%a]@]"
         (Pp.print_list Pp.semi print_value) (Array.to_list a)
   | Vpurefun (_, mv, v) ->
-      fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
+      fprintf fmt "@[<hov 2>[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
   | Vterm t ->
       print_term fmt t
@@ -420,65 +423,74 @@ module Log = struct
         | Some _ ->
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
-  let print_log_entry_desc fmt e =
-    let ls2string ls = ls.ls_name.id_string in
-    let vs2string vs = vs.vs_name.id_string in
-    let rs2string rs = rs.rs_name.id_string in
-    let id2string id = id.id_string in
+    let ls2string ls = ls.ls_name.id_string
+    let vs2string vs = vs.vs_name.id_string
+    let rs2string rs = rs.rs_name.id_string
+    let id2string id = id.id_string
+
     let filter_invalid_values l =
-      List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l in
+     List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l
+
     let print_assoc key2string print_value fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
-        print_decoded (key2string k) print_value v in
-    let print_list key2string =
-      Pp.print_list_pre Pp.newline (print_assoc key2string print_value) in
+        print_decoded (key2string k) print_value v
+
+    let print_list key2string fmt l =
+      match l with
+      | [] -> fprintf fmt "[]"
+      | _ ->
+          fprintf fmt "@[<hov 2>[ %a ]@]"
+            (Pp.print_list Pp.comma (print_assoc key2string print_value)) l
+
+    let print_envs fmt (lsenv,vsenv,rsenv,idenv) =
+    fprintf fmt "@[<hov 2>{ @[<hov 2>lsenv =@ %a@];@ @[<hov 2>vsenv =@ %a@];@ @[<hov 2>rsenv =@ %a@];@ @[<hov 2>idenv =@ %a@] }@]"
+      (print_list ls2string) (filter_invalid_values (Mls.bindings lsenv))
+      (print_list vs2string) (Mvs.bindings vsenv)
+      (print_list rs2string) (filter_invalid_values (Mrs.bindings rsenv))
+      (print_list id2string) (Mid.bindings idenv)
+
+  let print_log_entry_desc fmt e =
     match e.log_desc with
     | Val_assumed (id, v) ->
-        fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
+        fprintf fmt "@[<hov 2>%a =@ %a@]" print_decoded id.id_string print_value v;
     | Res_assumed (None,v) ->
-        fprintf fmt "@[<h2>result = %a@]" print_value v
+        fprintf fmt "@[<hov 2>result =@ %a@]" print_value v
     | Res_assumed (Some rs,v) ->
-        fprintf fmt "@[<h2>result of `%a` = %a@]" print_rs rs print_value v
+        fprintf fmt "@[<hov 2>result of `%a` =@ %a@]" print_rs rs print_value v
     | Const_init id ->
-        fprintf fmt "@[<h2>Constant %a initialization@]" print_decoded id.id_string;
+        fprintf fmt "@[Constant %a initialization@]" print_decoded id.id_string;
     | Exec_call (None, mvs, k) ->
-        fprintf fmt "@[<h2>%s execution of anonymous function with args:%a@]"
+        fprintf fmt "@[<hov 2>%s execution of anonymous function with args:@ %a@]"
           (exec_kind_to_string k)
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_call (Some rs, mvs, k) ->
-        fprintf fmt "@[<h2>%s execution of function `%a` with args:%a@]"
+        fprintf fmt "@[<hov 2>%s execution of function `%a` with args:@ %a@]"
           (exec_kind_to_string k)
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_pure (ls,k) ->
-        fprintf fmt "@[<h2>%s execution of function `%a`@]" (exec_kind_to_string k)
+        fprintf fmt "@[<hov 2>%s execution of function `%a`@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(giant-step) execution of unimplemented function%t%t%a@]"
+           "@[<hov 2>(giant-step) execution of unimplemented function%t@ with args:@ %a@]"
            (fun fmt -> Option.iter (fprintf fmt " `%a`" print_rs) rs)
-           (fun fmt -> if Mvs.is_empty mvs then fprintf fmt " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
-        fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
+        fprintf fmt "@[<hov 2>%s iteration of loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mls, mvs, mrs) ->
-        fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a%a@]"
+        fprintf fmt "@[<hov 2>Execution of main function `%a`@ with env:@ %a@]"
           print_decoded rs.rs_name.id_string
-          (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
-          (print_list vs2string) (Mvs.bindings mvs)
-          (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
+          print_envs (mls,mvs,mrs,Mid.empty)
     | Exec_failed (msg,mrs,mls,mvs,mid) ->
-       fprintf fmt "@[<h2>Property failure at %s with:%a%a%a%a@]"
+       fprintf fmt "@[<hov 2>Property failure at %s@ with env:@ %a@]"
          msg
-         (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
-         (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
-         (print_list vs2string) (Mvs.bindings mvs)
-         (print_list id2string) (Mid.bindings mid)
+         print_envs (mls,mvs,mrs,mid)
     | Exec_stucked (msg,mid) ->
-       fprintf fmt "@[<h2>Execution got stuck at %s with:%a@]"
+       fprintf fmt "@[<hov 2>Execution got stuck at %s with:@ %a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_ended ->
-        fprintf fmt "@[<h2>Execution of main function terminated normally@]"
+        fprintf fmt "@[<hov 2>Execution of main function terminated normally@]"
 
   let json_log entry_log =
     let open Json_base in

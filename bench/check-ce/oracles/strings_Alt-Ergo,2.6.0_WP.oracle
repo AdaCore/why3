@@ -190,15 +190,14 @@ File strings.mlw:
     s = ""
     s = ""
     Execution of main function `T11'goal` with env:
-      s = ""
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 16:
-    Property failure at postcondition of `T11'goal` with:
-      s = ""
-      result = ()
-      s = ""
+    Property failure at postcondition of `T11'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
 
@@ -241,15 +240,14 @@ File strings.mlw:
     s = ""
     s = ""
     Execution of main function `T13'goal` with env:
-      s = ""
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 18:
-    Property failure at postcondition of `T13'goal` with:
-      s = ""
-      result = ()
-      s = ""
+    Property failure at postcondition of `T13'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -268,15 +266,14 @@ File strings.mlw:
     s = ""
     s = ""
     Execution of main function `T14'goal` with env:
-      s = ""
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 19:
-    Property failure at postcondition of `T14'goal` with:
-      s = ""
-      result = ()
-      s = ""
+    Property failure at postcondition of `T14'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -297,18 +294,14 @@ File strings.mlw:
     s = ""
     i = 0
     Execution of main function `T15'goal` with env:
-      i = 0
-      s = ""
+      { lsenv = []; vsenv = [ i = 0, s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 20:
-    Property failure at postcondition of `T15'goal` with:
-      i = 0
-      s = ""
-      result = ()
-      i = 0
-      s = ""
+    Property failure at postcondition of `T15'goal` with env:
+      { lsenv = []; vsenv = [ i = 0, s = "", result = () ]; rsenv = [];
+        idenv = [ i = 0, s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

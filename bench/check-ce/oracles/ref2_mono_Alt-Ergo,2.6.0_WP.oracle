@@ -13,13 +13,11 @@ File ref2_mono.mlw:
   Line 4:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 5:
-    Normal execution of function `t'mk` with args:
-      c = 1
+    Normal execution of function `t'mk` with args: [ c = 1 ]
   Line 7:
-    Property failure at assertion with:
-      _ = ()
-      x = {c= 2}
-      _ = ()
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), x = { c = 2 }, _ = () ]; rsenv = [];
+        idenv = [] }
 

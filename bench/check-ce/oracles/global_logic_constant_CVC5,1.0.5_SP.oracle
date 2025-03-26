@@ -19,14 +19,11 @@ File global_logic_constant.mlw:
   Line 8:
     _ = ()
     Execution of main function `f1` with env:
-      _ = ()
-      v1 = (- 1)
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = [ v1 = (- 1) ]; idenv = [] }
   Line 9:
-    Property failure at postcondition of `f1` with:
-      v1 = (- 1)
-      _ = ()
-      result = (- 1)
-      result = (- 1)
+    Property failure at postcondition of `f1` with env:
+      { lsenv = []; vsenv = [ _ = (), result = (- 1) ];
+        rsenv = [ v1 = (- 1) ]; idenv = [ result = (- 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -44,24 +41,21 @@ File global_logic_constant.mlw:
   Line 6:
     v1 = 0
   Line 12:
-    v2 = {contents= (- 1)}
+    v2 = { contents = (- 1) }
 Unknown location:
     _ = ()
 File global_logic_constant.mlw:
   Line 14:
     _ = ()
     Execution of main function `f2` with env:
-      v2 = {contents= (- 1)}
-      _ = ()
-      v1 = 0
+      { lsenv = []; vsenv = [ v2 = { contents = (- 1) }, _ = () ];
+        rsenv = [ v1 = 0 ]; idenv = [] }
   Line 16:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 1)}
+      [ arg = { contents = (- 1) } ]
   Line 15:
-    Property failure at postcondition of `f2` with:
-      v1 = 0
-      v2 = {contents= (- 1)}
-      _ = ()
-      result = (- 1)
-      result = (- 1)
+    Property failure at postcondition of `f2` with env:
+      { lsenv = [];
+        vsenv = [ v2 = { contents = (- 1) }, _ = (), result = (- 1) ];
+        rsenv = [ v1 = 0 ]; idenv = [ result = (- 1) ] }
 

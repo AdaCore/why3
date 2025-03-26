@@ -18,15 +18,14 @@ File polymorphism.mlw:
     x = (B 1)
     x = (B 1)
     Execution of main function `gm'goal` with env:
-      x = (B 1)
+      { lsenv = []; vsenv = [ x = (B 1) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File polymorphism.mlw:
   Line 7:
-    Property failure at postcondition of `gm'goal1` with:
-      x = (B 1)
-      result = ()
-      x = (B 1)
+    Property failure at postcondition of `gm'goal1` with env:
+      { lsenv = []; vsenv = [ x = (B 1), result = () ]; rsenv = [];
+        idenv = [ x = (B 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -48,16 +47,14 @@ File polymorphism.mlw:
     x = (C 1 false)
     x = (C 1 false)
     Execution of main function `gm2'goal` with env:
-      x = (C 1 false)
+      { lsenv = []; vsenv = [ x = (C 1 false) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File polymorphism.mlw:
   Line 11:
-    Property failure at postcondition of `gm2'goal1` with:
-      x = (C 1 false)
-      result = ()
-      False = UNDEFINED
-      x = (C 1 false)
+    Property failure at postcondition of `gm2'goal1` with env:
+      { lsenv = []; vsenv = [ x = (C 1 false), result = () ]; rsenv = [];
+        idenv = [ False = UNDEFINED, x = (C 1 false) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -79,13 +76,12 @@ File polymorphism.mlw:
     x = (A 1)
     x = (A 1)
     Execution of main function `g'goal` with env:
-      x = (A 1)
+      { lsenv = []; vsenv = [ x = (A 1) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File polymorphism.mlw:
   Line 15:
-    Property failure at postcondition of `g'goal1` with:
-      x = (A 1)
-      result = ()
-      x = (A 1)
+    Property failure at postcondition of `g'goal1` with env:
+      { lsenv = []; vsenv = [ x = (A 1), result = () ]; rsenv = [];
+        idenv = [ x = (A 1) ] }
 

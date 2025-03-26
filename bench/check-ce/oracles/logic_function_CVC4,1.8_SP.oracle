@@ -17,13 +17,12 @@ File logic_function.mlw:
     y = 0
     y = 0
     Execution of main function `main_g` with env:
-      g = fun (bOUND_VARIABLE_314:int) -> 42
-      y = 0
+      { lsenv = [ g = fun (bOUND_VARIABLE_314:int) -> 42 ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 8:
-    Property failure at assertion with:
-      g = fun (bOUND_VARIABLE_314:int) -> 42
-      y = 0
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ g = fun (bOUND_VARIABLE_314:int) -> 42 ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [ y = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -46,16 +45,16 @@ File logic_function.mlw:
     y1 = 0
     y2 = false
     Execution of main function `main_h` with env:
-      h = fun (bOUND_VARIABLE_3314:int) (bOUND_VARIABLE_3324:bool) -> 42
-      y1 = 0
-      y2 = false
+      { lsenv =
+          [ h = fun (bOUND_VARIABLE_3314:int) (bOUND_VARIABLE_3324:bool) ->
+                 42 ]; vsenv = [ y1 = 0, y2 = false ]; rsenv = [];
+        idenv = [] }
   Line 14:
-    Property failure at assertion with:
-      h = fun (bOUND_VARIABLE_3314:int) (bOUND_VARIABLE_3324:bool) -> 42
-      y1 = 0
-      y2 = false
-      y1 = 0
-      y2 = false
+    Property failure at assertion with env:
+      { lsenv =
+          [ h = fun (bOUND_VARIABLE_3314:int) (bOUND_VARIABLE_3324:bool) ->
+                 42 ]; vsenv = [ y1 = 0, y2 = false ]; rsenv = [];
+        idenv = [ y1 = 0, y2 = false ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -76,13 +75,12 @@ File logic_function.mlw:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (bOUND_VARIABLE_314:int) -> 0
-      y = 0
+      { lsenv = [ f = fun (bOUND_VARIABLE_314:int) -> 0 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [] }
   Line 21:
-    Property failure at assertion with:
-      f = fun (bOUND_VARIABLE_314:int) -> 0
-      y = 0
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ f = fun (bOUND_VARIABLE_314:int) -> 0 ]; vsenv = [ y = 0 ];
+        rsenv = []; idenv = [ y = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -98,20 +96,21 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File logic_function.mlw:
   Line 16:
-    f = fun (bOUND_VARIABLE_343:int) ->
-         if bOUND_VARIABLE_343 = 1 then 0 else (- 1)
+    f =
+      fun (bOUND_VARIABLE_343:int) ->
+       if bOUND_VARIABLE_343 = 1 then 0 else (- 1)
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (bOUND_VARIABLE_343:int) ->
-           if bOUND_VARIABLE_343 = 1 then 0 else (- 1)
-      y = 0
+      { lsenv =
+          [ f = fun (bOUND_VARIABLE_343:int) ->
+                 if bOUND_VARIABLE_343 = 1 then 0 else (- 1) ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 22:
-    Property failure at assertion with:
-      f = fun (bOUND_VARIABLE_343:int) ->
-           if bOUND_VARIABLE_343 = 1 then 0 else (- 1)
-      y = 0
-      _ = ()
-      y = 0
+    Property failure at assertion with env:
+      { lsenv =
+          [ f = fun (bOUND_VARIABLE_343:int) ->
+                 if bOUND_VARIABLE_343 = 1 then 0 else (- 1) ];
+        vsenv = [ y = 0, _ = () ]; rsenv = []; idenv = [ y = 0 ] }
 

@@ -17,11 +17,8 @@ File logic_constant.mlw:
     y = 0
     y = 0
     Execution of main function `main` with env:
-      c = 0
-      y = 0
+      { lsenv = [ c = 0 ]; vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 9:
-    Property failure at assertion with:
-      c = 0
-      y = 0
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ c = 0 ]; vsenv = [ y = 0 ]; rsenv = []; idenv = [ y = 0 ] }
 

@@ -13,36 +13,30 @@ The program does not comply to the verification goal, for example during the
 File func_call6.mlw:
   Line 7:
     Constant z initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    z = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    z = { contents = 0 }
 Unknown location:
     _ = ()
 File func_call6.mlw:
   Line 13:
     _ = ()
     Execution of main function `f` with env:
-      z = {contents= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ z = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 14:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 0
+      [ r = { contents = 0 }, v = 0 ]
   Line 15:
-    Normal execution of function `Tuple0` with args:
-    (giant-step) execution of unimplemented function `g`
-      _ = ()
-    z = {contents= 2}
+    Normal execution of function `Tuple0` with args: []
+    (giant-step) execution of unimplemented function `g` with args:
+      [ _ = () ]
+    z = { contents = 2 }
     result of `g` = ()
   Line 16:
-    Property failure at assertion with:
-      z = {contents= 2}
-      _ = ()
-      _ = ()
-      _ = ()
-      z = {contents= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { contents = 2 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ z = { contents = 2 } ] }
 

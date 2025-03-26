@@ -18,14 +18,9 @@ File division_by_zero.mlw:
     x = 0
     x = 0
     Execution of main function `f` with env:
-      x = 0
-    Normal execution of function `(/)` with args:
-      x = 1000
-      y = 0
-    Property failure at precondition of `(/)` with:
-      x = 1000
-      y = 0
-      x = 0
-      o = 1000
-      y = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
+    Normal execution of function `(/)` with args: [ x = 1000, y = 0 ]
+    Property failure at precondition of `(/)` with env:
+      { lsenv = []; vsenv = [ x = 1000, y = 0, x = 0, o = 1000 ]; rsenv = [];
+        idenv = [ y = 0 ] }
 

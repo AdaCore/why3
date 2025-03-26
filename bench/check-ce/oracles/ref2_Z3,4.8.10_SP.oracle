@@ -16,19 +16,15 @@ File ref2.mlw:
   Line 4:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 5:
-    Normal execution of function `ref` with args:
-      contents = 1
-    Normal execution of function `ref'mk` with args:
-      contents = 1
+    Normal execution of function `ref` with args: [ contents = 1 ]
+    Normal execution of function `ref'mk` with args: [ contents = 1 ]
   Line 6:
     Normal execution of function `(:=)` with args:
-      r = {contents= 1}
-      v = 2
+      [ r = { contents = 1 }, v = 2 ]
   Line 7:
-    Property failure at assertion with:
-      _ = ()
-      x = {contents= 2}
-      _ = ()
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), x = { contents = 2 }, _ = () ];
+        rsenv = []; idenv = [] }
 

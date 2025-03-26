@@ -12,26 +12,23 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File func_call6_mono.mlw:
   Line 8:
-    z = {c= 0}
+    z = { c = 0 }
 Unknown location:
     _ = ()
 File func_call6_mono.mlw:
   Line 14:
     _ = ()
     Execution of main function `f` with env:
-      z = {c= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ z = { c = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 16:
-    Normal execution of function `Tuple0` with args:
-    (giant-step) execution of unimplemented function `g`
-      _ = ()
-    z = {c= 2}
+    Normal execution of function `Tuple0` with args: []
+    (giant-step) execution of unimplemented function `g` with args:
+      [ _ = () ]
+    z = { c = 2 }
     result of `g` = ()
   Line 17:
-    Property failure at assertion with:
-      z = {c= 2}
-      _ = ()
-      _ = ()
-      _ = ()
-      z = {c= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { c = 2 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ z = { c = 2 } ] }
 

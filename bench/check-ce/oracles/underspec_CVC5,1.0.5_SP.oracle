@@ -22,41 +22,32 @@ File underspec.mlw:
   Line 13:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 14:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    Giant-step execution of function `ref` with args: [ contents = 0 ]
+    result of `ref` = { contents = 0 }
   Line 15:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    Giant-step execution of function `ref` with args: [ contents = 0 ]
+    result of `ref` = { contents = 0 }
   Line 16:
     Giant-step iteration of loop
-    x1 = {contents= (- 1)}
-    x2 = {contents= 0}
+    x1 = { contents = (- 1) }
+    x2 = { contents = 0 }
     i = 0
     Giant-step iteration of loop
   Line 18:
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
+    Normal execution of function `(=)` with args: [ x = 0, y = 0 ]
   Line 19:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 1)}
-    Normal execution of function `(+)` with args:
-      _ = (- 1)
-      _ = 1
+      [ arg = { contents = (- 1) } ]
+    Normal execution of function `(+)` with args: [ _ = (- 1), _ = 1 ]
   Line 17:
-    Property failure at loop invariant preservation with:
-      _ = ()
-      x1 = {contents= 0}
-      x2 = {contents= 0}
-      i = 1
-      o = 1
-      o = 0
-      x1 = {contents= 0}
-      i = 1
+    Property failure at loop invariant preservation with env:
+      { lsenv = [];
+        vsenv =
+          [ _ = (), x1 = { contents = 0 }, x2 = { contents = 0 }, i = 1,
+            o = 1, o = 0 ]; rsenv = [];
+        idenv = [ x1 = { contents = 0 }, i = 1 ] }
 
 File "bench/check-ce/underspec.mlw", line 31, characters 14-23:
 Sub-goal Postcondition of goal g'vc.
@@ -77,26 +68,22 @@ The contracts of the following functions/loops are too weak :
 , for example during the following execution:
 File underspec.mlw:
   Line 27:
-    z = {contents= 0}
+    z = { contents = 0 }
 Unknown location:
     _ = ()
 File underspec.mlw:
   Line 34:
     _ = ()
     Execution of main function `f` with env:
-      z = {contents= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ z = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 36:
-    Normal execution of function `Tuple0` with args:
-    Giant-step execution of function `g` with args:
-      _ = ()
-    z = {contents= 2}
+    Normal execution of function `Tuple0` with args: []
+    Giant-step execution of function `g` with args: [ _ = () ]
+    z = { contents = 2 }
     result of `g` = ()
   Line 37:
-    Property failure at assertion with:
-      z = {contents= 2}
-      _ = ()
-      _ = ()
-      _ = ()
-      z = {contents= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { contents = 2 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ z = { contents = 2 } ] }
 

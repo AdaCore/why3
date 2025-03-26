@@ -17,48 +17,37 @@ File log-cond.mlw:
   Line 12:
     a = 0
   Line 14:
-    b = {contents= 43}
+    b = { contents = 43 }
   Line 16:
     x = 0
-    y = {contents= 0}
+    y = { contents = 0 }
     x = 0
-    y = {contents= 0}
+    y = { contents = 0 }
     Execution of main function `f1` with env:
-      a = 0
-      b = {contents= 43}
-      x = 0
-      y = {contents= 0}
+      { lsenv = [ a = 0 ];
+        vsenv = [ b = { contents = 43 }, x = 0, y = { contents = 0 } ];
+        rsenv = []; idenv = [] }
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 0
+      [ arg = { contents = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 0 ]
   Line 19:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(<=)` with args:
-      x = 0
-      y = 42
+      [ arg = { contents = 0 } ]
+    Normal execution of function `(<=)` with args: [ x = 0, y = 42 ]
   Line 21:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
     Normal execution of function `contents` with args:
-      arg = {contents= 43}
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 0
+      [ arg = { contents = 43 } ]
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 0 ]
   Line 22:
-    Property failure at assertion with:
-      a = 0
-      b = {contents= 43}
-      x = 0
-      y = {contents= 0}
-      _ = ()
-      _ = ()
-      b = {contents= 43}
-      x = 0
-      y = {contents= 0}
+    Property failure at assertion with env:
+      { lsenv = [ a = 0 ];
+        vsenv =
+          [ b = { contents = 43 }, x = 0, y = { contents = 0 }, _ = (),
+            _ = () ]; rsenv = [];
+        idenv = [ b = { contents = 43 }, x = 0, y = { contents = 0 } ] }
 
 File "bench/check-ce/log-cond.mlw", line 27, characters 17-23:
 Sub-goal Assertion of goal f1'vc.

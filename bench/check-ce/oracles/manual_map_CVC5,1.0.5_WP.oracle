@@ -15,17 +15,24 @@ File manual_map.mlw:
     x = fun (x1:int) -> if x1 = 1 then 3 else 0
     x = fun (x1:int) -> if x1 = 1 then 3 else 0
     Execution of main function `test_map` with env:
-      x = fun (x1:int) -> if x1 = 1 then 3 else 0
+      { lsenv = []; vsenv = [ x = fun (x1:int) -> if x1 = 1 then 3 else 0 ];
+        rsenv = []; idenv = [] }
   Line 7:
     Normal execution of function `set` with args:
-      f = fun (x1:int) -> if x1 = 1 then 3 else 0
-      x = 0
-      v = 3
+      [ f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3 ]
   Line 5:
-    Property failure at postcondition of `test_map` with:
-      x = fun (x1:int) -> if x1 = 1 then 3 else 0
-      result = (fun y -> if pure { if y = x then True else False } then v
-                  else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
-      result = (fun y -> if pure { if y = x then True else False } then v
-                  else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
+    Property failure at postcondition of `test_map` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = fun (x1:int) -> if x1 = 1 then 3 else 0,
+            result = (fun y ->
+                       if pure { if y = x then True else False } then v
+                       else f y) with f =
+                       fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3 ];
+        rsenv = [];
+        idenv =
+          [ result = (fun y ->
+                       if pure { if y = x then True else False } then v
+                       else f y) with f =
+                       fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3 ] }
 

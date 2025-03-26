@@ -25,51 +25,33 @@ File while_mono.mlw:
     z = 2
     z = 2
     Execution of main function `f` with env:
-      z = 2
+      { lsenv = []; vsenv = [ z = 2 ]; rsenv = []; idenv = [] }
   Line 7:
-    Normal execution of function `t'mk` with args:
-      c = 2
+    Normal execution of function `t'mk` with args: [ c = 2 ]
   Line 8:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 9:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 10:
     Giant-step iteration of loop
-    x1 = {c= (- 2)}
-    x2 = {c= 399}
-    i = {c= 0}
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(<)` with args:
-      _ = 0
-      _ = 2
+    x1 = { c = (- 2) }
+    x2 = { c = 399 }
+    i = { c = 0 }
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(<)` with args: [ _ = 0, _ = 2 ]
     Normal iteration of loop
   Line 13:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(=)` with args: [ x = 0, y = 0 ]
   Line 14:
-    Normal execution of function `c` with args:
-      arg = {c= (- 2)}
-    Normal execution of function `(+)` with args:
-      _ = (- 2)
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = (- 2) } ]
+    Normal execution of function `(+)` with args: [ _ = (- 2), _ = 1 ]
   Line 17:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 12:
-    Property failure at loop invariant preservation with:
-      z = 2
-      x1 = {c= (-1)}
-      x2 = {c= 399}
-      i = {c= 1}
-      x1 = {c= (-1)}
-      i = {c= 1}
+    Property failure at loop invariant preservation with env:
+      { lsenv = [];
+        vsenv = [ z = 2, x1 = { c = (-1) }, x2 = { c = 399 }, i = { c = 1 } ];
+        rsenv = []; idenv = [ x1 = { c = (-1) }, i = { c = 1 } ] }
 

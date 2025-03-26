@@ -26,30 +26,24 @@ The contracts of the following functions/loops are too weak :
 File func_call1_mono.mlw:
   Line 6:
     Constant z initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {c= 0}
-    z = {c= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { c = 0 }
+    z = { c = 0 }
 Unknown location:
     _ = ()
 File func_call1_mono.mlw:
   Line 15:
     _ = ()
     Execution of main function `f` with env:
-      z = {c= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ z = { c = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 17:
-    Giant-step execution of function `g` with args:
-      x = 2
-    z = {c= 2}
+    Giant-step execution of function `g` with args: [ x = 2 ]
+    z = { c = 2 }
     result of `g` = 3
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = 3
+    Normal execution of function `(+)` with args: [ _ = 3, _ = 3 ]
   Line 18:
-    Property failure at assertion with:
-      z = {c= 2}
-      _ = ()
-      _ = ()
-      w = 6
-      z = {c= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { c = 2 }, _ = (), _ = (), w = 6 ];
+        rsenv = []; idenv = [ z = { c = 2 } ] }
 

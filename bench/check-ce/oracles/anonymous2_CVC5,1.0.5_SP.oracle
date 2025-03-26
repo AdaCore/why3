@@ -14,29 +14,23 @@ The contracts of the following functions/loops are too weak :
 File anonymous2.mlw:
   Line 3:
     Constant z initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    z = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    z = { contents = 0 }
   Line 5:
     x = 1
     x = 1
     Execution of main function `f` with env:
-      z = {contents= 0}
-      x = 1
+      { lsenv = []; vsenv = [ z = { contents = 0 }, x = 1 ]; rsenv = [];
+        idenv = [] }
   Line 8:
-    Giant-step execution of function `h` with args:
-      y = 1
-    z = {contents= 0}
+    Giant-step execution of function `h` with args: [ y = 1 ]
+    z = { contents = 0 }
     result of `h` = ()
   Line 9:
-    Property failure at assertion with:
-      z = {contents= 0}
-      x = 1
-      _ = ()
-      _ = ()
-      z = {contents= 0}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { contents = 0 }, x = 1, _ = (), _ = () ];
+        rsenv = []; idenv = [ z = { contents = 0 } ] }
 

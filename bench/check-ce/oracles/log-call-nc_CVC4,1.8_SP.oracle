@@ -21,35 +21,27 @@ The program does not comply to the verification goal, for example during the
 File log-call-nc.mlw:
   Line 9:
     Constant x initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    x = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    x = { contents = 0 }
 Unknown location:
     _ = ()
 File log-call-nc.mlw:
   Line 17:
     _ = ()
     Execution of main function `f1` with env:
-      x = {contents= 0}
-      _ = ()
+      { lsenv = []; vsenv = [ x = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 19:
-    Normal execution of function `f` with args:
-      y = 1
+    Normal execution of function `f` with args: [ y = 1 ]
   Line 15:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+      [ arg = { contents = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 20:
-    Property failure at assertion with:
-      x = {contents= 1}
-      _ = ()
-      _ = ()
-      _ = ()
-      x = {contents= 1}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = { contents = 1 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ x = { contents = 1 } ] }
 

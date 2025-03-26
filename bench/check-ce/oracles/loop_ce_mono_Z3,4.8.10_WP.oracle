@@ -21,90 +21,56 @@ The program does not comply to the verification goal, for example during the
 File loop_ce_mono.mlw:
   Line 8:
     Constant a initialization
-    Normal execution of function `t'mk` with args:
-      c = 0
-    a = {c= 0}
+    Normal execution of function `t'mk` with args: [ c = 0 ]
+    a = { c = 0 }
   Line 10:
-    b = {c= 5}
+    b = { c = 5 }
 Unknown location:
     _ = ()
 File loop_ce_mono.mlw:
   Line 12:
     _ = ()
     Execution of main function `f` with env:
-      a = {c= 0}
-      b = {c= 5}
-      _ = ()
+      { lsenv = []; vsenv = [ a = { c = 0 }, b = { c = 5 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 16:
-    Normal execution of function `c` with args:
-      arg = {c= 2}
-    Normal execution of function `(<)` with args:
-      _ = 2
-      _ = 10
+    Normal execution of function `c` with args: [ arg = { c = 2 } ]
+    Normal execution of function `(<)` with args: [ _ = 2, _ = 10 ]
     Normal iteration of loop
   Line 19:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `c` with args:
-      arg = {c= 2}
-    Normal execution of function `(+)` with args:
-      _ = 2
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `c` with args: [ arg = { c = 2 } ]
+    Normal execution of function `(+)` with args: [ _ = 2, _ = 1 ]
   Line 16:
-    Normal execution of function `c` with args:
-      arg = {c= 3}
-    Normal execution of function `(<)` with args:
-      _ = 3
-      _ = 10
+    Normal execution of function `c` with args: [ arg = { c = 3 } ]
+    Normal execution of function `(<)` with args: [ _ = 3, _ = 10 ]
     Normal iteration of loop
   Line 19:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `c` with args:
-      arg = {c= 3}
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `c` with args: [ arg = { c = 3 } ]
+    Normal execution of function `(+)` with args: [ _ = 3, _ = 1 ]
   Line 16:
-    Normal execution of function `c` with args:
-      arg = {c= 4}
-    Normal execution of function `(<)` with args:
-      _ = 4
-      _ = 10
+    Normal execution of function `c` with args: [ arg = { c = 4 } ]
+    Normal execution of function `(<)` with args: [ _ = 4, _ = 10 ]
     Normal iteration of loop
   Line 19:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `c` with args:
-      arg = {c= 4}
-    Normal execution of function `(+)` with args:
-      _ = 4
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `c` with args: [ arg = { c = 4 } ]
+    Normal execution of function `(+)` with args: [ _ = 4, _ = 1 ]
   Line 16:
-    Normal execution of function `c` with args:
-      arg = {c= 5}
-    Normal execution of function `(<)` with args:
-      _ = 5
-      _ = 10
+    Normal execution of function `c` with args: [ arg = { c = 5 } ]
+    Normal execution of function `(<)` with args: [ _ = 5, _ = 10 ]
     Normal iteration of loop
   Line 19:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `c` with args:
-      arg = {c= 5}
-    Normal execution of function `(+)` with args:
-      _ = 5
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `c` with args: [ arg = { c = 5 } ]
+    Normal execution of function `(+)` with args: [ _ = 5, _ = 1 ]
   Line 18:
-    Property failure at loop invariant preservation with:
-      a = {c= 1}
-      b = {c= 6}
-      _ = ()
-      _ = ()
-      _ = ()
-      _ = ()
-      a = {c= 1}
-      b = {c= 6}
+    Property failure at loop invariant preservation with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { c = 1 }, b = { c = 6 }, _ = (), _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ a = { c = 1 }, b = { c = 6 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -120,33 +86,24 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File loop_ce_mono.mlw:
   Line 30:
-    a = {c1= 0}
-    a = {c1= 0}
+    a = { c1 = 0 }
+    a = { c1 = 0 }
     Execution of main function `g` with env:
-      a = {c1= 0}
+      { lsenv = []; vsenv = [ a = { c1 = 0 } ]; rsenv = []; idenv = [] }
   Line 34:
-    Normal execution of function `c` with args:
-      arg = {c1= 0}
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 10
+    Normal execution of function `c` with args: [ arg = { c1 = 0 } ]
+    Normal execution of function `(=)` with args: [ x = 0, y = 10 ]
 Unknown location:
-    Normal execution of function `True` with args:
+    Normal execution of function `True` with args: []
 File loop_ce_mono.mlw:
   Line 34:
-    Normal execution of function `c` with args:
-      arg = {c1= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c1 = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 35:
-    Property failure at assertion with:
-      a = {c1= 1}
-      _ = ()
-      a = t'mk1 0
-      a = {c1= 0}
-      a = {c1= 1}
-      a = t'mk1 0
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv = [ a = { c1 = 1 }, _ = (), a = t'mk1 0, a = { c1 = 0 } ];
+        rsenv = []; idenv = [ a = { c1 = 1 }, a = t'mk1 0 ] }
 
 File "bench/check-ce/loop_ce_mono.mlw", line 31, characters 12-29:
 Sub-goal Postcondition of goal g'vc.
@@ -170,26 +127,21 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File loop_ce_mono.mlw:
   Line 30:
-    a = {c1= 10}
-    a = {c1= 10}
+    a = { c1 = 10 }
+    a = { c1 = 10 }
     Execution of main function `g` with env:
-      a = {c1= 10}
+      { lsenv = []; vsenv = [ a = { c1 = 10 } ]; rsenv = []; idenv = [] }
   Line 34:
-    Normal execution of function `c` with args:
-      arg = {c1= 10}
-    Normal execution of function `(=)` with args:
-      x = 10
-      y = 10
+    Normal execution of function `c` with args: [ arg = { c1 = 10 } ]
+    Normal execution of function `(=)` with args: [ x = 10, y = 10 ]
 Unknown location:
-    Normal execution of function `False` with args:
+    Normal execution of function `False` with args: []
 File loop_ce_mono.mlw:
   Line 34:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
   Line 31:
-    Property failure at postcondition of `g` with:
-      a = {c1= 10}
-      a = {c1= 10}
-      result = ()
-      a = {c1= 10}
-      a = {c1= 10}
+    Property failure at postcondition of `g` with env:
+      { lsenv = [];
+        vsenv = [ a = { c1 = 10 }, a = { c1 = 10 }, result = () ];
+        rsenv = []; idenv = [ a = { c1 = 10 }, a = { c1 = 10 } ] }
 

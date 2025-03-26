@@ -72,15 +72,14 @@ File algebraic_types_mono.mlw:
     x = A
     x = A
     Execution of main function `g4'goal` with env:
-      x = A
+      { lsenv = []; vsenv = [ x = A ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 12:
-    Property failure at postcondition of `g4'goal` with:
-      x = A
-      result = ()
-      x = A
+    Property failure at postcondition of `g4'goal` with env:
+      { lsenv = []; vsenv = [ x = A, result = () ]; rsenv = [];
+        idenv = [ x = A ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -102,15 +101,14 @@ File algebraic_types_mono.mlw:
     x = (Au 1 0)
     x = (Au 1 0)
     Execution of main function `g5'goal` with env:
-      x = (Au 1 0)
+      { lsenv = []; vsenv = [ x = (Au 1 0) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File algebraic_types_mono.mlw:
   Line 16:
-    Property failure at postcondition of `g5'goal1` with:
-      x = (Au 1 0)
-      result = ()
-      x = (Au 1 0)
+    Property failure at postcondition of `g5'goal1` with env:
+      { lsenv = []; vsenv = [ x = (Au 1 0), result = () ]; rsenv = [];
+        idenv = [ x = (Au 1 0) ] }
 
 Warning: Error while checking function definition type match_mylist: Function arity mismatch when interpreting
 (Function ()

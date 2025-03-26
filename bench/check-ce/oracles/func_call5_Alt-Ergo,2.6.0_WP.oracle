@@ -46,22 +46,15 @@ File func_call5.mlw:
     x = 0
     x = 0
     Execution of main function `f2` with env:
-      x = 0
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 20:
-    Normal execution of function `g2` with args:
-      y = 0
+    Normal execution of function `g2` with args: [ y = 0 ]
   Line 17:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
-    Normal execution of function `ref` with args:
-      contents = 1
-    Normal execution of function `ref'mk` with args:
-      contents = 1
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
+    Normal execution of function `ref` with args: [ contents = 1 ]
+    Normal execution of function `ref'mk` with args: [ contents = 1 ]
   Line 21:
-    Property failure at assertion with:
-      x = 0
-      z = {contents= 1}
-      x = 0
-      z = {contents= 1}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 0, z = { contents = 1 } ]; rsenv = [];
+        idenv = [ x = 0, z = { contents = 1 } ] }
 

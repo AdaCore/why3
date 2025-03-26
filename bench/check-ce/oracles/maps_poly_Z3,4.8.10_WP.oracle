@@ -12,36 +12,45 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 7:
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 }
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 }
     Execution of main function `test_map` with env:
-      x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      { lsenv = [];
+        vsenv =
+          [ x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ];
+        rsenv = []; idenv = [] }
   Line 10:
     Normal execution of function `(!)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      [ arg = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ]
 File maps_poly.mlw:
   Line 10:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) -> if x!0 = 1 then 3 else 2
-      x = 0
-      v = 3
+      [ f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 },
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x
+              = 0, v = 3 ]
   Line 8:
-    Property failure at postcondition of `test_map` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
-      result = ()
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
+    Property failure at postcondition of `test_map` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 },
+            result = () ]; rsenv = [];
+        idenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -57,204 +66,184 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 13:
-    x = {contents=
-         fun (x!0:int) ->
-          if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-          else if x!0 = 1
-               then fun (x!01:int) ->
-                     if x!01 = 0 then 3
-                     else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-               else fun (x!01:int) -> 4}
-    x = {contents=
-         fun (x!0:int) ->
-          if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-          else if x!0 = 1
-               then fun (x!01:int) ->
-                     if x!01 = 0 then 3
-                     else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-               else fun (x!01:int) -> 4}
+    x =
+      { contents =
+          fun (x!0:int) ->
+           if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+           else if x!0 = 1
+                then fun (x!01:int) ->
+                      if x!01 = 0 then 3
+                      else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
+                else fun (x!01:int) -> 4 }
+    x =
+      { contents =
+          fun (x!0:int) ->
+           if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+           else if x!0 = 1
+                then fun (x!01:int) ->
+                      if x!01 = 0 then 3
+                      else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
+                else fun (x!01:int) -> 4 }
     Execution of main function `test_map_multidim1` with env:
-      x = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-            else if x!0 = 1
-                 then fun (x!01:int) ->
-                       if x!01 = 0 then 3
-                       else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    fun (x!0:int) ->
+                     if x!0 = 0
+                     then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                     else if x!0 = 1
+                          then fun (x!01:int) ->
+                                if x!01 = 0 then 3
+                                else if x!01 = 6 then 7
+                                     else if x!01 = 1 then 3 else 2
+                          else fun (x!01:int) -> 4 } ]; rsenv = [];
+        idenv = [] }
   Line 16:
     Normal execution of function `(!)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-            else if x!0 = 1
-                 then fun (x!01:int) ->
-                       if x!01 = 0 then 3
-                       else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) ->
+                            if x!01 = 0 then 3
+                            else if x!01 = 6 then 7
+                                 else if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents=
-             fun (x!0:int) ->
-              if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-              else if x!0 = 1
-                   then fun (x!01:int) ->
-                         if x!01 = 0 then 3
-                         else if x!01 = 6 then 7
-                              else if x!01 = 1 then 3 else 2
-                   else fun (x!01:int) -> 4}
+      [ arg = { contents =
+                  fun (x!0:int) ->
+                   if x!0 = 0
+                   then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                   else if x!0 = 1
+                        then fun (x!01:int) ->
+                              if x!01 = 0 then 3
+                              else if x!01 = 6 then 7
+                                   else if x!01 = 1 then 3 else 2
+                        else fun (x!01:int) -> 4 } ]
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `get` with args:
-      f = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-           else if x!0 = 1
-                then fun (x!01:int) ->
-                      if x!01 = 0 then 3
-                      else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      x = 1
+      [ f = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+             else if x!0 = 1
+                  then fun (x!01:int) ->
+                        if x!01 = 0 then 3
+                        else if x!01 = 6 then 7
+                             else if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, x = 1 ]
 File map.mlw:
   Line 11:
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-           else if x!0 = 1
-                then fun (x!01:int) ->
-                      if x!01 = 0 then 3
-                      else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      u = 1
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+             else if x!0 = 1
+                  then fun (x!01:int) ->
+                        if x!01 = 0 then 3
+                        else if x!01 = 6 then 7
+                             else if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, u = 1 ]
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `(!)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-            else if x!0 = 1
-                 then fun (x!01:int) ->
-                       if x!01 = 0 then 3
-                       else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) ->
+                            if x!01 = 0 then 3
+                            else if x!01 = 6 then 7
+                                 else if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents=
-             fun (x!0:int) ->
-              if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-              else if x!0 = 1
-                   then fun (x!01:int) ->
-                         if x!01 = 0 then 3
-                         else if x!01 = 6 then 7
-                              else if x!01 = 1 then 3 else 2
-                   else fun (x!01:int) -> 4}
+      [ arg = { contents =
+                  fun (x!0:int) ->
+                   if x!0 = 0
+                   then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                   else if x!0 = 1
+                        then fun (x!01:int) ->
+                              if x!01 = 0 then 3
+                              else if x!01 = 6 then 7
+                                   else if x!01 = 1 then 3 else 2
+                        else fun (x!01:int) -> 4 } ]
 File maps_poly.mlw:
   Line 16:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-           else if x!0 = 1
-                then fun (x!01:int) ->
-                      if x!01 = 0 then 3
-                      else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      x = 0
-      v = fun (x!0:int) ->
-           if x!0 = 0 then 3
-           else if x!0 = 6 then 7 else if x!0 = 1 then 3 else 2
+      [ f = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+             else if x!0 = 1
+                  then fun (x!01:int) ->
+                        if x!01 = 0 then 3
+                        else if x!01 = 6 then 7
+                             else if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, x = 0,
+        v = fun (x!0:int) ->
+             if x!0 = 0 then 3
+             else if x!0 = 6 then 7 else if x!0 = 1 then 3 else 2 ]
     Normal execution of function `(:=)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
-            else if x!0 = 1
-                 then fun (x!01:int) ->
-                       if x!01 = 0 then 3
-                       else if x!01 = 6 then 7 else if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) ->
-                                 if x!0 = 0
-                                 then fun (x!01:int) ->
-                                       if x!01 = 6 then 8 else 5
-                                 else if x!0 = 1
-                                      then fun (x!01:int) ->
-                                            if x!01 = 0 then 3
-                                            else if x!01 = 6 then 7
-                                                 else if x!01 = 1 then 3
-                                                      else 2
-                                      else fun (x!01:int) -> 4, x = 0, v = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 3
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 6
-                                                                    then 7
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 1
-                                                                    then 3
-                                                                    else 2
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) ->
+                            if x!01 = 0 then 3
+                            else if x!01 = 6 then 7
+                                 else if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 },
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f =
+              fun (x!0:int) ->
+               if x!0 = 0 then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+               else if x!0 = 1
+                    then fun (x!01:int) ->
+                          if x!01 = 0 then 3
+                          else if x!01 = 6 then 7
+                               else if x!01 = 1 then 3 else 2
+                    else fun (x!01:int) -> 4, x = 0, v =
+              fun (x!0:int) ->
+               if x!0 = 0 then 3
+               else if x!0 = 6 then 7 else if x!0 = 1 then 3 else 2 ]
   Line 14:
-    Property failure at postcondition of `test_map_multidim1` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 0
-                                  then fun (x!01:int) ->
-                                        if x!01 = 6 then 8 else 5
-                                  else if x!0 = 1
-                                       then fun (x!01:int) ->
-                                             if x!01 = 0 then 3
-                                             else if x!01 = 6 then 7
-                                                  else if x!01 = 1 then 3
-                                                       else 2
-                                       else fun (x!01:int) -> 4, x = 0, v = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 3
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 6
-                                                                    then 7
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 1
-                                                                    then 3
-                                                                    else 2}
-      result = ()
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 0
-                                  then fun (x!01:int) ->
-                                        if x!01 = 6 then 8 else 5
-                                  else if x!0 = 1
-                                       then fun (x!01:int) ->
-                                             if x!01 = 0 then 3
-                                             else if x!01 = 6 then 7
-                                                  else if x!01 = 1 then 3
-                                                       else 2
-                                       else fun (x!01:int) -> 4, x = 0, v = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 3
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 6
-                                                                    then 7
-                                                                    else 
-                                                                    if 
-                                                                    x!0 = 1
-                                                                    then 3
-                                                                    else 2}
+    Property failure at postcondition of `test_map_multidim1` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) ->
+                       if x!0 = 0
+                       then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                       else if x!0 = 1
+                            then fun (x!01:int) ->
+                                  if x!01 = 0 then 3
+                                  else if x!01 = 6 then 7
+                                       else if x!01 = 1 then 3 else 2
+                            else fun (x!01:int) -> 4, x = 0, v =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 3
+                       else if x!0 = 6 then 7 else if x!0 = 1 then 3 else 2 },
+            result = () ]; rsenv = [];
+        idenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) ->
+                       if x!0 = 0
+                       then fun (x!01:int) -> if x!01 = 6 then 8 else 5
+                       else if x!0 = 1
+                            then fun (x!01:int) ->
+                                  if x!01 = 0 then 3
+                                  else if x!01 = 6 then 7
+                                       else if x!01 = 1 then 3 else 2
+                            else fun (x!01:int) -> 4, x = 0, v =
+                      fun (x!0:int) ->
+                       if x!0 = 0 then 3
+                       else if x!0 = 6 then 7 else if x!0 = 1 then 3 else 2 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -270,157 +259,145 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 18:
-    x = {contents=
-         fun (x!0:int) ->
-          if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-          else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-               else fun (x!01:int) -> 4}
-    x = {contents=
-         fun (x!0:int) ->
-          if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-          else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-               else fun (x!01:int) -> 4}
+    x =
+      { contents =
+          fun (x!0:int) ->
+           if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+           else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                else fun (x!01:int) -> 4 }
+    x =
+      { contents =
+          fun (x!0:int) ->
+           if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+           else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                else fun (x!01:int) -> 4 }
     Execution of main function `test_map_multidim2` with env:
-      x = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-            else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    fun (x!0:int) ->
+                     if x!0 = 0
+                     then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                     else if x!0 = 1
+                          then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                          else fun (x!01:int) -> 4 } ]; rsenv = [];
+        idenv = [] }
   Line 21:
     Normal execution of function `(!)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-            else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents=
-             fun (x!0:int) ->
-              if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-              else if x!0 = 1
-                   then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                   else fun (x!01:int) -> 4}
+      [ arg = { contents =
+                  fun (x!0:int) ->
+                   if x!0 = 0
+                   then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                   else if x!0 = 1
+                        then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                        else fun (x!01:int) -> 4 } ]
 File maps_poly.mlw:
   Line 21:
     Normal execution of function `get` with args:
-      f = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-           else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      x = 0
+      [ f = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+             else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, x = 0 ]
 File map.mlw:
   Line 11:
     Normal execution of function `(@)` with args:
-      u = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-           else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      u = 0
+      [ u = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+             else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, u = 0 ]
 File maps_poly.mlw:
   Line 22:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) -> if x!0 = 0 then 6 else 5
-      x = 0
-      v = 3
+      [ f = fun (x!0:int) -> if x!0 = 0 then 6 else 5, x = 0, v = 3 ]
   Line 23:
     Normal execution of function `(!)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-            else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents=
-             fun (x!0:int) ->
-              if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-              else if x!0 = 1
-                   then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                   else fun (x!01:int) -> 4}
+      [ arg = { contents =
+                  fun (x!0:int) ->
+                   if x!0 = 0
+                   then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                   else if x!0 = 1
+                        then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                        else fun (x!01:int) -> 4 } ]
 File maps_poly.mlw:
   Line 23:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) ->
-           if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-           else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                else fun (x!01:int) -> 4
-      x = 0
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) -> if x!0 = 0 then 6 else 5, x = 0, v = 3
+      [ f = fun (x!0:int) ->
+             if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+             else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                  else fun (x!01:int) -> 4, x = 0,
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) -> if x!0 = 0 then 6 else 5, x
+              = 0, v = 3 ]
     Normal execution of function `(:=)` with args:
-      r = {contents=
-           fun (x!0:int) ->
-            if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
-            else if x!0 = 1 then fun (x!01:int) -> if x!01 = 1 then 3 else 2
-                 else fun (x!01:int) -> 4}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) ->
-                                 if x!0 = 0
-                                 then fun (x!01:int) ->
-                                       if x!01 = 0 then 6 else 5
-                                 else if x!0 = 1
-                                      then fun (x!01:int) ->
-                                            if x!01 = 1 then 3 else 2
-                                      else fun (x!01:int) -> 4, x = 0, v = (fun y -> if pure { 
-                                                                    if 
-                                                                    y = x
-                                                                    then True
-                                                                    else False } then v
-                                                                    else f y) with f = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 6
-                                                                    else 5, x = 0, v = 3
+      [ r = { contents =
+                fun (x!0:int) ->
+                 if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                 else if x!0 = 1
+                      then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                      else fun (x!01:int) -> 4 },
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f =
+              fun (x!0:int) ->
+               if x!0 = 0 then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+               else if x!0 = 1
+                    then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                    else fun (x!01:int) -> 4, x = 0, v =
+              (fun y -> if pure { if y = x then True else False } then v
+                else f y) with f = fun (x!0:int) -> if x!0 = 0 then 6 else 5,
+                x = 0, v = 3 ]
   Line 19:
-    Property failure at postcondition of `test_map_multidim2` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 0
-                                  then fun (x!01:int) ->
-                                        if x!01 = 0 then 6 else 5
-                                  else if x!0 = 1
-                                       then fun (x!01:int) ->
-                                             if x!01 = 1 then 3 else 2
-                                       else fun (x!01:int) -> 4, x = 0, v = (fun y -> if pure { 
-                                                                    if 
-                                                                    y = x
-                                                                    then True
-                                                                    else False } then v
-                                                                    else f y) with f = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 6
-                                                                    else 5, x = 0, v = 3}
-      result = ()
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 0
-                                  then fun (x!01:int) ->
-                                        if x!01 = 0 then 6 else 5
-                                  else if x!0 = 1
-                                       then fun (x!01:int) ->
-                                             if x!01 = 1 then 3 else 2
-                                       else fun (x!01:int) -> 4, x = 0, v = (fun y -> if pure { 
-                                                                    if 
-                                                                    y = x
-                                                                    then True
-                                                                    else False } then v
-                                                                    else f y) with f = fun
-                                                                    (x!0:
-                                                                    int) ->
-                                                                    if 
-                                                                    x!0 = 0
-                                                                    then 6
-                                                                    else 5, x = 0, v = 3}
+    Property failure at postcondition of `test_map_multidim2` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) ->
+                       if x!0 = 0
+                       then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                       else if x!0 = 1
+                            then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                            else fun (x!01:int) -> 4, x = 0, v =
+                      (fun y ->
+                        if pure { if y = x then True else False } then v
+                        else f y) with f =
+                        fun (x!0:int) -> if x!0 = 0 then 6 else 5, x = 0, v =
+                        3 }, result = () ]; rsenv = [];
+        idenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) ->
+                       if x!0 = 0
+                       then fun (x!01:int) -> if x!01 = 0 then 6 else 5
+                       else if x!0 = 1
+                            then fun (x!01:int) -> if x!01 = 1 then 3 else 2
+                            else fun (x!01:int) -> 4, x = 0, v =
+                      (fun y ->
+                        if pure { if y = x then True else False } then v
+                        else f y) with f =
+                        fun (x!0:int) -> if x!0 = 0 then 6 else 5, x = 0, v =
+                        3 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -436,36 +413,45 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 25:
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 }
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 }
     Execution of main function `proj_map_test1` with env:
-      x = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      { lsenv = [];
+        vsenv =
+          [ x = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ];
+        rsenv = []; idenv = [] }
   Line 28:
     Normal execution of function `(!)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
+      [ arg = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 } ]
 File maps_poly.mlw:
   Line 28:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) -> if x!0 = 1 then 3 else 2
-      x = 0
-      v = 3
+      [ f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then 3 else 2}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then 3 else 2 },
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x
+              = 0, v = 3 ]
   Line 26:
-    Property failure at postcondition of `proj_map_test1` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
-      result = ()
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3}
+    Property failure at postcondition of `proj_map_test1` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 },
+            result = () ]; rsenv = [];
+        idenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -481,40 +467,49 @@ The program does not comply to the verification goal, for example during the
   following execution:
 File maps_poly.mlw:
   Line 30:
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
-    x = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then True else False }
+    x = { contents = fun (x!0:int) -> if x!0 = 1 then True else False }
     Execution of main function `proj_map_test2` with env:
-      x = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
+      { lsenv = [];
+        vsenv =
+          [ x = { contents = fun (x!0:int) -> if x!0 = 1 then True else False } ];
+        rsenv = []; idenv = [] }
   Line 33:
-    Normal execution of function `True` with args:
+    Normal execution of function `True` with args: []
     Normal execution of function `(!)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then True else False } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
+      [ arg = { contents = fun (x!0:int) -> if x!0 = 1 then True else False } ]
 File maps_poly.mlw:
   Line 33:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) -> if x!0 = 1 then True else False
-      x = 0
-      v = true
+      [ f = fun (x!0:int) -> if x!0 = 1 then True else False, x = 0,
+        v = true ]
     Normal execution of function `(:=)` with args:
-      r = {contents= fun (x!0:int) -> if x!0 = 1 then True else False}
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x!0:int) ->
-                                 if x!0 = 1 then True else False, x = 0, v = true
+      [ r = { contents = fun (x!0:int) -> if x!0 = 1 then True else False },
+        v = (fun y -> if pure { if y = x then True else False } then v
+              else f y) with f =
+              fun (x!0:int) -> if x!0 = 1 then True else False, x = 0, v =
+              true ]
   Line 31:
-    Property failure at postcondition of `proj_map_test2` with:
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 1 then True else False, x = 0, v = true}
-      result = ()
-      x = {contents=
-           (fun y -> if pure { if y = x then True else False } then v
-              else f y) with f = fun (x!0:int) ->
-                                  if x!0 = 1 then True else False, x = 0, v = true}
+    Property failure at postcondition of `proj_map_test2` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then True else False, x =
+                      0, v = true }, result = () ]; rsenv = [];
+        idenv =
+          [ x = { contents =
+                    (fun y ->
+                      if pure { if y = x then True else False } then v
+                      else f y) with f =
+                      fun (x!0:int) -> if x!0 = 1 then True else False, x =
+                      0, v = true } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -535,18 +530,19 @@ File maps_poly.mlw:
     t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
     i = 0
     Execution of main function `t1'goal` with env:
-      i = 0
-      t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
+      { lsenv = [];
+        vsenv = [ i = 0, t = fun (x!0:int) -> if x!0 = 0 then 3 else 2 ];
+        rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File maps_poly.mlw:
   Line 42:
-    Property failure at postcondition of `t1'goal` with:
-      i = 0
-      t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
-      result = ()
-      i = 0
-      t = fun (x!0:int) -> if x!0 = 0 then 3 else 2
+    Property failure at postcondition of `t1'goal` with env:
+      { lsenv = [];
+        vsenv =
+          [ i = 0, t = fun (x!0:int) -> if x!0 = 0 then 3 else 2,
+            result = () ]; rsenv = [];
+        idenv = [ i = 0, t = fun (x!0:int) -> if x!0 = 0 then 3 else 2 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

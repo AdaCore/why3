@@ -25,22 +25,19 @@ File for1_mono.mlw:
   Line 5:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 7:
-    Normal execution of function `t'mk` with args:
-      c = 0
+    Normal execution of function `t'mk` with args: [ c = 0 ]
   Line 8:
     Giant-step iteration of loop
-    x = {c= 1}
+    x = { c = 1 }
     i = 2
   Line 12:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
   Line 6:
-    Property failure at postcondition of `f` with:
-      _ = ()
-      result = 1
-      result = 1
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ _ = (), result = 1 ]; rsenv = [];
+        idenv = [ result = 1 ] }
 
 File "bench/check-ce/for1_mono.mlw", line 6, characters 12-22:
 Goal f'vc.

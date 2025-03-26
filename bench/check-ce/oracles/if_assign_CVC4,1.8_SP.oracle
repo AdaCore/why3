@@ -13,33 +13,29 @@ The program does not comply to the verification goal, for example during the
 File if_assign.mlw:
   Line 7:
     Constant x initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    x = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    x = { contents = 0 }
   Line 9:
     _a = 0
     _a = 0
     Execution of main function `f` with env:
-      x = {contents= 0}
-      _a = 0
+      { lsenv = []; vsenv = [ x = { contents = 0 }, _a = 0 ]; rsenv = [];
+        idenv = [] }
   Line 12:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 42
+      [ r = { contents = 0 }, v = 42 ]
   Line 13:
-    Normal execution of function `(!)` with args:
-      r = {contents= 42}
+    Normal execution of function `(!)` with args: [ r = { contents = 42 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 42}
+      [ arg = { contents = 42 } ]
 File if_assign.mlw:
   Line 10:
-    Property failure at postcondition of `f` with:
-      x = {contents= 42}
-      _a = 0
-      result = 42
-      result = 42
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ x = { contents = 42 }, _a = 0, result = 42 ];
+        rsenv = []; idenv = [ result = 42 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -56,37 +52,32 @@ The program does not comply to the verification goal, for example during the
 File if_assign.mlw:
   Line 7:
     Constant x initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    x = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    x = { contents = 0 }
   Line 15:
     a = (- 1)
     a = (- 1)
     Execution of main function `fTest1` with env:
-      x = {contents= 0}
-      a = (- 1)
+      { lsenv = []; vsenv = [ x = { contents = 0 }, a = (- 1) ]; rsenv = [];
+        idenv = [] }
   Line 18:
-    Normal execution of function `(=)` with args:
-      x = (- 1)
-      y = 0
+    Normal execution of function `(=)` with args: [ x = (- 1), y = 0 ]
   Line 21:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 18
+      [ r = { contents = 0 }, v = 18 ]
   Line 22:
-    Normal execution of function `(!)` with args:
-      r = {contents= 18}
+    Normal execution of function `(!)` with args: [ r = { contents = 18 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 18}
+      [ arg = { contents = 18 } ]
 File if_assign.mlw:
   Line 16:
-    Property failure at postcondition of `fTest1` with:
-      x = {contents= 18}
-      a = (- 1)
-      result = 18
-      result = 18
+    Property failure at postcondition of `fTest1` with env:
+      { lsenv = [];
+        vsenv = [ x = { contents = 18 }, a = (- 1), result = 18 ];
+        rsenv = []; idenv = [ result = 18 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -103,25 +94,21 @@ The program does not comply to the verification goal, for example during the
 File if_assign.mlw:
   Line 7:
     Constant x initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    x = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    x = { contents = 0 }
   Line 24:
     a = 0
     a = 0
     Execution of main function `fTest2` with env:
-      x = {contents= 0}
-      a = 0
+      { lsenv = []; vsenv = [ x = { contents = 0 }, a = 0 ]; rsenv = [];
+        idenv = [] }
   Line 27:
-    Normal execution of function `(=)` with args:
-      x = 0
-      y = 0
+    Normal execution of function `(=)` with args: [ x = 0, y = 0 ]
   Line 28:
-    Property failure at assertion with:
-      x = {contents= 42}
-      a = 0
-      _ = ()
-      x = {contents= 42}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = { contents = 42 }, a = 0, _ = () ];
+        rsenv = []; idenv = [ x = { contents = 42 } ] }
 
 File "bench/check-ce/if_assign.mlw", line 30, characters 23-30:
 Sub-goal Assertion of goal fTest2'vc.
@@ -145,27 +132,23 @@ The program does not comply to the verification goal, for example during the
 File if_assign.mlw:
   Line 7:
     Constant x initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    x = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    x = { contents = 0 }
   Line 24:
     a = (- 1)
     a = (- 1)
     Execution of main function `fTest2` with env:
-      x = {contents= 0}
-      a = (- 1)
+      { lsenv = []; vsenv = [ x = { contents = 0 }, a = (- 1) ]; rsenv = [];
+        idenv = [] }
   Line 27:
-    Normal execution of function `(=)` with args:
-      x = (- 1)
-      y = 0
+    Normal execution of function `(=)` with args: [ x = (- 1), y = 0 ]
   Line 30:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 18
+      [ r = { contents = 0 }, v = 18 ]
   Line 25:
-    Property failure at postcondition of `fTest2` with:
-      x = {contents= 18}
-      a = (- 1)
-      result = 17
-      result = 17
+    Property failure at postcondition of `fTest2` with env:
+      { lsenv = [];
+        vsenv = [ x = { contents = 18 }, a = (- 1), result = 17 ];
+        rsenv = []; idenv = [ result = 17 ] }
 

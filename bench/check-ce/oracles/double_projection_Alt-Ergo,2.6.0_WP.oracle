@@ -22,14 +22,14 @@ File double_projection.mlw:
     x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
     x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
     Execution of main function `f` with env:
-      d = fun (_arg_0:t) -> 0
-      c = fun (_arg_0:t) -> 1
-      x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
+      { lsenv = [ d = fun (_arg_0:t) -> 0, c = fun (_arg_0:t) -> 1 ];
+        vsenv = [ x = epsilon x10:t. d x10 = 0 /\ c x10 = 1 ]; rsenv = [];
+        idenv = [] }
   Line 19:
-    Property failure at postcondition of `f` with:
-      d = fun (_arg_0:t) -> 0
-      c = fun (_arg_0:t) -> 1
-      x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
-      _t = epsilon x10:t. d x10 = 0 /\ c x10 = 1
-      x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
+    Property failure at postcondition of `f` with env:
+      { lsenv = [ d = fun (_arg_0:t) -> 0, c = fun (_arg_0:t) -> 1 ];
+        vsenv =
+          [ x = epsilon x10:t. d x10 = 0 /\ c x10 = 1,
+            _t = epsilon x10:t. d x10 = 0 /\ c x10 = 1 ]; rsenv = [];
+        idenv = [ x = epsilon x10:t. d x10 = 0 /\ c x10 = 1 ] }
 

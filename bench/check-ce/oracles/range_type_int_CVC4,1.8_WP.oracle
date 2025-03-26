@@ -15,9 +15,10 @@ File range_type_int.mlw:
     x = epsilon x:int32. int32'int x = 5
     x = epsilon x:int32. int32'int x = 5
     Execution of main function `f` with env:
-      x = epsilon x:int32. int32'int x = 5
+      { lsenv = []; vsenv = [ x = epsilon x:int32. int32'int x = 5 ];
+        rsenv = []; idenv = [] }
   Line 9:
-    Property failure at assertion with:
-      x = epsilon x:int32. int32'int x = 5
-      x = epsilon x:int32. int32'int x = 5
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = epsilon x:int32. int32'int x = 5 ];
+        rsenv = []; idenv = [ x = epsilon x:int32. int32'int x = 5 ] }
 

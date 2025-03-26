@@ -34,18 +34,15 @@ File val_function.mlw:
     y = 42
     y = 42
     Execution of main function `main_g` with env:
-      y = 42
+      { lsenv = []; vsenv = [ y = 42 ]; rsenv = []; idenv = [] }
   Line 18:
-    (giant-step) execution of unimplemented function `g`
-      x = 42
+    (giant-step) execution of unimplemented function `g` with args:
+      [ x = 42 ]
     result of `g` = 43
   Line 19:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 16:
-    Property failure at postcondition of `main_g` with:
-      y = 42
-      result = 44
-      result = 44
+    Property failure at postcondition of `main_g` with env:
+      { lsenv = []; vsenv = [ y = 42, result = 44 ]; rsenv = [];
+        idenv = [ result = 44 ] }
 

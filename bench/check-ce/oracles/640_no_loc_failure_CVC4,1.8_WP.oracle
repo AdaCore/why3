@@ -16,15 +16,15 @@ File 640_no_loc_failure.mlw:
   Line 4:
     x = (4611686018427387904:t)
     Execution of main function `wrong'goal` with env:
-      x = (4611686018427387904:t)
+      { lsenv = []; vsenv = [ x = (4611686018427387904:t) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File 640_no_loc_failure.mlw:
   Line 5:
-    Property failure at postcondition of `wrong'goal` with:
-      x = (4611686018427387904:t)
-      result = ()
-      x = (4611686018427387904:t)
+    Property failure at postcondition of `wrong'goal` with env:
+      { lsenv = []; vsenv = [ x = (4611686018427387904:t), result = () ];
+        rsenv = []; idenv = [ x = (4611686018427387904:t) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
