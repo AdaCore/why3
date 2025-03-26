@@ -10,13 +10,6 @@ Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (sat) (416 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File attributes_mono.mlw:
@@ -24,8 +17,6 @@ File attributes_mono.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 7:
     Normal execution of function `t'mk` with args:
       c = 0
@@ -340,8 +331,6 @@ File attributes_mono.mlw:
       _ = 193
       _ = 10
     Property failure at assertion with:
-      zero = 0
-      one = 1
       _ = ()
       x = {c= 203}
       _ = ()
@@ -361,13 +350,6 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Unknown (sat) (207 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File attributes_mono.mlw:
@@ -375,8 +357,6 @@ File attributes_mono.mlw:
     _ = ()
     Execution of main function `g` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 22:
     Normal execution of function `t'mk` with args:
       c = 0
@@ -392,8 +372,6 @@ File attributes_mono.mlw:
     result of `h` = ()
   Line 25:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       _ = ()
       x = {c= 200}
       _ = ()

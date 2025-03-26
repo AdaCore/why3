@@ -16,13 +16,6 @@ The contracts of the following functions/loops are too weak :
   - Loop at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8
   - Loop at "bench/check-ce/underspec.mlw", line 16, character 4 to line 22, character 8
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File underspec.mlw:
@@ -30,8 +23,6 @@ File underspec.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 14:
     Giant-step execution of function `ref` with args:
       contents = 0
@@ -58,8 +49,6 @@ File underspec.mlw:
       _ = 1
   Line 17:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       _ = ()
       x1 = {contents= 0}
       x2 = {contents= 0}
@@ -90,13 +79,6 @@ Prover result is: Unknown (unknown + incomplete) (358 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'g' at "bench/check-ce/underspec.mlw", line 36, characters 4-8
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File underspec.mlw:
   Line 27:
     z = {contents= 0}
@@ -108,8 +90,6 @@ File underspec.mlw:
     Execution of main function `f` with env:
       z = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 36:
     Normal execution of function `Tuple0` with args:
     Giant-step execution of function `g` with args:
@@ -118,8 +98,6 @@ File underspec.mlw:
     result of `g` = ()
   Line 37:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       z = {contents= 2}
       _ = ()
       _ = ()

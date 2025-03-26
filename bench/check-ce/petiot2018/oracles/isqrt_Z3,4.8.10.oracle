@@ -51,8 +51,6 @@ File isqrt-S1.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = (- 1)
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = (- 1)
@@ -88,8 +86,6 @@ File lib.mlw:
 File isqrt-S1.mlw:
   Line 10:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       n = (- 1)
       r = {contents= (- 1)}
       y = {contents= 1}
@@ -108,8 +104,6 @@ File isqrt-S2.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 1
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 1
@@ -145,8 +139,6 @@ File lib.mlw:
 File isqrt-S2.mlw:
   Line 13:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       n = 1
       r = {contents= 1}
       y = {contents= 1}
@@ -165,8 +157,6 @@ File isqrt-S3.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 1
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 1
@@ -202,8 +192,6 @@ File lib.mlw:
 File isqrt-S3.mlw:
   Line 13:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       n = 1
       r = {contents= 1}
       y = {contents= 1}
@@ -222,8 +210,6 @@ File isqrt-S4.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 8
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 8
@@ -343,8 +329,6 @@ File isqrt-S4.mlw:
       i = 7
   Line 11:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       n = 8
       r = {contents= 7}
       y = {contents= 79}
@@ -376,8 +360,6 @@ File isqrt-S5.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 2
-      zero = 0
-      one = 1
   Line 6:
     Giant-step execution of function `int_ref` with args:
       i = 2
@@ -453,8 +435,6 @@ File isqrt-S5.mlw:
     result of `(:=)` = ()
   Line 11:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       n = 2
       r = {contents= 1}
       y = {contents= 0}
@@ -473,8 +453,6 @@ File isqrt-S6.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 3
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 3
@@ -611,8 +589,6 @@ File lib.mlw:
 File isqrt-S6.mlw:
   Line 5:
     Property failure at postcondition of `isqrt` with:
-      zero = 0
-      one = 1
       n = 3
       result = 2
       n = 3
@@ -635,8 +611,6 @@ File isqrt-S7.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 1
-      zero = 0
-      one = 1
   Line 6:
     Giant-step execution of function `int_ref` with args:
       i = 1
@@ -675,8 +649,6 @@ File isqrt-S7.mlw:
     result of `(!)` = 0
   Line 5:
     Property failure at postcondition of `isqrt` with:
-      zero = 0
-      one = 1
       n = 1
       result = 0
       n = 1
@@ -693,8 +665,6 @@ File isqrt-S8.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 0
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 0
@@ -762,8 +732,6 @@ File int.mlw:
 File isqrt-S8.mlw:
   Line 5:
     Property failure at postcondition of `isqrt` with:
-      zero = 0
-      one = 1
       n = 0
       result = (-1)
       n = 0
@@ -780,8 +748,6 @@ File isqrt-S9.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 3
-      zero = 0
-      one = 1
   Line 6:
     Normal execution of function `int_ref` with args:
       i = 3
@@ -967,8 +933,6 @@ File isqrt-S9.mlw:
       i = 1
   Line 14:
     Property failure at loop variant decrease with:
-      zero = 0
-      one = 1
       n = 3
       r = {contents= 1}
       y = {contents= 1}
@@ -1004,8 +968,6 @@ File isqrt-S10.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
       n = 0
-      zero = 0
-      one = 1
   Line 6:
     Giant-step execution of function `int_ref` with args:
       i = 0
@@ -1081,8 +1043,6 @@ File isqrt-S10.mlw:
     result of `(:=)` = ()
   Line 14:
     Property failure at loop variant decrease with:
-      zero = 0
-      one = 1
       n = 0
       r = {contents= (- 3)}
       y = {contents= 9}

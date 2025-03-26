@@ -29,21 +29,12 @@ Sub-goal Postcondition of goal main_g'vc.
 Prover result is: Unknown (unknown + incomplete) (342 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File val_function.mlw:
   Line 15:
     y = 42
     y = 42
     Execution of main function `main_g` with env:
       y = 42
-      zero = 0
-      one = 1
   Line 18:
     (giant-step) execution of unimplemented function `g`
       x = 42
@@ -54,8 +45,6 @@ File val_function.mlw:
       _ = 1
   Line 16:
     Property failure at postcondition of `main_g` with:
-      zero = 0
-      one = 1
       y = 42
       result = 44
       result = 44

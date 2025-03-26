@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal record_old_test1'vc.
 Prover result is: Unknown (sat) (650 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
     y = {f= 0; g= false}
@@ -26,12 +19,8 @@ File records_label.mlw:
     Execution of main function `record_old_test1` with env:
       y = {f= 0; g= false}
       x = {f= 0; g= false}
-      zero = 0
-      one = 1
   Line 12:
     Property failure at postcondition of `record_old_test1` with:
-      zero = 0
-      one = 1
       y = {f= 0; g= false}
       x = {f= 6; g= false}
       x = {f= 0; g= false}
@@ -53,13 +42,6 @@ Sub-goal Assertion of goal record_at_test2'vc.
 Prover result is: Unknown (sat) (862 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
     y = {f= 0; g= false}
@@ -69,12 +51,8 @@ File records_label.mlw:
     Execution of main function `record_at_test2` with env:
       y = {f= 0; g= false}
       x = {f= 0; g= false}
-      zero = 0
-      one = 1
   Line 22:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       y = {f= 0; g= false}
       x = {f= 12; g= false}
       _ = ()
@@ -98,13 +76,6 @@ Sub-goal Assertion of goal several_hats'vc.
 Prover result is: Unknown (sat) (129 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
     Constant y initialization
@@ -117,12 +88,8 @@ File records_label.mlw:
     Execution of main function `several_hats` with env:
       y = {f= 0; g= false}
       x = {f= 0; g= false}
-      zero = 0
-      one = 1
   Line 30:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       y = {f= 0; g= false}
       x = {f= 6; g= false}
       _ = ()

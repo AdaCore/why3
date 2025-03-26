@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown (unknown + incomplete) (459 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 8:
     x = 1
@@ -26,8 +19,6 @@ File ref_ex.mlw:
     Execution of main function `test_post` with env:
       x = 1
       y = {contents= 0}
-      zero = 0
-      one = 1
   Line 11:
     Normal execution of function `(!)` with args:
       r = {contents= 0}
@@ -57,8 +48,6 @@ File ref_ex.mlw:
       v = 0
   Line 9:
     Property failure at postcondition of `test_post` with:
-      zero = 0
-      one = 1
       x = 1
       y = {contents= 0}
       y = {contents= 0}
@@ -78,13 +67,6 @@ Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown (unknown + incomplete) (506 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 13:
     x = 43
@@ -94,8 +76,6 @@ File ref_ex.mlw:
     Execution of main function `test_post2` with env:
       x = 43
       y = {contents= (- 42)}
-      zero = 0
-      one = 1
   Line 17:
     Normal execution of function `(!)` with args:
       r = {contents= (- 42)}
@@ -125,8 +105,6 @@ File ref_ex.mlw:
       v = 0
   Line 15:
     Property failure at postcondition of `test_post2` with:
-      zero = 0
-      one = 1
       x = 43
       y = {contents= 0}
       y = {contents= (- 42)}
@@ -147,13 +125,6 @@ Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (unknown + incomplete) (604 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 23:
     y = {contents= (- 1)}
@@ -163,8 +134,6 @@ File ref_ex.mlw:
     Execution of main function `incr` with env:
       y = {contents= (- 1)}
       x23 = {contents= (- 2)}
-      zero = 0
-      one = 1
   Line 29:
     Normal execution of function `(!)` with args:
       r = {contents= (- 1)}
@@ -212,8 +181,6 @@ File ref_ex.mlw:
       v = 0
   Line 26:
     Property failure at postcondition of `incr` with:
-      zero = 0
-      one = 1
       y = {contents= 0}
       x23 = {contents= 0}
       x23 = {contents= (- 2)}

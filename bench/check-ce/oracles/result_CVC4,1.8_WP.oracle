@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (unknown + incomplete) (1405 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File result.mlw:
   Line 7:
     a = {contents= 0}
@@ -26,8 +19,6 @@ File result.mlw:
     Execution of main function `p1` with env:
       a = {contents= 0}
       b = {contents= 3}
-      zero = 0
-      one = 1
   Line 12:
     Normal execution of function `(!)` with args:
       r = {contents= 3}
@@ -65,8 +56,6 @@ File result.mlw:
       _ = 1
   Line 11:
     Property failure at postcondition of `p1` with:
-      zero = 0
-      one = 1
       a = {contents= 3}
       b = {contents= 3}
       result = 4
@@ -85,13 +74,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (1142 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File result.mlw:
   Line 7:
     Constant a initialization
@@ -104,8 +86,6 @@ File result.mlw:
     Execution of main function `f` with env:
       a = {contents= 0}
       a = {contents= 42}
-      zero = 0
-      one = 1
   Line 19:
     Normal execution of function `(:=)` with args:
       r = {contents= 42}
@@ -128,8 +108,6 @@ File result.mlw:
       _ = 1
   Line 18:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       a = {contents= 0}
       a = {contents= 1}
       a = {contents= 42}

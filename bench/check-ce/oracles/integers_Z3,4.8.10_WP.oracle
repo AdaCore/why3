@@ -10,28 +10,17 @@ Goal g_lab.
 Prover result is: Unknown (sat) (123 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File integers.mlw:
   Line 5:
     x = 48
     x = 48
     Execution of main function `g_lab'goal` with env:
       x = 48
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File integers.mlw:
   Line 5:
     Property failure at postcondition of `g_lab'goal` with:
-      zero = 0
-      one = 1
       x = 48
       result = ()
       x = 48
@@ -48,28 +37,17 @@ Goal g_no_lab.
 Prover result is: Unknown (sat) (123 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File integers.mlw:
   Line 7:
     x = 48
     x = 48
     Execution of main function `g_no_lab'goal` with env:
       x = 48
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File integers.mlw:
   Line 7:
     Property failure at postcondition of `g_no_lab'goal` with:
-      zero = 0
-      one = 1
       x = 48
       result = ()
       x = 48
@@ -86,13 +64,6 @@ Goal g2_lab.
 Prover result is: Unknown (sat) (126 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File integers.mlw:
   Line 9:
     g = 0
@@ -102,15 +73,11 @@ File integers.mlw:
     Execution of main function `g2_lab'goal` with env:
       g = 0
       x = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File integers.mlw:
   Line 11:
     Property failure at postcondition of `g2_lab'goal` with:
-      zero = 0
-      one = 1
       g = 0
       x = 1
       result = ()
@@ -128,13 +95,6 @@ Goal newgoal.
 Prover result is: Unknown (sat) (364 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File integers.mlw:
   Line 9:
     g = 0
@@ -165,15 +125,11 @@ File integers.mlw:
       x3 = 1
       x2 = 1
       x1 = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File integers.mlw:
   Line 22:
     Property failure at postcondition of `newgoal'goal` with:
-      zero = 0
-      one = 1
       g = 0
       x8 = 1
       x7 = 1

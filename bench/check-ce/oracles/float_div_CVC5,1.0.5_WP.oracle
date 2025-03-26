@@ -1,0 +1,55 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `(-)` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `(-)` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `(-)` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `(-)` cannot be evaluated)
+File "bench/check-ce/float_div.mlw", line 24, characters 11-25:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Step limit exceeded (815115 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `(-)` cannot be evaluated):
+File ieee_float.mlw:
+  Line 934:
+    zeroF :  = <UNDEFINED>
+File float_div.mlw:
+  Line 19:
+    y :
+       = float{ exp_size = 11; significand_size = 53;
+                value = number{exp=#b00000000000, sign=#b0, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+    y :
+      t = float{ exp_size = 11; significand_size = 53;
+                 value = number{exp=#b00000000000, sign=#b0, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+  Line 22:
+    result of call at line 22, characters 16-36 :
+      t = float{ exp_size = 11; significand_size = 53;
+                 value = number{exp=#b01111111101, sign=#b1, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+    result of call at line 22, characters 16-23 :
+      t = float{ exp_size = 11; significand_size = 53;
+                 value = number{exp=#b00000000000, sign=#b0, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `RNE` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `RNE` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `RNE` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `RNE` cannot be evaluated)
+File "bench/check-ce/float_div.mlw", line 40, characters 11-25:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Step limit exceeded (815115 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `RNE` cannot be evaluated):
+File ieee_float.mlw:
+  Line 934:
+    zeroF :  = <UNDEFINED>
+File float_div.mlw:
+  Line 35:
+    y :
+       = float{ exp_size = 11; significand_size = 53;
+                value = number{exp=#b00000000000, sign=#b0, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+    y :
+      t = float{ exp_size = 11; significand_size = 53;
+                 value = number{exp=#b00000000000, sign=#b0, mant=#b0000000000000000000000000000000000000000000000000000, hex=} }
+

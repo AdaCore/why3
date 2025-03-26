@@ -10,21 +10,12 @@ Sub-goal Assertion of goal test1'vc.
 Prover result is: Unknown (sat) (237 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value1.mlw:
   Line 8:
     x = (- 1)
     x = (- 1)
     Execution of main function `test1` with env:
       x = (- 1)
-      zero = 0
-      one = 1
   Line 10:
     (giant-step) execution of unimplemented function `id`
       x = (- 1)
@@ -38,8 +29,6 @@ File test_result_ce_value1.mlw:
       _ = 1
   Line 12:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = (- 1)
       a = 42
       a = 42
@@ -56,21 +45,12 @@ Sub-goal Assertion of goal test1bis'vc.
 Prover result is: Unknown (sat) (237 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value1.mlw:
   Line 14:
     x = (- 1)
     x = (- 1)
     Execution of main function `test1bis` with env:
       x = (- 1)
-      zero = 0
-      one = 1
   Line 15:
     (giant-step) execution of unimplemented function `id`
       x = (- 1)
@@ -83,8 +63,6 @@ File test_result_ce_value1.mlw:
       _ = 1
   Line 16:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = (- 1)
       a = 42
       a = 42

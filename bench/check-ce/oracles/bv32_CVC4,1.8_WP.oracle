@@ -10,21 +10,12 @@ Sub-goal Postcondition of goal dummy_update'vc.
 Prover result is: Unknown (unknown + incomplete) (1069 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File bv32.mlw:
   Line 7:
     r = {contents= (34:t)}
     r = {contents= (34:t)}
     Execution of main function `dummy_update` with env:
       r = {contents= (34:t)}
-      zero = 0
-      one = 1
   Line 11:
     Normal execution of function `contents` with args:
       arg = {contents= 66}
@@ -36,8 +27,6 @@ File bv32.mlw:
     result of `add` = (132:t)
   Line 9:
     Property failure at postcondition of `dummy_update` with:
-      zero = 0
-      one = 1
       r = {contents= (132:t)}
       result = ()
       r = {contents= (132:t)}

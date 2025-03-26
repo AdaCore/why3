@@ -18,13 +18,6 @@ Prover result is: Unknown (unknown) (18 steps).
 The contracts of the following functions/loops are too weak :
   - Anonymous function at "bench/check-ce/anonymous6.mlw", line 6, characters 2-40
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File anonymous6.mlw:
@@ -32,8 +25,6 @@ File anonymous6.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 5:
     Giant-step execution of function `ref` with args:
       contents = 0
@@ -45,8 +36,6 @@ File anonymous6.mlw:
     result = ()
   Line 7:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       _ = ()
       z = {contents= 3}
       _ = ()

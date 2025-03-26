@@ -13,13 +13,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown) (12 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File if_assign.mlw:
   Line 7:
     Constant x initialization
@@ -32,8 +25,6 @@ File if_assign.mlw:
     Execution of main function `f` with env:
       x = {contents= 0}
       _a = 0
-      zero = 0
-      one = 1
   Line 12:
     Normal execution of function `(:=)` with args:
       r = {contents= 0}
@@ -48,8 +39,6 @@ File ref.mlw:
 File if_assign.mlw:
   Line 10:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       x = {contents= 42}
       _a = 0
       result = 42
@@ -70,13 +59,6 @@ Sub-goal Postcondition of goal fTest1'vc.
 Prover result is: Unknown (unknown) (17 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File if_assign.mlw:
   Line 7:
     Constant x initialization
@@ -89,8 +71,6 @@ File if_assign.mlw:
     Execution of main function `fTest1` with env:
       x = {contents= 0}
       a = 0
-      zero = 0
-      one = 1
   Line 18:
     Normal execution of function `(=)` with args:
       x = 0
@@ -105,8 +85,6 @@ File ref.mlw:
 File if_assign.mlw:
   Line 16:
     Property failure at postcondition of `fTest1` with:
-      zero = 0
-      one = 1
       x = {contents= 42}
       a = 0
       result = 42
@@ -127,13 +105,6 @@ Sub-goal Assertion of goal fTest2'vc.
 Prover result is: Unknown (unknown) (12 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File if_assign.mlw:
   Line 7:
     Constant x initialization
@@ -146,16 +117,12 @@ File if_assign.mlw:
     Execution of main function `fTest2` with env:
       x = {contents= 0}
       a = 0
-      zero = 0
-      one = 1
   Line 27:
     Normal execution of function `(=)` with args:
       x = 0
       y = 0
   Line 28:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = {contents= 42}
       a = 0
       _ = ()
@@ -180,13 +147,6 @@ Sub-goal Postcondition of goal fTest2'vc.
 Prover result is: Unknown (unknown) (19 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File if_assign.mlw:
   Line 7:
     Constant x initialization
@@ -199,8 +159,6 @@ File if_assign.mlw:
     Execution of main function `fTest2` with env:
       x = {contents= 0}
       a = (- 1)
-      zero = 0
-      one = 1
   Line 27:
     Normal execution of function `(=)` with args:
       x = (- 1)
@@ -211,8 +169,6 @@ File if_assign.mlw:
       v = 18
   Line 25:
     Property failure at postcondition of `fTest2` with:
-      zero = 0
-      one = 1
       x = {contents= 18}
       a = (- 1)
       result = 17

@@ -45,13 +45,6 @@ Sub-goal Assertion of goal g2'vc.
 Prover result is: Unknown (unknown) (3 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File model_projection2.mlw:
   Line 12:
     get = fun (_arg_06:poly_map int int) (_arg_16:int) -> 41
@@ -61,12 +54,8 @@ File model_projection2.mlw:
     Execution of main function `g2` with env:
       get = fun (_arg_06:poly_map int int) (_arg_16:int) -> 41
       x = UNDEFINED
-      zero = 0
-      one = 1
   Line 26:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       get = fun (_arg_06:poly_map int int) (_arg_16:int) -> 41
       x = UNDEFINED
       x = UNDEFINED

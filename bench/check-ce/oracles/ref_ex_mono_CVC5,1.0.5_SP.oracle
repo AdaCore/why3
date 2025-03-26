@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown (sat) (259 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 9:
     x = 1
@@ -26,8 +19,6 @@ File ref_ex_mono.mlw:
     Execution of main function `test_post` with env:
       x = 1
       y = {c= 0}
-      zero = 0
-      one = 1
   Line 12:
     Normal execution of function `c` with args:
       arg = {c= 0}
@@ -48,8 +39,6 @@ File ref_ex_mono.mlw:
       _ = 0
   Line 10:
     Property failure at postcondition of `test_post` with:
-      zero = 0
-      one = 1
       x = 1
       y = {c= 0}
       y = {c= 0}
@@ -69,13 +58,6 @@ Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown (sat) (343 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 14:
     x = 43
@@ -85,8 +67,6 @@ File ref_ex_mono.mlw:
     Execution of main function `test_post2` with env:
       x = 43
       y = {c= (- 42)}
-      zero = 0
-      one = 1
   Line 18:
     Normal execution of function `c` with args:
       arg = {c= (- 42)}
@@ -107,8 +87,6 @@ File ref_ex_mono.mlw:
       _ = (- 42)
   Line 16:
     Property failure at postcondition of `test_post2` with:
-      zero = 0
-      one = 1
       x = 43
       y = {c= 0}
       y = {c= (- 42)}
@@ -129,13 +107,6 @@ Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (sat) (404 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 24:
     y = {c= (- 1)}
@@ -145,8 +116,6 @@ File ref_ex_mono.mlw:
     Execution of main function `incr` with env:
       y = {c= (- 1)}
       x23 = {c= (- 2)}
-      zero = 0
-      one = 1
   Line 30:
     Normal execution of function `c` with args:
       arg = {c= (- 1)}
@@ -167,8 +136,6 @@ File ref_ex_mono.mlw:
       _ = 1
   Line 27:
     Property failure at postcondition of `incr` with:
-      zero = 0
-      one = 1
       y = {c= 0}
       x23 = {c= 0}
       x23 = {c= (- 2)}

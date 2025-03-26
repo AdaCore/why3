@@ -14,29 +14,18 @@ Prover result is: Unknown (unknown) (12 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'incr' at "bench/check-ce/multifile2.mlw", line 9, characters 2-8
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File multifile2.mlw:
   Line 7:
     x = (- 2)
     x = (- 2)
     Execution of main function `f` with env:
       x = (- 2)
-      zero = 0
-      one = 1
   Line 9:
     Giant-step execution of function `incr` with args:
       x = (- 2)
     result of `incr` = 0
   Line 8:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       x = (- 2)
       result = 0
       x = (- 2)
@@ -57,21 +46,12 @@ Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (unknown) (14 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File multifile2.mlw:
   Line 12:
     x = 0
     x = 0
     Execution of main function `g` with env:
       x = 0
-      zero = 0
-      one = 1
   Line 14:
     Normal execution of function `incr` with args:
       x = 0
@@ -98,8 +78,6 @@ File multifile1.mlw:
 File multifile2.mlw:
   Line 13:
     Property failure at postcondition of `g` with:
-      zero = 0
-      one = 1
       x = 0
       result = 1
       x = 0
@@ -120,29 +98,18 @@ Sub-goal Postcondition of goal h'vc.
 Prover result is: Unknown (unknown) (14 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File multifile2.mlw:
   Line 17:
     x = (- 3)
     x = (- 3)
     Execution of main function `h` with env:
       x = (- 3)
-      zero = 0
-      one = 1
   Line 19:
     (giant-step) execution of unimplemented function `incr_val`
       x = (- 3)
     result of `incr_val` = 0
   Line 18:
     Property failure at postcondition of `h` with:
-      zero = 0
-      one = 1
       x = (- 3)
       result = 0
       x = (- 3)

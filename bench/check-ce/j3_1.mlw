@@ -1,0 +1,17 @@
+
+module Integer
+
+use int.Int
+
+function f (x:int) : int = x
+
+use mach.int.Int32
+
+let test (x:int32) : unit
+  requires { 0 <= to_int x <= 10 }
+=
+  assert { to_int (11:int32) = 11 };
+  assert { exists y:int32. to_int y > to_int x }
+
+
+end

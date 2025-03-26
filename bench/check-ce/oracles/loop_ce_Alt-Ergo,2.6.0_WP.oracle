@@ -21,13 +21,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (unknown) (36 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce.mlw:
   Line 6:
     Constant a initialization
@@ -52,8 +45,6 @@ File loop_ce.mlw:
       a = {contents= 0}
       b = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 14:
     Normal execution of function `contents` with args:
       arg = {contents= 2}
@@ -116,8 +107,6 @@ File loop_ce.mlw:
       _ = 1
   Line 16:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       a = {contents= 1}
       b = {contents= 6}
       _ = ()
@@ -142,21 +131,12 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Unknown (unknown) (22 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce.mlw:
   Line 26:
     a = {contents= 0}
     a = {contents= 0}
     Execution of main function `g` with env:
       a = {contents= 0}
-      zero = 0
-      one = 1
   Line 30:
     Normal execution of function `contents` with args:
       arg = {contents= 0}
@@ -174,8 +154,6 @@ File loop_ce.mlw:
       _ = 1
   Line 31:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = {contents= 1}
       _ = ()
       a = ref'mk 0
@@ -206,21 +184,12 @@ Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (unknown) (12 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce.mlw:
   Line 26:
     a = {contents= 10}
     a = {contents= 10}
     Execution of main function `g` with env:
       a = {contents= 10}
-      zero = 0
-      one = 1
   Line 30:
     Normal execution of function `contents` with args:
       arg = {contents= 10}
@@ -234,8 +203,6 @@ File loop_ce.mlw:
     Normal execution of function `Tuple0` with args:
   Line 27:
     Property failure at postcondition of `g` with:
-      zero = 0
-      one = 1
       a = {contents= 10}
       a = {contents= 10}
       result = ()

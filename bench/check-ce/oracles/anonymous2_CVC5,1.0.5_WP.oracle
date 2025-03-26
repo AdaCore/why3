@@ -11,13 +11,6 @@ Prover result is: Unknown (sat) (95 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'h' at "bench/check-ce/anonymous2.mlw", line 8, characters 2-25
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File anonymous2.mlw:
   Line 3:
     Constant z initialization
@@ -34,8 +27,6 @@ File anonymous2.mlw:
     Execution of main function `f` with env:
       z = {contents= 0}
       x = 1
-      zero = 0
-      one = 1
   Line 8:
     Giant-step execution of function `h` with args:
       y = 1
@@ -43,8 +34,6 @@ File anonymous2.mlw:
     result of `h` = ()
   Line 9:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       z = {contents= 0}
       x = 1
       _ = ()

@@ -14,28 +14,17 @@ Goal test1.
 Prover result is: Unknown (sat) (110 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 9:
     x = 0
     x = 0
     Execution of main function `test1'goal` with env:
       x = 0
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File int_overflow.mlw:
   Line 9:
     Property failure at postcondition of `test1'goal` with:
-      zero = 0
-      one = 1
       x = 0
       result = ()
       x = 0
@@ -112,13 +101,6 @@ Goal test_overflow_int16.
 Prover result is: Unknown (sat) (337 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 30:
     x = 1
@@ -129,15 +111,11 @@ File int_overflow.mlw:
     Execution of main function `test_overflow_int16'goal` with env:
       y = 65535
       x = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File int_overflow.mlw:
   Line 31:
     Property failure at postcondition of `test_overflow_int16'goal` with:
-      zero = 0
-      one = 1
       y = 65535
       x = 1
       result = ()
@@ -182,13 +160,6 @@ Goal test_overflow_int16_bis.
 Prover result is: Unknown (sat) (402 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 40:
     x = 1
@@ -199,15 +170,11 @@ File int_overflow.mlw:
     Execution of main function `test_overflow_int16_bis'goal` with env:
       y = 65535
       x = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File int_overflow.mlw:
   Line 42:
     Property failure at postcondition of `test_overflow_int16_bis'goal` with:
-      zero = 0
-      one = 1
       y = 65535
       x = 1
       result = ()
@@ -226,13 +193,6 @@ Goal test_overflow_int32.
 Prover result is: Unknown (sat) (337 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 48:
     x = 1
@@ -243,15 +203,11 @@ File int_overflow.mlw:
     Execution of main function `test_overflow_int32'goal` with env:
       y = 2147483647
       x = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File int_overflow.mlw:
   Line 49:
     Property failure at postcondition of `test_overflow_int32'goal` with:
-      zero = 0
-      one = 1
       y = 2147483647
       x = 1
       result = ()
@@ -270,13 +226,6 @@ Goal test_overflow_int32_bis.
 Prover result is: Unknown (sat) (402 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 53:
     x = 1
@@ -287,15 +236,11 @@ File int_overflow.mlw:
     Execution of main function `test_overflow_int32_bis'goal` with env:
       y = 2147483647
       x = 1
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File int_overflow.mlw:
   Line 54:
     Property failure at postcondition of `test_overflow_int32_bis'goal` with:
-      zero = 0
-      one = 1
       y = 2147483647
       x = 1
       result = ()

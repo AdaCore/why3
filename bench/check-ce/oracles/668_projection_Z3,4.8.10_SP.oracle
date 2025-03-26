@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (sat) (151 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File 668_projection.mlw:
   Line 12:
     n = epsilon x:t. t'int x = 3
@@ -26,12 +19,8 @@ File 668_projection.mlw:
     Execution of main function `f` with env:
       n = epsilon x:t. t'int x = 3
       min = epsilon x:t. t'int x = 2
-      zero = 0
-      one = 1
   Line 13:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       n = epsilon x:t. t'int x = 3
       min = epsilon x:t. t'int x = 2
       result = epsilon x:t. t'int x = 3

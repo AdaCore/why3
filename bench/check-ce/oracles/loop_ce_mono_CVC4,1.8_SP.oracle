@@ -18,13 +18,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (sat) (611 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce_mono.mlw:
   Line 8:
     Constant a initialization
@@ -42,8 +35,6 @@ File loop_ce_mono.mlw:
       a = {c= 0}
       b = {c= 5}
       _ = ()
-      zero = 0
-      one = 1
   Line 16:
     Normal execution of function `c` with args:
       arg = {c= 2}
@@ -106,8 +97,6 @@ File loop_ce_mono.mlw:
       _ = 1
   Line 18:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       a = {c= 1}
       b = {c= 6}
       _ = ()
@@ -129,21 +118,12 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Unknown (sat) (438 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce_mono.mlw:
   Line 30:
     a = {c1= (- 1)}
     a = {c1= (- 1)}
     Execution of main function `g` with env:
       a = {c1= (- 1)}
-      zero = 0
-      one = 1
   Line 34:
     Normal execution of function `c` with args:
       arg = {c1= (- 1)}
@@ -161,8 +141,6 @@ File loop_ce_mono.mlw:
       _ = 1
   Line 35:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = {c1= 0}
       _ = ()
       a = t'mk1 (- 1)
@@ -182,21 +160,12 @@ Sub-goal Postcondition of goal g'vc.
 Prover result is: Unknown (sat) (424 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_ce_mono.mlw:
   Line 30:
     a = {c1= 10}
     a = {c1= 10}
     Execution of main function `g` with env:
       a = {c1= 10}
-      zero = 0
-      one = 1
   Line 34:
     Normal execution of function `c` with args:
       arg = {c1= 10}
@@ -210,8 +179,6 @@ File loop_ce_mono.mlw:
     Normal execution of function `Tuple0` with args:
   Line 31:
     Property failure at postcondition of `g` with:
-      zero = 0
-      one = 1
       a = {c1= 10}
       a = {c1= 10}
       result = ()

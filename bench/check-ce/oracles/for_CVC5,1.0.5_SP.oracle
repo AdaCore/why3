@@ -16,13 +16,6 @@ The contracts of the following functions/loops are too weak :
   - Loop at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6
   - Loop at "bench/check-ce/for.mlw", line 7, character 2 to line 13, character 6
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File for.mlw:
@@ -30,8 +23,6 @@ File for.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 5:
     Giant-step execution of function `ref` with args:
       contents = 0
@@ -58,8 +49,6 @@ File for.mlw:
       _ = 1
   Line 8:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       _ = ()
       x1 = {contents= 0}
       x2 = {contents= 0}

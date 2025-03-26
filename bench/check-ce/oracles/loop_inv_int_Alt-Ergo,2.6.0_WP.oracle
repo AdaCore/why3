@@ -17,13 +17,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (unknown) (33 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File loop_inv_int.mlw:
@@ -31,8 +24,6 @@ File loop_inv_int.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 9:
     Normal execution of function `ref` with args:
       contents = 0
@@ -105,8 +96,6 @@ File loop_inv_int.mlw:
       _ = 5
   Line 13:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       _ = ()
       a = {contents= 1}
       _ = ()
@@ -133,13 +122,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (unknown) (34 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_inv_int.mlw:
   Line 23:
     Constant a initialization
@@ -168,8 +150,6 @@ File loop_inv_int.mlw:
       a = {contents= 0}
       b = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 33:
     Normal execution of function `contents` with args:
       arg = {contents= 2}
@@ -232,8 +212,6 @@ File loop_inv_int.mlw:
       _ = 5
   Line 34:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       a = {contents= 1}
       b = {contents= 6}
       _ = ()

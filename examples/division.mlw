@@ -76,7 +76,15 @@ end
 
 module HoareSound
   use int.Int
-  clone Hoare with type integer = int, val zero = zero,
-    val one = one, val (+) = (+), val (-) = (-), val (*) = (*),
-    val (<=) = (<=), lemma .
+  let constant zero : int = 0
+  let constant one : int = 1
+  clone Hoare with
+    type integer = int,
+    val zero = zero,
+    val one = one,
+    val (+) = (+),
+    val (-) = (-),
+    val (*) = (*),
+    val (<=) = (<=),
+    lemma .
 end

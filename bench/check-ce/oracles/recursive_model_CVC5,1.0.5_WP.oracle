@@ -10,13 +10,6 @@ Sub-goal Assertion of goal test'vc.
 Prover result is: Unknown (unknown + incomplete) (414 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File recursive_model.mlw:
   Line 6:
     global = (S Z)
@@ -26,12 +19,8 @@ File recursive_model.mlw:
     Execution of main function `test` with env:
       global = (S Z)
       i = (- 1)
-      zero = 0
-      one = 1
   Line 10:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       global = (S Z)
       i = (- 1)
       Z = UNDEFINED

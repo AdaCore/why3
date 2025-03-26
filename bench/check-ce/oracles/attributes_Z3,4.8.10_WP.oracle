@@ -10,13 +10,6 @@ Sub-goal Assertion of goal f'vc.
 Prover result is: Step limit exceeded (3000103 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File attributes.mlw:
@@ -24,8 +17,6 @@ File attributes.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 5:
     Normal execution of function `ref` with args:
       contents = 0
@@ -342,8 +333,6 @@ File attributes.mlw:
       _ = 193
       _ = 10
     Property failure at assertion with:
-      zero = 0
-      one = 1
       _ = ()
       x = {contents= 203}
       _ = ()
@@ -363,13 +352,6 @@ Sub-goal Assertion of goal g'vc.
 Prover result is: Step limit exceeded (3000051 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File attributes.mlw:
@@ -377,8 +359,6 @@ File attributes.mlw:
     _ = ()
     Execution of main function `g` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 20:
     Normal execution of function `ref` with args:
       contents = 0
@@ -396,8 +376,6 @@ File attributes.mlw:
     result of `h` = ()
   Line 23:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       _ = ()
       x = {contents= 200}
       _ = ()

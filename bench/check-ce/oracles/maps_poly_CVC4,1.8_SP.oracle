@@ -10,21 +10,12 @@ Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown (unknown + incomplete) (1262 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_poly.mlw:
   Line 7:
     x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     Execution of main function `test_map` with env:
       x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
-      zero = 0
-      one = 1
   Line 10:
     Normal execution of function `(!)` with args:
       r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
@@ -44,8 +35,6 @@ File maps_poly.mlw:
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 8:
     Property failure at postcondition of `test_map` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
@@ -66,21 +55,12 @@ Sub-goal Postcondition of goal test_map_multidim1'vc.
 Prover result is: Unknown (unknown + incomplete) (1363 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_poly.mlw:
   Line 13:
     x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
     x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
     Execution of main function `test_map_multidim1` with env:
       x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
-      zero = 0
-      one = 1
   Line 16:
     Giant-step execution of function `(!)` with args:
       r = {contents= fun (x1:int) -> fun (x2:int) -> 0}
@@ -104,8 +84,6 @@ File maps_poly.mlw:
     result of `(:=)` = ()
   Line 14:
     Property failure at postcondition of `test_map_multidim1` with:
-      zero = 0
-      one = 1
       x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
       result = ()
       x = {contents= fun (x1:int) -> fun (x2:int) -> 0}
@@ -122,13 +100,6 @@ Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown (unknown + incomplete) (1501 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_poly.mlw:
   Line 18:
     x = {contents=
@@ -144,8 +115,6 @@ File maps_poly.mlw:
            fun (x1:int) ->
             if x1 = 1 then fun (x2:int) -> if x2 = 1 then 3 else 0
             else fun (x2:int) -> 0}
-      zero = 0
-      one = 1
   Line 21:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -221,8 +190,6 @@ File maps_poly.mlw:
                                                                     int) -> 0, x = 0, v = 3
   Line 19:
     Property failure at postcondition of `test_map_multidim2` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->
@@ -267,21 +234,12 @@ Sub-goal Postcondition of goal proj_map_test1'vc.
 Prover result is: Unknown (unknown + incomplete) (1262 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_poly.mlw:
   Line 25:
     x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     Execution of main function `proj_map_test1` with env:
       x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
-      zero = 0
-      one = 1
   Line 28:
     Normal execution of function `(!)` with args:
       r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
@@ -301,8 +259,6 @@ File maps_poly.mlw:
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 26:
     Property failure at postcondition of `proj_map_test1` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3}
@@ -323,21 +279,12 @@ Sub-goal Postcondition of goal proj_map_test2'vc.
 Prover result is: Unknown (unknown + incomplete) (1283 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_poly.mlw:
   Line 30:
     x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
     x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
     Execution of main function `proj_map_test2` with env:
       x = {contents= fun (x1:int) -> if x1 = 1 then True else False}
-      zero = 0
-      one = 1
   Line 33:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
@@ -359,8 +306,6 @@ File maps_poly.mlw:
                                  if x1 = 1 then True else False, x = 0, v = true
   Line 31:
     Property failure at postcondition of `proj_map_test2` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->

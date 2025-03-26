@@ -157,8 +157,6 @@ File rgf-R1.mlw:
       a = {length= 2;
            elts=
            fun (x:int) -> if x = 0 then (- 1) else if x = 1 then (- 1) else 0}
-      zero = 0
-      one = 1
   Line 32:
     Normal execution of function `length` with args:
       arg = {length= 2;
@@ -351,8 +349,6 @@ File rgf-R1.mlw:
                                                              else 0}
       i = 1
     Property failure at precondition of `g` with:
-      zero = 0
-      one = 1
       a = {length= 2;
            elts=
            (fun j -> if j = i then v
@@ -421,8 +417,6 @@ File rgf-R4.mlw:
   Line 24:
     Execution of main function `f` with env:
       a = {length= 2; elts= fun (x:int) -> 0}
-      zero = 0
-      one = 1
   Line 32:
     Normal execution of function `length` with args:
       arg = {length= 2; elts= fun (x:int) -> 0}
@@ -588,8 +582,6 @@ File rgf-R4.mlw:
               else elts1 j) with i = 1, v = 2, elts1 = fun (x:int) -> 0}
       i = 1
     Property failure at precondition of `g` with:
-      zero = 0
-      one = 1
       a = {length= 2;
            elts=
            (fun j -> if j = i then v

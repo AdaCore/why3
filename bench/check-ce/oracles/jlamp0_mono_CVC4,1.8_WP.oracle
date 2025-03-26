@@ -14,13 +14,6 @@ Sub-goal Assertion of goal p1'vc.
 Prover result is: Unknown (sat) (467 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -30,8 +23,6 @@ File jlamp0_mono.mlw:
     Execution of main function `p1` with env:
       a = {contents= 0}
       b = {contents= 3}
-      zero = 0
-      one = 1
   Line 16:
     Normal execution of function `(!)` with args:
       x = {contents= 3}
@@ -53,8 +44,6 @@ File jlamp0_mono.mlw:
       v = 3
   Line 17:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = {contents= 3}
       b = {contents= 3}
       _ = ()
@@ -72,13 +61,6 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (sat) (754 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -88,8 +70,6 @@ File jlamp0_mono.mlw:
     Execution of main function `p1` with env:
       a = {contents= 0}
       b = {contents= 10}
-      zero = 0
-      one = 1
   Line 16:
     Normal execution of function `(!)` with args:
       x = {contents= 10}
@@ -142,8 +122,6 @@ File jlamp0_mono.mlw:
       v = 9
   Line 15:
     Property failure at postcondition of `p1` with:
-      zero = 0
-      one = 1
       a = {contents= 9}
       b = {contents= 10}
       result = ()
@@ -161,13 +139,6 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (sat) (623 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -177,8 +148,6 @@ File jlamp0_mono.mlw:
     Execution of main function `p1` with env:
       a = {contents= 0}
       b = {contents= 5}
-      zero = 0
-      one = 1
   Line 16:
     Normal execution of function `(!)` with args:
       x = {contents= 5}
@@ -211,8 +180,6 @@ File jlamp0_mono.mlw:
     Normal execution of function `Tuple0` with args:
   Line 15:
     Property failure at postcondition of `p1` with:
-      zero = 0
-      one = 1
       a = {contents= 5}
       b = {contents= 5}
       result = ()
@@ -230,13 +197,6 @@ Sub-goal Loop invariant init of goal p2'vc.
 Prover result is: Unknown (sat) (219 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -254,16 +214,12 @@ File jlamp0_mono.mlw:
       a = {contents= 0}
       c = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 25:
     Normal execution of function `(:=)` with args:
       x = {contents= 0}
       v = 1
   Line 27:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       a = {contents= 0}
       c = {contents= 1}
       _ = ()
@@ -299,13 +255,6 @@ Sub-goal Loop invariant preservation of goal p2'vc.
 Prover result is: Unknown (sat) (862 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -320,16 +269,12 @@ File jlamp0_mono.mlw:
       a = {contents= 0}
       c = {contents= 10}
       _ = ()
-      zero = 0
-      one = 1
   Line 25:
     Normal execution of function `(:=)` with args:
       x = {contents= 10}
       v = 1
   Line 27:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       a = {contents= 0}
       c = {contents= 1}
       _ = ()
@@ -378,13 +323,6 @@ Sub-goal Loop invariant init of goal p3'vc.
 Prover result is: Unknown (sat) (263 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -399,12 +337,8 @@ File jlamp0_mono.mlw:
       a = {contents= 0}
       c = {contents= 3}
       _ = ()
-      zero = 0
-      one = 1
   Line 41:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       a = {contents= 0}
       c = {contents= 3}
       _ = ()
@@ -448,13 +382,6 @@ Sub-goal Loop invariant preservation of goal p3'vc.
 Prover result is: Unknown (sat) (938 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
     a = {contents= 0}
@@ -469,12 +396,8 @@ File jlamp0_mono.mlw:
       a = {contents= 0}
       c = {contents= 3}
       _ = ()
-      zero = 0
-      one = 1
   Line 41:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       a = {contents= 0}
       c = {contents= 3}
       _ = ()

@@ -23,13 +23,6 @@ Prover result is: Unknown (unknown) (24 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'g' at "bench/check-ce/func_call1.mlw", line 15, characters 10-15
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File func_call1.mlw:
   Line 4:
     Constant z initialization
@@ -48,8 +41,6 @@ File func_call1.mlw:
     Execution of main function `f` with env:
       z = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 15:
     Giant-step execution of function `g` with args:
       x = 2
@@ -60,8 +51,6 @@ File func_call1.mlw:
       _ = 3
   Line 16:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       z = {contents= 2}
       _ = ()
       _ = ()

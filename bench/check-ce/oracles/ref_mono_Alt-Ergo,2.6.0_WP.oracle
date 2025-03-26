@@ -25,13 +25,6 @@ Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown (unknown) (21 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_mono.mlw:
   Line 20:
     x = 1
@@ -41,8 +34,6 @@ File ref_mono.mlw:
     Execution of main function `test_post` with env:
       x = 1
       y = {contents= 0}
-      zero = 0
-      one = 1
   Line 23:
     Normal execution of function `(!)` with args:
       r = {contents= 0}
@@ -70,8 +61,6 @@ File ref_mono.mlw:
       v = 0
   Line 21:
     Property failure at postcondition of `test_post` with:
-      zero = 0
-      one = 1
       x = 1
       y = {contents= 0}
       y = {contents= 0}
@@ -94,13 +83,6 @@ Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown (unknown) (25 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_mono.mlw:
   Line 25:
     x = 43
@@ -110,8 +92,6 @@ File ref_mono.mlw:
     Execution of main function `test_post2` with env:
       x = 43
       y = {contents= 0}
-      zero = 0
-      one = 1
   Line 29:
     Normal execution of function `(!)` with args:
       r = {contents= 0}
@@ -139,8 +119,6 @@ File ref_mono.mlw:
       v = 42
   Line 27:
     Property failure at postcondition of `test_post2` with:
-      zero = 0
-      one = 1
       x = 43
       y = {contents= 42}
       y = {contents= 0}
@@ -164,13 +142,6 @@ Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (unknown) (47 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_mono.mlw:
   Line 35:
     y = {contents= (- 1)}
@@ -180,8 +151,6 @@ File ref_mono.mlw:
     Execution of main function `incr` with env:
       y = {contents= (- 1)}
       x23 = {contents= 0}
-      zero = 0
-      one = 1
   Line 40:
     Normal execution of function `(!)` with args:
       r = {contents= (- 1)}
@@ -223,8 +192,6 @@ File ref_mono.mlw:
       v = 2
   Line 38:
     Property failure at postcondition of `incr` with:
-      zero = 0
-      one = 1
       y = {contents= 0}
       x23 = {contents= 2}
       x23 = {contents= 0}
@@ -249,13 +216,6 @@ Sub-goal Loop invariant init of goal test_loop'vc.
 Prover result is: Unknown (unknown) (23 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_mono.mlw:
   Line 35:
     Constant y initialization
@@ -268,8 +228,6 @@ File ref_mono.mlw:
     Execution of main function `test_loop` with env:
       y = {contents= 0}
       x = {contents= 0}
-      zero = 0
-      one = 1
   Line 48:
     Normal execution of function `incr` with args:
       x23 = {contents= 0}
@@ -314,8 +272,6 @@ File ref_mono.mlw:
       v = 2
   Line 51:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       y = {contents= 1}
       x = {contents= 2}
       _ = ()
@@ -345,13 +301,6 @@ Sub-goal Loop invariant preservation of goal test_loop'vc.
 Prover result is: Unknown (unknown) (60 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_mono.mlw:
   Line 35:
     Constant y initialization
@@ -364,8 +313,6 @@ File ref_mono.mlw:
     Execution of main function `test_loop` with env:
       y = {contents= 0}
       x = {contents= 0}
-      zero = 0
-      one = 1
   Line 48:
     Normal execution of function `incr` with args:
       x23 = {contents= 0}
@@ -410,8 +357,6 @@ File ref_mono.mlw:
       v = 2
   Line 51:
     Property failure at loop invariant init with:
-      zero = 0
-      one = 1
       y = {contents= 1}
       x = {contents= 2}
       _ = ()

@@ -21,13 +21,6 @@ Sub-goal Assertion of goal f1'vc.
 Prover result is: Unknown (unknown) (15 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-call-nc.mlw:
   Line 9:
     Constant x initialization
@@ -46,8 +39,6 @@ File log-call-nc.mlw:
     Execution of main function `f1` with env:
       x = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 19:
     Normal execution of function `f` with args:
       y = 1
@@ -59,8 +50,6 @@ File log-call-nc.mlw:
       _ = 1
   Line 20:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = {contents= 1}
       _ = ()
       _ = ()

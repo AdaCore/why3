@@ -15,13 +15,6 @@ Prover result is: Step limit exceeded (3000019 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'set_x' at "bench/check-ce/fide21.mlw", line 14, characters 2-9
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File fide21.mlw:
   Line 4:
     Constant x initialization
@@ -40,8 +33,6 @@ File fide21.mlw:
     Execution of main function `main` with env:
       x = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 14:
     Giant-step execution of function `set_x` with args:
       n = 2
@@ -49,8 +40,6 @@ File fide21.mlw:
     result of `set_x` = ()
   Line 15:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = {contents= 4}
       _ = ()
       _ = ()
@@ -74,13 +63,6 @@ Prover result is: Unknown (sat) (174 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'incr' at "bench/check-ce/fide21.mlw", line 23, characters 10-16
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File fide21.mlw:
   Line 4:
     Constant x initialization
@@ -99,16 +81,12 @@ File fide21.mlw:
     Execution of main function `test` with env:
       x = {contents= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 23:
     Giant-step execution of function `incr` with args:
       x = 1
     result of `incr` = 3
   Line 24:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = {contents= 0}
       _ = ()
       y = 3

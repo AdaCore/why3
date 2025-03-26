@@ -13,13 +13,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown) (7 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File double_projection.mlw:
   Line 8:
     d = fun (_arg_0:t) -> 0
@@ -32,12 +25,8 @@ File double_projection.mlw:
       d = fun (_arg_0:t) -> 0
       c = fun (_arg_0:t) -> 1
       x = epsilon x10:t. d x10 = 0 /\ c x10 = 1
-      zero = 0
-      one = 1
   Line 19:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       d = fun (_arg_0:t) -> 0
       c = fun (_arg_0:t) -> 1
       x = epsilon x10:t. d x10 = 0 /\ c x10 = 1

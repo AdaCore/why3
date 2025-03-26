@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (sat) (309 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File if_decision_branch.mlw:
   Line 8:
     Constant path_selector initialization
@@ -29,8 +22,6 @@ File if_decision_branch.mlw:
     Execution of main function `f` with env:
       path_selector = {sel_path= false}
       a = 5
-      zero = 0
-      one = 1
   Line 22:
     Normal execution of function `(=)` with args:
       x = 5
@@ -47,8 +38,6 @@ File if_decision_branch.mlw:
       arg = {sel_path= true}
   Line 19:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       path_selector = {sel_path= true}
       a = 5
       result = 15

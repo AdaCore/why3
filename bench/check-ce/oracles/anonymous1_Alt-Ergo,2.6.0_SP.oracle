@@ -13,21 +13,12 @@ Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (unknown) (9 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File anonymous1.mlw:
   Line 4:
     x = 0
     x = 0
     Execution of main function `f` with env:
       x = 0
-      zero = 0
-      one = 1
   Line 5:
     Normal execution of function `h` with args:
       y = 0
@@ -36,8 +27,6 @@ File anonymous1.mlw:
       _ = 2
   Line 6:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       x = 0
       w = 2
       x = 0

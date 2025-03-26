@@ -14,13 +14,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (sat) (604 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File loop_inv_int_mono.mlw:
@@ -28,8 +21,6 @@ File loop_inv_int_mono.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 11:
     Normal execution of function `t'mk` with args:
       c = 0
@@ -98,8 +89,6 @@ File loop_inv_int_mono.mlw:
       _ = 5
   Line 15:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       _ = ()
       a = {c= 1}
       _ = ()
@@ -123,13 +112,6 @@ Sub-goal Loop invariant preservation of goal f'vc.
 Prover result is: Unknown (sat) (557 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File loop_inv_int_mono.mlw:
   Line 27:
     Constant a initialization
@@ -150,8 +132,6 @@ File loop_inv_int_mono.mlw:
       a = {c1= 0}
       b = {c1= 0}
       _ = ()
-      zero = 0
-      one = 1
   Line 37:
     Normal execution of function `c` with args:
       arg = {c1= 2}
@@ -214,8 +194,6 @@ File loop_inv_int_mono.mlw:
       _ = 5
   Line 38:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       a = {c1= 1}
       b = {c1= 6}
       _ = ()

@@ -23,13 +23,6 @@ Sub-goal Assertion of goal g2'vc.
 Prover result is: Unknown (unknown + incomplete) (204 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File model_projection2.mlw:
   Line 12:
     get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
@@ -43,12 +36,8 @@ File model_projection2.mlw:
       to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
                   fun (x:int) -> 0
       x = epsilon x:poly_map int int. to_array x = (fun (x1:int) -> 0)
-      zero = 0
-      one = 1
   Line 26:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       get = fun (_arg_14:poly_map int int) (_arg_24:int) -> 41
       to_array = fun (bOUND_VARIABLE_389:poly_map int int) ->
                   fun (x:int) -> 0

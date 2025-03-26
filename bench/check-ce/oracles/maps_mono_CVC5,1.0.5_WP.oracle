@@ -27,13 +27,6 @@ Sub-goal Postcondition of goal test_map_multidim1'vc.
 Prover result is: Unknown (unknown + incomplete) (718 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 50:
     x = {contents=
@@ -49,8 +42,6 @@ File maps_mono.mlw:
            fun (x1:int) ->
             if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
             else fun (x2:int) -> 0}
-      zero = 0
-      one = 1
   Line 53:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -111,8 +102,6 @@ File maps_mono.mlw:
                                                                     int) -> 0
   Line 51:
     Property failure at postcondition of `test_map_multidim1` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x1:int) ->
@@ -187,13 +176,6 @@ Sub-goal Postcondition of goal proj_map_test2'vc.
 Prover result is: Unknown (unknown + incomplete) (637 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 67:
     x = {contents=
@@ -206,8 +188,6 @@ File maps_mono.mlw:
       x = {contents=
            fun (x2:int) ->
             if x2 = 0 then True else if x2 = 1 then True else False}
-      zero = 0
-      one = 1
   Line 70:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
@@ -237,8 +217,6 @@ File maps_mono.mlw:
                                    else if x2 = 1 then True else False, x1 = 0, v1 = true
   Line 68:
     Property failure at postcondition of `proj_map_test2` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x1 then True else False } then v1
               else f1 y) with f1 = fun (x2:int) ->

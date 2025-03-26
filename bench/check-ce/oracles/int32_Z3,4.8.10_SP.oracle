@@ -15,13 +15,6 @@ Prover result is: Step limit exceeded (3000044 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File int.mlw:
   Line 285:
     Constant min_int32 initialization
     min_int32 = (-2147483648)
@@ -34,8 +27,6 @@ File int32.mlw:
     r = {contents= epsilon x:int32. int32'int x = 22}
     Execution of main function `dummy_update` with env:
       r = {contents= epsilon x:int32. int32'int x = 22}
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 9:
@@ -49,8 +40,6 @@ File int32.mlw:
     result of `(+)` = epsilon x:int32. int32'int x = 84
   Line 7:
     Property failure at postcondition of `dummy_update` with:
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
       r = {contents= epsilon x:int32. int32'int x = 84}

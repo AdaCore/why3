@@ -10,13 +10,6 @@ Sub-goal Assertion of goal test2'vc.
 Prover result is: Unknown (unknown + incomplete) (1096 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
@@ -33,8 +26,6 @@ File test_result_ce_value2.mlw:
     Execution of main function `test2` with env:
       a = {contents= 0}
       x = (- 1)
-      zero = 0
-      one = 1
   Line 12:
     (giant-step) execution of unimplemented function `id`
       x = (- 1)
@@ -45,8 +36,6 @@ File test_result_ce_value2.mlw:
       _ = 10
   Line 13:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = {contents= (- 1)}
       x = (- 1)
       _ = ()
@@ -64,13 +53,6 @@ Sub-goal Assertion of goal test2'vc.
 Prover result is: Unknown (unknown + incomplete) (1088 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
@@ -87,8 +69,6 @@ File test_result_ce_value2.mlw:
     Execution of main function `test2` with env:
       a = {contents= 0}
       x = 0
-      zero = 0
-      one = 1
   Line 12:
     (giant-step) execution of unimplemented function `id`
       x = 0
@@ -99,8 +79,6 @@ File test_result_ce_value2.mlw:
       _ = 10
   Line 15:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = {contents= 42}
       x = 0
       _ = ()
@@ -118,13 +96,6 @@ Sub-goal Postcondition of goal test3'vc.
 Prover result is: Unknown (unknown + incomplete) (1532 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value2.mlw:
   Line 3:
     Constant a initialization
@@ -141,8 +112,6 @@ File test_result_ce_value2.mlw:
     Execution of main function `test3` with env:
       a = {contents= 0}
       x = 99
-      zero = 0
-      one = 1
   Line 21:
     (giant-step) execution of unimplemented function `id`
       x = 99
@@ -162,8 +131,6 @@ File test_result_ce_value2.mlw:
       _ = 2
   Line 18:
     Property failure at postcondition of `test3` with:
-      zero = 0
-      one = 1
       a = {contents= 42}
       x = 99
       result = ()

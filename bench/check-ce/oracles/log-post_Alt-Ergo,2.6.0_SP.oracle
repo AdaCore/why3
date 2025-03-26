@@ -17,13 +17,6 @@ Sub-goal Postcondition of goal f1'vc.
 Prover result is: Unknown (unknown) (41 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-post.mlw:
   Line 12:
     a = 0
@@ -39,8 +32,6 @@ File log-post.mlw:
       b = {contents= 43}
       x = 0
       y = {contents= 0}
-      zero = 0
-      one = 1
   Line 19:
     Normal execution of function `contents` with args:
       arg = {contents= 0}
@@ -57,8 +48,6 @@ File log-post.mlw:
       _ = 0
   Line 18:
     Property failure at postcondition of `f1` with:
-      zero = 0
-      one = 1
       a = 0
       b = {contents= 43}
       x = 0

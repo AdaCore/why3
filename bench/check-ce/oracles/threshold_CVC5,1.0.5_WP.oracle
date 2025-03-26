@@ -11,13 +11,6 @@ Prover result is: Unknown (unknown + incomplete) (493 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File int.mlw:
   Line 285:
     Constant min_int32 initialization
     min_int32 = (-2147483648)
@@ -36,8 +29,6 @@ File threshold.mlw:
       n = epsilon x:int32. int32'int x = (- 2147483648)
       min = epsilon x:int32. int32'int x = (- 2147483648)
       max = epsilon x:int32. int32'int x = (- 1)
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
@@ -45,8 +36,6 @@ File threshold.mlw:
       a = epsilon x:int32. int32'int x = (- 2147483648)
       b = epsilon x:int32. int32'int x = (- 1)
     Property failure at precondition of `(+)` with:
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
       a = epsilon x:int32. int32'int x = (- 2147483648)
@@ -70,13 +59,6 @@ Prover result is: Unknown (unknown + incomplete) (1295 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File int.mlw:
   Line 285:
     Constant min_int32 initialization
     min_int32 = (-2147483648)
@@ -95,8 +77,6 @@ File threshold.mlw:
       n = epsilon x:int32. int32'int x = 0
       min = epsilon x:int32. int32'int x = 1
       max = epsilon x:int32. int32'int x = 0
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
   Line 11:
@@ -111,8 +91,6 @@ File threshold.mlw:
     result of `(<)` = true
   Line 9:
     Property failure at postcondition of `f` with:
-      zero = 0
-      one = 1
       min_int32 = (-2147483648)
       max_int32 = 2147483647
       n = epsilon x:int32. int32'int x = 0
@@ -135,13 +113,6 @@ Sub-goal Arithmetic overflow of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (9245 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File threshold.mlw:
   Line 26:
     n = (0:t)
@@ -154,15 +125,11 @@ File threshold.mlw:
       n = (0:t)
       min = (4294967295:t)
       max = (4294967295:t)
-      zero = 0
-      one = 1
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
       a = (4294967295:t)
       b = (4294967295:t)
     Property failure at precondition of `u_add` with:
-      zero = 0
-      one = 1
       a = (4294967295:t)
       b = (4294967295:t)
       n = (0:t)
@@ -183,13 +150,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Step limit exceeded (150171 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File threshold.mlw:
   Line 26:
     n = (4294967293:t)
@@ -202,8 +162,6 @@ File threshold.mlw:
       n = (4294967293:t)
       min = (4294967294:t)
       max = (1:t)
-      zero = 0
-      one = 1
   Line 30:
     (giant-step) execution of unimplemented function `u_add`
       a = (4294967294:t)
@@ -216,8 +174,6 @@ File threshold.mlw:
     result of `u_lt` = true
   Line 27:
     Property failure at postcondition of `f1` with:
-      zero = 0
-      one = 1
       n = (4294967293:t)
       min = (4294967294:t)
       max = (1:t)

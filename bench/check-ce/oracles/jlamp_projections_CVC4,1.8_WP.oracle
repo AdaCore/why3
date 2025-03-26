@@ -14,13 +14,6 @@ Sub-goal Integer overflow of goal p3'vc.
 Prover result is: Unknown (unknown + incomplete) (503 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp_projections.mlw:
   Line 7:
     to_int = fun (bOUND_VARIABLE_385:byte) ->
@@ -34,8 +27,6 @@ File jlamp_projections.mlw:
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
                 else 127
       a = epsilon x:byte. to_int x = 127
-      zero = 0
-      one = 1
   Line 29:
     (giant-step) execution of unimplemented function `of_int`
       x = 1
@@ -44,8 +35,6 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      zero = 0
-      one = 1
       to_int = fun (bOUND_VARIABLE_385:byte) ->
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_385 then 1
                 else 127
@@ -72,13 +61,6 @@ Sub-goal Integer overflow of goal p3'vc.
 Prover result is: Unknown (unknown + incomplete) (502 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp_projections.mlw:
   Line 7:
     to_int = fun (bOUND_VARIABLE_384:byte) ->
@@ -92,8 +74,6 @@ File jlamp_projections.mlw:
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
                 else 127
       a = {contents= epsilon x:byte. to_int x = 127}
-      zero = 0
-      one = 1
   Line 42:
     (giant-step) execution of unimplemented function `of_int`
       x = 1
@@ -110,8 +90,6 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      zero = 0
-      one = 1
       to_int = fun (bOUND_VARIABLE_384:byte) ->
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_384 then 1
                 else 127
@@ -139,13 +117,6 @@ Sub-goal Integer overflow of goal p4'vc.
 Prover result is: Unknown (unknown + incomplete) (678 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp_projections.mlw:
   Line 7:
     to_int = fun (bOUND_VARIABLE_475:byte) ->
@@ -159,8 +130,6 @@ File jlamp_projections.mlw:
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
                 else 127
       b = {f= epsilon x:byte. to_int x = 127; g= true}
-      zero = 0
-      one = 1
   Line 54:
     Normal execution of function `g` with args:
       arg = {f= epsilon x:byte. to_int x = 127; g= true}
@@ -173,8 +142,6 @@ File jlamp_projections.mlw:
       x = epsilon x:byte. to_int x = 127
       y = epsilon x:byte. to_int x = 1
     Property failure at precondition of `add` with:
-      zero = 0
-      one = 1
       to_int = fun (bOUND_VARIABLE_475:byte) ->
                 if (epsilon x:byte. to_int x = 1) = bOUND_VARIABLE_475 then 1
                 else 127

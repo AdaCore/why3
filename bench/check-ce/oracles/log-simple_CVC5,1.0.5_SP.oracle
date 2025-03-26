@@ -10,13 +10,6 @@ Sub-goal Assertion of goal f1'vc.
 Prover result is: Unknown (unknown + incomplete) (549 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-simple.mlw:
   Line 10:
     a = 43
@@ -32,8 +25,6 @@ File log-simple.mlw:
       b = {contents= 0}
       x = 0
       y = {contents= 0}
-      zero = 0
-      one = 1
   Line 16:
     Normal execution of function `contents` with args:
       arg = {contents= 0}
@@ -50,8 +41,6 @@ File log-simple.mlw:
       _ = 0
   Line 18:
     Property failure at assertion with:
-      zero = 0
-      one = 1
       a = 43
       b = {contents= 0}
       x = 0

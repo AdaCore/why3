@@ -22,13 +22,6 @@ Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown (unknown) (5365 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 44:
     x = {contents=
@@ -47,8 +40,6 @@ File maps_mono.mlw:
             if x!0 = 0 then 2
             else if x!0 = 8 then 10
                  else if x!0 = 5 then 6 else if x!0 = 1 then 3 else 2}
-      zero = 0
-      one = 1
   Line 47:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -87,8 +78,6 @@ File maps_mono.mlw:
                                            else if x!0 = 1 then 3 else 2, x = 0, v = 3
   Line 45:
     Property failure at postcondition of `test_map` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) ->
@@ -139,13 +128,6 @@ Sub-goal Postcondition of goal test_map_multidim1'vc.
 Prover result is: Unknown (unknown) (5817 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 50:
     x = {contents=
@@ -164,8 +146,6 @@ File maps_mono.mlw:
             if x!0 = 3 then fun (x!01:int) -> if x!01 = 4 then 5 else 5
             else if x!0 = 1 then fun (x!01:int) -> 2
                  else fun (x!01:int) -> if x!01 = 4 then 5 else 5}
-      zero = 0
-      one = 1
   Line 53:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -238,8 +218,6 @@ File maps_mono.mlw:
                                                                     int) -> 2
   Line 51:
     Property failure at postcondition of `test_map_multidim1` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x1 then True else False } then v1
               else f1 y) with f1 = fun (x!0:int) ->
@@ -294,13 +272,6 @@ Sub-goal Postcondition of goal test_map_multidim2'vc.
 Prover result is: Unknown (unknown) (6926 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 55:
     x = {contents=
@@ -368,8 +339,6 @@ File maps_mono.mlw:
                                            else if x!01 = 22 then 23
                                                 else if x!01 = 2 then 7
                                                      else 8}
-      zero = 0
-      one = 1
   Line 58:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -652,8 +621,6 @@ File maps_mono.mlw:
                                                                     else 8, x = 0, v = 3
   Line 56:
     Property failure at postcondition of `test_map_multidim2` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x1 then True else False } then v1
               else f1 y) with f1 = fun (x!0:int) ->
@@ -818,13 +785,6 @@ Sub-goal Postcondition of goal proj_map_test1'vc.
 Prover result is: Unknown (unknown) (5365 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 62:
     x = {contents=
@@ -843,8 +803,6 @@ File maps_mono.mlw:
             if x!0 = 0 then 2
             else if x!0 = 8 then 10
                  else if x!0 = 5 then 6 else if x!0 = 1 then 3 else 2}
-      zero = 0
-      one = 1
   Line 65:
     Normal execution of function `(!)` with args:
       r = {contents=
@@ -883,8 +841,6 @@ File maps_mono.mlw:
                                            else if x!0 = 1 then 3 else 2, x = 0, v = 3
   Line 63:
     Property failure at postcondition of `proj_map_test1` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x then True else False } then v
               else f y) with f = fun (x!0:int) ->
@@ -925,13 +881,6 @@ Sub-goal Postcondition of goal proj_map_test2'vc.
 Prover result is: Unknown (unknown) (5551 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File maps_mono.mlw:
   Line 67:
     x = {contents=
@@ -951,8 +900,6 @@ File maps_mono.mlw:
             else if x!0 = 5 then True
                  else if x!0 = 4 then True
                       else if x!0 = 1 then True else True}
-      zero = 0
-      one = 1
   Line 70:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
@@ -996,8 +943,6 @@ File maps_mono.mlw:
                                                   else True, x2 = 0, v2 = true
   Line 68:
     Property failure at postcondition of `proj_map_test2` with:
-      zero = 0
-      one = 1
       x = {contents=
            (fun y -> if pure { if y = x2 then True else False } then v2
               else f2 y) with f2 = fun (x!0:int) ->

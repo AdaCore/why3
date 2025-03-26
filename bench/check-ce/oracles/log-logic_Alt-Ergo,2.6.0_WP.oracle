@@ -13,28 +13,17 @@ Goal g1.
 Prover result is: Unknown (unknown) (3 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 43
   Line 12:
     Execution of main function `g1'goal` with env:
       a = 43
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File log-logic.mlw:
   Line 12:
     Property failure at postcondition of `g1'goal1` with:
-      zero = 0
-      one = 1
       a = 43
       result = ()
 
@@ -53,13 +42,6 @@ Goal g2.
 Prover result is: Unknown (unknown) (5 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 2
@@ -69,15 +51,11 @@ File log-logic.mlw:
     Execution of main function `g2'goal` with env:
       a = 2
       b = 0
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File log-logic.mlw:
   Line 26:
     Property failure at postcondition of `g2'goal1` with:
-      zero = 0
-      one = 1
       a = 2
       b = 0
       result = ()
@@ -97,13 +75,6 @@ Goal g3.
 Prover result is: Unknown (unknown) (5 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 2
@@ -113,15 +84,11 @@ File log-logic.mlw:
     Execution of main function `g3'goal` with env:
       a = 2
       x = 0
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File log-logic.mlw:
   Line 37:
     Property failure at postcondition of `g3'goal1` with:
-      zero = 0
-      one = 1
       a = 2
       x = 0
       result = ()
@@ -142,13 +109,6 @@ Goal g4.
 Prover result is: Unknown (unknown) (5 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 0
@@ -158,15 +118,11 @@ File log-logic.mlw:
     Execution of main function `g4'goal` with env:
       a = 0
       f = fun (_arg_0:int) -> 43
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File log-logic.mlw:
   Line 53:
     Property failure at postcondition of `g4'goal1` with:
-      zero = 0
-      one = 1
       a = 0
       f = fun (_arg_0:int) -> 43
       result = ()
@@ -200,13 +156,6 @@ Goal g6.
 Prover result is: Unknown (unknown) (10 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 43
@@ -225,15 +174,11 @@ File log-logic.mlw:
       f = fun (_arg_0:int) -> 0
       p = fun (_arg_0:int) -> true
       x = 0
-      zero = 0
-      one = 1
 Unknown location:
     Normal execution of function `Tuple0` with args:
 File log-logic.mlw:
   Line 80:
     Property failure at postcondition of `g6'goal1` with:
-      zero = 0
-      one = 1
       a = 43
       b = 0
       f = fun (_arg_0:int) -> 0

@@ -16,13 +16,6 @@ The contracts of the following functions/loops are too weak :
   - Loop at "bench/check-ce/for_mono.mlw", line 9, character 2 to line 15, character 6
   - Loop at "bench/check-ce/for_mono.mlw", line 9, character 2 to line 15, character 6
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File for_mono.mlw:
@@ -30,8 +23,6 @@ File for_mono.mlw:
     _ = ()
     Execution of main function `f` with env:
       _ = ()
-      zero = 0
-      one = 1
   Line 7:
     Normal execution of function `t'mk` with args:
       c = 0
@@ -56,8 +47,6 @@ File for_mono.mlw:
       _ = 1
   Line 10:
     Property failure at loop invariant preservation with:
-      zero = 0
-      one = 1
       _ = ()
       x1 = {c= (-175)}
       x2 = {c= 0}
