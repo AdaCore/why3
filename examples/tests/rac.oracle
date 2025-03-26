@@ -25,10 +25,10 @@ globals: <none>
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 19, characters 13-19
 <rac:check_term_result>Assertion failed at "examples/tests/rac.mlw", line 20, characters 13-19
                        - Term: x.contents > 10
-                       - Variables: x -> {contents= 1}
+                       - Variables: x -> { contents = 1 }
 Assertion failed at "examples/tests/rac.mlw", line 20, characters 13-19
 - Term: x.contents > 10
-- Variables: x -> {contents= 1}
+- Variables: x -> { contents = 1 }
 ** Local.test4 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 23, characters 13-28
@@ -53,7 +53,7 @@ globals: <none>
 <rac:check_term_result>Postcondition of `(+)` is ok at "examples/tests/rac.mlw", line 38, characters 9-14
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 39, characters 13-18
 result: () = ()
-globals: x -> {contents= 1}, y -> {contents= 42}
+globals: x -> { contents = 1 }, y -> { contents = 42 }
 ** Global.test2 ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 34, characters 12-17
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 34, characters 12-17
@@ -62,7 +62,7 @@ globals: x -> {contents= 1}, y -> {contents= 42}
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 44, characters 13-19
 result: () = ()
-globals: x -> {contents= 0}, y -> {contents= 42}
+globals: x -> { contents = 0 }, y -> { contents = 42 }
 
 * Functions
 ** Functions.test1 ()
@@ -83,7 +83,7 @@ Assertion failed at "examples/tests/rac.mlw", line 59, characters 13-35
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 63, characters 13-29
 result: () = ()
-globals: x -> {contents= 0}
+globals: x -> { contents = 0 }
 ** Functions.test3a ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
@@ -122,11 +122,11 @@ Postcondition of `test3_aux` failed at "examples/tests/rac.mlw", line 75, charac
 <rac:check_term_result>Exceptional postcondition of `test4_aux` failed at "examples/tests/rac.mlw", line 85, characters 8-20
                        - Defined at "examples/tests/rac.mlw", line 80, characters 20-25
                        - Term: j = x.contents
-                       - Variables: j -> 42, x -> {contents= 1}
+                       - Variables: j -> 42, x -> { contents = 1 }
 Exceptional postcondition of `test4_aux` failed at "examples/tests/rac.mlw", line 85, characters 8-20
 - Defined at "examples/tests/rac.mlw", line 80, characters 20-25
 - Term: j = x.contents
-- Variables: j -> 42, x -> {contents= 1}
+- Variables: j -> 42, x -> { contents = 1 }
 ** Functions.test5 ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
@@ -140,11 +140,12 @@ Exceptional postcondition of `test4_aux` failed at "examples/tests/rac.mlw", lin
 <rac:check_term_result>Postcondition of `test5_aux` failed at "examples/tests/rac.mlw", line 94, characters 4-15
                        - Defined at "examples/tests/rac.mlw", line 89, characters 14-27
                        - Term: x.contents = (x1.contents + 1)
-                       - Variables: x -> {contents= 3}, x1 -> {contents= 1}
+                       - Variables: x -> { contents = 3 },
+                         x1 -> { contents = 1 }
 Postcondition of `test5_aux` failed at "examples/tests/rac.mlw", line 94, characters 4-15
 - Defined at "examples/tests/rac.mlw", line 89, characters 14-27
 - Term: x.contents = (x1.contents + 1)
-- Variables: x -> {contents= 3}, x1 -> {contents= 1}
+- Variables: x -> { contents = 3 }, x1 -> { contents = 1 }
 ** Functions.test6 ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 53, characters 14-15
@@ -159,11 +160,11 @@ Postcondition of `test5_aux` failed at "examples/tests/rac.mlw", line 94, charac
 <rac:check_term_result>Precondition of `test6_aux` failed at "examples/tests/rac.mlw", line 105, characters 12-26
                        - Defined at "examples/tests/rac.mlw", line 97, characters 15-21
                        - Term: not x.contents = y
-                       - Variables: x -> {contents= 42}, y -> 42
+                       - Variables: x -> { contents = 42 }, y -> 42
 Precondition of `test6_aux` failed at "examples/tests/rac.mlw", line 105, characters 12-26
 - Defined at "examples/tests/rac.mlw", line 97, characters 15-21
 - Term: not x.contents = y
-- Variables: x -> {contents= 42}, y -> 42
+- Variables: x -> { contents = 42 }, y -> 42
 
 * Loops
 ** Loops.test1 ()
@@ -194,7 +195,7 @@ Precondition of `test6_aux` failed at "examples/tests/rac.mlw", line 105, charac
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "examples/tests/rac.mlw", line 116, characters 31-31
 <rac:check_term_result>Loop invariant preservation is ok at "examples/tests/rac.mlw", line 116, characters 18-29
 result: () = ()
-globals: x -> {contents= 0}
+globals: x -> { contents = 0 }
 ** Loops.test2 ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 112, characters 12-17
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 112, characters 12-17
@@ -209,10 +210,10 @@ globals: x -> {contents= 0}
 <rac:check_term_result>Postcondition of `(+)` is ok at "examples/tests/rac.mlw", line 122, characters 11-16
 <rac:check_term_result>Loop invariant preservation failed at "examples/tests/rac.mlw", line 121, characters 18-32
                        - Term: x.contents = 0 || x.contents = 1
-                       - Variables: x -> {contents= 2}
+                       - Variables: x -> { contents = 2 }
 Loop invariant preservation failed at "examples/tests/rac.mlw", line 121, characters 18-32
 - Term: x.contents = 0 || x.contents = 1
-- Variables: x -> {contents= 2}
+- Variables: x -> { contents = 2 }
 ** Loops.test3 ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 112, characters 12-17
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 112, characters 12-17
@@ -254,10 +255,10 @@ Loop invariant preservation failed at "examples/tests/rac.mlw", line 121, charac
 <rac:check_term_result>Postcondition of `(+)` is ok at "examples/tests/rac.mlw", line 129, characters 11-16
 <rac:check_term_result>Loop invariant preservation failed at "examples/tests/rac.mlw", line 128, characters 18-24
                        - Term: 5 >= x.contents
-                       - Variables: x -> {contents= 6}
+                       - Variables: x -> { contents = 6 }
 Loop invariant preservation failed at "examples/tests/rac.mlw", line 128, characters 18-24
 - Term: 5 >= x.contents
-- Variables: x -> {contents= 6}
+- Variables: x -> { contents = 6 }
 
 * Aliasing
 ** Aliasing.test1 ()
@@ -267,7 +268,7 @@ Loop invariant preservation failed at "examples/tests/rac.mlw", line 128, charac
 <rac:check_term_result>Postcondition of `value` is ok at "examples/tests/rac.mlw", line 144, characters 13-20
 <rac:check_term_result>Postcondition of `value` is ok at "examples/tests/rac.mlw", line 144, characters 4-11
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 144, characters 4-20
-result: (int, int) = (100, 100)
+result: (int, int) = ( 100, 100 )
 globals: <none>
 ** Aliasing.test2 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -349,7 +350,7 @@ globals: <none>
 <rac:check_term_result>Postcondition of `(:=)` is ok at "examples/tests/rac.mlw", line 244, characters 4-15
                        - Defined at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44
 result: () = ()
-globals: myref -> {contents= 0}
+globals: myref -> { contents = 0 }
 ** PolyRefContracts.test2a ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
@@ -362,7 +363,7 @@ globals: myref -> {contents= 0}
 <rac:check_term_result>Postcondition of `test2_aux` is ok at "examples/tests/rac.mlw", line 256, characters 4-23
                        - Defined at "examples/tests/rac.mlw", line 249, characters 14-27
 result: int = 1
-globals: myref -> {contents= 1}
+globals: myref -> { contents = 1 }
 ** PolyRefContracts.test2b ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
@@ -370,11 +371,11 @@ globals: myref -> {contents= 1}
 <rac:check_term_result>Precondition of `test2_aux` failed at "examples/tests/rac.mlw", line 259, characters 4-23
                        - Defined at "examples/tests/rac.mlw", line 247, characters 15-29
                        - Term: not argref.contents = argx
-                       - Variables: argref -> {contents= 0}, argx -> 0
+                       - Variables: argref -> { contents = 0 }, argx -> 0
 Precondition of `test2_aux` failed at "examples/tests/rac.mlw", line 259, characters 4-23
 - Defined at "examples/tests/rac.mlw", line 247, characters 15-29
 - Term: not argref.contents = argx
-- Variables: argref -> {contents= 0}, argx -> 0
+- Variables: argref -> { contents = 0 }, argx -> 0
 ** PolyRefContracts.test2c ()
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
 <rac:check_term_result>Postcondition of `ref` is ok at "examples/tests/rac.mlw", line 253, characters 18-19
@@ -427,16 +428,16 @@ globals: <none>
 <rac:check_term_result>Assertion is ok at "examples/tests/rac.mlw", line 299, characters 13-28
 <rac:check_term_result>Assertion failed at "examples/tests/rac.mlw", line 300, characters 13-29
                        - Term: (r.elts @ 1) = False
-                       - Variables: r -> {elts=
-                                          (fun j -> if j = i then x
-                                             else f j) with i = 3, x = false, f = (fun _ -> true);
-                                          length= 5}
+                       - Variables: r -> { elts =
+                                             (fun j -> if j = i then x
+                                               else f j) with i = 3, x =
+                                               false, f = (fun _ -> true);
+                                           length = 5 }
 Assertion failed at "examples/tests/rac.mlw", line 300, characters 13-29
 - Term: (r.elts @ 1) = False
-- Variables: r -> {elts=
-                   (fun j -> if j = i then x
-                      else f j) with i = 3, x = false, f = (fun _ -> true);
-                   length= 5}
+- Variables: r -> { elts =
+                      (fun j -> if j = i then x else f j) with i = 3, x =
+                        false, f = (fun _ -> true); length = 5 }
 
 * PolyFunc
 ** PolyFunc.test1 ()
@@ -460,7 +461,7 @@ globals: <none>
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac:check_term_result>Postcondition of `(@)` is ok at "examples/tests/rac.mlw", line 323, characters 4-9
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 323, characters 4-16
-result: (int, int) = (111, 0)
+result: (int, int) = ( 111, 0 )
 globals: <none>
 
 * ArrayExec
@@ -474,7 +475,7 @@ globals: <none>
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 350, characters 4-22
 <rac:check_term_result>Postcondition of `test1` is ok at "command line expression to execute", line 1, characters 0-8
                        - Defined at "examples/tests/rac.mlw", line 349, character 4 to line 350, character 22
-result: (int, int) = (0, 0)
+result: (int, int) = ( 0, 0 )
 globals: <none>
 ** ArrayExec.test2 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -490,7 +491,7 @@ globals: <none>
                        - Defined at "WHY3DATA/stdlib/int.mlw", line 16, characters 39-55
 <rac:check_term_result>Postcondition of `(@)` is ok at "examples/tests/rac.mlw", line 355, characters 4-12
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 355, characters 4-22
-result: (int, int) = (11, 0)
+result: (int, int) = ( 11, 0 )
 globals: <none>
 ** ArrayExec.test3 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -515,7 +516,7 @@ globals: <none>
 <rac:check_term_result>Postcondition of `([])` is ok at "examples/tests/rac.mlw", line 360, characters 4-8
                        - Defined at "examples/tests/rac.mlw", line 341, characters 41-49
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 360, characters 4-14
-result: (int, int) = (10, 0)
+result: (int, int) = ( 10, 0 )
 globals: <none>
 ** ArrayExec.test4 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -571,7 +572,7 @@ Assertion failed at "examples/tests/rac.mlw", line 373, characters 13-19
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 427, characters 4-16
 <rac:check_term_result>Postcondition of `test1` is ok at "command line expression to execute", line 1, characters 0-8
                        - Defined at "examples/tests/rac.mlw", line 425, character 4 to line 427, character 16
-result: (int, int) = (123, 456)
+result: (int, int) = ( 123, 456 )
 globals: <none>
 ** Ghost.test2 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -603,7 +604,7 @@ globals: <none>
 <rac:check_term_result>Postcondition of `Tuple3` is ok at "examples/tests/rac.mlw", line 459, characters 4-15
 <rac:check_term_result>Postcondition of `test2` is ok at "command line expression to execute", line 1, characters 0-8
                        - Defined at "examples/tests/rac.mlw", line 453, character 4 to line 459, character 15
-result: (bool, int, bool) = (True, 0, True)
+result: (bool, int, bool) = ( True, 0, True )
 globals: <none>
 
 * Arrays
@@ -634,7 +635,7 @@ Warning: Postcondition of `([]<-)` cannot be evaluated.
 <rac:check_term_result>Postcondition of `([])` is ok at "examples/tests/rac.mlw", line 393, characters 4-8
                        - Defined at "WHY3DATA/stdlib/array.mlw", line 24, characters 15-28
 <rac:check_term_result>Postcondition of `Tuple2` is ok at "examples/tests/rac.mlw", line 393, characters 4-14
-result: (int, int) = (10, 0)
+result: (int, int) = ( 10, 0 )
 globals: <none>
 ** Arrays.test1 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 6-8
@@ -771,11 +772,12 @@ globals: <none>
 <rac:check_term_result>Loop variant decrease failed at "examples/tests/rac.mlw", line 483, characters 16-17
                        - Term: 0 <= i.contents /\ i1.contents < i.contents \/
                                i.contents = i1.contents /\ false
-                       - Variables: i1 -> {contents= 1}, i -> {contents= 1}
+                       - Variables: i1 -> { contents = 1 },
+                         i -> { contents = 1 }
 Loop variant decrease failed at "examples/tests/rac.mlw", line 483, characters 16-17
 - Term: 0 <= i.contents /\ i1.contents < i.contents \/
         i.contents = i1.contents /\ false
-- Variables: i1 -> {contents= 1}, i -> {contents= 1}
+- Variables: i1 -> { contents = 1 }, i -> { contents = 1 }
 ** Variants.loop_var_fail2 ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 15-17
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 488, characters 16-17
@@ -814,19 +816,19 @@ Loop variant decrease failed at "examples/tests/rac.mlw", line 483, characters 1
                                i.contents = i1.contents /\
                                (0 <= j.contents /\ j1.contents < j.contents \/
                                 j.contents = j1.contents /\ false)
-                       - Variables: i1 -> {contents= 0},
-                         i -> {contents= 0},
-                         j1 -> {contents= 1},
-                         j -> {contents= 1}
+                       - Variables: i1 -> { contents = 0 },
+                         i -> { contents = 0 },
+                         j1 -> { contents = 1 },
+                         j -> { contents = 1 }
 Loop variant decrease failed at "examples/tests/rac.mlw", line 491, characters 16-17
 - Term: 0 <= i.contents /\ i1.contents < i.contents \/
         i.contents = i1.contents /\
         (0 <= j.contents /\ j1.contents < j.contents \/
          j.contents = j1.contents /\ false)
-- Variables: i1 -> {contents= 0},
-  i -> {contents= 0},
-  j1 -> {contents= 1},
-  j -> {contents= 1}
+- Variables: i1 -> { contents = 0 },
+  i -> { contents = 0 },
+  j1 -> { contents = 1 },
+  j -> { contents = 1 }
 ** Variants.loop_custom_variant ()
 <rac:check_term_result>Postcondition of `Tuple0` is ok at "command line expression to execute", line 1, characters 20-22
 <rac:check_term_result>Postcondition of `ref'mk` is ok at "examples/tests/rac.mlw", line 502, characters 16-17
@@ -871,12 +873,12 @@ Loop variant decrease failed at "examples/tests/rac.mlw", line 491, characters 1
 <rac:check_term_result>Loop variant decrease failed at "examples/tests/rac.mlw", line 510, characters 16-21
                        - Term: p (2 - i.contents) (2 - i1.contents) \/
                                (2 - i1.contents) = (2 - i.contents) /\ false
-                       - Variables: i -> {contents= (-2)},
-                         i1 -> {contents= (-1)}
+                       - Variables: i -> { contents = (-2) },
+                         i1 -> { contents = (-1) }
 Loop variant decrease failed at "examples/tests/rac.mlw", line 510, characters 16-21
 - Term: p (2 - i.contents) (2 - i1.contents) \/
         (2 - i1.contents) = (2 - i.contents) /\ false
-- Variables: i -> {contents= (-2)}, i1 -> {contents= (-1)}
+- Variables: i -> { contents = (-2) }, i1 -> { contents = (-1) }
 
 * TestUInt64
 ** TestUInt64.test ()
