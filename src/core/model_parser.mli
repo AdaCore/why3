@@ -38,6 +38,9 @@ type model_element_kind =
   | Other
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
+val compute_kind : Ident.Sattr.t -> Loc.position option -> Ident.Sattr.t -> model_element_kind
+(* Computes the kidn of an element given the attributes of the VC, the loc of the element
+   and its attributes *)
 
 (** {3 Model element concrete value} *)
 

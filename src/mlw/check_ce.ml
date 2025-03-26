@@ -942,7 +942,6 @@ let rec value_to_concrete_term known_map v =
 (** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
     this function fills the missing information to create a model element *)
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
-  ignore loc;
   if id.id_string <> "zero" && id.id_string <> "one" then
     begin
     (* Format.eprintf "crafting a me for id %s (attrs: %a)@." id.id_string Pretty.print_attrs id.id_attrs; *)
@@ -951,7 +950,8 @@ let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
     Some {me_name = id_name id;
           me_concrete_value;
           me_lsymbol = dummy_ls;
-          me_kind = Other;
+          (* TODO we should provide the Sattr of the VC term here *)
+          me_kind = Model_parser.compute_kind Ident.Sattr.empty loc id.id_attrs;
           me_value = dummy_term;
           me_location = loc;
           me_attrs = id.id_attrs}
