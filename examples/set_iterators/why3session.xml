@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="set_iterators.mlw"/>
+<theory name="TestIntSetIterator" proved="true">
+ <goal name="filter_non_neg&#39;vc" expl="VC for filter_non_neg" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="filter_non_neg&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.058141" steps="38"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.034365" steps="19"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.042306" steps="154"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.045060" steps="135"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.065150" steps="112389"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="0"><result status="valid" time="0.048984" steps="89414"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.075763" steps="6736"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.030426" steps="43"/></proof>
+  </goal>
+  <goal name="filter_non_neg&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.035341" steps="68624"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestStringSetIterator" proved="true">
+ <goal name="filter_minlength&#39;vc" expl="VC for filter_minlength" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="filter_minlength&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.056043" steps="8789"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.085578" steps="8827"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.060742" steps="200"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.054547" steps="108"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.063810" steps="145"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.086573" steps="173"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.058863" steps="64968"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.047315" steps="57"/></proof>
+  </goal>
+  <goal name="filter_minlength&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.042799" steps="53"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

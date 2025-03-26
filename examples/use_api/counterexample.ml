@@ -177,7 +177,7 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
+  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let results = Check_ce.models_from_rac ~limits rac env pm models in
@@ -191,7 +191,7 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
+  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
     (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let rac_results = Check_ce.models_from_giant_step ~limits
