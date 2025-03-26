@@ -972,7 +972,7 @@ let rec mlw_expr_to_simple_expr (* ctx vars *)e =
     Ident.Sattr.fold
       (fun a acc ->
         let s = a.Ident.attr_string in
-        try Strings.remove_prefix "bddinfer:" s
+        try Strings.remove_prefix ~prefix:"bddinfer:" s
         with Not_found -> acc)
       e.e_attrs ""
   in
@@ -1595,9 +1595,9 @@ let infer_loop_invs attrs env tkn mkn e cty =
     Ident.Sattr.fold
       (fun a acc ->
          try
-           let suf = Strings.remove_prefix "bddinfer" a.Ident.attr_string in
+           let suf = Strings.remove_prefix ~prefix:"bddinfer" a.Ident.attr_string in
            begin try
-             let n = int_of_string (Strings.remove_prefix ":" suf) in
+             let n = int_of_string (Strings.remove_prefix ~prefix:":" suf) in
              verbose_level := n
              with _ -> ()
            end;
