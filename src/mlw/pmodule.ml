@@ -229,19 +229,16 @@ let empty_module env n p = {
   muc_env    = env;
 }
 
-let close_module, restore_module =
-  let h = Wid.create 17 in
-  (fun uc ->
-     let th = close_theory uc.muc_theory in (* catches errors *)
-     let m = { mod_theory = th;
-               mod_units  = List.rev uc.muc_units;
-               mod_export = List.hd uc.muc_export;
-               mod_known  = uc.muc_known;
-               mod_local  = uc.muc_local;
-               mod_used   = uc.muc_used; } in
-     Wid.set h th.th_name m;
-     m),
-  (fun th -> Wid.find h th.th_name)
+let close_module uc =
+  let th = close_theory uc.muc_theory in (* catches errors *)
+  {
+    mod_theory = th;
+    mod_units  = List.rev uc.muc_units;
+    mod_export = List.hd uc.muc_export;
+    mod_known  = uc.muc_known;
+    mod_local  = uc.muc_local;
+    mod_used   = uc.muc_used;
+  }
 
 let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
@@ -310,6 +307,11 @@ let store_path, store_module, restore_path, restore_module_id =
   let restore_path id = Wid.find id_to_path id in
   let restore_module_id id = Wid.find id_to_pmod id in
   store_path, store_module, restore_path, restore_module_id
+
+let restore_module th =
+  restore_module_id th.th_name
+
+let close_module_no_store = close_module
 
 let close_module uc =
   let m = close_module uc in
@@ -389,27 +391,35 @@ let builtin_module =
   let uc = add_pdecl_no_logic uc pd_real in
   let uc = add_pdecl_no_logic uc pd_str in
   let uc = add_pdecl_no_logic uc pd_equ in
-  let m = close_module uc in
-  { m with mod_theory = builtin_theory }
+  let m = close_module_no_store uc in
+  let m = { m with mod_theory = builtin_theory } in
+  store_module m;
+  m
 
 let ignore_module =
   let uc = empty_module dummy_env (id_fresh "Ignore") ["why3";"Ignore"] in
   let uc = add_pdecl_no_logic uc pd_ignore_term in
-  let m = close_module uc in
-  { m with mod_theory = ignore_theory }
+  let m = close_module_no_store uc in
+  let m = { m with mod_theory = ignore_theory } in
+  store_module m;
+  m
 
 let bool_module =
   let uc = empty_module dummy_env (id_fresh "Bool") ["why3";"Bool"] in
   let uc = add_pdecl_no_logic uc pd_bool in
-  let m = close_module uc in
-  { m with mod_theory = bool_theory }
+  let m = close_module_no_store uc in
+  let m = { m with mod_theory = bool_theory } in
+  store_module m;
+  m
 
 let highord_module =
   let uc = empty_module dummy_env (id_fresh "HighOrd") ["why3";"HighOrd"] in
   let uc = add_pdecl_no_logic uc pd_func in
   let uc = add_pdecl_no_logic uc pd_func_app in
-  let m = close_module uc in
-  { m with mod_theory = highord_theory }
+  let m = close_module_no_store uc in
+  let m = { m with mod_theory = highord_theory } in
+  store_module m;
+  m
 
 let acc_ind_decl =
   try
@@ -484,8 +494,10 @@ let tuple_module = Hint.memo 17 (fun n ->
   let nm = "Tuple" ^ string_of_int n in
   let uc = empty_module dummy_env (id_fresh nm) ["why3";nm] in
   let uc = add_pdecl_no_logic uc (pd_tuple n) in
-  let m = close_module uc in
-  { m with mod_theory = tuple_theory n })
+  let m = close_module_no_store uc in
+  let m = { m with mod_theory = tuple_theory n } in
+  store_module m;
+  m)
 
 let unit_module =
   let uc = empty_module dummy_env (id_fresh "Unit") ["why3";"Unit"] in
