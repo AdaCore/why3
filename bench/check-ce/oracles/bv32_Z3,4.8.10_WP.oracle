@@ -10,33 +10,25 @@ Sub-goal Postcondition of goal dummy_update'vc.
 Prover result is: Step limit exceeded (500036 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File bv32.mlw:
   Line 7:
-    r = {contents= (34:t)}
-    r = {contents= (34:t)}
+    r = { contents = (34:t) }
+    r = { contents = (34:t) }
     Execution of main function `dummy_update` with env:
-      r = {contents= (34:t)}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ r = { contents = (34:t) } ]; rsenv = [];
+        idenv = [] }
   Line 11:
     Normal execution of function `contents` with args:
-      arg = {contents= 66}
+      [ arg = { contents = 66 } ]
     Normal execution of function `contents` with args:
-      arg = {contents= 66}
-    (giant-step) execution of unimplemented function `add`
-      v1 = 66
-      v2 = 66
+      [ arg = { contents = 66 } ]
+    (giant-step) execution of unimplemented function `add` with args:
+      [ v1 = 66, v2 = 66 ]
     result of `add` = (132:t)
   Line 9:
-    Property failure at postcondition of `dummy_update` with:
-      r = {contents= (132:t)}
+    Property failure at postcondition of `dummy_update` with env:
+      { lsenv = []; vsenv = [ r = { contents = (132:t) }, result = () ];
+        rsenv = []; idenv = [ r = { contents = (132:t) } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

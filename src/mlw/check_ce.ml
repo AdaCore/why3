@@ -551,9 +551,22 @@ let print_dbg_rac_result_model ~print_normal ~print_giant
 let debug_concrete_term = Debug.register_info_flag "debug-concrete-term"
     ~desc:"Print debug messages about the conversion to concrete term"
 
+let warn_concrete_term = Loc.register_warning "concrete-term"
+  "Warn about failures when creating a concrete counterexample"
+
 let id_name {id_string= name; id_attrs= attrs} =
   Ident.(get_model_trace_string ~name ~attrs)
   (* Ident.get_model_trace_string ~name ~attrs *)
+
+exception Concrete_term_failure of string
+
+let concrete_failure msg elem =
+  match elem with
+  | `Term t -> raise (Concrete_term_failure (asprintf "%s: %a" msg Pretty.print_term t))
+  | `Value v -> raise (Concrete_term_failure (asprintf "%s: %a" msg Pinterp_core.print_value v))
+  | `Real r -> raise (Concrete_term_failure (asprintf "%s: %a" msg (Number.print_real_constant Number.full_support) r))
+  | `Cexp c -> raise (Concrete_term_failure (asprintf "%s: %a" msg (Expr.print_cexp true 0) c))
+  | `Expr e -> raise (Concrete_term_failure (asprintf "%s: %a" msg Expr.print_expr e))
 
 let concrete_of_ls ls =
   ls.ls_name.id_string
@@ -590,19 +603,22 @@ let concrete_of_constant c ty =
       | _ -> assert false
       end
       in
-      let sign,exp,mant = Number.compute_float r fp in
-      let float_sign = concrete_bv_of_bigint (BigInt.of_int (if sign then 1 else 0)) 1 in
-      let float_exp = concrete_bv_of_bigint exp fp.fp_exponent_digits in
-      let float_mant = concrete_bv_of_bigint mant (fp.fp_significand_digits - 1) in
-      let f = Float_number { float_sign; float_exp; float_mant;
-          float_hex= "" (* TODO *) }
-      in
-      concrete_const (
-        Float {
-          float_exp_size = fp.fp_exponent_digits;
-          float_significand_size = fp.fp_significand_digits;
-          float_val = f
-        })
+      begin try
+        let sign,exp,mant = Number.compute_float r fp in
+        let float_sign = concrete_bv_of_bigint (BigInt.of_int (if sign then 1 else 0)) 1 in
+        let float_exp = concrete_bv_of_bigint exp fp.fp_exponent_digits in
+        let float_mant = concrete_bv_of_bigint mant (fp.fp_significand_digits - 1) in
+        let f = Float_number { float_sign; float_exp; float_mant;
+            float_hex= "" (* TODO *) }
+        in
+        concrete_const (
+          Float {
+            float_exp_size = fp.fp_exponent_digits;
+            float_significand_size = fp.fp_significand_digits;
+            float_val = f
+          })
+      with NonRepresentableFloat r -> concrete_failure "Non representable float" (`Real r)
+      end
   | Constant.ConstStr s -> concrete_const (String s)
 
 (* Also converts some concrete epsilon terms (was previously done in model_parser):
@@ -687,7 +703,7 @@ let rec concrete_term_of_term (known_map:Decl.known_map) (m : concrete_syntax_te
     | Term.Tnot t -> concrete_not (concrete_term_of_term known_map m t)
     | Term.Ttrue -> concrete_const (Boolean true)
     | Term.Tfalse -> concrete_const (Boolean false)
-    | Term.Tcase (_, _) -> failwith "Cannot convert pattern-matching term to model value"
+    | Term.Tcase (_, _) -> concrete_failure "case not supported" (`Term tm)
 
 and get_record known_map m lsymb args =
   (* Gets the list of record field and value from a term of the form `record'mk t1 ... tn`
@@ -850,29 +866,29 @@ let rec concrete_of_cexp (known_map:Decl.known_map)
 | Capp (rs, pvsymbols) ->
     let get_pv pv = Mpv.find_def (concrete_var (concrete_string_from_vs pv.pv_vs)) pv mpv in
     concrete_apply (id_name rs.rs_name) (List.map get_pv pvsymbols)
-| Cpur (_, _) -> failwith "Cannot convert Cpur to model value"
+| Cpur (_, _) -> concrete_failure "Cannot convert Cpur to concrete term" (`Cexp c)
 | Cfun e -> concrete_of_expr known_map mpv mv e
-| Cany -> failwith "Cannot convert Cany to model value"
+| Cany -> concrete_failure "Cannot convert Cany to concrete term" (`Cexp c)
 
 and concrete_of_expr (known_map:Decl.known_map) (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
   match e.e_node with
 | Econst c -> concrete_of_constant c (Ity.ty_of_ity e.e_ity)
 | Evar v -> (Mpv.find_def (concrete_var (concrete_string_from_vs v.pv_vs)) v mpv)
 | Eexec (cexp, _) -> concrete_of_cexp known_map mpv mv cexp
-| Eassign _ -> failwith "Cannot convert assign expr to concrete term"
-| Elet (_, _) -> failwith "Cannot convert let expr to concrete term"
+| Eassign _ -> concrete_failure "Cannot convert Eassign to concrete term" (`Expr e)
+| Elet (_, _) -> concrete_failure "Cannot convert Elet to concrete term" (`Expr e)
 | Eif (e, e1, e2) ->
     concrete_if (concrete_of_expr known_map mpv mv e)
       (concrete_of_expr known_map mpv mv e1) (concrete_of_expr known_map mpv mv e2)
-| Ematch (_, _, _) -> failwith "Cannot convert match expr to concrete term"
-| Ewhile (_, _, _, _) -> failwith "Cannot convert while expr to concrete term"
-| Efor (_, _, _, _, _) -> failwith "Cannot convert for expr to concrete term"
-| Eraise (_, _) ->  failwith "Cannot convert raise expr to concrete term"
-| Eexn (_, _) -> failwith "Cannot convert exn expr to concrete term"
-| Eassert (_, _) -> failwith "Cannot convert assert expr to concrete term"
-| Eghost _ -> failwith "Cannot convert ghost expr to concrete term"
+| Ematch (_, _, _) -> concrete_failure "Cannot convert Ematch to concrete term" (`Expr e)
+| Ewhile (_, _, _, _) -> concrete_failure "Cannot convert Ewhile to concrete term" (`Expr e)
+| Efor (_, _, _, _, _) -> concrete_failure "Cannot convert Efor to concrete term" (`Expr e)
+| Eraise (_, _) -> concrete_failure "Cannot convert Eraise to concrete term" (`Expr e)
+| Eexn (_, _) -> concrete_failure "Cannot convert Eexn to concrete term" (`Expr e)
+| Eassert (_, _) -> concrete_failure "Cannot convert Eassert to concrete term" (`Expr e)
+| Eghost _ -> concrete_failure "Cannot convert Eghost to concrete term" (`Expr e)
 | Epure t -> concrete_term_of_term known_map mv t
-| Eabsurd -> failwith "Cannot convert absurd expr to concrete term"
+| Eabsurd -> concrete_failure "Cannot convert Eabsurd to concrete term" (`Expr e)
 
 let rec value_to_concrete_term known_map v =
   let open Value in
@@ -906,14 +922,16 @@ let rec value_to_concrete_term known_map v =
   | Vfun (_vars, bvar, e) ->
       concrete_of_expr known_map Mpv.empty
         (Mvs.of_list [bvar, concrete_var (concrete_string_from_vs bvar)]) e
-  | Vpurefun _  -> failwith "Cannot convert pure fun to model value"
+  | Vpurefun _  -> concrete_failure "Cannot convert Vpurefun to concrete term" (`Value v)
   | Vundefined -> concrete_undefined
   | Vterm t -> concrete_term_of_term known_map Mvs.empty t
   | Vreal r ->
     let dummy_real = Number.real_literal ~radix:10 ~neg:false ~int:"42" ~frac:"" ~exp:None in
     concrete_const
       (Real {real_value = dummy_real ; real_verbatim = (asprintf "%a" Big_real.print_real r)})
-  | Vfloat _ | Vfloat_mode _ -> failwith "Cannot convert float to model value"
+  (* TODO Vfloats are sometimes present (e.g. in Spark testsuite), this should be implemented *)
+  | Vfloat _ -> concrete_failure "Cannot convert Vfloat to concrete term" (`Value v)
+  | Vfloat_mode _ -> concrete_failure "Cannot convert Vfloat_mode to concrete term" (`Value v)
 
 (* let model_value pm v =
   Format.printf ">>>> value: %a@." print_value v;
@@ -924,17 +942,14 @@ let rec value_to_concrete_term known_map v =
 (** In case there is no model element in the smt2 model at a LOC that is present in the RAC log,
     this function fills the missing information to create a model element *)
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
-  ignore loc;
-  if id.id_string <> "zero" && id.id_string <> "one" then
-    let dummy_term = Term.t_true in
-    let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-    Some {me_concrete_value;
-          me_lsymbol = dummy_ls;
-          me_kind = Other;
-          me_value = dummy_term;
-          me_location = loc;
-          me_attrs = id.id_attrs}
-  else None
+  let dummy_term = Term.t_true in
+  let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
+  {me_concrete_value;
+   me_lsymbol = dummy_ls;
+   me_kind = Other;
+   me_value = dummy_term;
+   me_location = loc;
+   me_attrs = id.id_attrs}
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
     ~desc:"Print original counterexample model when --check-ce"
@@ -957,20 +972,36 @@ let model_of_exec_log ~known_map ~prover_model log =
     If there is no model element in the prover model, we fabricate a minimal model
     element with the information we can extract from the log entry (in particular,
     we have no term and no lsymbol!)*)
+    try
     match search_model_element_for_id prover_model ~loc id with
   | Some me -> Some {me with me_concrete_value = value_to_concrete_term known_map value}
   | None ->
-      model_element_of_unmatched_log_entry ~loc id
-        (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty
+      Some (model_element_of_unmatched_log_entry ~loc id
+        (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty)
+    with Concrete_term_failure msg -> Loc.warning warn_concrete_term "%s" msg;
+      None
+  in
+  let filter_invalid_values =
+    function Pinterp_core.Log.Value v -> Some v
+    | Pinterp_core.Log.Invalid -> None
   in
   let me_of_log_entry e = match e.Log.log_loc with
     | Some loc when not Loc.(equal loc dummy_position) -> (
         match e.Log.log_desc with
         | Log.Val_assumed (id, v) ->
             Option.to_list (me_of_log_entry loc id v)
-        | Log.Exec_failed (_, mid) ->
-            Mid.fold (fun id v l ->
-              Option.to_list (me_of_log_entry loc id v) @ l) mid []
+        | Log.Exec_failed (_, mrs, mls, mvs, mid) ->
+            Mvs.fold (fun vs v l ->
+              Option.to_list (me_of_log_entry loc vs.vs_name v) @ l)
+            mvs
+            (Mls.fold (fun ls v l ->
+              Option.to_list (me_of_log_entry loc ls.ls_name v) @ l)
+            (Mls.map_filter filter_invalid_values mls)
+            (Mrs.fold (fun rs v l ->
+              Option.to_list (me_of_log_entry loc rs.rs_name v) @ l)
+            (Mrs.map_filter filter_invalid_values mrs)
+            (Mid.fold (fun id v l ->
+              Option.to_list (me_of_log_entry loc id v) @ l) mid [])))
         | Log.Res_assumed (ors,v) ->
           (* Results are expected to have the special name "result"?
              TODO: make this match the model element kind *)

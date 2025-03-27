@@ -10,33 +10,20 @@ Sub-goal Postcondition of goal main_f'vc.
 Prover result is: Unknown (sat) (190 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File let_function.mlw:
   Line 5:
     y = 42
     y = 42
     Execution of main function `main_f` with env:
-      y = 42
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = 42 ]; rsenv = []; idenv = [] }
   Line 8:
-    Normal execution of function `f` with args:
-      x = 42
+    Normal execution of function `f` with args: [ x = 42 ]
   Line 3:
-    Normal execution of function `(+)` with args:
-      _ = 42
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 42, _ = 1 ]
   Line 9:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 6:
-    Property failure at postcondition of `main_f` with:
-      result = 44
+    Property failure at postcondition of `main_f` with env:
+      { lsenv = []; vsenv = [ y = 42, result = 44 ]; rsenv = [];
+        idenv = [ result = 44 ] }
 

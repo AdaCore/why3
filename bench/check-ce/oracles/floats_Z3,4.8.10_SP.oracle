@@ -18,18 +18,11 @@ Goal g1.
 Prover result is: Unknown (sat) (1200 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -38,16 +31,16 @@ File floats.mlw:
     x = ((- 0x1.000002p-126):t)
     x = ((- 0x1.000002p-126):t)
     Execution of main function `g1'goal` with env:
-      x = ((- 0x1.000002p-126):t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = ((- 0x1.000002p-126):t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 5:
-    Property failure at postcondition of `g1'goal` with:
-      x = ((- 0x1.000002p-126):t)
+    Property failure at postcondition of `g1'goal` with env:
+      { lsenv = []; vsenv = [ x = ((- 0x1.000002p-126):t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = ((- 0x1.000002p-126):t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -69,18 +62,11 @@ Goal g2.
 Prover result is: Unknown (sat) (1242 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -89,16 +75,16 @@ File floats.mlw:
     x = ((- 0x0.000002p-126):t)
     x = ((- 0x0.000002p-126):t)
     Execution of main function `g2'goal` with env:
-      x = ((- 0x0.000002p-126):t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = ((- 0x0.000002p-126):t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 7:
-    Property failure at postcondition of `g2'goal` with:
-      x = ((- 0x0.000002p-126):t)
+    Property failure at postcondition of `g2'goal` with env:
+      { lsenv = []; vsenv = [ x = ((- 0x0.000002p-126):t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = ((- 0x0.000002p-126):t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -120,18 +106,11 @@ Goal g3.
 Prover result is: Unknown (sat) (564 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -140,16 +119,15 @@ File floats.mlw:
     x = (0.0:t)
     x = (0.0:t)
     Execution of main function `g3'goal` with env:
-      x = (0.0:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0.0:t) ]; rsenv = [ zeroF = UNDEFINED ];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 9:
-    Property failure at postcondition of `g3'goal` with:
-      x = (0.0:t)
+    Property failure at postcondition of `g3'goal` with env:
+      { lsenv = []; vsenv = [ x = (0.0:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0.0:t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -171,18 +149,11 @@ Goal g4.
 Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -191,16 +162,15 @@ File floats.mlw:
     x = (0x1.4p0:t)
     x = (0x1.4p0:t)
     Execution of main function `g4'goal` with env:
-      x = (0x1.4p0:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.4p0:t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 11:
-    Property failure at postcondition of `g4'goal` with:
-      x = (0x1.4p0:t)
+    Property failure at postcondition of `g4'goal` with env:
+      { lsenv = []; vsenv = [ x = (0x1.4p0:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.4p0:t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -222,18 +192,11 @@ Goal g5.
 Prover result is: Unknown (sat) (1162 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -242,16 +205,15 @@ File floats.mlw:
     x = (0x1.50002p3:t)
     x = (0x1.50002p3:t)
     Execution of main function `g5'goal` with env:
-      x = (0x1.50002p3:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.50002p3:t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 13:
-    Property failure at postcondition of `g5'goal` with:
-      x = (0x1.50002p3:t)
+    Property failure at postcondition of `g5'goal` with env:
+      { lsenv = []; vsenv = [ x = (0x1.50002p3:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.50002p3:t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -273,36 +235,29 @@ Goal g6.
 Prover result is: Unknown (sat) (739 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 15:
-    x = epsilon x6:t. is_nan x6
-    x = epsilon x6:t. is_nan x6
+    x = epsilon x8:t. is_nan x8
+    x = epsilon x8:t. is_nan x8
     Execution of main function `g6'goal` with env:
-      x = epsilon x6:t. is_nan x6
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = epsilon x8:t. is_nan x8 ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 15:
-    Property failure at postcondition of `g6'goal` with:
-      x = epsilon x6:t. is_nan x6
+    Property failure at postcondition of `g6'goal` with env:
+      { lsenv = []; vsenv = [ x = epsilon x8:t. is_nan x8, result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = epsilon x8:t. is_nan x8 ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -324,18 +279,11 @@ Goal g7.
 Prover result is: Unknown (sat) (58478 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -344,17 +292,16 @@ File floats.mlw:
     x = ((- 0x1.0p64):t)
     x = ((- 0x1.0p64):t)
     Execution of main function `g7'goal` with env:
-      x = ((- 0x1.0p64):t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = ((- 0x1.0p64):t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 17:
-    Property failure at postcondition of `g7'goal` with:
-      RNE = UNDEFINED
-      x = ((- 0x1.0p64):t)
+    Property failure at postcondition of `g7'goal` with env:
+      { lsenv = []; vsenv = [ x = ((- 0x1.0p64):t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ RNE = UNDEFINED, x = ((- 0x1.0p64):t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -376,37 +323,30 @@ Goal g8.
 Prover result is: Unknown (sat) (397 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 19:
-    x = epsilon x12:t. is_plus_infinity x12
-    x = epsilon x12:t. is_plus_infinity x12
+    x = epsilon x16:t. is_plus_infinity x16
+    x = epsilon x16:t. is_plus_infinity x16
     Execution of main function `g8'goal` with env:
-      x = epsilon x12:t. is_plus_infinity x12
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = epsilon x16:t. is_plus_infinity x16 ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 19:
-    Property failure at postcondition of `g8'goal` with:
-      RNE = UNDEFINED
-      x = epsilon x12:t. is_plus_infinity x12
+    Property failure at postcondition of `g8'goal` with env:
+      { lsenv = [];
+        vsenv = [ x = epsilon x16:t. is_plus_infinity x16, result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ RNE = UNDEFINED, x = epsilon x16:t. is_plus_infinity x16 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -462,18 +402,11 @@ Goal g11.
 Prover result is: Unknown (sat) (446 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -482,16 +415,15 @@ File floats.mlw:
     x = (0x1.0p-126:t)
     x = (0x1.0p-126:t)
     Execution of main function `g11'goal` with env:
-      x = (0x1.0p-126:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.0p-126:t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 26:
-    Property failure at postcondition of `g11'goal` with:
-      x = (0x1.0p-126:t)
+    Property failure at postcondition of `g11'goal` with env:
+      { lsenv = []; vsenv = [ x = (0x1.0p-126:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.0p-126:t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -513,18 +445,11 @@ Goal g12.
 Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -533,16 +458,15 @@ File floats.mlw:
     x = (0x0.FFFFFEp-126:t)
     x = (0x0.FFFFFEp-126:t)
     Execution of main function `g12'goal` with env:
-      x = (0x0.FFFFFEp-126:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x0.FFFFFEp-126:t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 29:
-    Property failure at postcondition of `g12'goal` with:
-      x = (0x0.FFFFFEp-126:t)
+    Property failure at postcondition of `g12'goal` with env:
+      { lsenv = []; vsenv = [ x = (0x0.FFFFFEp-126:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x0.FFFFFEp-126:t) ] }
 
 Warning: Error while interpreting fp.isFinite32: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -564,18 +488,11 @@ Goal g13.
 Prover result is: Unknown (sat) (456 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 892:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 892:
     zeroF = UNDEFINED
@@ -584,16 +501,15 @@ File floats.mlw:
     x = (0x0.8p-126:t)
     x = (0x0.8p-126:t)
     Execution of main function `g13'goal` with env:
-      x = (0x0.8p-126:t)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x0.8p-126:t) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 32:
-    Property failure at postcondition of `g13'goal` with:
-      x = (0x0.8p-126:t)
+    Property failure at postcondition of `g13'goal` with env:
+      { lsenv = []; vsenv = [ x = (0x0.8p-126:t), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x0.8p-126:t) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -615,18 +531,11 @@ Goal g1.
 Prover result is: Unknown (sat) (1904 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -635,16 +544,17 @@ File floats.mlw:
     x = ((- 0x1.0000000000001p-1022):t1)
     x = ((- 0x1.0000000000001p-1022):t1)
     Execution of main function `g1'goal` with env:
-      x = ((- 0x1.0000000000001p-1022):t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = ((- 0x1.0000000000001p-1022):t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 41:
-    Property failure at postcondition of `g1'goal2` with:
-      x = ((- 0x1.0000000000001p-1022):t1)
+    Property failure at postcondition of `g1'goal2` with env:
+      { lsenv = [];
+        vsenv = [ x = ((- 0x1.0000000000001p-1022):t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = ((- 0x1.0000000000001p-1022):t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -666,18 +576,11 @@ Goal g2.
 Prover result is: Unknown (sat) (1946 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -686,16 +589,17 @@ File floats.mlw:
     x = ((- 0x0.0000000000001p-1022):t1)
     x = ((- 0x0.0000000000001p-1022):t1)
     Execution of main function `g2'goal` with env:
-      x = ((- 0x0.0000000000001p-1022):t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = ((- 0x0.0000000000001p-1022):t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 43:
-    Property failure at postcondition of `g2'goal2` with:
-      x = ((- 0x0.0000000000001p-1022):t1)
+    Property failure at postcondition of `g2'goal2` with env:
+      { lsenv = [];
+        vsenv = [ x = ((- 0x0.0000000000001p-1022):t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = ((- 0x0.0000000000001p-1022):t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -717,18 +621,11 @@ Goal g3.
 Prover result is: Unknown (sat) (756 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -737,16 +634,15 @@ File floats.mlw:
     x = (0.0:t1)
     x = (0.0:t1)
     Execution of main function `g3'goal` with env:
-      x = (0.0:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0.0:t1) ]; rsenv = [ zeroF = UNDEFINED ];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 45:
-    Property failure at postcondition of `g3'goal2` with:
-      x = (0.0:t1)
+    Property failure at postcondition of `g3'goal2` with env:
+      { lsenv = []; vsenv = [ x = (0.0:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0.0:t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -768,18 +664,11 @@ Goal g4.
 Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -788,16 +677,15 @@ File floats.mlw:
     x = (0x1.4p0:t1)
     x = (0x1.4p0:t1)
     Execution of main function `g4'goal` with env:
-      x = (0x1.4p0:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.4p0:t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 47:
-    Property failure at postcondition of `g4'goal2` with:
-      x = (0x1.4p0:t1)
+    Property failure at postcondition of `g4'goal2` with env:
+      { lsenv = []; vsenv = [ x = (0x1.4p0:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.4p0:t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -819,18 +707,11 @@ Goal g5.
 Prover result is: Unknown (sat) (1868 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -839,16 +720,16 @@ File floats.mlw:
     x = (0x1.3000000000002p3:t1)
     x = (0x1.3000000000002p3:t1)
     Execution of main function `g5'goal` with env:
-      x = (0x1.3000000000002p3:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.3000000000002p3:t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 49:
-    Property failure at postcondition of `g5'goal2` with:
-      x = (0x1.3000000000002p3:t1)
+    Property failure at postcondition of `g5'goal2` with env:
+      { lsenv = []; vsenv = [ x = (0x1.3000000000002p3:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = (0x1.3000000000002p3:t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -870,36 +751,29 @@ Goal g6.
 Prover result is: Unknown (sat) (1325 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 51:
-    x = epsilon x18:t1. is_nan1 x18
-    x = epsilon x18:t1. is_nan1 x18
+    x = epsilon x24:t1. is_nan1 x24
+    x = epsilon x24:t1. is_nan1 x24
     Execution of main function `g6'goal` with env:
-      x = epsilon x18:t1. is_nan1 x18
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = epsilon x24:t1. is_nan1 x24 ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 51:
-    Property failure at postcondition of `g6'goal2` with:
-      x = epsilon x18:t1. is_nan1 x18
+    Property failure at postcondition of `g6'goal2` with env:
+      { lsenv = []; vsenv = [ x = epsilon x24:t1. is_nan1 x24, result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = epsilon x24:t1. is_nan1 x24 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -938,37 +812,31 @@ Goal g8.
 Prover result is: Unknown (sat) (525 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 55:
-    x = epsilon x24:t1. is_plus_infinity1 x24
-    x = epsilon x24:t1. is_plus_infinity1 x24
+    x = epsilon x32:t1. is_plus_infinity1 x32
+    x = epsilon x32:t1. is_plus_infinity1 x32
     Execution of main function `g8'goal` with env:
-      x = epsilon x24:t1. is_plus_infinity1 x24
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = epsilon x32:t1. is_plus_infinity1 x32 ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 55:
-    Property failure at postcondition of `g8'goal2` with:
-      RNE = UNDEFINED
-      x = epsilon x24:t1. is_plus_infinity1 x24
+    Property failure at postcondition of `g8'goal2` with env:
+      { lsenv = [];
+        vsenv = [ x = epsilon x32:t1. is_plus_infinity1 x32, result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv =
+          [ RNE = UNDEFINED, x = epsilon x32:t1. is_plus_infinity1 x32 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -1024,18 +892,11 @@ Goal g11.
 Prover result is: Unknown (sat) (574 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -1044,16 +905,15 @@ File floats.mlw:
     x = (0x1.0p-1022:t1)
     x = (0x1.0p-1022:t1)
     Execution of main function `g11'goal` with env:
-      x = (0x1.0p-1022:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x1.0p-1022:t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 62:
-    Property failure at postcondition of `g11'goal2` with:
-      x = (0x1.0p-1022:t1)
+    Property failure at postcondition of `g11'goal2` with env:
+      { lsenv = []; vsenv = [ x = (0x1.0p-1022:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.0p-1022:t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -1075,18 +935,11 @@ Goal g12.
 Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -1095,16 +948,17 @@ File floats.mlw:
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     Execution of main function `g12'goal` with env:
-      x = (0x0.FFFFFFFFFFFFFp-1022:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x0.FFFFFFFFFFFFFp-1022:t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 65:
-    Property failure at postcondition of `g12'goal2` with:
-      x = (0x0.FFFFFFFFFFFFFp-1022:t1)
+    Property failure at postcondition of `g12'goal2` with env:
+      { lsenv = [];
+        vsenv = [ x = (0x0.FFFFFFFFFFFFFp-1022:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ x = (0x0.FFFFFFFFFFFFFp-1022:t1) ] }
 
 Warning: Error while interpreting fp.isFinite64: No lsymbol found for qualified identifier (Qident (Isymbol fp.isInfinite))
 
@@ -1126,18 +980,11 @@ Goal g13.
 Prover result is: Unknown (sat) (584 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ieee_float.mlw:
   Line 934:
     Constant zeroF initialization
   Line 63:
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
   Line 934:
     zeroF = UNDEFINED
@@ -1146,14 +993,13 @@ File floats.mlw:
     x = (0x0.8p-1022:t1)
     x = (0x0.8p-1022:t1)
     Execution of main function `g13'goal` with env:
-      x = (0x0.8p-1022:t1)
-      zero = 0
-      one = 1
-      zeroF = UNDEFINED
+      { lsenv = []; vsenv = [ x = (0x0.8p-1022:t1) ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 68:
-    Property failure at postcondition of `g13'goal2` with:
-      x = (0x0.8p-1022:t1)
+    Property failure at postcondition of `g13'goal2` with env:
+      { lsenv = []; vsenv = [ x = (0x0.8p-1022:t1), result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x0.8p-1022:t1) ] }
 

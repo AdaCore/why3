@@ -15,8 +15,10 @@ File range_type_float.mlw:
     x = epsilon x:t. t'real x = 10.0
     x = epsilon x:t. t'real x = 10.0
     Execution of main function `f` with env:
-      x = epsilon x:t. t'real x = 10.0
+      { lsenv = []; vsenv = [ x = epsilon x:t. t'real x = 10.0 ]; rsenv = [];
+        idenv = [] }
   Line 10:
-    Property failure at assertion with:
-      x = epsilon x:t. t'real x = 10.0
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = epsilon x:t. t'real x = 10.0 ]; rsenv = [];
+        idenv = [ x = epsilon x:t. t'real x = 10.0 ] }
 

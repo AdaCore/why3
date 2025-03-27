@@ -14,51 +14,52 @@ Sub-goal Index in array bounds of goal var_overwrite'vc.
 Prover result is: Unknown (unknown + incomplete) (286 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File array_records_mono.mlw:
   Line 45:
-    a = {elts=
-         fun (x:int) ->
-          if x = (- 1) then basic_record'mk True 3 5
-          else basic_record'mk False 0 0;
-         length= 0}
+    a =
+      { elts =
+          fun (x:int) ->
+           if x = (- 1) then basic_record'mk True 3 5
+           else basic_record'mk False 0 0; length = 0 }
     i = (- 1)
-    a = {elts=
-         fun (x:int) ->
-          if x = (- 1) then basic_record'mk True 3 5
-          else basic_record'mk False 0 0;
-         length= 0}
+    a =
+      { elts =
+          fun (x:int) ->
+           if x = (- 1) then basic_record'mk True 3 5
+           else basic_record'mk False 0 0; length = 0 }
     i = (- 1)
     Execution of main function `var_overwrite` with env:
-      a = {elts=
-           fun (x:int) ->
-            if x = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk False 0 0;
-           length= 0}
-      i = (- 1)
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv =
+          [ a = { elts =
+                    fun (x:int) ->
+                     if x = (- 1) then basic_record'mk True 3 5
+                     else basic_record'mk False 0 0; length = 0 },
+            i = (- 1) ]; rsenv = []; idenv = [] }
   Line 49:
-    (giant-step) execution of unimplemented function `([])`
-      a = {elts=
-           fun (x:int) ->
-            if x = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk False 0 0;
-           length= 0}
-      i = (- 1)
-    Property failure at precondition of `([])` with:
-      a = {elts=
-           fun (x:int) ->
-            if x = (- 1) then basic_record'mk True 3 5
-            else basic_record'mk False 0 0;
-           length= 0}
-      i = (- 1)
+    (giant-step) execution of unimplemented function `([])` with args:
+      [ a = { elts =
+                fun (x:int) ->
+                 if x = (- 1) then basic_record'mk True 3 5
+                 else basic_record'mk False 0 0; length = 0 }, i = (- 1) ]
+    Property failure at precondition of `([])` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { elts =
+                    fun (x:int) ->
+                     if x = (- 1) then basic_record'mk True 3 5
+                     else basic_record'mk False 0 0; length = 0 }, i = (- 1),
+            a = { elts =
+                    fun (x:int) ->
+                     if x = (- 1) then basic_record'mk True 3 5
+                     else basic_record'mk False 0 0; length = 0 }, i = (- 1),
+            o = 69 ]; rsenv = [];
+        idenv =
+          [ a = { elts =
+                    fun (x:int) ->
+                     if x = (- 1) then basic_record'mk True 3 5
+                     else basic_record'mk False 0 0; length = 0 },
+            i = (- 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

@@ -14,36 +14,24 @@ Sub-goal Postcondition of goal main'vc.
 Prover result is: Unknown (sat) (787 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File let_function_logic.mlw:
   Line 3:
-    g = fun (x!01:int) -> if x!01 = 42 then 43 else 1 + x!01
+    g = fun (x!02:int) -> if x!02 = 42 then 43 else 1 + x!02
   Line 11:
     y = 42
     y = 42
     Execution of main function `main` with env:
-      g = fun (x!01:int) -> if x!01 = 42 then 43 else 1 + x!01
-      y = 42
-      zero = 0
-      one = 1
+      { lsenv = [ g = fun (x!02:int) -> if x!02 = 42 then 43 else 1 + x!02 ];
+        vsenv = [ y = 42 ]; rsenv = []; idenv = [] }
   Line 14:
-    Normal execution of function `f` with args:
-      x = 42
+    Normal execution of function `f` with args: [ x = 42 ]
   Line 9:
-    Normal execution of function `(+)` with args:
-      _ = 42
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 42, _ = 1 ]
   Line 15:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 12:
-    Property failure at postcondition of `main` with:
-      result = 44
+    Property failure at postcondition of `main` with env:
+      { lsenv = [ g = fun (x!02:int) -> if x!02 = 42 then 43 else 1 + x!02 ];
+        vsenv = [ y = 42, result = 44 ]; rsenv = [];
+        idenv = [ result = 44 ] }
 

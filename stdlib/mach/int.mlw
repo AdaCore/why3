@@ -473,7 +473,7 @@ module Int63
     function to_int = int63'int,
     lemma to_int_in_bounds,
     lemma extensionality
-
+  (* FIXME: we should not need zero and one, at least as program constants *)
   let constant zero = (0:int63)
   let constant one = (1:int63)
   val constant max_int:int63

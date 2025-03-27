@@ -14,46 +14,34 @@ Sub-goal Assertion of goal p1'vc.
 Prover result is: Unknown (sat) (678 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 13:
-    b = {contents= 16}
-    b = {contents= 16}
+    b = { contents = 16 }
+    b = { contents = 16 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 16}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 16 } ];
+        rsenv = []; idenv = [] }
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 16}
+    Normal execution of function `(!)` with args: [ x = { contents = 16 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 16}
+      [ arg = { contents = 16 } ]
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 0}
+    Normal execution of function `(!)` with args: [ x = { contents = 0 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
   Line 16:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 16
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 16 ]
     Normal execution of function `(:=)` with args:
-      x = {contents= 0}
-      v = 16
+      [ x = { contents = 0 }, v = 16 ]
   Line 17:
-    Property failure at assertion with:
-      a = {contents= 16}
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 16 }, b = { contents = 16 }, _ = () ];
+        rsenv = []; idenv = [ a = { contents = 16 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -67,77 +55,55 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (sat) (1208 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 13:
-    b = {contents= 14}
-    b = {contents= 14}
+    b = { contents = 14 }
+    b = { contents = 14 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 14}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 14 } ];
+        rsenv = []; idenv = [] }
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 14}
+    Normal execution of function `(!)` with args: [ x = { contents = 14 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 14}
+      [ arg = { contents = 14 } ]
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 0}
+    Normal execution of function `(!)` with args: [ x = { contents = 0 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
   Line 16:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 14
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 14 ]
     Normal execution of function `(:=)` with args:
-      x = {contents= 0}
-      v = 14
+      [ x = { contents = 0 }, v = 14 ]
   Line 18:
-    Normal execution of function `(!)` with args:
-      x = {contents= 14}
+    Normal execution of function `(!)` with args: [ x = { contents = 14 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 14}
+      [ arg = { contents = 14 } ]
   Line 18:
-    Normal execution of function `(>=)` with args:
-      x = 14
-      y = 10
-    Normal execution of function `(!)` with args:
-      x = {contents= 14}
+    Normal execution of function `(>=)` with args: [ x = 14, y = 10 ]
+    Normal execution of function `(!)` with args: [ x = { contents = 14 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 14}
+      [ arg = { contents = 14 } ]
   Line 18:
-    Normal execution of function `(-)` with args:
-      x = 14
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 14, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 14
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 14, _ = (-1) ]
 File jlamp0_mono.mlw:
   Line 18:
     Normal execution of function `(:=)` with args:
-      x = {contents= 14}
-      v = 13
+      [ x = { contents = 14 }, v = 13 ]
   Line 15:
-    Property failure at postcondition of `p1` with:
-      a = {contents= 13}
+    Property failure at postcondition of `p1` with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 13 }, b = { contents = 14 }, result = () ];
+        rsenv = []; idenv = [ a = { contents = 13 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -151,57 +117,42 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (sat) (956 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 13:
-    b = {contents= 5}
-    b = {contents= 5}
+    b = { contents = 5 }
+    b = { contents = 5 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 5}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 5 } ];
+        rsenv = []; idenv = [] }
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 5}
+    Normal execution of function `(!)` with args: [ x = { contents = 5 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 5}
+      [ arg = { contents = 5 } ]
   Line 16:
-    Normal execution of function `(!)` with args:
-      x = {contents= 0}
+    Normal execution of function `(!)` with args: [ x = { contents = 0 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
   Line 16:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 5
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 5 ]
     Normal execution of function `(:=)` with args:
-      x = {contents= 0}
-      v = 5
+      [ x = { contents = 0 }, v = 5 ]
   Line 18:
-    Normal execution of function `(!)` with args:
-      x = {contents= 5}
+    Normal execution of function `(!)` with args: [ x = { contents = 5 } ]
   Line 7:
     Normal execution of function `contents` with args:
-      arg = {contents= 5}
+      [ arg = { contents = 5 } ]
   Line 18:
-    Normal execution of function `(>=)` with args:
-      x = 5
-      y = 10
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `(>=)` with args: [ x = 5, y = 10 ]
+    Normal execution of function `Tuple0` with args: []
   Line 15:
-    Property failure at postcondition of `p1` with:
-      a = {contents= 5}
+    Property failure at postcondition of `p1` with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 5 }, b = { contents = 5 }, result = () ];
+        rsenv = []; idenv = [ a = { contents = 5 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -215,39 +166,32 @@ Sub-goal Loop invariant init of goal p2'vc.
 Prover result is: Unknown (sat) (289 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 20:
     Constant c initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    c = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    c = { contents = 0 }
 Unknown location:
     _ = ()
 File jlamp0_mono.mlw:
   Line 22:
     _ = ()
     Execution of main function `p2` with env:
-      a = {contents= 0}
-      c = {contents= 0}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 0 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 25:
     Normal execution of function `(:=)` with args:
-      x = {contents= 0}
-      v = 1
+      [ x = { contents = 0 }, v = 1 ]
   Line 27:
-    Property failure at loop invariant init with:
-      c = {contents= 1}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { contents = 0 }, c = { contents = 1 }, _ = (), _ = () ];
+        rsenv = []; idenv = [ c = { contents = 1 } ] }
 
 File "bench/check-ce/jlamp0_mono.mlw", line 28, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
@@ -278,36 +222,29 @@ Sub-goal Loop invariant preservation of goal p2'vc.
 Prover result is: Unknown (sat) (1331 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 20:
-    c = {contents= 10}
+    c = { contents = 10 }
 Unknown location:
     _ = ()
 File jlamp0_mono.mlw:
   Line 22:
     _ = ()
     Execution of main function `p2` with env:
-      a = {contents= 0}
-      c = {contents= 10}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 10 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 25:
     Normal execution of function `(:=)` with args:
-      x = {contents= 10}
-      v = 1
+      [ x = { contents = 10 }, v = 1 ]
   Line 27:
-    Property failure at loop invariant init with:
-      c = {contents= 1}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { contents = 0 }, c = { contents = 1 }, _ = (), _ = () ];
+        rsenv = []; idenv = [ c = { contents = 1 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -351,32 +288,25 @@ Sub-goal Loop invariant init of goal p3'vc.
 Prover result is: Unknown (sat) (430 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 20:
-    c = {contents= 3}
+    c = { contents = 3 }
 Unknown location:
     _ = ()
 File jlamp0_mono.mlw:
   Line 34:
     _ = ()
     Execution of main function `p3` with env:
-      a = {contents= 0}
-      c = {contents= 3}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 3 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 41:
-    Property failure at loop invariant init with:
-      a = {contents= 0}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 3 }, _ = () ];
+        rsenv = []; idenv = [ a = { contents = 0 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -416,32 +346,25 @@ Sub-goal Loop invariant preservation of goal p3'vc.
 Prover result is: Unknown (sat) (1431 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File jlamp0_mono.mlw:
   Line 11:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 20:
-    c = {contents= 3}
+    c = { contents = 3 }
 Unknown location:
     _ = ()
 File jlamp0_mono.mlw:
   Line 34:
     _ = ()
     Execution of main function `p3` with env:
-      a = {contents= 0}
-      c = {contents= 3}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 3 }, _ = () ];
+        rsenv = []; idenv = [] }
   Line 41:
-    Property failure at loop invariant init with:
-      a = {contents= 0}
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 0 }, c = { contents = 3 }, _ = () ];
+        rsenv = []; idenv = [ a = { contents = 0 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

@@ -144,7 +144,7 @@ module Log : sig
     | Iter_loop of exec_mode
     | Exec_main of (Expr.rsymbol * value_or_invalid Term.Mls.t * value Term.Mvs.t * value_or_invalid Expr.Mrs.t)
     | Exec_stucked of (string * value Ident.Mid.t)
-    | Exec_failed of (string * value Ident.Mid.t)
+    | Exec_failed of (string * value_or_invalid Expr.Mrs.t * value_or_invalid Term.Mls.t * value Term.Mvs.t * value Ident.Mid.t)
     | Exec_ended
 
   type log_entry = private {
@@ -166,8 +166,8 @@ module Log : sig
   val log_iter_loop : log_uc -> exec_mode -> Loc.position option -> unit
   val log_exec_main : log_uc -> Expr.rsymbol -> value Lazy.t Term.Mls.t -> value Term.Mvs.t -> value Lazy.t Expr.Mrs.t ->
                       Loc.position option -> unit
-  val log_failed : log_uc -> string -> value Ident.Mid.t ->
-                   Loc.position option -> unit
+  val log_failed : log_uc -> string -> value Lazy.t Expr.Mrs.t -> value Lazy.t Term.Mls.t ->
+                      value Term.Mvs.t -> value Ident.Mid.t -> Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Ident.Mid.t ->
                     Loc.position option -> unit
   val log_exec_ended : log_uc -> Loc.position option -> unit

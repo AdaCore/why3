@@ -24,11 +24,10 @@ File var_clones.mlw:
   Line 8:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
-      n = 111
-      n = 222
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = [ n = 111, n = 222 ];
+        idenv = [] }
   Line 9:
-    Property failure at assertion with:
-      n = 111
-      n = 222
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = [ n = 111, n = 222 ];
+        idenv = [ n = 111, n = 222 ] }
 

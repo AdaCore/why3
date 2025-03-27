@@ -13,13 +13,6 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown) (10 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File return_value_below_if_when_vc_sp.mlw:
   Line 6:
     b = true
@@ -27,19 +20,13 @@ File return_value_below_if_when_vc_sp.mlw:
     b = true
     y = 42
     Execution of main function `f` with env:
-      b = true
-      y = 42
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ b = true, y = 42 ]; rsenv = []; idenv = [] }
   Line 8:
-    (giant-step) execution of unimplemented function `bool_neq`
-      x = 42
-      y = 0
+    (giant-step) execution of unimplemented function `bool_neq` with args:
+      [ x = 42, y = 0 ]
     result of `bool_neq` = true
   Line 7:
-    Property failure at postcondition of `f` with:
-      True = UNDEFINED
-      b = true
-      y = 42
-      result = true
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ b = true, y = 42, result = true ]; rsenv = [];
+        idenv = [ True = UNDEFINED, b = true, y = 42, result = true ] }
 

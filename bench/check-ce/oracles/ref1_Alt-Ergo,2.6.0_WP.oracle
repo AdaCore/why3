@@ -14,12 +14,12 @@ File ref1.mlw:
   Line 4:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 5:
-    Normal execution of function `ref` with args:
-      contents = 1
-    Normal execution of function `ref'mk` with args:
-      contents = 1
+    Normal execution of function `ref` with args: [ contents = 1 ]
+    Normal execution of function `ref'mk` with args: [ contents = 1 ]
   Line 6:
-    Property failure at assertion with:
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), x = { contents = 1 } ]; rsenv = [];
+        idenv = [] }
 
