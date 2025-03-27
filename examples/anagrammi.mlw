@@ -1,0 +1,108 @@
+
+(** {1 Anagrammi}
+
+  In Umberto Eco's "Foucault's Pendulum" (Il pendolo di Foucault,
+  1988), there is a short BASIC program that computes the 24
+  permutations of four letters. It is as follows:
+  {h<pre>
+    10 REM anagrammi
+    20 INPUT L$(1), L$(2), L$(3), L$(4)
+    30 PRINT
+    40 FOR I1 = 1 TO 4
+    50 FOR I2 = 1 TO 4
+    60 IF I2=I1 THEN 130
+    70 FOR I3 = 1 TO 4
+    80 IF I3=I1 THEN 120
+    90 IF I3=i2 THEN 120
+   100 LET I4 = 10-(I1+I2+I3)
+   110 LPRINT L$(I1); L$(I2); L$(I3); L$(I4)
+   120 NEXT I3
+   130 NEXT I2
+   140 NEXT I1
+   150 END
+  </pre>}
+
+  Note: In the French edition (Grasset, 2013), there is a typo
+  on line 80, with `=11` instead of `=I1`. And the dollar symbols
+  are replaced with the letter S.
+
+  I could not resist implementing it in WhyML and verifying it,
+  which is a simple, yet enjoyable, exercise.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use seq.Seq
+use seq.Mem
+use seq.Distinct
+
+(** A line printed on the output by the program is
+    a sequence of (4) integers. *)
+type line = seq int
+
+(** The line `s` is a permutation of `1234`. *)
+predicate perm4 (s: line) =
+  length s = 4 && (forall i. 0 <= i < 4 -> 1 <= s[i] <= 4) &&
+  distinct s
+
+(** The program outputs the permutations in lexicographic
+    order, so we introduce this order relation. *)
+predicate lt (s1 s2: line) =
+  exists i. 0 <= i < 4 && s1[i] < s2[i] &&
+    forall j. 0 <= j < i -> s1[j] = s2[j]
+
+lemma lt_trans:
+  forall s1 s2 s3. perm4 s1 -> perm4 s2 -> perm4 s3 ->
+  lt s1 s2 -> lt s2 s3 -> lt s1 s3
+
+(** A sequence of lines contains only permutations
+    and is sorted. *)
+predicate sorted (o: seq line) =
+  (* only permutations *)
+  (forall j. 0 <= j < length o -> perm4 o[j]) &&
+  (* and they are sorted (and thus all distinct) *)
+  (forall j1 j2. 0 <= j1 < j2 < length o -> lt o[j1] o[j2])
+
+(** A sequence of lines is sorted and contains exactly
+    the permutations satisfying predicate `pr`. *)
+predicate below (o: seq line) (pr: line -> bool) =
+  sorted o &&
+  (forall j. 0 <= j < length o -> pr o[j]) &&
+  (forall s. perm4 s -> pr s -> mem s o)
+
+(** Shortcut predicates for the loop invariants below: *)
+function pr1 (i1: int) : line->bool = fun s ->
+  s[0]<i1
+function pr2 (i1 i2: int) : line->bool = fun s ->
+  pr1 i1 s || s[0]=i1 && s[1]<i2
+function pr3 (i1 i2 i3: int) : line->bool = fun s ->
+  pr2 i1 i2 s || s[0]=i1 && s[1]=i2 && s[2]<i3
+
+(** The output of the program is modeled with the
+    following global variable that contains a sequence
+    of lines. *)
+val ref output: seq line
+
+let anagrammi () : unit
+  requires { output = empty }
+  ensures  { below output (fun _ -> true) }
+= for i1 = 1 to 4 do
+    invariant { below output (pr1 i1) }
+    for i2 = 1 to 4 do
+      invariant { below output (pr2 i1 i2) }
+      if i2 = i1 then continue;
+      for i3 = 1 to 4 do
+        invariant { below output (pr3 i1 i2 i3) }
+        if i3 = i1 then continue;
+        if i3 = i2 then continue;
+        let i4 = 10 - (i1+i2+i3) in
+        (* LPRINT L$(I1); L$(I2); L$(I3); L$(I4) *)
+        let line = cons i1 (cons i2 (cons i3 (cons i4 empty))) in
+        assert { line[0] = i1 && line[1] = i2 &&
+                 line[2] = i3 && line[3] = i4 };
+        assert { perm4 line };
+        output <- snoc output line
+      done
+    done
+  done

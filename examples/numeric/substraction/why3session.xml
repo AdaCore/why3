@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.4.2" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="substraction.mlw"/>
 <theory name="SubstractionSingle" proved="true">
  <goal name="substraction_errors_basic&#39;vc" expl="VC for substraction_errors_basic" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="substraction_errors_basic&#39;vc.0" expl="postcondition" proved="true">
-  <transf name="inline_trivial" proved="true" >
-   <goal name="substraction_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="(((abs1 ((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real
-b)) -&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))) /\ ((abs1
-((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real a) -&#39; (to_real
-b))))))">
+  <transf name="assert" proved="true" arg1="let t = to_real c in
+let t1 = 1.0 +. eps in
+let t2 = to_real a -. to_real b in
+abs (to_real result -. (t2 -. t))
+&lt;=. ((((eps +. 0.0) +. eps) *. (abs t2 +. abs t))
+     +. (((t1 +. 0.0) *. 0.0) +. ((t1 +. eps) *. 0.0)))">
+   <goal name="substraction_errors_basic&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. ((to_real a -. to_real b) -. to_real c))
+&lt;=. ((((eps +. 0.0) +. eps)
+      *. (abs (to_real a -. to_real b) +. abs (to_real c)))
+     +. ((((1.0 +. eps) +. 0.0) *. 0.0) +. (((1.0 +. eps) +. eps) *. 0.0)))">
     <goal name="substraction_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="substraction_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.062922" steps="390"/></proof>
-       </goal>
-       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.043032" steps="232"/></proof>
-       </goal>
-      </transf>
+    <transf name="apply" proved="true" arg1="usub_single_error_propagation" arg2="with" arg3="a --. b,c">
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (a --. b) -. (to_real a -. to_real b))
+&lt;=. (eps *. abs (to_real a -. to_real b))">
+      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <proof prover="1"><result status="valid" time="0.039705" steps="723"/></proof>
       </goal>
       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.069025" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037232" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.040094" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.036743" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.039137" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.034305" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.040035" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.015924" steps="115"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.056000" steps="390"/></proof>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.012067" steps="89"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.017003" steps="92"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.012202" steps="92"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014883" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.013623" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.013115" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.016362" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.013187" steps="83"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="substraction_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.102857" steps="808"/></proof>
+    <goal name="substraction_errors_basic&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.028274" steps="198"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="substraction_errors_basic&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.041960" steps="371"/></proof>
    </goal>
   </transf>
   </goal>
@@ -74,232 +74,155 @@ b)))))">
  <goal name="substraction_errors&#39;vc" expl="VC for substraction_errors" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="substraction_errors&#39;vc.0" expl="postcondition" proved="true">
-  <transf name="inline_trivial" proved="true" >
-   <goal name="substraction_errors&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="((((((abs1 ((to_real (usub (usub (usub a b) c) (usub d (usub e
-f)))) -&#39; ((((to_real a) -&#39; (to_real b)) -&#39; (to_real c)) -&#39; ((to_real
-d) -&#39; ((to_real e) -&#39; (to_real
-f)))))) &lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) -&#39; (to_real
-f)))))) +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)))) /\ ((abs1
-((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real b)) -&#39; (to_real
-c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real a) -&#39; (to_real
-b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))) /\ ((abs1
-((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real a) -&#39; (to_real b)))))) /\ ((abs1 ((to_real (usub d (usub e
-f))) -&#39; ((to_real d) -&#39; ((to_real e) -&#39; (to_real
-f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1 ((to_real
-e) -&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))) /\ ((abs1
-((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real f)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real e) -&#39; (to_real
-f))))))">
+  <transf name="assert" proved="true" arg1="let t = to_real d in
+let t1 = to_real c in
+let t2 = eps +. eps in
+let t3 = to_real e -. to_real f in
+let t4 = to_real a -. to_real b in
+let t5 = ((1.0 +. eps) +. t2) *. 0.0 in
+abs (to_real result -. ((t4 -. t1) -. (t -. t3)))
+&lt;=. ((((t2 +. t2) +. eps) *. ((abs t4 +. abs t1) +. (abs t +. abs t3)))
+     +. (t5 +. t5))">
+   <goal name="substraction_errors&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs
+(to_real result
+ -. (((to_real a -. to_real b) -. to_real c)
+     -. (to_real d -. (to_real e -. to_real f))))
+&lt;=. (((((eps +. eps) +. (eps +. eps)) +. eps)
+      *. ((abs (to_real a -. to_real b) +. abs (to_real c))
+          +. (abs (to_real d) +. abs (to_real e -. to_real f))))
+     +. ((((1.0 +. eps) +. (eps +. eps)) *. 0.0)
+         +. (((1.0 +. eps) +. (eps +. eps)) *. 0.0)))">
     <goal name="substraction_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="substraction_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real
-b)) -&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.061545" steps="390"/></proof>
-         </goal>
-         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="0"><result status="valid" time="0.044017" steps="232"/></proof>
-         </goal>
-        </transf>
+    <transf name="apply" proved="true" arg1="usub_single_error_propagation" arg2="with" arg3="(a --. b) --. c,d --. (e --. f)">
+     <goal name="substraction_errors&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real ((a --. b) --. c) -. ((to_real a -. to_real b) -. to_real c))
+&lt;=. ((((eps +. 0.0) +. eps)
+      *. (abs (to_real a -. to_real b) +. abs (to_real c)))
+     +. ((((1.0 +. eps) +. 0.0) *. 0.0) +. (((1.0 +. eps) +. eps) *. 0.0)))">
+      <goal name="substraction_errors&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="apply" proved="true" arg1="usub_single_error_propagation" arg2="with" arg3="a --. b,c">
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
+       <transf name="assert" proved="true" arg1="abs (to_real (a --. b) -. (to_real a -. to_real b))
+&lt;=. (eps *. abs (to_real a -. to_real b))">
+        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.039116" steps="723"/></proof>
         </goal>
         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.075708" steps="522"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.037516" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.040371" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.041630" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.036626" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.043104" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.039105" steps="231"/></proof>
+        <proof prover="1"><result status="valid" time="0.017451" steps="115"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="substraction_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.028536" steps="233"/></proof>
+       <proof prover="1"><result status="valid" time="0.020543" steps="89"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.016043" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.019725" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.016456" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.018428" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.020320" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.013344" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.8" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014676" steps="83"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="substraction_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub d (usub e f))) -&#39; ((to_real d) -&#39; ((to_real
-e) -&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) -&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.0.1.0" expl="asserted formula" proved="true">
-       <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.0" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.062879" steps="522"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1" expl="apply premises" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) -&#39; (to_real
-f)))))">
-         <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.065740" steps="390"/></proof>
-         </goal>
-         <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1.1" expl="apply premises" proved="true">
-         <proof prover="0"><result status="valid" time="0.042581" steps="232"/></proof>
-         </goal>
-        </transf>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.041868" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.036459" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.4" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.037511" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.5" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.033723" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.6" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.035249" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.7" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.035215" steps="231"/></proof>
-        </goal>
-       </transf>
-       </goal>
-       <goal name="substraction_errors&#39;vc.0.0.0.0.1.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039667" steps="233"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.077365" steps="638"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.078303" steps="637"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.048719" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.042753" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.036380" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.031034" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.020530" steps="144"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.1.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.1.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.055802" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (d --. (e --. f)) -. (to_real d -. (to_real e -. to_real f)))
+&lt;=. ((((0.0 +. eps) +. eps)
+      *. (abs (to_real d) +. abs (to_real e -. to_real f)))
+     +. ((((1.0 +. eps) +. eps) *. 0.0) +. (((1.0 +. eps) +. 0.0) *. 0.0)))">
+      <goal name="substraction_errors&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
+      <transf name="apply" proved="true" arg1="usub_single_error_propagation" arg2="with" arg3="d,e --. f">
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.0" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014739" steps="89"/></proof>
        </goal>
        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.027033" steps="232"/></proof>
+       <transf name="assert" proved="true" arg1="abs (to_real (e --. f) -. (to_real e -. to_real f))
+&lt;=. (eps *. abs (to_real e -. to_real f))">
+        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.041533" steps="723"/></proof>
+        </goal>
+        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.014262" steps="115"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014873" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015998" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015247" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015105" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014480" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.011594" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.8" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014263" steps="83"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="substraction_errors&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.066206" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.035430" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.041509" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.033384" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.042862" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.040216" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.043511" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.018609" steps="152"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.2" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.065031" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.017101" steps="122"/></proof>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.3" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_single_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.3.0" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.070120" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.1" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) -&#39; (to_real
-f)))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.3.1.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.060752" steps="390"/></proof>
-       </goal>
-       <goal name="substraction_errors&#39;vc.0.0.0.3.1.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.034750" steps="232"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.045291" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.043510" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037678" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.040566" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037262" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.039620" steps="231"/></proof>
-      </goal>
-     </transf>
+     <goal name="substraction_errors&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.017462" steps="116"/></proof>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.4" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.056088" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.018061" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.015492" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014949" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014738" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.012286" steps="83"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="substraction_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.623905" steps="2333"/></proof>
+    <goal name="substraction_errors&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.092121" steps="613"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="substraction_errors&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.683527" steps="2765"/></proof>
    </goal>
   </transf>
   </goal>
@@ -310,64 +233,63 @@ f)))))">
  <goal name="substraction_errors_basic&#39;vc" expl="VC for substraction_errors_basic" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="substraction_errors_basic&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.197347" steps="7686"/></proof>
-  <transf name="inline_trivial" proved="true" >
-   <goal name="substraction_errors_basic&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="(((abs1 ((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real
-b)) -&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0)))) /\ ((abs1
-((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real a) -&#39; (to_real
-b))))))">
+  <transf name="assert" proved="true" arg1="let t = to_real c in
+let t1 = 1.0 +. eps in
+let t2 = to_real a -. to_real b in
+abs (to_real result -. (t2 -. t))
+&lt;=. ((((eps +. 0.0) +. eps) *. (abs t2 +. abs t))
+     +. (((t1 +. 0.0) *. 0.0) +. ((t1 +. eps) *. 0.0)))">
+   <goal name="substraction_errors_basic&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs (to_real result -. ((to_real a -. to_real b) -. to_real c))
+&lt;=. ((((eps +. 0.0) +. eps)
+      *. (abs (to_real a -. to_real b) +. abs (to_real c)))
+     +. ((((1.0 +. eps) +. 0.0) *. 0.0) +. (((1.0 +. eps) +. eps) *. 0.0)))">
     <goal name="substraction_errors_basic&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="substraction_errors_basic&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.052086" steps="390"/></proof>
-       </goal>
-       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.036228" steps="232"/></proof>
-       </goal>
-      </transf>
+    <transf name="apply" proved="true" arg1="usub_double_error_propagation" arg2="with" arg3="a --. b,c">
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (a --. b) -. (to_real a -. to_real b))
+&lt;=. (eps *. abs (to_real a -. to_real b))">
+      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <proof prover="1"><result status="valid" time="0.040899" steps="723"/></proof>
       </goal>
       <goal name="substraction_errors_basic&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.078773" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037540" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.049042" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.041853" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.038069" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.035566" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors_basic&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.029037" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.017314" steps="115"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors_basic&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.050830" steps="390"/></proof>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.017142" steps="89"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.012805" steps="92"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.018154" steps="92"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014130" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.018020" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.015565" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.015286" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors_basic&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014466" steps="83"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="substraction_errors_basic&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.098690" steps="811"/></proof>
+    <goal name="substraction_errors_basic&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.024136" steps="198"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="substraction_errors_basic&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.048284" steps="371"/></proof>
    </goal>
   </transf>
   </goal>
@@ -376,232 +298,155 @@ b)))))">
  <goal name="substraction_errors&#39;vc" expl="VC for substraction_errors" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="substraction_errors&#39;vc.0" expl="postcondition" proved="true">
-  <transf name="inline_trivial" proved="true" >
-   <goal name="substraction_errors&#39;vc.0.0" expl="postcondition" proved="true">
-   <transf name="assert" proved="true" arg1="((((((abs1 ((to_real (usub (usub (usub a b) c) (usub d (usub e
-f)))) -&#39; ((((to_real a) -&#39; (to_real b)) -&#39; (to_real c)) -&#39; ((to_real
-d) -&#39; ((to_real e) -&#39; (to_real
-f)))))) &lt;=&#39; (((((eps +&#39; eps) +&#39; (eps +&#39; eps)) +&#39; eps) *&#39; (((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real c))) +&#39; ((abs1 (to_real d)) +&#39; (abs1
-((to_real e) -&#39; (to_real
-f)))))) +&#39; ((((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; (eps +&#39; eps)) *&#39; 0.0)))) /\ ((abs1
-((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real b)) -&#39; (to_real
-c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real a) -&#39; (to_real
-b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))) /\ ((abs1
-((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real b)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real a) -&#39; (to_real b)))))) /\ ((abs1 ((to_real (usub d (usub e
-f))) -&#39; ((to_real d) -&#39; ((to_real e) -&#39; (to_real
-f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real d)) +&#39; (abs1 ((to_real
-e) -&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))) /\ ((abs1
-((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real f)))) &lt;=&#39; (eps *&#39; (abs1
-((to_real e) -&#39; (to_real
-f))))))">
+  <transf name="assert" proved="true" arg1="let t = to_real d in
+let t1 = to_real c in
+let t2 = eps +. eps in
+let t3 = to_real e -. to_real f in
+let t4 = to_real a -. to_real b in
+let t5 = ((1.0 +. eps) +. t2) *. 0.0 in
+abs (to_real result -. ((t4 -. t1) -. (t -. t3)))
+&lt;=. ((((t2 +. t2) +. eps) *. ((abs t4 +. abs t1) +. (abs t +. abs t3)))
+     +. (t5 +. t5))">
+   <goal name="substraction_errors&#39;vc.0.0" expl="asserted formula" proved="true">
+   <transf name="assert" proved="true" arg1="abs
+(to_real result
+ -. (((to_real a -. to_real b) -. to_real c)
+     -. (to_real d -. (to_real e -. to_real f))))
+&lt;=. (((((eps +. eps) +. (eps +. eps)) +. eps)
+      *. ((abs (to_real a -. to_real b) +. abs (to_real c))
+          +. (abs (to_real d) +. abs (to_real e -. to_real f))))
+     +. ((((1.0 +. eps) +. (eps +. eps)) *. 0.0)
+         +. (((1.0 +. eps) +. (eps +. eps)) *. 0.0)))">
     <goal name="substraction_errors&#39;vc.0.0.0" expl="asserted formula" proved="true">
-    <transf name="split_vc" proved="true" >
-     <goal name="substraction_errors&#39;vc.0.0.0.0" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.0.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub (usub a b) c)) -&#39; (((to_real a) -&#39; (to_real
-b)) -&#39; (to_real c)))) &lt;=&#39; ((((eps +&#39; 0.0) +&#39; eps) *&#39; ((abs1 ((to_real
-a) -&#39; (to_real b))) +&#39; (abs1 (to_real
-c)))) +&#39; ((((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.0.0.0" expl="asserted formula" proved="true">
-       <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.071230" steps="390"/></proof>
-         </goal>
-         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="0"><result status="valid" time="0.044991" steps="232"/></proof>
-         </goal>
-        </transf>
+    <transf name="apply" proved="true" arg1="usub_double_error_propagation" arg2="with" arg3="(a --. b) --. c,d --. (e --. f)">
+     <goal name="substraction_errors&#39;vc.0.0.0.0" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real ((a --. b) --. c) -. ((to_real a -. to_real b) -. to_real c))
+&lt;=. ((((eps +. 0.0) +. eps)
+      *. (abs (to_real a -. to_real b) +. abs (to_real c)))
+     +. ((((1.0 +. eps) +. 0.0) *. 0.0) +. (((1.0 +. eps) +. eps) *. 0.0)))">
+      <goal name="substraction_errors&#39;vc.0.0.0.0.0" expl="asserted formula" proved="true">
+      <transf name="apply" proved="true" arg1="usub_double_error_propagation" arg2="with" arg3="a --. b,c">
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.0" expl="apply premises" proved="true">
+       <transf name="assert" proved="true" arg1="abs (to_real (a --. b) -. (to_real a -. to_real b))
+&lt;=. (eps *. abs (to_real a -. to_real b))">
+        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.044775" steps="723"/></proof>
         </goal>
         <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.074943" steps="522"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.040858" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.039527" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.036582" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.041072" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.052280" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.036115" steps="231"/></proof>
+        <proof prover="1"><result status="valid" time="0.020180" steps="115"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="substraction_errors&#39;vc.0.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.038238" steps="233"/></proof>
+       <proof prover="1"><result status="valid" time="0.021562" steps="89"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.017258" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015673" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.017849" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.017039" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.019294" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.016156" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.0.0.8" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.019100" steps="83"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="substraction_errors&#39;vc.0.0.0.0.1" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub d (usub e f))) -&#39; ((to_real d) -&#39; ((to_real
-e) -&#39; (to_real f))))) &lt;=&#39; ((((0.0 +&#39; eps) +&#39; eps) *&#39; ((abs1 (to_real
-d)) +&#39; (abs1 ((to_real e) -&#39; (to_real
-f))))) +&#39; ((((1.0 +&#39; eps) +&#39; eps) *&#39; 0.0) +&#39; (((1.0 +&#39; eps) +&#39; 0.0) *&#39; 0.0))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.0.1.0" expl="asserted formula" proved="true">
-       <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.0" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.069501" steps="522"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1" expl="apply premises" proved="true">
-        <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) -&#39; (to_real
-f)))))">
-         <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
-         <proof prover="0"><result status="valid" time="0.067083" steps="390"/></proof>
-         </goal>
-         <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.1.1" expl="apply premises" proved="true">
-         <proof prover="0"><result status="valid" time="0.047807" steps="232"/></proof>
-         </goal>
-        </transf>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.043093" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.038122" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.4" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.042140" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.5" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.042518" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.6" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.039589" steps="231"/></proof>
-        </goal>
-        <goal name="substraction_errors&#39;vc.0.0.0.0.1.0.7" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.032675" steps="231"/></proof>
-        </goal>
-       </transf>
-       </goal>
-       <goal name="substraction_errors&#39;vc.0.0.0.0.1.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.039938" steps="233"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.079015" steps="629"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.082163" steps="627"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.039166" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.036170" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.042757" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.0.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037321" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.020572" steps="144"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.1" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.1.0" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub a b)) -&#39; ((to_real a) -&#39; (to_real
-b)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real a) -&#39; (to_real
-b)))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.1.0.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.053387" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.1" expl="apply premises" proved="true">
+     <transf name="assert" proved="true" arg1="abs (to_real (d --. (e --. f)) -. (to_real d -. (to_real e -. to_real f)))
+&lt;=. ((((0.0 +. eps) +. eps)
+      *. (abs (to_real d) +. abs (to_real e -. to_real f)))
+     +. ((((1.0 +. eps) +. eps) *. 0.0) +. (((1.0 +. eps) +. 0.0) *. 0.0)))">
+      <goal name="substraction_errors&#39;vc.0.0.0.1.0" expl="asserted formula" proved="true">
+      <transf name="apply" proved="true" arg1="usub_double_error_propagation" arg2="with" arg3="d,e --. f">
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.0" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014144" steps="89"/></proof>
        </goal>
        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.044779" steps="232"/></proof>
+       <transf name="assert" proved="true" arg1="abs (to_real (e --. f) -. (to_real e -. to_real f))
+&lt;=. (eps *. abs (to_real e -. to_real f))">
+        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1.0" expl="asserted formula" proved="true">
+        <proof prover="1"><result status="valid" time="0.042873" steps="723"/></proof>
+        </goal>
+        <goal name="substraction_errors&#39;vc.0.0.0.1.0.1.1" expl="apply premises" proved="true">
+        <proof prover="1"><result status="valid" time="0.020348" steps="115"/></proof>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.2" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015125" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.3" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014370" steps="92"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.4" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.014733" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.5" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.016034" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.6" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.011815" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.7" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.017854" steps="84"/></proof>
+       </goal>
+       <goal name="substraction_errors&#39;vc.0.0.0.1.0.8" expl="apply premises" proved="true">
+       <proof prover="1"><result status="valid" time="0.015277" steps="83"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="substraction_errors&#39;vc.0.0.0.1.1" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.074007" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.036639" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.035072" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.042430" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.039172" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.043196" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.1.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.029203" steps="231"/></proof>
+      <proof prover="1"><result status="valid" time="0.022236" steps="152"/></proof>
       </goal>
      </transf>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.2" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.059218" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.2" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.017706" steps="122"/></proof>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.3" expl="asserted formula" proved="true">
-     <transf name="apply" proved="true" arg1="usub_double_error_propagation">
-      <goal name="substraction_errors&#39;vc.0.0.0.3.0" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.066665" steps="522"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.1" expl="apply premises" proved="true">
-      <transf name="assert" proved="true" arg1="((abs1 ((to_real (usub e f)) -&#39; ((to_real e) -&#39; (to_real
-f)))) &lt;=&#39; (eps *&#39; (abs1 ((to_real e) -&#39; (to_real
-f)))))">
-       <goal name="substraction_errors&#39;vc.0.0.0.3.1.0" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="0.066311" steps="390"/></proof>
-       </goal>
-       <goal name="substraction_errors&#39;vc.0.0.0.3.1.1" expl="apply premises" proved="true">
-       <proof prover="0"><result status="valid" time="0.042953" steps="232"/></proof>
-       </goal>
-      </transf>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.2" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037832" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.034663" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.4" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.039756" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.5" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037970" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.6" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.044591" steps="231"/></proof>
-      </goal>
-      <goal name="substraction_errors&#39;vc.0.0.0.3.7" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.037348" steps="231"/></proof>
-      </goal>
-     </transf>
+     <goal name="substraction_errors&#39;vc.0.0.0.3" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014809" steps="116"/></proof>
      </goal>
-     <goal name="substraction_errors&#39;vc.0.0.0.4" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.066620" steps="390"/></proof>
+     <goal name="substraction_errors&#39;vc.0.0.0.4" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.013262" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.5" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.016992" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.6" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.015925" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.7" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.014043" steps="84"/></proof>
+     </goal>
+     <goal name="substraction_errors&#39;vc.0.0.0.8" expl="apply premises" proved="true">
+     <proof prover="1"><result status="valid" time="0.016216" steps="83"/></proof>
      </goal>
     </transf>
     </goal>
-    <goal name="substraction_errors&#39;vc.0.0.1" expl="postcondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.737215" steps="2564"/></proof>
+    <goal name="substraction_errors&#39;vc.0.0.1" expl="asserted formula" proved="true">
+    <proof prover="1"><result status="valid" time="0.084850" steps="613"/></proof>
     </goal>
    </transf>
+   </goal>
+   <goal name="substraction_errors&#39;vc.0.1" expl="postcondition" proved="true">
+   <proof prover="1"><result status="valid" time="0.658332" steps="2759"/></proof>
    </goal>
   </transf>
   </goal>

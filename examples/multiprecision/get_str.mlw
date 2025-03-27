@@ -543,7 +543,7 @@ module Get_str
 
   use util.UtilOld
 
-  let wmpn_get_str_other (sp: ptr uchar) (ghost sz:int32)
+  let partial wmpn_get_str_other (sp: ptr uchar) (ghost sz:int32)
                          (base:int32) (info:wmpn_base_info)
                          (up: ptr limb) (un: int32) : uint32
     requires { valid up un }
@@ -573,7 +573,8 @@ module Get_str
     let ghost vu = value up (int32'int un) in
     let ref sn = 0 in
     let ref n = un in
-    begin ensures { svalue_le base sp sn + power base sn * value up 1 = vu }
+    begin partial
+          ensures { svalue_le base sp sn + power base sn * value up 1 = vu }
           ensures { in_base base (pelts sp) (offset sp) (offset sp + sn) }
           ensures { 0 <= sn < sz }
           ensures { 0 < value up 1 }
@@ -933,7 +934,7 @@ module Get_str
                = vu };
     UInt32.of_int32 sn
 
-  let wmpn_get_str (sp: ptr uchar) (ghost sz: int32) (base: int32)
+  let partial wmpn_get_str (sp: ptr uchar) (ghost sz: int32) (base: int32)
                    (up: ptr limb) (un: int32) : uint32
     requires { 0 < sz }
     requires { 0 < un }

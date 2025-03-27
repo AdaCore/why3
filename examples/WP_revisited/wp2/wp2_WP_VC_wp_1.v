@@ -439,7 +439,7 @@ clear H2.
 apply H with (3:=Next_iter).
   assert (Hn1_pos := steps_non_neg _ _ _ _ _ _ _ First_iter).
   assert (Hn2_pos := steps_non_neg _ _ _ _ _ _ _ Next_iter).
-  omega.
+  auto with zarith.
 destruct (H_abstracted sigma2 pi2 H_abstr_in_s2) as ((Htrue,_) & Hnext).
 clear H_abstracted.
 assert (H_abstr_in_s3 := Hnext s3 p3 n1 First_iter); clear Hnext.
@@ -454,3 +454,4 @@ clear H_abstracted.
 apply Hfalse; split; auto.
 rewrite H11; discriminate.
 Qed.
+

@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_ex_mono.mlw", line 10, characters 14-26)
 File "bench/check-ce/ref_ex_mono.mlw", line 10, characters 14-26:
 Sub-goal Postcondition of goal test_post'vc.
-Prover result is: Unknown (unknown + incomplete) (1595 steps).
+Prover result is: Unknown (sat) (294 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,37 +19,37 @@ File int.mlw:
     one = 1
 File ref_ex_mono.mlw:
   Line 9:
-    x = 0
-    y = {c1= (- 1)}
-    x = 0
-    y = {c1= (- 1)}
+    x = 1
+    y = {c= 0}
+    x = 1
+    y = {c= 0}
     Execution of main function `test_post` with env:
-      x = 0
-      y = {c1= (- 1)}
+      x = 1
+      y = {c= 0}
       zero = 0
       one = 1
   Line 12:
     Normal execution of function `c` with args:
-      arg = {c1= (- 1)}
+      arg = {c= 0}
     Normal execution of function `(-)` with args:
-      x = 0
+      x = 1
       y = 1
 File int.mlw:
   Line 23:
     Normal execution of function `(-_)` with args:
       _ = 1
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = 1
       _ = (-1)
 File ref_ex_mono.mlw:
   Line 12:
     Normal execution of function `(+)` with args:
-      _ = (-1)
-      _ = (- 1)
+      _ = 0
+      _ = 0
   Line 10:
     Property failure at postcondition of `test_post` with:
-      x = 0
-      y = {c1= (- 1)}
+      x = 1
+      y = {c= 0}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -60,7 +60,7 @@ File ref_ex_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_ex_mono.mlw", line 16, characters 14-31)
 File "bench/check-ce/ref_ex_mono.mlw", line 16, characters 14-31:
 Sub-goal Postcondition of goal test_post2'vc.
-Prover result is: Unknown (unknown + incomplete) (1724 steps).
+Prover result is: Unknown (sat) (397 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -73,17 +73,17 @@ File int.mlw:
 File ref_ex_mono.mlw:
   Line 14:
     x = 43
-    y = {c1= 0}
+    y = {c= (- 42)}
     x = 43
-    y = {c1= 0}
+    y = {c= (- 42)}
     Execution of main function `test_post2` with env:
       x = 43
-      y = {c1= 0}
+      y = {c= (- 42)}
       zero = 0
       one = 1
   Line 18:
     Normal execution of function `c` with args:
-      arg = {c1= 0}
+      arg = {c= (- 42)}
     Normal execution of function `(-)` with args:
       x = 43
       y = 1
@@ -98,12 +98,12 @@ File ref_ex_mono.mlw:
   Line 18:
     Normal execution of function `(+)` with args:
       _ = 42
-      _ = 0
+      _ = (- 42)
   Line 16:
     Property failure at postcondition of `test_post2` with:
       x = 43
-      y = {c1= 42}
-      y = {c1= 0}
+      y = {c= 0}
+      y = {c= (- 42)}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -114,7 +114,7 @@ File ref_ex_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_ex_mono.mlw", line 27, characters 12-39)
 File "bench/check-ce/ref_ex_mono.mlw", line 27, characters 12-39:
 Sub-goal Postcondition of goal incr'vc.
-Prover result is: Unknown (unknown + incomplete) (1876 steps).
+Prover result is: Unknown (sat) (519 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -126,38 +126,38 @@ File int.mlw:
     one = 1
 File ref_ex_mono.mlw:
   Line 24:
-    y = {c1= (- 1)}
+    y = {c= (- 1)}
   Line 26:
-    x23 = {c1= 0}
-    x23 = {c1= 0}
+    x23 = {c= (- 2)}
+    x23 = {c= (- 2)}
     Execution of main function `incr` with env:
-      y = {c1= (- 1)}
-      x23 = {c1= 0}
+      y = {c= (- 1)}
+      x23 = {c= (- 2)}
       zero = 0
       one = 1
   Line 30:
     Normal execution of function `c` with args:
-      arg = {c1= (- 1)}
+      arg = {c= (- 1)}
     Normal execution of function `(+)` with args:
       _ = (- 1)
       _ = 1
   Line 31:
     Normal execution of function `c` with args:
-      arg = {c1= 0}
+      arg = {c= (- 2)}
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (- 2)
       _ = 1
   Line 32:
     Normal execution of function `c` with args:
-      arg = {c1= 1}
+      arg = {c= (-1)}
     Normal execution of function `(+)` with args:
-      _ = 1
+      _ = (-1)
       _ = 1
   Line 27:
     Property failure at postcondition of `incr` with:
-      x23 = {c1= 2}
-      x23 = {c1= 0}
-      y = {c1= (- 1)}
+      x23 = {c= 0}
+      x23 = {c= (- 2)}
+      y = {c= (- 1)}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -168,13 +168,13 @@ File ref_ex_mono.mlw:
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex_mono.mlw", line 41, characters 14-39)
 File "bench/check-ce/ref_ex_mono.mlw", line 41, characters 14-39:
 Sub-goal Loop invariant init of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (1619 steps).
+Prover result is: Unknown (sat) (312 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/ref_ex_mono.mlw", line 42, characters 12-15:
 Sub-goal Loop variant decrease of goal test_loop'vc.
-Prover result is: Valid (1684 steps).
+Prover result is: Valid (647 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -185,7 +185,7 @@ Prover result is: Valid (1684 steps).
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex_mono.mlw", line 41, characters 14-39)
 File "bench/check-ce/ref_ex_mono.mlw", line 41, characters 14-39:
 Sub-goal Loop invariant preservation of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (1963 steps).
+Prover result is: Unknown (sat) (650 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -198,7 +198,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_ex_mono.mlw", line 41, characters 14-39)
 File "bench/check-ce/ref_ex_mono.mlw", line 35, characters 12-25:
 Sub-goal Postcondition of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (1838 steps).
+Prover result is: Unknown (sat) (518 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

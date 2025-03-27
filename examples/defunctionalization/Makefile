@@ -39,10 +39,10 @@ doc:
 	@echo firefox ../defunctionalization.html why3session.html
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma -o $@ $^
+	ocamlc -g $(INCLUDE) zarith.cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 

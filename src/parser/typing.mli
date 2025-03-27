@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -62,3 +62,17 @@ module Unsafe : sig
   val create_user_id : Ptree.ident -> Ident.preid
   val create_user_prog_id : Ptree.ident -> Ident.preid
 end
+
+
+(** exported for Coma *)
+
+val ty_of_pty : Theory.theory_uc -> Ptree.pty -> Ty.ty
+
+val type_term_in_denv :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Term.term
+
+val check_term_in_denv :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Ty.ty -> Term.term
+
+val type_fmla_in_denv :
+  Theory.namespace -> Decl.known_map -> Coercion.t -> Dterm.denv -> Ptree.term -> Term.term

@@ -32,16 +32,20 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -65,7 +69,7 @@ Definition range (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
 Theorem inverting2'vc :
   forall (a:array Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
   (n = (length a)) /\ injective a n /\ range a n ->
-  let b := make n 0%Z in
+  forall (b:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
    ((mixfix_lbrb b i) = 0%Z)) /\
   ((length b) = n) ->
@@ -75,6 +79,7 @@ Theorem inverting2'vc :
   (forall (j:Numbers.BinNums.Z), (0%Z <= j)%Z /\ (j < (o + 1%Z)%Z)%Z ->
    ((mixfix_lbrb b1 (mixfix_lbrb a j)) = j)) ->
   injective b1 n.
+(* Why3 intros a n (h1,(h2,h3)) b (h4,h5) o h6 b1 h7 h8. *)
 Proof.
 intros a n (h1,(h2,h3)) b (h4,h5) o h6 b1 h7 h8.
 assert (MapInjection.surjective (elts a) n).
@@ -83,9 +88,10 @@ intros i j H0 H1.
 destruct (H i H0) as (i1, (Hi1, <-)).
 destruct (H j H1) as (j1, (Hj1, <-)).
 unfold o, mixfix_lbrb in h8.
-rewrite h8 by omega.
-rewrite h8 by omega.
+rewrite h8 by auto with zarith.
+rewrite h8 by auto with zarith.
 intros H2.
 contradict H2.
 now rewrite H2.
 Qed.
+

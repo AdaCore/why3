@@ -1,0 +1,65 @@
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/657.mlw", line 8, characters 27-40:
+Sub-goal Precondition of goal ok'vc.
+Prover result is: Unknown (unknown) (35 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41)
+File "bench/check-ce/657.mlw", line 10, characters 27-41:
+Sub-goal Precondition of goal ko'vc.
+Prover result is: Unknown (unknown) (35 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 10, characters 29-41):
+File bv.mlw:
+  Line 319:
+    is_signed_positive : t -> bool = [|_ => false|]
+File 657.mlw:
+  Line 10:
+    i :  = 0
+    i :  = 0
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55)
+File "bench/check-ce/657.mlw", line 13, characters 14-40:
+Sub-goal Postcondition of goal ko2'vc.
+Prover result is: Unknown (unknown) (34 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for return value of call to stoBig at "bench/check-ce/657.mlw", line 13, characters 45-55):
+File bv.mlw:
+  Line 319:
+    is_signed_positive : t -> bool = [|_ => false|]
+File 657.mlw:
+  Line 12:
+    i :  = 0
+    i :  = 0
+

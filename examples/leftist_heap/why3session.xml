@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -11,14 +11,14 @@
  <goal name="size_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="size_nonneg.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="15"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="21"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="size_empty" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="size_empty.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="35"/></proof>
   </goal>
  </transf>
  </goal>
@@ -27,26 +27,26 @@
  <goal name="occ_nonneg" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="occ_nonneg.0" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="27"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="32"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="LeftistHeap" proved="true">
  <goal name="le_root_trans" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="30"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="32"/></proof>
  </goal>
  <goal name="root_is_miminum&#39;vc" expl="VC for root_is_miminum" proved="true">
- <proof prover="2"><result status="valid" time="0.760000" steps="90705"/></proof>
+ <proof prover="2"><result status="valid" time="0.326828" steps="90705"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="23"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="24"/></proof>
  </goal>
  <goal name="is_empty&#39;vc" expl="VC for is_empty" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="33"/></proof>
+ <proof prover="1"><result status="valid" time="0.000000" steps="28"/></proof>
  </goal>
  <goal name="rank&#39;vc" expl="VC for rank" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="39"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="48"/></proof>
  </goal>
  <goal name="make_n&#39;vc" expl="VC for make_n" proved="true">
  <proof prover="2"><result status="valid" time="0.080000" steps="17592"/></proof>
@@ -54,25 +54,25 @@
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="merge&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="143"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="170"/></proof>
   </goal>
   <goal name="merge&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="74"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="70"/></proof>
   </goal>
   <goal name="merge&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="88"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="88"/></proof>
   </goal>
   <goal name="merge&#39;vc.3" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.160000" steps="16155"/></proof>
   </goal>
   <goal name="merge&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="146"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="172"/></proof>
   </goal>
   <goal name="merge&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="76"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="92"/></proof>
   </goal>
   <goal name="merge&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="90"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="110"/></proof>
   </goal>
   <goal name="merge&#39;vc.7" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.080000" steps="16206"/></proof>
@@ -89,13 +89,13 @@
  </transf>
  </goal>
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
- <proof prover="0"><result status="valid" time="0.050000" steps="357"/></proof>
+ <proof prover="1"><result status="valid" time="0.050000" steps="361"/></proof>
  </goal>
  <goal name="find_min&#39;vc" expl="VC for find_min" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="40"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="42"/></proof>
  </goal>
  <goal name="delete_min&#39;vc" expl="VC for delete_min" proved="true">
- <proof prover="0"><result status="valid" time="0.040000" steps="358"/></proof>
+ <proof prover="1"><result status="valid" time="0.040000" steps="357"/></proof>
  </goal>
 </theory>
 </file>

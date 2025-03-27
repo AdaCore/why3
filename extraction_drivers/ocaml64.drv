@@ -32,6 +32,7 @@ end
 module bool.Bool
   syntax val andb  "%1 && %2"      prec 12 11 12
   syntax val orb   "%1 || %2"      prec 13 12 13
+  syntax val (=)   "%1 = %2"       prec 11 11 10
   syntax val xorb  "%1 <> %2"      prec 11 11 10
   syntax val notb  "not %1"        prec 4 3
   syntax val implb "not %1 || %2"  prec 13 3 13
@@ -311,6 +312,26 @@ module mach.int.Int63
   syntax val      of_bv     "(fun x -> x)"*)
 end
 
+module ieee_float.Float64
+  syntax type t "float"
+
+  syntax val (.+)     "%1 +. %2"   prec 8 8 7
+  syntax val (.-)     "%1 -. %2"   prec 8 8 7
+  syntax val (.-_)    "-. %1"      prec 5 4
+  syntax val (.*)     "%1 *. %2"   prec 7 7 6
+  syntax val (./)     "%1 /. %2"   prec 7 7 6
+  syntax val (.=)     "%1 = %2"    prec 11 11 10
+  syntax val (.<=)    "%1 <= %2"   prec 11 11 10
+  syntax val (.<)     "%1 < %2"    prec 11 11 10
+  syntax val (.>=)    "%1 >= %2"   prec 11 11 10
+  syntax val (.>)     "%1 > %2"    prec 11 11 10
+  syntax val eq       "%1 = %2"    prec 11 11 10
+  syntax val le       "%1 <= %2"   prec 11 11 10
+  syntax val lt       "%1 < %2"    prec 11 11 10
+  syntax val ge       "%1 >= %2"   prec 11 11 10
+  syntax val gt       "%1 > %2"    prec 11 11 10
+end
+
 module mach.int.Random63
   syntax val s             "REMOVE"
   syntax val init          "Random.init"
@@ -384,6 +405,14 @@ module mach.onetime.OneTime
   syntax val sub      "%1 - %2" prec 8 8 7
   syntax val split    "(%1-%2, %2)" prec 0 13 13
 end
+
+module mach.list.OCaml
+
+  syntax val length_defensive "List.length %1"
+  syntax val length "List.length %1"
+
+end
+
 
 module string.Char
   syntax type char "char"

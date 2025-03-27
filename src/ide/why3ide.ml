@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -17,6 +17,8 @@ open Ide_utils
 open History
 open Itp_communication
 module GSourceView = GSourceView3
+
+module Main () = struct
 
 let debug = Debug.lookup_flag "ide_info"
 
@@ -196,6 +198,9 @@ let env, gconfig =
 (* Source language highlighting *)
 (********************************)
 
+let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
+
+
 let get_extra_lang =
   let main = Whyconf.get_main gconfig.config in
   let load_path = Filename.concat (Whyconf.datadir main) "lang" in
@@ -205,16 +210,16 @@ let get_extra_lang =
     let ll = ref None in
     fun () ->
       match !ll with
-      | Some l -> l
+      | Some _ as l -> l
       | None -> (
         match languages_manager#language shortcut with
         | None ->
-          eprintf "language file for '%s' not found in directory %s@." name
+            Loc.warning warn_unknown_format "Language file for '%s' not found in directory %s" name
             load_path;
-          exit 1
-        | Some x as l ->
+          None
+        | Some _ as l ->
           ll := l;
-          x)
+          l)
 
 (* Borrowed from Frama-C src/gui/source_manager.ml: Try to convert a source file
    either as UTF-8 or as locale. *)
@@ -379,12 +384,12 @@ let erase_loc_all_view () =
 let update_label_change (label : GMisc.label) =
   let s = label#text in
   erase_loc_all_view ();
-  if not (Strings.has_prefix "*" s) then label#set_text ("*" ^ s)
+  if not (Strings.has_prefix ~prefix:"*" s) then label#set_text ("*" ^ s)
 
 (* Update name of the tab when the label is saved. Removes * prefix *)
 let update_label_saved (label : GMisc.label) =
   let s = label#text in
-  if Strings.has_prefix "*" s then
+  if Strings.has_prefix ~prefix:"*" s then
     label#set_text (String.sub s 1 (String.length s - 1))
 
 let make_sources_editable b =
@@ -601,7 +606,7 @@ type pa_status =
   * bool
     (* obsolete or not *)
     (* TODO *)
-  * Call_provers.resource_limit
+  * Call_provers.resource_limits
 
 let node_id_type : node_type Hint.t = Hint.create 17
 let node_id_proved : bool Hint.t = Hint.create 17
@@ -817,8 +822,8 @@ let print_message ~kind ~notif_kind fmt =
       let buf = message_zone#buffer in
       if kind > 0 then (
         if
-          Strings.ends_with notif_kind "error"
-          || Strings.ends_with notif_kind "Error"
+          Strings.has_suffix ~suffix:"error" notif_kind
+          || Strings.has_suffix ~suffix:"Error" notif_kind
         then
           buf#insert ~tags:[ !message_zone_error_tag ] (s ^ "\n")
         else
@@ -895,34 +900,32 @@ let () = create_colors gconfig task_view
 let why_lang = get_extra_lang "why3" "Why3"
 let why3py_lang = get_extra_lang "why3py" "Why3python"
 let why3c_lang = get_extra_lang "why3c" "Why3c"
+let coma_lang = get_extra_lang "coma" "Coma"
 let rust_lang = get_extra_lang "rust" "Rust"
 let ada_lang = get_extra_lang "ada" "Ada"
 let java_lang = get_extra_lang "java" "Java"
 let c_lang = get_extra_lang "c" "C"
 
-let warn_unknown_format = Loc.register_warning "unk_format" "Unknown source format"
-
 let change_lang view lang =
-  try
-    let lang =
-      match lang with
-      | "python" -> why3py_lang ()
-      | "micro-C" -> why3c_lang ()
-      | ".rs" -> rust_lang ()
-      | ".adb" -> ada_lang ()
-      | ".ads" -> ada_lang ()
-      | ".java" -> java_lang ()
-      | ".c" -> c_lang ()
-      | ".mlw"
-      | ".why"
-      | "whyml" ->  why_lang ()
-      | _ ->
-          Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
-          raise Exit
-    in
-    view#source_buffer#set_language (Some lang)
-  with
-  | Exit -> ()
+  let lang =
+    match lang with
+    | "python"  -> why3py_lang ()
+    | "micro-C" -> why3c_lang ()
+    | ".rs"     -> rust_lang ()
+    | ".adb"    -> ada_lang ()
+    | ".ads"    -> ada_lang ()
+    | ".java"   -> java_lang ()
+    | ".c"      -> c_lang ()
+    | "coma"
+    | ".coma"   -> coma_lang ()
+    | ".mlw"
+    | ".why"
+    | "whyml"   ->  why_lang ()
+    | _ ->
+        Loc.warning warn_unknown_format "Unrecognized source format `%s`" lang;
+        None
+  in
+    view#source_buffer#set_language lang
 
 (* Create an eventbox for the title label of the notebook tab *)
 let create_eventbox ~read_only file =
@@ -1371,8 +1374,8 @@ let color_loc ?(ce = false) ~color loc =
    to appropriate source files *)
 let apply_loc_on_source (l : (Loc.position * color) list) loc_goal =
   erase_loc_all_view ();
-  List.iter (fun (loc, color) -> color_loc ~color loc) l;
-  scroll_to_loc ~force_tab_switch:false loc_goal
+  scroll_to_loc ~force_tab_switch:false loc_goal;
+  List.iter (fun (loc, color) -> color_loc ~color loc) l
 
 (* Erase the colors and apply the colors given by l (which come from the task)
    to the counterexample tab *)
@@ -1410,8 +1413,8 @@ let () =
   Gconfig.add_modifiable_mono_font_view counterexample_view#misc;
   Gconfig.add_modifiable_mono_font_view command_entry#misc;
   Gconfig.add_modifiable_mono_font_view message_zone#misc;
-  task_view#source_buffer#set_language (Some (why_lang ()));
-  counterexample_view#source_buffer#set_language (Some (why_lang ()));
+  task_view#source_buffer#set_language (why_lang ());
+  counterexample_view#source_buffer#set_language (why_lang ());
   Gconfig.set_fonts ()
 
 (******************)
@@ -1880,7 +1883,7 @@ let image_of_pa_status ~obsolete pa =
         !image_failure_obs
       else
         !image_failure
-    | Call_provers.HighFailure ->
+    | Call_provers.HighFailure _ ->
       if obsolete then
         !image_failure_obs
       else
@@ -2572,7 +2575,7 @@ let init_completion provers transformations strategies commands =
   (* Remove counterexample provers from the menu *)
   let menu_provers =
     List.filter
-      (fun (_, _, s) -> not (Strings.ends_with s "counterexamples"))
+      (fun (_, _, s) -> not (Strings.has_suffix ~suffix:"counterexamples" s))
       provers_sorted
   in
   List.iter (add_submenu_prover provers_factory context_factory) menu_provers;
@@ -3195,3 +3198,7 @@ let () =
     ()
   | None -> ());
   GMain.main ()
+
+end
+
+let () = Whyconf.register_command "ide" (module Main)

@@ -263,7 +263,7 @@ type a
 val constant rzero : r
 val constant rone : r
 val constant aone : a
-val ghost constant azero : a
+val constant azero : a
 
 val function rplus r r : r
 val function rtimes r r : r
@@ -472,4 +472,3 @@ clone export AssocAlgebraDecision with type r = int, type a = int, val rzero = I
 goal g: forall x y. x + y = y + x
 goal h: forall x y z. x $$ (y * z) = (x $$ y) * z
 end
-

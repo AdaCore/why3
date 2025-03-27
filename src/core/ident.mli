@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -262,8 +262,7 @@ val get_model_element_name : attrs:Sattr.t -> string
 
 val get_model_trace_string : name:string -> attrs:Sattr.t -> string
 (** If attrs contain an attribute of the form ["model_trace:mt_string"],
-    return ["mt_string"]. Raises [Not_found] if there is no attribute of
-    the form ["model_trace:*"]. *)
+    return ["mt_string"]. Returns ["name"] otherwise. *)
 
 val get_element_name: attrs:Sattr.t -> string option
 

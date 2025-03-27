@@ -1,0 +1,40 @@
+module Unreachable
+  use int.Int
+  use ref.Ref
+  use mach.java.lang.Integer
+
+
+  let return1972 () : integer 
+    ensures { result = 1972 }   
+  =
+    let i : ref integer = ref 0 in
+    while true do
+      invariant { !i <= 1972 }
+      variant { 1972 - !i }
+      if !i = (1972:integer) then
+        return !i;      
+      i := !i+1;
+    done;
+    absurd  
+end
+
+module UnreachableFixed
+  use int.Int
+  use ref.Ref
+  use mach.java.lang.Integer
+
+  let return1972 () : integer 
+    ensures { result = 1972 }   
+  =
+    let i : ref integer = ref 0 in
+    let j : ref integer = ref 1 in 
+    while !j > 0 do
+      invariant { !i <= 1972 }
+      variant { 1972 - !i }
+      if !i = (1972:integer) then
+        return !i;      
+      i := !i+1;
+    done;
+    absurd  
+
+end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -440,7 +440,7 @@ and analyze_cexp muc st regions (c : cexp) : domain_elt * cexp =
             | _ -> failwith "projection applied to more than one arg")
         | None ->
             (* check if r is a record constructor *)
-            if Strings.has_suffix "'mk" r.rs_name.id_string then
+            if Strings.has_suffix ~suffix:"'mk" r.rs_name.id_string then
               Union (c.c_cty.cty_result, List.map (fun x -> find regions x (Variable (FreshNames.pv st x x))) args)
             else Bot
       in

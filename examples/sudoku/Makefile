@@ -39,10 +39,10 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma -o $@ $^
+	ocamlc -g $(INCLUDE) zarith.cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -60,7 +60,7 @@ $(JSMAIN).js: $(JSMAIN).byte
 	js_of_ocaml +nat.js $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
-	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) zarith.cma -o $@ -linkpkg $^
 
 %.cmo: %.ml
 	$(JSOCAMLC) $(INCLUDE) -annot -c $<

@@ -1,0 +1,28 @@
+use int.Int
+use int.ComputerDivision
+use coma.Std
+
+let product (a b: int) {b >= 0} (return (c: int) {c = a * b}) =
+  loop
+  [ loop {p * q + r = a * b /\ q >= 0}
+    = if {q > 0} next (-> return {r})
+      [ next ->
+          if {mod q 2 = 1} (-> [&r <- r + p] step) step
+          [ step -> [&p <- p + p | &q <- div q 2] loop ] ] ]
+  [ &p: int = a | &q: int = b | &r: int = 0 ]
+
+let product_pure (a b: int) {b >= 0} (return (c: int) {c = a * b}) =
+  loop {a} {b} {0}
+  [ loop (p q r: int) {p * q + r = a * b /\ q >= 0}
+    = if {q > 0} (-> if {mod q 2 = 1} (-> next {r+p}) (-> next {r})
+                     [ next (s: int) -> loop {p+p} {div q 2} {s} ])
+                 (-> return {r})
+  ]
+
+let product_inline (a b: int) {b >= 0} (return (c: int) {c = a * b}) =
+  loop {a} {b} {0}
+  [ loop (p q r: int) {p * q + r = a * b /\ q >= 0}
+    = if {q > 0} (-> if {mod q 2 = 1} (-> loop {p+p} {div q 2} {r+p})
+                                      (-> loop {p+p} {div q 2} {r}))
+                 (-> return {r})
+  ]

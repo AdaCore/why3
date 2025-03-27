@@ -412,3 +412,31 @@ module FibonacciLogarithmic
     then raise BenchFailure
 
 end
+
+(** The only Fibonacci numbers n such that Fib(n)=n^2 are 0, 1, and 12. *)
+module FibSquare
+
+  use int.Int
+  use int.Fibonacci
+
+  lemma fib_12 : fib 12 = 144
+  lemma fib_13 : fib 13 = 233
+  lemma fib_14 : fib 14 = 377
+
+  let lemma fib_bigger_than_square (n: int)
+    requires { n > 12 }
+    ensures  { fib n > n*n }
+  = for k = 13 to n - 1 do
+      invariant { fib k     > k*k         }
+      invariant { fib (k+1) > (k+1)*(k+1) }
+      (* help SMT solvers with non linear arithmetic
+         (other than that, this loop body would be empty!) *)
+      assert { fib (k+2) = fib k + fib (k+1)
+                         >= k*k + (k+1)*(k+1) + 2
+                         > (k+2)*(k+2) }
+    done
+
+  lemma fib_square:
+    forall n: int. n >= 0 -> fib n = n*n <-> n=0 \/ n=1 \/ n=12
+
+end

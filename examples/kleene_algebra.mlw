@@ -205,10 +205,10 @@ module RelAlgebra
     not (disjoint (post s1 a1) (pre s2 a2)))
 
   lemma unit_l : forall x. one * x = x
-  by one * x == x
+  (*by one * x == x*)
 
   lemma unit_r : forall x. x * one = x
-  by x * one == x
+  (*by x * one == x*)
 
   lemma assoc_mul : forall x y z. x * y * z = x * (y * z)
   by forall e. (mem e (x * y * z) -> mem e (x * (y * z))) /\

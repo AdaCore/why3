@@ -1,0 +1,342 @@
+module SinCosSingle
+  use real.RealInfix
+  use real.Abs
+  use ufloat.USingle
+  use ufloat.USingleLemmas
+  use real.Trigonometry
+
+  constant sin_rel_err:real
+  axiom sin_rel_err_range : 0.0 <=. sin_rel_err
+  constant sin_abs_err:real
+  axiom sin_abs_err_range : 0. <=. sin_abs_err
+  constant sin_max:real
+  axiom sin_max_range : 0.0 <=. sin_max
+  val sin_approx (x:usingle) : usingle
+    requires { abs (to_real x) <=. sin_max }
+    ensures {
+      abs (to_real result -. sin (to_real x)) <=.
+         sin_rel_err *. abs (sin (to_real x)) +. sin_abs_err
+    }
+
+  constant cos_rel_err:real
+  axiom cos_rel_err_range : 0. <=. cos_rel_err
+  constant cos_abs_err:real
+  axiom cos_abs_err_range : 0. <=. cos_abs_err
+  constant cos_max:real
+  axiom cos_max_range : 0.0 <=. cos_max
+
+  val cos_approx (x:usingle) : usingle
+    requires { abs (to_real x) <=. cos_max }
+    ensures {
+      abs (to_real result -. cos (to_real x)) <=.
+        cos_rel_err *. abs (cos (to_real x))  +. cos_abs_err
+    }
+
+
+  let sin_simple_example (a b :usingle)
+    requires { abs (to_real a) <=. 0.25 *. sin_max }
+    requires { abs (to_real b) <=. 0.25 *. sin_max }
+    ensures {
+      abs (to_real result -. sin(to_real a +. to_real b))
+      <=. sin_rel_err *. abs (sin (to_real a +. to_real b))
+       +. eps *. abs (to_real a +. to_real b) *. (1. +. sin_rel_err)
+       +. sin_abs_err
+    }
+  = sin_approx(a ++. b)
+
+  let cos_simple_example (a b :usingle)
+   requires { abs (to_real a) <=. 0.25 *. cos_max }
+   requires { abs (to_real b) <=. 0.25 *. cos_max }
+   ensures {
+      abs (to_real result -. cos(to_real a -. to_real b))
+      <=. cos_rel_err *. abs (cos (to_real a -. to_real b))
+       +. eps *. abs (to_real a -. to_real b) *. (1. +. cos_rel_err)
+       +. cos_abs_err
+    }
+  = cos_approx(a --. b)
+
+  (* Example from the report *)
+  let r_cos_theta (r theta : usingle)
+     (ghost r_exact theta_exact r_err theta_err :real)
+     requires { cos_max >=. 3.1416 }
+     requires { 0.0 <=. to_real r <=. 1.0 }
+     requires { 0.0 <=. r_exact <=. 1.0 }
+     requires { -3.1416 <=. to_real theta <=. 3.1416 }
+     requires { -3.1416 <=. theta_exact <=. 3.1416 }
+     requires { abs(to_real r -. r_exact) <=. r_err }
+     requires { abs(to_real theta -. theta_exact) <=. theta_err }
+     ensures {
+       let t1 = 1.0 +. eps in
+       let t3 = theta_err *. (1.0 +. cos_rel_err) +. cos_abs_err in
+       abs (to_real result -. r_exact *. cos theta_exact) <=.
+          (* relative error *)
+          (eps +. cos_rel_err *. t1) *. abs (r_exact *. cos theta_exact) +.
+          (* absolute error *)
+           (t3 *. abs r_exact
+            +. (r_err +. r_err *. cos_rel_err) *. abs (cos theta_exact)
+            +. r_err *. t3)  *. t1
+           +. eta }
+   = r **. cos_approx theta
+
+  lemma cos_square_plus_sine_square : forall x. cos x *. cos x +. sin x *. sin x = 1.
+
+  let cos_and_sine_example (a :usingle)
+    requires { abs (to_real a) <=. sin_max }
+    requires { abs (to_real a) <=. cos_max }
+    ensures {
+    let a = to_real a in let sa = sin a in let ca = cos a in
+    let t = 1.0 +. eps in
+    let s2a = sa *. sa in
+    let c2a = ca *. ca in
+    let crerr = eps +. (((cos_rel_err +. cos_rel_err) +. (cos_rel_err *. cos_rel_err)) *. t) in
+    let srerr = eps +. (((sin_rel_err +. sin_rel_err) +. (sin_rel_err *. sin_rel_err)) *. t) in
+    let ccerr = (t *. (cos_abs_err +. (cos_abs_err *. cos_rel_err))) *. abs ca in
+    let scerr = (t *. (sin_abs_err +. (sin_abs_err *. sin_rel_err))) *. abs sa  in
+    abs (to_real result -. 1.0)
+    <=. ((((crerr +. srerr) +. eps) *. (abs c2a +. abs s2a))
+         +. (((t +. srerr)
+              *. ((2.0 *. ccerr +. (t *. (cos_abs_err *. cos_abs_err)))
+                  +. eta))
+             +. ((t +. crerr)
+                 *. ((2.0 *. scerr
+                      +. (t *. (sin_abs_err *. sin_abs_err)))
+                     +. eta))))
+      }
+  = cos_approx a **. cos_approx a ++. sin_approx a **. sin_approx a
+
+val exact_cte (x:real) : usingle
+  ensures { to_real result = x }
+
+(* Kinematics example *)
+
+let kinematics (theta1 theta2:usingle)
+  requires { abs (to_real theta1) <=. 0.25 *. sin_max }
+  requires { abs (to_real theta2) <=. 0.25 *. sin_max }
+  ensures {
+    let theta1 = to_real theta1 in
+    let theta2 = to_real theta2 in
+    let t1 = 1.0 +. eps in
+    let t2 = eps +. sin_rel_err *. t1 in
+    abs (to_real result -.
+         (0.5 *. sin theta1 +. 2.5 *. sin (theta1 +. theta2)))
+    <=.
+    (* Relative part of the error *)
+    (2.0 *. t2 +. eps) *.
+       (0.5 *. abs (sin theta1) +. 2.5 *. abs (sin (theta1 +. theta2)))
+    (* Absolute part of the error *)
+    +. (t1 +. t2) *.
+         (t1 *. (0.5 *. sin_abs_err
+                 +. 2.5 *. (eps *. abs (theta1 +. theta2) *. (1.0 +. sin_rel_err)
+                            +. sin_abs_err))
+          +. 2.0 *. eta)
+  }
+= exact_cte 0.5 **. sin_approx (theta1)
+  ++. exact_cte 2.5 **. sin_approx(theta1 ++. theta2)
+
+
+(* Raytracer example *)
+
+let raytracer (theta phi nx ny nz:usingle)
+  requires { abs (to_real phi) <=. sin_max }
+  requires { abs (to_real phi) <=. cos_max }
+  requires { abs (to_real theta) <=. sin_max }
+  requires { abs (to_real theta) <=. cos_max }
+  ensures {
+    let nz = to_real nz in
+    let ny = to_real ny in
+    let nx = to_real nx in
+    let phi = to_real phi in
+    let theta = to_real theta in
+    let t1 = 1.0 +. eps in
+    let t2c = eps +. cos_rel_err *. t1 in
+    let t2s = eps +. sin_rel_err *. t1 in
+    let t3c = eps +. (t2c +. cos_rel_err +. t2c *. cos_rel_err) *. t1 in
+    let t3s = eps +. (t2c +. sin_rel_err +. t2c *. sin_rel_err) *. t1 in
+    let t4 = t3c +. t2s +. eps in
+    abs (to_real result -.
+         (nx *. cos theta *. cos phi +. ny *. sin theta +. nz *. cos theta *. sin phi))
+    <=.
+        (* Relative part of the error *)
+        (t4 +. t3s +. eps) *.
+        (abs (nx *. cos theta *. cos phi) +.
+                    abs (ny *. sin theta) +. abs (nz *. cos theta *. sin phi))
+        (* Absolute part of the error *)
+        +. (t1 +. t3s)
+            *. ((t1 +. t2s)
+                 *. (t1 *. (cos_abs_err *. (1.0 +. t2c) *. abs (nx *. cos theta)
+                            +. (t1 *. cos_abs_err *. abs nx +. eta) *.
+                               ((1.0 +. cos_rel_err) *. abs (cos phi) +. cos_abs_err))
+                     +. eta)
+                +. (t1 +. t3c) *. (t1 *. sin_abs_err *. abs ny +. eta))
+         +. (t1 +. t4)
+            *. (t1 *. (sin_abs_err *. (1.0 +. t2c) *. abs (nz *. cos theta)
+                       +. (t1 *. cos_abs_err *. abs nz +. eta) *.
+                          ((1.0 +. sin_rel_err) *. abs (sin phi) +. sin_abs_err))
+                +. eta)
+  }
+=
+  nx **. cos_approx theta **. cos_approx phi
+  ++. ny **. sin_approx theta
+  ++. nz **. cos_approx theta **. sin_approx phi
+
+
+end
+
+
+module SinCosDouble
+  use real.RealInfix
+  use real.Abs
+  use ufloat.UDouble
+  use ufloat.UDoubleLemmas
+  use real.Trigonometry
+
+  constant sin_rel_err:real
+  axiom sin_rel_err_range : 0.0 <=. sin_rel_err
+  constant sin_abs_err:real
+  axiom sin_abs_err_range : 0. <=. sin_abs_err
+  constant sin_max:real
+  axiom sin_max_range : 0.0 <=. sin_max
+  val sin_approx (x:udouble) : udouble
+    requires { abs (to_real x) <=. sin_max }
+    ensures {
+      abs (to_real result -. sin (to_real x)) <=.
+         sin_rel_err *. abs (sin (to_real x)) +. sin_abs_err
+    }
+
+  constant cos_rel_err:real
+  axiom cos_rel_err_range : 0. <=. cos_rel_err
+  constant cos_abs_err:real
+  axiom cos_abs_err_range : 0. <=. cos_abs_err
+  constant cos_max:real
+  axiom cos_max_range : 0.0 <=. cos_max
+
+  val cos_approx (x:udouble) : udouble
+    requires { abs (to_real x) <=. cos_max }
+    ensures {
+      abs (to_real result -. cos (to_real x)) <=.
+        cos_rel_err *. abs (cos (to_real x))  +. cos_abs_err
+    }
+
+
+  let sin_simple_example (a b :udouble)
+    requires { abs (to_real a) <=. 0.25 *. sin_max }
+    requires { abs (to_real b) <=. 0.25 *. sin_max }
+    ensures {
+      abs (to_real result -. sin(to_real a +. to_real b))
+      <=. sin_rel_err *. abs (sin (to_real a +. to_real b))
+       +. eps *. abs (to_real a +. to_real b) *. (1. +. sin_rel_err)
+       +. sin_abs_err
+    }
+  = sin_approx(a ++. b)
+
+  let cos_simple_example (a b :udouble)
+   requires { abs (to_real a) <=. 0.25 *. cos_max }
+   requires { abs (to_real b) <=. 0.25 *. cos_max }
+   ensures {
+      abs (to_real result -. cos(to_real a -. to_real b))
+      <=. cos_rel_err *. abs (cos (to_real a -. to_real b))
+       +. eps *. abs (to_real a -. to_real b) *. (1. +. cos_rel_err)
+       +. cos_abs_err
+    }
+  = cos_approx(a --. b)
+
+  let cos_and_sine_example (a :udouble)
+    requires { abs (to_real a) <=. sin_max }
+    requires { abs (to_real a) <=. cos_max }
+    ensures {
+    let a = to_real a in
+    let t = 1.0 +. eps in
+    let crel = eps +. cos_rel_err *. (2.0 +. cos_rel_err) *. t in
+    let srel = eps +. sin_rel_err *. (2.0 +. sin_rel_err) *. t in
+    abs (to_real result -. 1.0) <=. crel +. srel +. eps +.
+      (t +. srel) *.
+        (t *. cos_abs_err *. (2.0 *. (1.0 +. cos_rel_err) *. abs (cos a)
+            +. cos_abs_err) +. eta) +.
+      (t +. crel) *.
+        (t *. sin_abs_err *. (2.0 *. (1.0 +. sin_rel_err) *. abs (sin a)
+            +. sin_abs_err) +. eta)
+      by cos a *. cos a +. sin a *. sin a = 1.0
+      so abs (cos a *. cos a) +. abs (sin a *. sin a) = 1.0
+      so (crel +. srel +. eps) *.
+           (abs (sin a *. sin a) +. abs (cos a *. cos a))
+         = crel +. srel +. eps
+      }
+  = cos_approx a **. cos_approx a ++. sin_approx a **. sin_approx a
+
+val exact_cte (x:real) : udouble
+  ensures { to_real result = x }
+
+(* Kinematics example *)
+
+let kinematics (theta1 theta2:udouble)
+  requires { abs (to_real theta1) <=. 0.25 *. sin_max }
+  requires { abs (to_real theta2) <=. 0.25 *. sin_max }
+  ensures {
+    let theta1 = to_real theta1 in
+    let theta2 = to_real theta2 in
+    let t1 = 1.0 +. eps in
+    let t2 = eps +. sin_rel_err *. t1 in
+    abs (to_real result -.
+         (0.5 *. sin theta1 +. 2.5 *. sin (theta1 +. theta2)))
+    <=.
+    (* Relative part of the error *)
+    (2.0 *. t2 +. eps) *.
+       (0.5 *. abs (sin theta1) +. 2.5 *. abs (sin (theta1 +. theta2)))
+    (* Absolute part of the error *)
+    +. (t1 +. t2) *.
+         (t1 *. (0.5 *. sin_abs_err
+                 +. 2.5 *. (eps *. abs (theta1 +. theta2) *. (1.0 +. sin_rel_err)
+                            +. sin_abs_err))
+          +. 2.0 *. eta)
+  }
+= exact_cte 0.5 **. sin_approx (theta1)
+  ++. exact_cte 2.5 **. sin_approx(theta1 ++. theta2)
+
+
+(* Raytracer example *)
+
+let raytracer (theta phi nx ny nz:udouble)
+  requires { abs (to_real phi) <=. sin_max }
+  requires { abs (to_real phi) <=. cos_max }
+  requires { abs (to_real theta) <=. sin_max }
+  requires { abs (to_real theta) <=. cos_max }
+  ensures {
+    let nz = to_real nz in
+    let ny = to_real ny in
+    let nx = to_real nx in
+    let phi = to_real phi in
+    let theta = to_real theta in
+    let t1 = 1.0 +. eps in
+    let t2c = eps +. cos_rel_err *. t1 in
+    let t2s = eps +. sin_rel_err *. t1 in
+    let t3c = eps +. (t2c +. cos_rel_err +. t2c *. cos_rel_err) *. t1 in
+    let t3s = eps +. (t2c +. sin_rel_err +. t2c *. sin_rel_err) *. t1 in
+    let t4 = t3c +. t2s +. eps in
+    abs (to_real result -.
+         (nx *. cos theta *. cos phi +. ny *. sin theta +. nz *. cos theta *. sin phi))
+    <=.
+        (* Relative part of the error *)
+        (t4 +. t3s +. eps) *.
+        (abs (nx *. cos theta *. cos phi) +.
+                    abs (ny *. sin theta) +. abs (nz *. cos theta *. sin phi))
+        (* Absolute part of the error *)
+        +. (t1 +. t3s)
+            *. ((t1 +. t2s)
+                 *. (t1 *. (cos_abs_err *. (1.0 +. t2c) *. abs (nx *. cos theta)
+                            +. (t1 *. cos_abs_err *. abs nx +. eta) *.
+                               ((1.0 +. cos_rel_err) *. abs (cos phi) +. cos_abs_err))
+                     +. eta)
+                +. (t1 +. t3c) *. (t1 *. sin_abs_err *. abs ny +. eta))
+         +. (t1 +. t4)
+            *. (t1 *. (sin_abs_err *. (1.0 +. t2c) *. abs (nz *. cos theta)
+                       +. (t1 *. cos_abs_err *. abs nz +. eta) *.
+                          ((1.0 +. sin_rel_err) *. abs (sin phi) +. sin_abs_err))
+                +. eta)
+  }
+=
+  nx **. cos_approx theta **. cos_approx phi
+  ++. ny **. sin_approx theta
+  ++. nz **. cos_approx theta **. sin_approx phi
+
+
+end

@@ -11,7 +11,7 @@ let only_first_field1 str =
     | _ :: "" :: "content" :: rest | _ :: "content" :: rest
     | "split_fields" :: rest | "split_discrs" :: rest -> aux rest
     | _ -> false in
-  not (String.equal str "") && aux Re.Str.(split (regexp "__") str)
+  aux Re.Str.(split (regexp "__") str)
 
 (** Decide for a list of field names of a record to replace the record with the
     value of the first field. *)
@@ -63,10 +63,11 @@ let collect_attrs a (attrs, fields) = match get_field_attr a with
 let correct_name f = Re.Str.global_replace (Re.Str.regexp_string f) ""
 
 let clean_name me =
+  let me_name = List.hd (Strings.bounded_split '@' (get_lsymbol_or_model_trace_name me) 2) in
   let me_attrs, fields =
     Sattr.fold collect_attrs me.me_attrs (Sattr.empty, []) in
-  let me_name = List.fold_right correct_name fields me.me_name in
-  {me with me_name; me_attrs}
+  let me_name = List.fold_right correct_name fields me_name in
+  {me with me_attrs; me_name}
 
 (* Filtering the model to remove elements that are not understood by gnat2why
    (sole purpose is to reduce the size of the output). *)
@@ -85,8 +86,7 @@ let post_clean = object (self)
   method! element me =
     match super#element me with
     | Some me ->
-        let me_name = List.hd (Strings.bounded_split '@' me.me_name 2) in
-        let me = clean_name {me with me_name} in
+        let me = clean_name me in
         if in_spark me then Some me else None
     | _ -> None
 
@@ -96,5 +96,5 @@ let post_clean = object (self)
       self#value (List.hd field_values)
     else match List.concat (List.map (for_field self) fs) with
       | [] -> None
-      | fs -> Some (Record fs)
+      | fs -> Some (concrete_record fs)
 end

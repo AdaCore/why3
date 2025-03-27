@@ -9,7 +9,6 @@ module BubbleSort
   use array.IntArraySorted
   use array.ArraySwap
   use array.ArrayPermut
-  use array.ArrayEq
 
   let bubble_sort (a: array int)
     ensures { permut_all (old a) a }
@@ -55,5 +54,53 @@ module BubbleSort
     if a[6] <> 91 then raise BenchFailure;
     if a[7] <> 413 then raise BenchFailure;
     a
+
+end
+
+(* {2 Knuth's version}
+
+   This is the version of bubble sort we can find in TAOCP, volume 3,
+   section 5.2.2 (page 107).
+
+   Though Knuth is concluding with ``In short, the bubble sort seems
+   to have nothing to recommend it, except a catchy name and the fact
+   that it leads to some interesting theoretical problems'', the
+   following makes yet another nice exercise in program verification.
+
+*)
+
+module TAOCP
+
+  use int.Int
+  use ref.Ref
+  use array.Array
+  use array.IntArraySorted
+  use array.ArraySwap
+  use array.ArrayPermut
+
+  let bubble_sort (a: array int) : unit
+    writes  { a }
+    ensures { permut_all (old a) a }
+    ensures { sorted a }
+  = let n = length a in
+    let ref bound = n in
+    while bound >= 2 do
+      invariant { bound <= n }
+      invariant { permut_all (old a) a }
+      invariant { forall i1 i2. 0 <= i1 < bound <= i2 < n -> a[i1] <= a[i2] }
+      invariant { sorted_sub a bound n }
+      variant   { bound }
+      let ref t = 0 in
+      for j = 0 to bound - 2 do
+        invariant { 0 <= t <= j }
+        invariant { permut_all (old a) a }
+        invariant { forall i1 i2. 0 <= i1 < bound <= i2 < n -> a[i1] <= a[i2] }
+        invariant { forall i. 0 <= i <= t -> a[i] <= a[t] }
+        invariant { sorted_sub a t (j+1) }
+        invariant { sorted_sub a bound n }
+        if a[j] > a[j+1] then (swap a j (j+1); t <- j+1)
+      done;
+      bound <- t
+    done
 
 end

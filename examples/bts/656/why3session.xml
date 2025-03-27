@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="dreal" version="4.21.06.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Gappa" version="1.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<file format="whyml" proved="true">
 <path name=".."/><path name="656.mlw"/>
-<theory name="Top">
- <goal name="test&#39;vc" expl="VC for test">
- <transf name="split_vc" >
+<theory name="Top" proved="true">
+ <goal name="test&#39;vc" expl="VC for test" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="test&#39;vc.0" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.014571" steps="54"/></proof>
   <proof prover="1"><result status="valid" time="0.001524"/></proof>
   <proof prover="2"><result status="valid" time="0.016548" steps="495"/></proof>
   <proof prover="3"><result status="valid" time="0.016514" steps="357"/></proof>
-  <proof prover="4"><result status="valid" time="0.037825" steps="222"/></proof>
+  <proof prover="4"><result status="valid" time="0.037825" steps="215"/></proof>
   <proof prover="5"><result status="valid" time="0.002211"/></proof>
   </goal>
   <goal name="test&#39;vc.1" expl="finite floating-point number" proved="true">
@@ -26,14 +26,14 @@
   <proof prover="1"><result status="valid" time="0.005400"/></proof>
   <proof prover="2"><result status="valid" time="0.014353" steps="531"/></proof>
   <proof prover="3"><result status="valid" time="0.019800" steps="378"/></proof>
-  <proof prover="4"><result status="valid" time="0.043249" steps="224"/></proof>
+  <proof prover="4"><result status="valid" time="0.043249" steps="218"/></proof>
   <proof prover="5"><result status="valid" time="0.000001"/></proof>
   </goal>
   <goal name="test&#39;vc.2" expl="floating-point overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.025512" steps="212"/></proof>
   <proof prover="2"><result status="valid" time="0.019347" steps="700"/></proof>
   <proof prover="3"><result status="valid" time="0.013859" steps="465"/></proof>
-  <proof prover="4"><result status="valid" time="0.805191" steps="10990"/></proof>
+  <proof prover="4"><result status="valid" time="0.101719" steps="1598"/></proof>
   <proof prover="5"><result status="valid" time="0.002580"/></proof>
   </goal>
   <goal name="test&#39;vc.3" expl="finite floating-point number" proved="true">
@@ -41,28 +41,28 @@
   <proof prover="1"><result status="valid" time="0.000001"/></proof>
   <proof prover="2"><result status="valid" time="0.019900" steps="640"/></proof>
   <proof prover="3"><result status="valid" time="0.017300" steps="443"/></proof>
-  <proof prover="4"><result status="valid" time="0.046885" steps="228"/></proof>
+  <proof prover="4"><result status="valid" time="0.046885" steps="222"/></proof>
   <proof prover="5"><result status="valid" time="0.002227"/></proof>
   </goal>
   <goal name="test&#39;vc.4" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.012776" steps="228"/></proof>
   <proof prover="2"><result status="valid" time="0.015673" steps="646"/></proof>
   <proof prover="3"><result status="valid" time="0.026985" steps="445"/></proof>
-  <proof prover="4"><result status="valid" time="0.039862" steps="228"/></proof>
+  <proof prover="4"><result status="valid" time="0.039862" steps="222"/></proof>
   <proof prover="5"><result status="valid" time="0.002224"/></proof>
   </goal>
   <goal name="test&#39;vc.5" expl="floating-point overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.017162" steps="399"/></proof>
   <proof prover="2"><result status="valid" time="0.021514" steps="933"/></proof>
   <proof prover="3"><result status="valid" time="0.025353" steps="656"/></proof>
-  <proof prover="4"><result status="valid" time="1.420771" steps="19423"/></proof>
+  <proof prover="4"><result status="valid" time="0.117963" steps="1662"/></proof>
   <proof prover="5"><result status="valid" time="0.003431"/></proof>
   </goal>
   <goal name="test&#39;vc.6" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.025399" steps="363"/></proof>
   <proof prover="2"><result status="valid" time="0.021374" steps="759"/></proof>
   <proof prover="3"><result status="valid" time="0.020584" steps="524"/></proof>
-  <proof prover="4"><result status="valid" time="0.054897" steps="234"/></proof>
+  <proof prover="4"><result status="valid" time="0.054897" steps="227"/></proof>
   <proof prover="5"><result status="valid" time="0.002205"/></proof>
   </goal>
   <goal name="test&#39;vc.7" expl="finite floating-point number" proved="true">
@@ -70,22 +70,22 @@
   <proof prover="1"><result status="valid" time="0.000001"/></proof>
   <proof prover="2"><result status="valid" time="0.025756" steps="793"/></proof>
   <proof prover="3"><result status="valid" time="0.021199" steps="545"/></proof>
-  <proof prover="4"><result status="valid" time="0.043544" steps="237"/></proof>
+  <proof prover="4"><result status="valid" time="0.043544" steps="230"/></proof>
   <proof prover="5"><result status="valid" time="0.002277"/></proof>
   </goal>
-  <goal name="test&#39;vc.8" expl="non-zero floating-point number">
+  <goal name="test&#39;vc.8" expl="non-zero floating-point number" proved="true">
   <proof prover="0"><result status="unknown" time="0.023714" steps="504"/></proof>
   <proof prover="1"><result status="unknown" time="0.009488"/></proof>
   <proof prover="2"><result status="unknown" time="0.019258" steps="923"/></proof>
   <proof prover="3"><result status="unknown" time="0.007989" steps="670"/></proof>
-  <proof prover="4"><result status="timeout" time="5.000000" steps="40572"/></proof>
+  <proof prover="4"><result status="valid" time="0.113197" steps="1393"/></proof>
   <proof prover="5"><result status="unknown" time="0.016360"/></proof>
   </goal>
   <goal name="test&#39;vc.9" expl="floating-point overflow" proved="true">
   <proof prover="0"><result status="valid" time="0.021108" steps="414"/></proof>
   <proof prover="2"><result status="valid" time="0.021791" steps="1017"/></proof>
   <proof prover="3"><result status="valid" time="0.027093" steps="666"/></proof>
-  <proof prover="4"><result status="valid" time="0.098813" steps="599"/></proof>
+  <proof prover="4"><result status="valid" time="0.098813" steps="236"/></proof>
   <proof prover="5"><result status="valid" time="0.004375"/></proof>
   </goal>
   <goal name="test&#39;vc.10" expl="finite floating-point number" proved="true">
@@ -93,44 +93,44 @@
   <proof prover="1"><result status="valid" time="0.000001"/></proof>
   <proof prover="2"><result status="valid" time="0.021946" steps="793"/></proof>
   <proof prover="3"><result status="valid" time="0.017670" steps="546"/></proof>
-  <proof prover="4"><result status="valid" time="0.045358" steps="237"/></proof>
+  <proof prover="4"><result status="valid" time="0.045358" steps="231"/></proof>
   <proof prover="5"><result status="valid" time="0.002229"/></proof>
   </goal>
   <goal name="test&#39;vc.11" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.018522" steps="335"/></proof>
   <proof prover="2"><result status="valid" time="0.022901" steps="829"/></proof>
   <proof prover="3"><result status="valid" time="0.017695" steps="567"/></proof>
-  <proof prover="4"><result status="valid" time="0.054883" steps="241"/></proof>
+  <proof prover="4"><result status="valid" time="0.054883" steps="233"/></proof>
   <proof prover="5"><result status="valid" time="0.000001"/></proof>
   </goal>
-  <goal name="test&#39;vc.12" expl="floating-point overflow">
+  <goal name="test&#39;vc.12" expl="floating-point overflow" proved="true">
   <proof prover="0"><result status="unknown" time="0.034689" steps="1079"/></proof>
   <proof prover="1"><result status="unknown" time="0.001882"/></proof>
   <proof prover="2"><result status="unknown" time="0.028621" steps="1215"/></proof>
   <proof prover="3"><result status="unknown" time="0.018399" steps="1011"/></proof>
-  <proof prover="4"><result status="timeout" time="5.000000" steps="39293"/></proof>
+  <proof prover="4"><result status="valid" time="0.131203" steps="1786"/></proof>
   <proof prover="5"><result status="unknown" time="0.027864"/></proof>
   </goal>
   <goal name="test&#39;vc.13" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.014662" steps="319"/></proof>
   <proof prover="2"><result status="valid" time="0.013974" steps="821"/></proof>
   <proof prover="3"><result status="valid" time="0.018415" steps="560"/></proof>
-  <proof prover="4" timelimit="1"><result status="valid" time="0.034815" steps="244"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.034815" steps="237"/></proof>
   <proof prover="5"><result status="valid" time="0.000001"/></proof>
   </goal>
   <goal name="test&#39;vc.14" expl="finite floating-point number" proved="true">
   <proof prover="0"><result status="valid" time="0.010769" steps="340"/></proof>
   <proof prover="2"><result status="valid" time="0.022604" steps="827"/></proof>
   <proof prover="3"><result status="valid" time="0.022183" steps="562"/></proof>
-  <proof prover="4" timelimit="1"><result status="valid" time="0.039747" steps="244"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.039747" steps="237"/></proof>
   <proof prover="5"><result status="valid" time="0.002408"/></proof>
   </goal>
-  <goal name="test&#39;vc.15" expl="floating-point overflow">
+  <goal name="test&#39;vc.15" expl="floating-point overflow" proved="true">
   <proof prover="0"><result status="unknown" time="0.019824" steps="1096"/></proof>
   <proof prover="1"><result status="unknown" time="0.001742"/></proof>
   <proof prover="2"><result status="unknown" time="0.015122" steps="1218"/></proof>
   <proof prover="3"><result status="unknown" time="0.018989" steps="1013"/></proof>
-  <proof prover="4" timelimit="1"><result status="timeout" time="1.000000" steps="15078"/></proof>
+  <proof prover="4" timelimit="1"><result status="valid" time="0.124731" steps="1788"/></proof>
   <proof prover="5"><result status="unknown" time="0.014981"/></proof>
   </goal>
  </transf>

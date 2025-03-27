@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,6 +11,9 @@
 
 open Format
 open Why3
+
+module Main : functor () -> sig end
+ = functor () -> struct
 
 (** {2 Warnings} *)
 
@@ -182,7 +185,7 @@ let same_result r1 r2 =
     | StepLimitExceeded, StepLimitExceeded
     | Unknown _, Unknown _
     | Failure _, Failure _
-    | HighFailure, HighFailure
+    | HighFailure _, HighFailure _
       -> true
     | Valid, _ | _, Valid
     | Invalid, _ | _, Invalid
@@ -327,7 +330,7 @@ let transform_smoke cont tr_name =
            let _new_paid =
              Session_itp.graft_proof_attempt
                session new_pn pa.Session_itp.prover
-               ~limit:pa.Session_itp.limit in
+               ~limits:pa.Session_itp.limits in
            ())
           paids
      | _ -> assert false)
@@ -431,9 +434,6 @@ let () =
       eprintf "Aborting...@.";
       exit 1
 
+end
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. bin/why3replay.opt"
-End:
-*)
+let () = Whyconf.register_command "replay" (module Main)

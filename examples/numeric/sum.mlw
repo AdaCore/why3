@@ -1,0 +1,121 @@
+module SumSingle
+  use int.Int
+  use real.RealInfix
+  use real.Abs
+  use real.Sum
+  use ufloat.USingle
+  use ufloat.USingleLemmas
+  use ref.Ref
+  use real.FromInt
+
+  function abs_real_fun (f:int -> usingle) : int -> real =
+                                                  fun i -> abs (to_real (f i))
+
+  let rec lemma sum_of_fun_le_sum_of_abs_fun (f : int -> usingle) (i:int)
+    requires { 0 <= i }
+    variant { i }
+    ensures { abs (sum (real_fun f) 0 i) <=. sum (abs_real_fun f) 0 i }
+  = if i > 1 then sum_of_fun_le_sum_of_abs_fun f (i - 1)
+
+  let ghost usum (f : int -> usingle) (n:int) : usingle
+    requires { 0 <= n }
+    ensures {
+      abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
+    }
+  =
+  let s = ref u0 in
+  for i = 0 to n - 1 do
+    (* We use the propagation lemma on IEEE addition to prove the invariant *)
+    invariant {
+      abs (to_real !s -. sum (real_fun f) 0 i) <=. sum (abs_real_fun f) 0 i *. (eps *. from_int i)
+    }
+    s := !s ++. f i;
+  done;
+  !s
+
+  (* We use the propagation lemma on IEEE addition to prove the postcondition *)
+  let rec usum_rec (f : int -> usingle) (n:int) : usingle
+    requires { 0 <= n }
+    variant { n }
+    ensures {
+      abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
+    }
+  = if n = 0 then uzero else usum_rec f (n-1) ++. f (n-1)
+
+  function exact_f : int -> real
+  function f' : int -> real
+  axiom f'_def : f' = fun i -> abs (exact_f i)
+  constant f_rel_err:real
+  constant f_cst_err:real
+
+  (* We use the propagation on sum to prove the postcondition *)
+  let function example1 (f : int -> usingle) (n : int) : usingle
+    requires { 0 <= n }
+    requires { forall i. abs (to_real (f i) -. exact_f i) <=. f' i *. f_rel_err }
+    ensures {
+      abs (to_real result -. sum exact_f 0 n)
+      <=. sum f' 0 n *. (f_rel_err +. (eps *. from_int n) *. (1. +. f_rel_err))
+    }
+  = usum_rec f n
+end
+
+module SumDouble
+  use int.Int
+  use real.RealInfix
+  use real.Abs
+  use real.Sum
+  use ufloat.UDouble
+  use ufloat.UDoubleLemmas
+  use ref.Ref
+  use real.FromInt
+
+  function abs_real_fun (f:int -> udouble) : int -> real =
+                                                  fun i -> abs (to_real (f i))
+
+  let rec lemma sum_of_fun_le_sum_of_abs_fun (f : int -> udouble) (i:int)
+    requires { 0 <= i }
+    variant { i }
+    ensures { abs (sum (real_fun f) 0 i) <=. sum (abs_real_fun f) 0 i }
+  = if i > 1 then sum_of_fun_le_sum_of_abs_fun f (i - 1)
+
+  let ghost usum (f : int -> udouble) (n:int) : udouble
+    requires { 0 <= n }
+    ensures {
+      abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
+    }
+  =
+  let s = ref u0 in
+  for i = 0 to n - 1 do
+    (* We use the propagation lemma on IEEE addition to prove the invariant *)
+    invariant {
+      abs (to_real !s -. sum (real_fun f) 0 i) <=. sum (abs_real_fun f) 0 i *. (eps *. from_int i)
+    }
+    s := !s ++. f i;
+  done;
+  !s
+
+  (* We use the propagation lemma on IEEE addition to prove the postcondition *)
+  let rec usum_rec (f : int -> udouble) (n:int) : udouble
+    requires { 0 <= n }
+    variant { n }
+    ensures {
+      abs (to_real result -. sum (real_fun f) 0 n) <=. sum (abs_real_fun f) 0 n *. (eps *. from_int n)
+    }
+  = if n = 0 then uzero else usum_rec f (n-1) ++. f (n-1)
+
+  function exact_f : int -> real
+  function f' : int -> real
+  axiom f'_def : f' = fun i -> abs (exact_f i)
+  constant f_rel_err:real
+  constant f_cst_err:real
+
+  (* We use the propagation on sum to prove the postcondition *)
+  let function example1 (f : int -> udouble) (n : int) : udouble
+    requires { 0 <= n }
+    requires { forall i. abs (to_real (f i) -. exact_f i) <=. f' i *. f_rel_err }
+    ensures {
+      abs (to_real result -. sum exact_f 0 n)
+      <=. sum f' 0 n *. (f_rel_err +. (eps *. from_int n) *. (1. +. f_rel_err))
+    }
+  = usum_rec f n
+end

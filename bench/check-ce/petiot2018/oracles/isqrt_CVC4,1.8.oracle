@@ -351,30 +351,30 @@ The contracts of the following functions/loops are too weak :
 File isqrt-S5.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
-      n = 3
+      n = 2
       zero = 0
       one = 1
   Line 6:
     Giant-step execution of function `int_ref` with args:
-      i = 3
-    result of `int_ref` = {contents= 3}
+      i = 2
+    result of `int_ref` = {contents= 2}
   Line 7:
     Normal execution of function `( * )` with args:
-      _ = 3
-      _ = 3
+      _ = 2
+      _ = 2
     Giant-step execution of function `int_ref` with args:
-      i = 9
-    result of `int_ref` = {contents= 9}
+      i = 4
+    result of `int_ref` = {contents= 4}
   Line 8:
     Normal execution of function `( * )` with args:
       _ = (-2)
-      _ = 3
+      _ = 2
     Normal execution of function `(+)` with args:
-      _ = (-6)
+      _ = (-4)
       _ = 1
     Giant-step execution of function `int_ref` with args:
-      i = (-5)
-    result of `int_ref` = {contents= (- 5)}
+      i = (-3)
+    result of `int_ref` = {contents= (- 3)}
   Line 9:
     Giant-step iteration of loop
     r = {contents= 2}
@@ -385,7 +385,7 @@ File isqrt-S5.mlw:
     result of `(!)` = 4
     Normal execution of function `(>)` with args:
       x = 4
-      y = 3
+      y = 2
     Normal iteration of loop
   Line 15:
     Giant-step execution of function `(!)` with args:
@@ -953,84 +953,84 @@ The contracts of the following functions/loops are too weak :
 File isqrt-S10.mlw:
   Line 3:
     Execution of main function `isqrt` with env:
-      n = 0
+      n = 15
       zero = 0
       one = 1
   Line 6:
     Giant-step execution of function `int_ref` with args:
-      i = 0
-    result of `int_ref` = {contents= 0}
+      i = 15
+    result of `int_ref` = {contents= 15}
   Line 7:
     Normal execution of function `( * )` with args:
-      _ = 0
-      _ = 0
+      _ = 15
+      _ = 15
     Giant-step execution of function `int_ref` with args:
-      i = 0
-    result of `int_ref` = {contents= 0}
+      i = 225
+    result of `int_ref` = {contents= 225}
   Line 8:
     Normal execution of function `( * )` with args:
       _ = (-2)
-      _ = 0
+      _ = 15
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (-30)
       _ = 1
     Giant-step execution of function `int_ref` with args:
-      i = 1
-    result of `int_ref` = {contents= 1}
+      i = (-29)
+    result of `int_ref` = {contents= (- 29)}
   Line 9:
     Giant-step iteration of loop
-    r = {contents= (- 2)}
-    y = {contents= 4}
-    z = {contents= 5}
+    r = {contents= (- 5)}
+    y = {contents= 25}
+    z = {contents= 11}
     Giant-step execution of function `(!)` with args:
-      r = {contents= 4}
-    result of `(!)` = 4
+      r = {contents= 25}
+    result of `(!)` = 25
     Normal execution of function `(>)` with args:
-      x = 4
-      y = 0
+      x = 25
+      y = 15
     Normal iteration of loop
   Line 15:
     Giant-step execution of function `(!)` with args:
-      r = {contents= 5}
-    result of `(!)` = 5
+      r = {contents= 11}
+    result of `(!)` = 11
     Giant-step execution of function `(!)` with args:
-      r = {contents= 4}
-    result of `(!)` = 4
+      r = {contents= 25}
+    result of `(!)` = 25
     Normal execution of function `(+)` with args:
-      _ = 4
-      _ = 5
+      _ = 25
+      _ = 11
     Giant-step execution of function `(:=)` with args:
-      r = {contents= 4}
-      i = 9
-    y = {contents= 9}
+      r = {contents= 25}
+      i = 36
+    y = {contents= 36}
     result of `(:=)` = ()
   Line 16:
     Giant-step execution of function `(!)` with args:
-      r = {contents= 5}
-    result of `(!)` = 5
+      r = {contents= 11}
+    result of `(!)` = 11
     Normal execution of function `(+)` with args:
-      _ = 5
+      _ = 11
       _ = 2
     Giant-step execution of function `(:=)` with args:
-      r = {contents= 5}
-      i = 7
-    z = {contents= 7}
+      r = {contents= 11}
+      i = 13
+    z = {contents= 13}
     result of `(:=)` = ()
   Line 17:
     Giant-step execution of function `(!)` with args:
-      r = {contents= (- 2)}
-    result of `(!)` = (- 2)
+      r = {contents= (- 5)}
+    result of `(!)` = (- 5)
     Giant-step execution of function `(-)` with args:
-      x = (- 2)
+      x = (- 5)
       y = 1
-    result of `(-)` = (- 3)
+    result of `(-)` = (- 6)
     Giant-step execution of function `(:=)` with args:
-      r = {contents= (- 2)}
-      i = (- 3)
-    r = {contents= (- 3)}
+      r = {contents= (- 5)}
+      i = (- 6)
+    r = {contents= (- 6)}
     result of `(:=)` = ()
   Line 14:
     Property failure at loop variant decrease with:
-      r = {contents= (- 3)}
-      r = {contents= (- 2)}
+      r = {contents= (- 6)}
+      r = {contents= (- 5)}
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -145,7 +145,6 @@ let rec basename p =
 let print_file_path fmt p =
   Pp.print_list Pp.slash Pp.string fmt p
 
-
 let system_independent_path_of_file f =
   let rec aux acc f =
     let d = Filename.dirname f in
@@ -155,7 +154,7 @@ let system_independent_path_of_file f =
       b::acc
     else if f=d then
       (* we are at the root *)
-      acc
+      (d::acc)
     else
       let b = Filename.basename f in
       aux (b::acc) d
@@ -270,6 +269,21 @@ let resolve_from_paths paths name =
     | [] -> raise (FailedResolve fl)
     | [f] -> f
     | fl -> raise (AmbiguousResolve fl)
+
+let deep_mkdir path =
+  let rec aux dir dl =
+    if not (Sys.file_exists dir) then
+      Unix.mkdir dir 0o755
+    else if not (Sys.is_directory dir) then
+      raise (Sys_error (dir ^ " is not a directory"));
+    match dl with
+    | [] -> ()
+    | d :: tail -> aux (Filename.concat dir d) tail
+  in
+  let dlist = system_independent_path_of_file path in
+  match dlist with
+  | [] -> ()
+  | hd :: tl -> aux hd tl
 
 let () = Exn_printer.register (fun fmt exn -> match exn with
   | FailedResolve fl ->

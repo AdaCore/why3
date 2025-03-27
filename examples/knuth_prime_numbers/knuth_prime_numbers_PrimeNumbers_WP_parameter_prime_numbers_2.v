@@ -75,10 +75,14 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
@@ -90,13 +94,6 @@ Axiom make_spec :
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
    ((mixfix_lbrb (make n v) i) = v)) /\
   ((length (make n v)) = n).
-
-Parameter if_term: Numbers.BinNums.Z -> Init.Datatypes.bool.
-
-Axiom if_term'def :
-  forall (o:Numbers.BinNums.Z),
-  ((o = 0%Z) -> ((if_term o) = Init.Datatypes.true)) /\
-  (~ (o = 0%Z) -> ((if_term o) = Init.Datatypes.false)).
 
 Require Import Lia.
 
@@ -160,3 +157,4 @@ rewrite <- H1.
 apply H3; lia.
 lia.
 Qed.
+

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -131,117 +131,60 @@ and concrete_syntax_term =
   | Let of (string * concrete_syntax_term) list * concrete_syntax_term
 
 
-(* Pretty printing of concrete terms *)
-
-let print_concrete_bv fmt { bv_value; bv_length; bv_verbatim } =
-  ignore bv_value; ignore bv_length;
-  fprintf fmt "%s" bv_verbatim
-
-let print_concrete_float_value fmt = function
-  | Plus_infinity -> pp_print_string fmt "+infty"
-  | Minus_infinity -> pp_print_string fmt "-infty"
-  | Plus_zero -> pp_print_string fmt "+0"
-  | Minus_zero -> pp_print_string fmt "-0"
-  | NaN -> pp_print_string fmt "NaN"
-  | Float_number {float_exp;float_sign;float_mant;float_hex} ->
-    fprintf fmt "number{exp=%a, sign=%a, mant=%a, hex=%s}"
-      print_concrete_bv float_exp
-      print_concrete_bv float_sign
-      print_concrete_bv float_mant
-      float_hex
-
-let rec print_concrete_term fmt ct =
-  match ct with
-  | Var v -> pp_print_string fmt v
-  | Const (Boolean b) -> pp_print_bool fmt b
-  | Const (String s) -> Constant.print_string_def fmt s
-  | Const (Integer {int_value; int_verbatim}) ->
-      ignore int_value; pp_print_string fmt int_verbatim
-  | Const (Real {real_value; real_verbatim}) ->
-      ignore real_value; pp_print_string fmt real_verbatim
-  | Const (Float { float_exp_size; float_significand_size; float_val } ) ->
-    fprintf fmt
-      "float{ @[<hov>exp_size = %d;@ significand_size = %d;@ value = %a@] }"
-      float_exp_size
-      float_significand_size
-      print_concrete_float_value float_val
-  | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
-  | Const (Fraction {frac_num;frac_den;frac_verbatim}) ->
-      ignore frac_num; ignore frac_den; fprintf fmt "%s" frac_verbatim
-  | Apply ("=",[t1;t2]) ->
-    fprintf fmt "%a = %a"
-      print_concrete_term t1
-      print_concrete_term t2
-  | Apply (f,[]) -> pp_print_string fmt f
-  | Apply (f,ctl) ->
-    fprintf fmt "@[(%s@ %a)@]" f (Pp.print_list Pp.space print_concrete_term) ctl
-  | If (b,t1,t2) ->
-    fprintf fmt "@[if %a@ then %a@ else %a@]"
-      print_concrete_term b
-      print_concrete_term t1
-      print_concrete_term t2
-  | Epsilon (eps_vs,eps_t) ->
-    fprintf fmt "epsilon %s.@ %a" eps_vs print_concrete_term eps_t
-  | Quant (quant,quant_vars,quant_t) ->
-    let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
-    fprintf fmt "@[<hov 1>%s %a.@ %a@]" quant_string
-      (Pp.print_list Pp.comma Pp.print_string) quant_vars
-      print_concrete_term quant_t
-  | Binop (op,t1,t2) ->
-    let op_string = match op with
-      | And -> "/\\"
-      | Or -> "\\/"
-      | Implies -> "->"
-      | Iff -> "<->"
-    in
-    fprintf fmt "@[%a %s@ %a@]"
-      print_concrete_term t1
-      op_string
-      print_concrete_term t2
-  | Not ct' -> fprintf fmt "not %a" print_concrete_term ct'
-  | FunctionLiteral {elts; others} ->
-    let print_others fmt others =
-      fprintf fmt "@[_ =>@ %a@]"
-        print_concrete_term others
-    in
-    let print_indice_value fmt { elts_index; elts_value } =
-      fprintf fmt "@[%a =>@ %a@]"
-        print_concrete_term elts_index
-        print_concrete_term elts_value
-    in
-    fprintf fmt "@[[|%a%a|]@]"
-      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
-      print_others others
-  | Function {args; body} ->
-    fprintf fmt "@[<hov 1>fun %a ->@ %a@]"
-      (Pp.print_list Pp.space Pp.print_string) args
-      print_concrete_term body
-  | Record fields_values ->
-    let print_field_value fmt (field,value) =
-      fprintf fmt "@[%s =@ %a@]" field print_concrete_term value
-    in
-    fprintf fmt "@[<hv1>%a@]"
-      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
-  | Proj (proj_name,proj_value) ->
-    fprintf fmt "@[{%s =>@ %a}@]" proj_name print_concrete_term proj_value
-  | Let (ll, t) -> fprintf fmt "@[<hov 1>let %a@ in@ %a@]"
-                      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi (Pp.print_pair Pp.print_string print_concrete_term)) ll
-                      print_concrete_term t
-
 (* Helper functions for concrete terms *)
 
-let concrete_var_from_vs vs =
-  Var (Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs)
+let concrete_undefined = Epsilon("_", (Const (Boolean true)))
+
+let is_concrete_undefined t =
+  match t with
+  | Epsilon("_", Const (Boolean true)) -> true
+  | _ -> false
+
+let concrete_const c = Const c
+
+let concrete_var s = Var s
+
+let concrete_apply symb l =
+  if Strings.has_suffix ~suffix:"'mk" symb then failwith ("concrete_apply with " ^ symb);
+  Apply(symb,l)
+
+let concrete_if t1 t2 t3 = If(t1,t2,t3)
+
+let concrete_let v t1 t2 = Let ([(v, t1)], t2)
+
+let concrete_record l = Record l
+
+let concrete_proj s t = Proj(s,t)
+
+let concrete_epsilon v t = Epsilon(v,t)
+
+let concrete_function_literal l o = FunctionLiteral { elts = l; others = o }
+
+let concrete_function args body = Function {args; body}
+
+let concrete_quant q l t = Quant(q,l,t)
+
+let concrete_binop op t1 t2 = Binop(op,t1,t2)
+
+let concrete_not t = Not t
+
+let concrete_string_from_vs vs =
+  Format.asprintf "@[<h>%a@]" Pretty.print_vs_qualified vs
+
+(*
+let concrete_var_from_vs vs = Var (concrete_string_from_vs vs)
+*)
+
 let concrete_const_bool b = Const (Boolean b)
 let concrete_apply_from_ls ls ts =
   let ls_name = Format.asprintf "@[<h>%a@]" Pretty.print_ls_qualified ls in
-  Apply (ls_name, ts)
-let concrete_apply_equ t1 t2 = Apply ("=", [t1;t2])
+  concrete_apply ls_name ts
+let concrete_equ t1 t2 = concrete_apply "=" [t1;t2]
 let rec subst_concrete_term subst t =
   match t with
   | Var v -> (try Mstr.find v subst with _ -> t)
   | Const _ -> t
-  | Apply (f, ctl) -> Apply (f, List.map (subst_concrete_term subst) ctl)
+  | Apply (f, ctl) -> concrete_apply f (List.map (subst_concrete_term subst) ctl)
   | If (cb,ct1,ct2) ->
     If (subst_concrete_term subst cb,
         subst_concrete_term subst ct1,
@@ -277,7 +220,114 @@ let rec t_and_l_concrete = function
   | [f] -> f
   | f::fl -> Binop (And, f, (t_and_l_concrete fl))
 
+
+
+
+(* Pretty printing of concrete terms *)
+
+let print_concrete_bv fmt { bv_value; bv_length; bv_verbatim } =
+  ignore bv_value; ignore bv_length;
+  fprintf fmt "%s" bv_verbatim
+
+let print_concrete_float_value fmt = function
+  | Plus_infinity -> pp_print_string fmt "+infty"
+  | Minus_infinity -> pp_print_string fmt "-infty"
+  | Plus_zero -> pp_print_string fmt "+0"
+  | Minus_zero -> pp_print_string fmt "-0"
+  | NaN -> pp_print_string fmt "NaN"
+  | Float_number {float_exp;float_sign;float_mant;float_hex} ->
+    fprintf fmt "number{exp=%a, sign=%a, mant=%a, hex=%s}"
+      print_concrete_bv float_exp
+      print_concrete_bv float_sign
+      print_concrete_bv float_mant
+      float_hex
+
+let rec print_concrete_term fmt ct =
+  if is_concrete_undefined ct then fprintf fmt "<UNDEFINED>" else
+  match ct with
+  | Var v -> pp_print_string fmt v
+  | Const (Boolean b) -> pp_print_bool fmt b
+  | Const (String s) -> Constant.print_string_def fmt s
+  | Const (Integer {int_value; int_verbatim}) ->
+      ignore int_value; pp_print_string fmt int_verbatim
+  | Const (Real {real_value; real_verbatim}) ->
+      ignore real_value; pp_print_string fmt real_verbatim
+  | Const (Float { float_exp_size; float_significand_size; float_val } ) ->
+    fprintf fmt
+      "float{ @[<hov>exp_size = %d;@ significand_size = %d;@ value = %a@] }"
+      float_exp_size
+      float_significand_size
+      print_concrete_float_value float_val
+  | Const (BitVector bv) -> fprintf fmt "%a" print_concrete_bv bv
+  | Const (Fraction {frac_num;frac_den;frac_verbatim}) ->
+      ignore frac_num; ignore frac_den; fprintf fmt "%s" frac_verbatim
+  | Apply ("=",[t1;t2]) ->
+    fprintf fmt "%a = %a"
+      print_concrete_term t1
+      print_concrete_term t2
+  | Apply (f,[]) -> pp_print_string fmt f
+  | Apply (f,ctl) ->
+    fprintf fmt "@[Apply(%s,@ %a)@]" f (Pp.print_list Pp.space print_concrete_term) ctl
+  | If (b,t1,t2) ->
+    fprintf fmt "@[if %a@ then %a@ else %a@]"
+      print_concrete_term b
+      print_concrete_term t1
+      print_concrete_term t2
+  | Epsilon (eps_vs,eps_t) ->
+    fprintf fmt "(epsilon %s.@ %a)" eps_vs print_concrete_term eps_t
+  | Quant (quant,quant_vars,quant_t) ->
+    let quant_string = match quant with Forall -> "Forall" | Exists -> "Exists" in
+    fprintf fmt "@[<hov 1>(%s %a.@ %a)@]" quant_string
+      (Pp.print_list Pp.comma Pp.print_string) quant_vars
+      print_concrete_term quant_t
+  | Binop (op,t1,t2) ->
+    let op_string = match op with
+      | And -> "/\\"
+      | Or -> "\\/"
+      | Implies -> "->"
+      | Iff -> "<->"
+    in
+    fprintf fmt "@[(%a %s@ %a)@]"
+      print_concrete_term t1
+      op_string
+      print_concrete_term t2
+  | Not ct' -> fprintf fmt "not %a" print_concrete_term ct'
+  | FunctionLiteral {elts; others} ->
+    let print_others fmt others =
+      fprintf fmt "@[_ =>@ %a@]"
+        print_concrete_term others
+    in
+    let print_indice_value fmt { elts_index; elts_value } =
+      fprintf fmt "@[%a =>@ %a@]"
+        print_concrete_term elts_index
+        print_concrete_term elts_value
+    in
+    fprintf fmt "@[[|%a%a|]@]"
+      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi print_indice_value) elts
+      print_others others
+  | Function {args; body} ->
+    fprintf fmt "@[<hov 1>(fun %a ->@ %a)@]"
+      (Pp.print_list Pp.space Pp.print_string) args
+      print_concrete_term body
+  | Record fields_values ->
+    let print_field_value fmt (field,value) =
+      fprintf fmt "@[%s =@ %a@]" field print_concrete_term value
+    in
+    fprintf fmt "@[<hv1>%a@]"
+      (Pp.print_list_delim ~start:Pp.lbrace ~stop:Pp.rbrace ~sep:Pp.semi print_field_value) fields_values
+  | Proj (proj_name,proj_value) ->
+    fprintf fmt "@[{%s =>@ %a}@]" proj_name print_concrete_term proj_value
+  | Let (ll, t) -> fprintf fmt "@[<hov 1>let %a@ in@ %a@]"
+                      (Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.semi ~sep:Pp.semi (Pp.print_pair Pp.print_string print_concrete_term)) ll
+                      print_concrete_term t
+
+
+
+
+(* models *)
+
 type model_element = {
+
   me_name: string;
   me_kind: model_element_kind;
   me_value: term;
@@ -394,6 +444,7 @@ let search_model_element_call_result model (call_id : Expr.expr_id option) =
 let cmp_attrs a1 a2 =
   String.compare a1.attr_string a2.attr_string
 
+(*
 let model_element_equal n1 n2 =
   let me_kind_equal k1 k2 = match k1,k2 with
   | Result, Result
@@ -412,8 +463,10 @@ let model_element_equal n1 n2 =
   Option.equal Loc.equal n1.me_location n2.me_location &&
   Sattr.equal n1.me_attrs n2.me_attrs &&
   Term.ls_equal n1.me_lsymbol n2.me_lsymbol
+*)
 
 (* FIXME: understand why some elements are duplicated *)
+(*
 let rec filter_duplicated l =
   let is_duplicated a l =
     List.exists (fun x -> model_element_equal a x) l in
@@ -421,6 +474,7 @@ let rec filter_duplicated l =
   | [] | [_] -> l
   | me :: l when is_duplicated me l -> filter_duplicated l
   | me :: l -> me :: filter_duplicated l
+*)
 
 let json_attrs attrs =
   let open Json_base in
@@ -759,7 +813,7 @@ let json_model_element me =
     | Loop_previous_iteration ->"before_iteration"
     | Loop_current_iteration -> "current_iteration" in
   Record [
-      "name", String me.me_name;
+      "name", String (me.me_name);
       "location", json_loc me.me_location;
       "attrs", json_attrs me.me_attrs;
       "value",
@@ -772,7 +826,6 @@ let json_model_element me =
     ]
 
 let json_model_elements model_elements =
-  let model_elements = filter_duplicated model_elements in
   Json_base.List (List.map json_model_element model_elements)
 
 let json_model_elements_on_lines vc_term_loc (file_name, model_file) =
@@ -842,16 +895,13 @@ let print_model_element ?(print_locs=false) ~print_attrs fmt m_element =
         (Pp.print_option (Pretty.print_ty)) m_element.me_value.t_ty
         print_concrete_term m_element.me_concrete_value
 
-let print_model_elements ~filter_similar ~print_attrs ?(sep = Pp.newline)
-    fmt m_elements =
-  let m_elements =
-    if filter_similar then filter_duplicated m_elements else m_elements in
+let print_model_elements ~print_attrs ?(sep = Pp.newline) fmt m_elements =
   fprintf fmt "@[%a@]"
     (Pp.print_list sep
        (print_model_element ?print_locs:None ~print_attrs))
     m_elements
 
-let print_model_file ~filter_similar ~print_attrs fmt (filename, model_file) =
+let print_model_file ~print_attrs fmt (filename, model_file) =
   (* Relativize does not work on nighly bench: using basename instead. It
      hides the local paths. *)
   let filename = Filename.basename filename in
@@ -865,21 +915,14 @@ let print_model_file ~filter_similar ~print_attrs fmt (filename, model_file) =
       if n = 0 then Sattr.compare me1.me_attrs me2.me_attrs else n in
     let m_elements = List.sort cmp m_elements in
     fprintf fmt "  @[<v 2>Line %d:@ %a@]" line
-      (print_model_elements ~filter_similar ?sep:None ~print_attrs)
+      (print_model_elements ?sep:None ~print_attrs)
       m_elements in
   fprintf fmt "@[<v 0>File %s:@ %a@]" filename
     Pp.(print_list space pp) (Mint.bindings model_file)
 
-let print_model ~filter_similar ~print_attrs
-    fmt model =
-  Pp.print_list Pp.newline (print_model_file ~filter_similar ~print_attrs)
+let print_model ~print_attrs fmt model =
+  Pp.print_list Pp.newline (print_model_file ~print_attrs)
     fmt (Mstr.bindings model.model_files)
-
-let print_model_human ?(filter_similar = true) fmt model =
-  print_model ~filter_similar fmt model
-
-let print_model ?(filter_similar = true) ~print_attrs fmt model =
-  print_model ~filter_similar ~print_attrs fmt model
 
 let get_model_file model filename =
   Mstr.find_def empty_model_file filename model
@@ -929,7 +972,7 @@ let interleave_line ~filename:_ ~print_attrs start_comment end_comment
     let model_elements = Mint.find line_number model_file in
     let cntexmp_line =
       asprintf "@[<h 0>%s%s%a%s@]" (get_padding line) start_comment
-        (print_model_elements ~filter_similar:true ~sep:Pp.semi ~print_attrs)
+        (print_model_elements ~sep:Pp.semi ~print_attrs)
         model_elements end_comment in
     (* We need to know how many lines will be taken by the counterexample. This
        is ad hoc as we don't really know how the lines are split in IDE. *)
@@ -998,7 +1041,7 @@ let while_loop_kind vc_attrs var_loc =
     a.attr_string = "expl:loop variant decrease" in
   if Sattr.exists is_inv_pres vc_attrs then
     let loop_loc =
-      let is_while a = Strings.has_prefix "loop:" a.attr_string in
+      let is_while a = Strings.has_prefix ~prefix:"loop:" a.attr_string in
       let attr = Sattr.choose (Sattr.filter is_while vc_attrs) in
       Scanf.sscanf attr.attr_string "loop:%[^:]:%d:%d:%d:%d"
         Loc.user_position in
@@ -1221,7 +1264,7 @@ class clean = object (self)
     Some (Not v)
   method apply s vs =
     opt_bind_all (List.map self#value vs) @@ fun vs ->
-    Some (Apply (s, vs))
+    Some (concrete_apply s vs)
   method cond b t1 t2 =
     Option.bind (self#value b) @@ fun b ->
     Option.bind (self#value t1) @@ fun t1 ->
@@ -1279,13 +1322,12 @@ type raw_model_parser = printing_info -> string -> model_element list
 
 
 let debug_elements elts =
-  let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true
-    ~filter_similar:false in
+  let print_elements = print_model_elements ~sep:Pp.semi ~print_attrs:true in
   Debug.dprintf debug "@[<v>Elements:@ %a@]@." print_elements elts;
   elts
 
 let debug_files files =
-  let print_file = print_model_file ~filter_similar:false ~print_attrs:true in
+  let print_file = print_model_file ~print_attrs:true in
    Debug.dprintf debug "@[<v>Files:@ %a@]@."
      (Pp.print_list Pp.newline print_file) (Mstr.bindings files);
    files

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -29,13 +29,15 @@ let () = Exn_printer.register
     (fun fmt e ->
       match e with
       | Parse_error s ->
-          Format.fprintf fmt "Parsing error: %s" s
+          Format.fprintf fmt "@[Parsing error:@ @[`%s`@]@]" s
       | Arg_expected (ty, s) ->
-          Format.fprintf fmt "Argument expected of type: %s\n Argument given: %s" ty s
+          Format.fprintf fmt "Argument expected of type: `%s`\n Argument given: `%s`" ty s
       | Arg_theory_not_found s ->
-          Format.fprintf fmt "Theory not found %s" s
+          Format.fprintf fmt "Theory not found `%s`" s
       | Arg_expected_none s ->
-          Format.fprintf fmt "Argument expected of type %s. None were given." s
+          Format.fprintf fmt "Argument expected of type `%s`. None were given." s
+      | Arg_error s ->
+          Format.fprintf fmt "@[General argument error:@ @[`%s`@].@]" s
       | _ -> raise e)
 
 open Wstdlib

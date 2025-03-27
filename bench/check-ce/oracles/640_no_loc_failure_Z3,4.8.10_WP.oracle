@@ -2,12 +2,12 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
-- Checked model 1: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65)
 File "bench/check-ce/640_no_loc_failure.mlw", line 5, characters 39-65:
 Goal wrong.
-Prover result is: Step limit exceeded (500007 steps).
+Prover result is: Unknown (sat) (1349 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -34,28 +34,28 @@ File 640_no_loc_failure.mlw:
       x = (42:t)
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `wrong'lemma` at "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 39-65)
-  - Abstract RAC: STUCK (failure in postcondition of `wrong'lemma` at "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 39-65)
-- Checked model 1: BAD_CE
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 12, characters 39-65:
 Goal wrong.
-Prover result is: Step limit exceeded (500007 steps).
+Prover result is: Unknown (sat) (1349 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
-  - Concrete RAC: STUCK (failure in postcondition of `wrong'lemma1` at "bench/check-ce/640_no_loc_failure.mlw", line 19, characters 22-48)
-  - Abstract RAC: STUCK (failure in postcondition of `wrong'lemma1` at "bench/check-ce/640_no_loc_failure.mlw", line 19, characters 22-48)
-- Checked model 1: BAD_CE
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 File "bench/check-ce/640_no_loc_failure.mlw", line 19, characters 22-48:
 Goal wrong.
-Prover result is: Step limit exceeded (500007 steps).
+Prover result is: Unknown (sat) (1349 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

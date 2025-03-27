@@ -238,6 +238,9 @@ module type S =
     val fold_left: ('b -> key -> 'a -> 'b) -> 'b -> 'a t -> 'b
     (** same as {!fold} but in the order of [List.fold_left] *)
 
+    val fold_right : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    (** same as {!fold} but in the right-to-left direction *)
+
     val fold2_inter: (key -> 'a -> 'b -> 'c -> 'c) -> 'a t -> 'b t -> 'c -> 'c
     (** fold the common keys of two map at the same time *)
 

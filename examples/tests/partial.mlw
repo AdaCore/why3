@@ -1,0 +1,10 @@
+module S
+
+use int.Int
+use string.OCaml
+
+let partial s (text: string) : ()
+= let (ghost n) = length text in
+  assert { n >= 0 }
+
+end

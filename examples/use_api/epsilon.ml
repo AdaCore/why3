@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -93,6 +93,11 @@ let my_tasks : Task.task list =
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
 
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
+
 let alt_ergo : Whyconf.config_prover =
   let fp = Whyconf.parse_filter_prover "Alt-Ergo" in
   let provers = Whyconf.filter_provers config fp in
@@ -113,8 +118,7 @@ let alt_ergo_driver : Driver.driver =
 let () =
   List.iteri (fun i t ->
       let call =
-        Driver.prove_task ~limit:Call_provers.empty_limit
-          ~config:main
+        Driver.prove_task ~limits ~config:main
           ~command:alt_ergo.Whyconf.command alt_ergo_driver t in
       let r = Call_provers.wait_on_call call in
       printf "@[On task %d, Alt-ergo answers %a@]@." (succ i)

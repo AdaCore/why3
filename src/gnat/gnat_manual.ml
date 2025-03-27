@@ -119,7 +119,7 @@ let editor_command (prover: Whyconf.prover) fn =
   in
   let cmd_line = Gnat_config.join " "
      (editor.Whyconf.editor_command :: editor.Whyconf.editor_options) in
-  let limit = Call_provers.empty_limit in
+  let limit = Call_provers.empty_limits in
   let cmd, _, _ = 
     Call_provers.actualcommand 
       ~inplace:false

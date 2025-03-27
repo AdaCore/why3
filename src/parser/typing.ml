@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -536,6 +536,19 @@ let type_term_in_namespace ns km crcmap t =
 
 let type_fmla_in_namespace ns km crcmap f =
   let f = dterm ns km crcmap no_gvars None Dterm.denv_empty f in
+  Dterm.fmla ~strict:true ~keep_loc:true f
+
+let type_term_in_denv ns km crcmap denv t =
+  let t = dterm ns km crcmap no_gvars None denv t in
+  Dterm.term ~strict:true ~keep_loc:true t
+
+let check_term_in_denv ns km crcmap denv t ty =
+  let t = dterm ns km crcmap no_gvars None denv t in
+  let t_assert = Dterm.dterm crcmap (DTcast (t, Dterm.dty_of_ty ty)) in
+  Dterm.term ~strict:true ~keep_loc:true t_assert
+
+let type_fmla_in_denv ns km crcmap denv f =
+  let f = dterm ns km crcmap no_gvars None denv f in
   Dterm.fmla ~strict:true ~keep_loc:true f
 
 
@@ -1698,25 +1711,25 @@ let rec add_decl muc env file d =
       let ity = ity_of_pty muc pty in
       let xs = create_xsymbol (create_user_id id) ~mask ity in
       add_pdecl ~vc muc (create_exn_decl xs)
-  | Ptree.Duseexport use ->
-      use_export muc (find_module env file use)
+  | Ptree.Duseexport (loc, use) ->
+      use_export muc (Loc.try3 ~loc find_module env file use)
   | Ptree.Dcloneexport (loc, use, inst) ->
-      let m = find_module env file use in
+      let m = Loc.try3 ~loc find_module env file use in
       warn_clone_not_abstract (qloc use) m.mod_theory;
       begin try clone_export ~loc muc m (type_inst muc m inst)
       with e -> raise (Loc.Located (loc, e)) end
-  | Ptree.Duseimport (_loc,import,uses) ->
+  | Ptree.Duseimport (loc,import,uses) ->
       let add_import muc (m, q) =
         let import = import || q = None in
         let muc = open_scope muc (use_as m q).id_str in
-        let m = find_module env file m in
+        let m = Loc.try3 ~loc find_module env file m in
         let muc = use_export muc m in
         close_scope muc ~import in
       List.fold_left add_import muc uses
   | Ptree.Dcloneimport (loc,import,qid,as_opt,inst) ->
       let import = import || as_opt = None in
       let muc = open_scope muc (use_as qid as_opt).id_str in
-      let m = find_module env file qid in
+      let m = Loc.try3 ~loc find_module env file qid in
       warn_clone_not_abstract (qloc qid) m.mod_theory;
       begin try
         let muc = clone_export ~loc muc m (type_inst muc m inst) in
@@ -1831,28 +1844,39 @@ let intf_mod_inst muc intf =
         { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
       with Not_found -> raise (Symbol_not_found ls.ls_name) in
 
+    let add_exn inst xs =
+      try
+        let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
+        { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
+      with Not_found -> raise (Symbol_not_found xs.xs_name) in
+
     let add_routine inst rs =
       try
         let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
         { inst with mi_rs = Mrs.add rs rs' inst.mi_rs }
       with Not_found ->
-        if Strings.has_suffix "'lemma" rs.rs_name.id_string
+        if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
         then inst (* do not raise for let lemma induced by lemmas *)
         else raise (Symbol_not_found rs.rs_name) in
 
     let aux_pure inst = function
       | { d_node = Dtype tys } -> add_type inst tys
       | { d_node = Dparam ls } -> add_logic inst ls
-      | { d_node = Dprop _ | Dlogic _ } -> inst
-      | _ -> raise Invalid_unit in
+      | { d_node = Dprop _ } -> inst
+      | { d_node = Dlogic lds } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst lds
+      | { d_node = Dind (_, ids) } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst ids
+      | { d_node = Ddata _ } -> assert false (* does not appear as PDpure *) in
 
     let aux_unit inst = function
       | Udecl { pd_node = PDtype its_defn; _ } ->
          List.fold_left (fun i d  -> add_type i d.itd_its.its_ts) inst its_defn
-      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDexn xs; _ } -> add_exn inst xs
       | Udecl { pd_node = PDpure; pd_pure; _ } ->
          List.fold_left aux_pure inst pd_pure
-      | Udecl _ -> raise Invalid_unit
+      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise Invalid_unit
       | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
       | Uscope (s, ul) ->
          let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
@@ -1892,7 +1916,7 @@ let close_module loc =
        let muc = clone_export muc mintf inst in
        let muc = close_scope ~import:false muc in
        let id_str =
-         Strings.remove_suffix "'impl" muc.muc_theory.uc_name.id_string in
+         Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.id_string in
        let id = id_fresh id_str in
        let m' = create_module slice.env ~path:slice.path id in
        let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in

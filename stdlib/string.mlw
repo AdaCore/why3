@@ -439,6 +439,8 @@ module Char
   axiom extensionality [@W:non_conservative_extension:N]:
     forall s1 s2. eq_string s1 s2 -> s1 = s2
 
+  meta extensionality predicate eq_string
+
   function make (size: int) (v: char) : string
 
   axiom make_length: forall size v. size >= 0 ->

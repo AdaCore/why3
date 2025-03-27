@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,9 +24,9 @@
   let add_attr id l = (* id.id_ats is usually nil *)
     { id with id_ats = List.rev_append id.id_ats l }
 
-  let id_anonymous loc = { id_str = "_"; id_ats = []; id_loc = loc }
+  let id_anonymous loc = Ptree_helpers.ident ~loc "_"
 
-  let mk_id id s e = { id_str = id; id_ats = []; id_loc = floc s e }
+  let mk_id id s e = Ptree_helpers.ident ~loc:(floc s e) id
 
   let get_op  q s e = Qident (mk_id (Ident.op_get q) s e)
   let upd_op  q s e = Qident (mk_id (Ident.op_update q) s e)
@@ -34,9 +34,9 @@
   let rcut_op q s e = Qident (mk_id (Ident.op_rcut q) s e)
   let lcut_op q s e = Qident (mk_id (Ident.op_lcut q) s e)
 
-  let mk_pat  d s e = { pat_desc  = d; pat_loc  = floc s e }
-  let mk_term d s e = { term_desc = d; term_loc = floc s e }
-  let mk_expr d s e = { expr_desc = d; expr_loc = floc s e }
+  let mk_pat  d s e = Ptree_helpers.pat ~loc:(floc s e) d
+  let mk_term d s e = Ptree_helpers.term ~loc:(floc s e) d
+  let mk_expr d s e = Ptree_helpers.expr ~loc:(floc s e) d
 
   let variant_union v1 v2 = match v1, v2 with
     | _, [] -> v1
@@ -44,18 +44,7 @@
     | _, ({term_loc = loc},_)::_ -> Loc.errorm ~loc
         "multiple `variant' clauses are not allowed"
 
-  let empty_spec = {
-    sp_pre     = [];
-    sp_post    = [];
-    sp_xpost   = [];
-    sp_reads   = [];
-    sp_writes  = [];
-    sp_alias   = [];
-    sp_variant = [];
-    sp_checkrw = false;
-    sp_diverge = false;
-    sp_partial = false;
-  }
+  let empty_spec = Ptree_helpers.empty_spec
 
   let spec_union s1 s2 = {
     sp_pre     = s1.sp_pre @ s2.sp_pre;
@@ -69,10 +58,6 @@
     sp_diverge = s1.sp_diverge || s2.sp_diverge;
     sp_partial = s1.sp_partial || s2.sp_partial;
   }
-
-  let break_id    = "'Break"
-  let continue_id = "'Continue"
-  let return_id   = "'Return"
 
   let apply_return pat sp =
     let apply = function
@@ -90,6 +75,10 @@
 
   let ghost part = (part = Ghost)
 
+  let apply_ghost part e =
+    if part <> Ghost then e else
+    { e with expr_desc = Eghost e }
+
   let apply_partial_sp part sp =
     if part <> Partial then sp else
     { sp with sp_partial = true }
@@ -105,6 +94,9 @@
           Loc.errorm ~loc:e.expr_loc
             "this expression cannot be declared partial" in
     { e with expr_desc = ed }
+
+  let apply_ghost_partial part e =
+    apply_partial part (apply_ghost part e)
 
   let we_attr = Ident.create_attribute "expl:witness existence"
 
@@ -341,7 +333,7 @@
 %nonassoc prec_no_else
 %nonassoc DOT ELSE RETURN
 %nonassoc prec_no_spec
-%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT
+%nonassoc REQUIRES ENSURES RETURNS RAISES READS WRITES ALIAS DIVERGES VARIANT PARTIAL
 %nonassoc below_LARROW
 %nonassoc LARROW
 %nonassoc below_COMMA
@@ -387,7 +379,8 @@ See also `plugins/cfg/cfg_parser.mly`
 
 %public use_clone_parsing_only:
 | USE EXPORT tqualid
-    { (Duseexport $3) }
+    { let loc = floc $startpos $endpos in
+      (Duseexport (loc,$3)) }
 | CLONE EXPORT tqualid clone_subst
     { let loc = floc $startpos $endpos in
       (Dcloneexport (loc,$3, $4)) }
@@ -879,19 +872,19 @@ minus_numeral:
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl)
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
 | VAL ghost kind sym_binder mk_expr(const_decl)
-    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+    { Dlet ($4, ghost $2, $3, apply_ghost_partial $2 $5) }
 | VAL ghost REF ref_binder mk_expr(const_decl)
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Dlet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee) }
+      Dlet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee) }
 | LET ghost kind attrs(lident_rich) mk_expr(fun_defn)
     { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
 | LET ghost kind sym_binder const_defn
-    { Dlet ($4, ghost $2, $3, apply_partial $2 $5) }
+    { Dlet ($4, ghost $2, $3, apply_ghost_partial $2 $5) }
 | LET ghost REF ref_binder const_defn
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Dlet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee) }
+      Dlet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee) }
 | LET REC with_list1(rec_defn)
     { Drec $3 }
 | EXCEPTION attrs(uident_nq)
@@ -920,7 +913,7 @@ rec_defn:
 | ghost kind attrs(lident_rich) binders return_opt spec EQUAL spec seq_expr
     { let pat, ty, mask = $5 in
       let spec = apply_return pat (spec_union $6 $8) in
-      let id = mk_id return_id $startpos($7) $endpos($7) in
+      let id = mk_id Ptree_helpers.return_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id, mask, $9) } in
       $3, ghost $1, $2, $4, ty, pat, mask, apply_partial_sp $1 spec, e }
 
@@ -928,7 +921,7 @@ fun_defn:
 | binders return_opt spec EQUAL spec seq_expr
     { let pat, ty, mask = $2 in
       let spec = apply_return pat (spec_union $3 $5) in
-      let id = mk_id return_id $startpos($4) $endpos($4) in
+      let id = mk_id Ptree_helpers.return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, mask, $6) } in
       Efun ($1, ty, pat, mask, spec, e) }
 
@@ -1047,10 +1040,15 @@ single_expr_:
         | Por (p,q) -> Por (push p, q)
         | _ -> Pghost pat) in
       let pat = if ghost $2 then push $4 else $4 in
+      let rec ghostify_rhs pat = match pat.pat_desc with
+        | Pghost _ -> { $6 with expr_desc = Eghost $6 }
+        | Pcast (p,_) -> ghostify_rhs p
+        | _ -> $6 in
+      let rhs = apply_partial $2 (ghostify_rhs pat) in
       let loc = floc $startpos($3) $endpos($3) in
-      simplify_let_pattern ~loc $3 (apply_partial $2 $6) pat $8 }
+      simplify_let_pattern ~loc $3 rhs pat $8 }
 | LET ghost kind attrs(lident_op_nq) const_defn IN seq_expr
-    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+    { Elet ($4, ghost $2, $3, apply_ghost_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_nq) mk_expr(fun_defn) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | LET ghost kind attrs(lident_op_nq) mk_expr(fun_defn) IN seq_expr
@@ -1058,11 +1056,11 @@ single_expr_:
 | LET ghost REF ref_binder const_defn IN seq_expr
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
+      Elet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee, $7) }
 | LET REC with_list1(rec_defn) IN seq_expr
     { Erec ($3, $5) }
 | FUN binders spec ARROW spec seq_expr
-    { let id = mk_id return_id $startpos($4) $endpos($4) in
+    { let id = mk_id Ptree_helpers.return_id $startpos($4) $endpos($4) in
       let e = { $6 with expr_desc = Eoptexn (id, Ity.MaskVisible, $6) } in
       let p = mk_pat Pwild $startpos $endpos in
       Efun ($2, None, p, Ity.MaskVisible, spec_union $3 $5, e) }
@@ -1085,11 +1083,11 @@ single_expr_:
 | VAL ghost kind attrs(lident_rich) mk_expr(fun_decl) IN seq_expr
     { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
 | VAL ghost kind sym_binder mk_expr(const_decl) IN seq_expr
-    { Elet ($4, ghost $2, $3, apply_partial $2 $5, $7) }
+    { Elet ($4, ghost $2, $3, apply_ghost_partial $2 $5, $7) }
 | VAL ghost REF ref_binder mk_expr(const_decl) IN seq_expr
     { let rf = mk_expr Eref $startpos($3) $endpos($3) in
       let ee = { $5 with expr_desc = Eapply (rf, $5) } in
-      Elet ($4, ghost $2, Expr.RKnone, apply_partial $2 ee, $7) }
+      Elet ($4, ghost $2, Expr.RKnone, apply_ghost_partial $2 ee, $7) }
 | MATCH seq_expr WITH ext_match_cases END
     { let bl, xl = $4 in
       let bl = if bl = [] then
@@ -1102,7 +1100,7 @@ single_expr_:
     { Eexn ($2, fst $3, snd $3, $5) }
 | LABEL id = attrs(uident) IN e = seq_expr
     { let cont e =
-        let id = { id with id_str = id.id_str ^ continue_id } in
+        let id = { id with id_str = id.id_str ^ Ptree_helpers.continue_id } in
         { e with expr_desc = Eoptexn (id, Ity.MaskVisible, e) } in
       let rec over_loop e = { e with expr_desc = over_loop_desc e }
       and over_loop_desc e = match e.expr_desc with
@@ -1114,30 +1112,30 @@ single_expr_:
         | Eoptexn (id, mask, e1) -> Eoptexn (id, mask, over_loop e1)
         | Ewhile (e1, inv, var, e2) ->
             let e = { e with expr_desc = Ewhile (e1, inv, var, cont e2) } in
-            let id = { id with id_str = id.id_str ^ break_id } in
+            let id = { id with id_str = id.id_str ^ Ptree_helpers.break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | Efor (i, ef, dir, et, inv, e1) ->
             let e = { e with expr_desc = Efor (i,ef,dir,et,inv,cont e1) } in
-            let id = { id with id_str = id.id_str ^ break_id } in
+            let id = { id with id_str = id.id_str ^ Ptree_helpers.break_id } in
             Eoptexn (id, Ity.MaskVisible, e)
         | d -> d in
       Elabel (id, over_loop e) }
 | WHILE seq_expr DO loop_annotation loop_body DONE
-    { let id_b = mk_id break_id $startpos($3) $endpos($3) in
-      let id_c = mk_id continue_id $startpos($3) $endpos($3) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($3) $endpos($3) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($3) $endpos($3) in
       let e = { $5 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $5) } in
       let e = mk_expr (Ewhile ($2, fst $4, snd $4, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR var_binder EQUAL seq_expr for_dir seq_expr DO invariant* loop_body DONE
-    { let id_b = mk_id break_id $startpos($7) $endpos($7) in
-      let id_c = mk_id continue_id $startpos($7) $endpos($7) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($7) $endpos($7) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($7) $endpos($7) in
       let e = { $9 with expr_desc = Eoptexn (id_c, Ity.MaskVisible, $9) } in
       let e = mk_expr (Efor ($2, $4, $5, $6, $8, e)) $startpos $endpos in
       Eoptexn (id_b, Ity.MaskVisible, e) }
 | FOR pattern IN seq_expr WITH uqualid iterator
   DO loop_annotation loop_body DONE
-    { let id_b = mk_id break_id $startpos($8) $endpos($8) in
-      let id_c = mk_id continue_id $startpos($8) $endpos($8) in
+    { let id_b = mk_id Ptree_helpers.break_id $startpos($8) $endpos($8) in
+      let id_c = mk_id Ptree_helpers.continue_id $startpos($8) $endpos($8) in
       let mk d = mk_expr d $startpos $endpos in
       let q s = Qdot ($6, mk_id s $startpos($6) $endpos($6)) in
       let next = mk (Eidapp (q "next", [mk (Eident (Qident $7))])) in
@@ -1156,17 +1154,17 @@ single_expr_:
 | RAISE LEFTPAR uqualid expr_arg? RIGHTPAR
     { Eraise ($3, $4) }
 | RETURN ioption(contract_expr)
-    { let id = mk_id return_id $startpos($1) $endpos($1) in
+    { let id = mk_id Ptree_helpers.return_id $startpos($1) $endpos($1) in
       Eraise (Qident id, $2) }
 | BREAK ioption(uident)
     { let id = match $2 with
-        | Some id -> { id with id_str = id.id_str ^ break_id }
-        | None -> mk_id break_id $startpos($1) $endpos($1) in
+        | Some id -> { id with id_str = id.id_str ^ Ptree_helpers.break_id }
+        | None -> mk_id Ptree_helpers.break_id $startpos($1) $endpos($1) in
       Eraise (Qident id, None) }
 | CONTINUE ioption(uident)
     { let id = match $2 with
-        | Some id -> { id with id_str = id.id_str ^ continue_id }
-        | None -> mk_id continue_id $startpos($1) $endpos($1) in
+        | Some id -> { id with id_str = id.id_str ^ Ptree_helpers.continue_id }
+        | None -> mk_id Ptree_helpers.continue_id $startpos($1) $endpos($1) in
       Eraise (Qident id, None) }
 | TRY seq_expr WITH bar_list1(exn_handler) END
     { Ematch ($2, [], $4) }
@@ -1312,6 +1310,8 @@ single_spec:
     { { empty_spec with sp_xpost = [floc $startpos($3) $endpos($3), $3] } }
 | DIVERGES
     { { empty_spec with sp_diverge = true } }
+| PARTIAL
+    { { empty_spec with sp_partial = true } }
 | variant
     { { empty_spec with sp_variant = $1 } }
 
@@ -1468,11 +1468,11 @@ ref_binder: (* let ref and val ref *)
 | uident                  { Qident $1 }
 | uqualid DOT uident      { Qdot ($1, $3) }
 
-lqualid:
+%public lqualid:
 | lident                  { Qident $1 }
 | uqualid DOT lident      { Qdot ($1, $3) }
 
-lqualid_rich:
+%public lqualid_rich:
 | lident                  { Qident $1 }
 | lident_op               { Qident $1 }
 | uqualid DOT lident      { Qdot ($1, $3) }
@@ -1536,7 +1536,7 @@ sident:
 | STRING          { mk_id $1 $startpos $endpos }
 (* TODO: we can add all keywords and save on quotes *)
 
-quote_lident:
+%public quote_lident:
 | QUOTE_LIDENT    { mk_id $1 $startpos $endpos }
 
 (* Symbolic operation names *)

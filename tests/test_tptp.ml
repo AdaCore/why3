@@ -151,9 +151,3 @@ let () =
     | e ->
       eprintf "Parsing error: %a@." Exn_printer.exn_printer e;
       exit 2
-
-(*
-Local Variables:
-compile-command: "ocamlc -I /home/cmarche/.opam/4.02.1/lib/zip -I /home/cmarche/.opam/4.02.1/lib/menhirLib -I ../lib/why3 -I ../plugins/tptp unix.cma nums.cma dynlink.cma str.cma menhirLib.cmo zip.cma why3.cma tptp_ast.cmo tptp_typing.cmo tptp_parser.cmo tptp_lexer.cmo test_tptp.ml -o test_tptp"
-End:
-*)

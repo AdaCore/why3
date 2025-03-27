@@ -1,15 +1,67 @@
 :x: marks a potential source of incompatibility
 
+Version 1.8.0, December 11, 2024
+--------------------------------
+
 Standard library
   * new library `ufloat`: unbounded floating-point numbers
+  * new library `coma`: standard library of the plugin Coma
+  * additional operators in library `fmap`
+  * added 16-bit integers in `mach/int`
+  * added a program equality in `bool`
+  * added meta annotations for "unused dependencies", which usually
+    improve proof automation but very rarely may lose some proofs :x:
+  * made most `(==)` operators trigger the `extensionality` transformation :x:
 
 Core
-  * extended notion of strategies: goal-oriented strategies
+  * records and range types now have some predefined symbol `foo'eq`
+    and some axiom `foo'inj` to express injectivity. See manual
+    Section "The WhyML Language Reference/Record Types".
+
+Transformations
+  * new transformation `extensionality` to help with equality proofs
 
 Plugins
-  * new goal-oriented strategy `forward_propagation` to automatically
-    propagate rounding errors in formulas involving unbounded
-    floats. See examples in `examples/numeric`
+  * new task-oriented strategy `forward_propagation` to automatically
+    propagate rounding errors
+  * new frontend plugin "Coma"
+
+Provers
+  * Alt-Ergo FPA requires Alt-Ergo >= 2.5.4
+  * drop support for versions of Coq < 8.16
+  * support for Coq 8.19 (released Jan 24, 2024)
+  * support for Z3 4.13 (released Mar 7, 2024)
+  * support for CVC5 1.2 (released Aug 8, 2024)
+  * support for Coq 8.20 (released Sep 11, 2024)
+  * support for Alt-Ergo 2.6 (released Sep 24, 2024)
+
+Tools
+  * `why3 prove`: dropped option `--json-model-values` :x:
+  * `why3 execute`: added option `--rac-memlimit`;
+    the `--rac-prover` option no longer supports specifying a time limit
+    and memory limit :x:
+  * `why3 pp`: the LaTeX output now shows algebraic types and logic definitions
+  * `why3 pp`: dropped option `--kind` :x:
+
+Extraction
+  * added support for Java, see Manual, Section "Executing WhyML Programs"
+  * improved extraction to C: floating-point numbers, global variables
+
+API
+  * changed how resource limits are specified :x
+  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x
+
+Miscellaneous
+  * dependency on OCaml library `num` was replaced by `zarith`
+
+Version 1.7.2, April 18, 2024
+-----------------------------
+
+Bug fixes
+  * restored the legacy shortcut for Alt-Ergo 2.5
+  * fixed various bugs in the lexer of `why3 doc`
+  * made prover detection more reliable when paths need escaping
+
 
 Version 1.7.1, January 20, 2024
 -------------------------------

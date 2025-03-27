@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
@@ -12,8 +13,9 @@
 <theory name="Th1">
  <goal name="l_false">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1610623"/></proof>
- <proof prover="2"><result status="unknown" time="0.010000" steps="0"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="1484113"/></proof>
+ <proof prover="2"><result status="unknown" time="0.004299" steps="0"/></proof>
+ <proof prover="3" timelimit="1"><result status="unknown" time="0.010000" steps="6"/></proof>
  <proof prover="4"><result status="timeout" time="1.000000"/></proof>
  <proof prover="6"><result status="unknown" time="0.010000"/></proof>
  </goal>
@@ -21,15 +23,17 @@
 <theory name="Th2">
  <goal name="mem_integer">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1532018"/></proof>
- <proof prover="2"><result status="unknown" time="0.000000" steps="2"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="1383076"/></proof>
+ <proof prover="2"><result status="unknown" time="0.010203" steps="2"/></proof>
+ <proof prover="3"><result status="timeout" time="5.000000" steps="104479"/></proof>
  <proof prover="4"><result status="timeout" time="1.000000"/></proof>
  <proof prover="6"><result status="timeout" time="1.000000"/></proof>
  </goal>
  <goal name="foo">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1834675"/></proof>
- <proof prover="2"><result status="unknown" time="0.000000" steps="0"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="1604114"/></proof>
+ <proof prover="2"><result status="unknown" time="0.003895" steps="0"/></proof>
+ <proof prover="3"><result status="timeout" time="5.000000" steps="82505"/></proof>
  <proof prover="4"><result status="timeout" time="1.000000"/></proof>
  <proof prover="6"><result status="unknown" time="0.020000"/></proof>
  </goal>
@@ -37,8 +41,9 @@
 <theory name="Th3">
  <goal name="foo">
  <proof prover="0"><result status="unknown" time="0.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="410958"/></proof>
- <proof prover="2"><result status="unknown" time="0.000000" steps="0"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000" steps="406775"/></proof>
+ <proof prover="2"><result status="unknown" time="0.003676" steps="0"/></proof>
+ <proof prover="3" timelimit="1"><result status="unknown" time="0.000000" steps="2"/></proof>
  <proof prover="4"><result status="unknown" time="0.020000"/></proof>
  <proof prover="6"><result status="unknown" time="0.000000"/></proof>
  </goal>

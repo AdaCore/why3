@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -31,7 +31,7 @@ type prover_answer =
   | StepLimitExceeded
   | Unknown of string
   | Failure of string
-  | HighFailure
+  | HighFailure of string
 (* END{proveranswer} anchor for automatic documentation, do not remove *)
 
 (* BEGIN{proverresult} anchor for automatic documentation, do not remove *)
@@ -46,14 +46,14 @@ type prover_result = {
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
 (* BEGIN{resourcelimit} anchor for automatic documentation, do not remove *)
-type resource_limit = {
+type resource_limits = {
   limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
 }
 (* END{resourcelimit} anchor for automatic documentation, do not remove *)
 
-let empty_limit = { limit_time = 0. ; limit_mem = 0; limit_steps = 0 }
+let empty_limits = { limit_time = 0. ; limit_mem = 0; limit_steps = 0 }
 
 let limit_max =
   let single_limit_max a b = if a = 0 || b = 0 then 0 else max a b in
@@ -156,7 +156,7 @@ let print_prover_answer fmt = function
   | StepLimitExceeded -> fprintf fmt "Step@ limit@ exceeded"
   | Unknown s -> fprintf fmt "Unknown@ (%s)" s
   | Failure s -> fprintf fmt "Failure@ (%s)" s
-  | HighFailure -> pp_print_string fmt "High failure"
+  | HighFailure s -> fprintf fmt "High failure (%s)" s
 
 let print_prover_status fmt = function
   | Unix.WSTOPPED n -> fprintf fmt "stopped by signal %d" n
@@ -197,13 +197,14 @@ let print_prover_result ?(json=false) fmt r =
     let color = match r.pr_answer with | Valid -> "green" | Invalid -> "red" | _ -> "cyan" in
     fprintf fmt "@{<bold %s>%a@}@ (%.2fs%a)"
       color print_prover_answer r.pr_answer r.pr_time print_steps r.pr_steps;
-    if r.pr_answer == HighFailure then
-      fprintf fmt ",@\nProver@ exit@ status:@ %a@\nprover@ output:@\n%s@\n"
-        print_prover_status r.pr_status r.pr_output
+    match r.pr_answer with
+    | HighFailure s ->
+      fprintf fmt "HighFailure (%s),@\nProver@ exit@ status:@ %a@\nprover@ output:@\n%s@\n"
+        s print_prover_status r.pr_status r.pr_output
+    | _ -> ()
 
 let rec grep out l = match l with
-  | [] ->
-      HighFailure
+  | [] -> HighFailure "no match found from given regexps"
   | (re,pa) :: l ->
       begin try
         ignore (Re.Str.search_forward re out 0);
@@ -211,7 +212,7 @@ let rec grep out l = match l with
         | Valid | Invalid | Timeout | OutOfMemory | StepLimitExceeded -> pa
         | Unknown s -> Unknown (Re.Str.replace_matched s out)
         | Failure s -> Failure (Re.Str.replace_matched s out)
-        | HighFailure -> assert false
+        | HighFailure _ -> assert false
       with Not_found -> grep out l end
 
 (* Create a regexp matching the same as the union of all regexp of the list. *)
@@ -226,8 +227,7 @@ let craft_efficient_re l =
   Re.Str.regexp s
 
 let debug_print_model ~print_attrs model =
-  Debug.dprintf debug "Call_provers: %a@."
-    (print_model ~filter_similar:false ~print_attrs) model
+  Debug.dprintf debug "Call_provers: %a@." (print_model ~print_attrs) model
 
 type answer_or_model = Answer of prover_answer | Model of string
 
@@ -253,20 +253,20 @@ let analyse_result exit_result res_parser get_model out =
     | Some ans2 ->
         match ans1 with
         (* prefer any answer over HighFailure *)
-        | HighFailure -> ans2
+        | HighFailure _ -> ans2
         | _ -> ans1
   in
 
   let rec analyse saved_models saved_res l =
     match l with
     | [] ->
-        Option.value ~default:HighFailure saved_res, List.rev saved_models
+        Option.value ~default:(HighFailure "default answer") saved_res, List.rev saved_models
     | Answer Valid :: _ ->
         (* answer Valid is always a priority *)
         Valid, []
-    | Answer res :: (Answer HighFailure :: []) ->
+    | Answer res :: (Answer (HighFailure s) :: []) ->
         Debug.dprintf debug_analyse_result
-          "@[[Call_provers.analyse_result] answer followed by HighFailure:@ @[%a@]@]@."
+          "@[[Call_provers.analyse_result] answer followed by HighFailure (%s):@ @[%a@]@]@." s
           print_prover_answer res;
         (* FIXME (see https://gitlab.inria.fr/why3/why3/-/issues/648)
         This case is a specific treatment for cases when Answer HighFailure
@@ -325,7 +325,7 @@ let analyse_result exit_result res_parser get_model out =
         (* this is not supposed to happen, but it happens. Possibly because the driver is missing
            a regexp for a possible answer. Let us assume the answer is equivalent to unknown
         *)
-        record_model saved_models saved_res (Unknown "unrecognized prover answer") model_str tl
+        record_model saved_models saved_res (HighFailure "unrecognized prover answer") model_str tl
   and record_model saved_models saved_res res model_str tl =
     match get_model with
     | Some printing_info ->
@@ -349,7 +349,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
   let int_exitcode = Int64.to_int exitcode in
   let ans, models =
     let exit_result =
-      if signaled then [Answer HighFailure] else
+      if signaled then [Answer (HighFailure "signaled")] else
       try [Answer (List.assoc int_exitcode res_parser.prp_exitcodes)]
       with Not_found -> []
     in analyse_result exit_result res_parser get_model out
@@ -360,25 +360,25 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
   let tlimit = limit.limit_time in
   let stepslimit = limit.limit_steps in
   let ans, time, steps =
-
-    (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
-    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
-    match ans with
-    | HighFailure | Unknown _ | Timeout ->
-       Debug.dprintf debug
-         "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
-       Timeout, tlimit, steps
-    | _ -> ans, time, steps
-    else
-      (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
-      if stepslimit > 0 && steps >= stepslimit then
+    (* HighFailure or Unknown when steps >= stepslimit are assumed to be StepLimitExceeded *)
+    if stepslimit > 0 && steps >= stepslimit then
       match ans with
-      | HighFailure | Unknown _ | StepLimitExceeded ->
-        Debug.dprintf debug
-          "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
-        StepLimitExceeded, time, steps
+      | HighFailure _ | Unknown _ | StepLimitExceeded ->
+          Debug.dprintf debug
+            "[Call_provers.parse_prover_run] answer after %d steps >= stepslimit -> StepLimitExceeded@." steps;
+          StepLimitExceeded, time, steps
       | _ -> ans, time, steps
-      else ans, time, steps
+    else
+      (* HighFailure or Unknown close to time limit are assumed to be timeouts *)
+    if tlimit > 0.0 && time >= 0.9 *. tlimit -. 0.1 then
+      match ans with
+      | HighFailure _ | Unknown _ | Timeout ->
+          Debug.dprintf debug
+            "[Call_provers.parse_prover_run] answer after %f >= 0.9 * timelimit - 0.1 -> Timeout@." time;
+          Timeout, tlimit, steps
+      | _ -> ans, time, steps
+    else
+      ans, time, steps
   in
   (* We avoid times smaller than 1/1000000s*)
   let time = max 0.000001 time in
@@ -446,12 +446,12 @@ let actualcommand ~cleanup ~inplace ~config command limit file =
     if inplace then Sys.rename (backup_file file) file;
     raise e
 
-let _adapt_limits limit on_timelimit =
-  if limit.limit_time = empty_limit.limit_time then limit
+let adapt_limits limit on_timelimit =
+  if limit.limit_time = empty_limits.limit_time then limit
   else
     { limit with limit_time =
       (* for steps limit use 2 * t + 1 time *)
-      if limit.limit_steps <> empty_limit.limit_steps
+      if limit.limit_steps <> empty_limits.limit_steps
       then (2. *. limit.limit_time +. 1.)
       (* if prover implements time limit, use 4t + 1 *)
       else if on_timelimit then 4. *. limit.limit_time +. 1.
@@ -467,7 +467,7 @@ let gen_id =
 type save_data = {
   vc_file         : string;
   inplace         : bool;
-  limit           : resource_limit;
+  limits          : resource_limits;
   res_parser      : prover_result_parser;
   get_model       : Printer.printing_info option;
 }
@@ -490,7 +490,7 @@ let handle_answer answer =
         if save.inplace then Sys.rename (backup_file save.vc_file) save.vc_file
       end;
       let ans = parse_prover_run save.res_parser timeout time out_file exit_code
-          save.limit save.get_model in
+          save.limits save.get_model in
       id, Some ans
   | Started id ->
       id, None
@@ -506,28 +506,29 @@ type prover_call =
   | EditorCall of int
 
 let call_on_file
-      ~config ~command ~limit ~res_parser ~get_model ?(inplace=false) fin =
+      ~config ~command ~limits ~res_parser ~get_model ?(inplace=false) fin =
   let id = gen_id () in
   let cmd, use_stdin, on_timelimit =
-    actualcommand ~cleanup:true ~inplace ~config command limit fin in
+    actualcommand ~cleanup:true ~inplace ~config command limits fin in
   let save = {
     vc_file         = fin;
     inplace         = inplace;
-    limit           = limit;
+    limits          = limits;
     res_parser      = res_parser;
     get_model       = get_model;
   } in
   Hashtbl.add saved_data id save;
+  let limits = adapt_limits limits on_timelimit in
   let use_stdin = if use_stdin then Some fin else None in
   Debug.dprintf
     debug
     "Request sent to prove_client:@ timelimit=%.2f@ memlimit=%d@ cmd=@[[%a]@]@."
-    limit.limit_time limit.limit_mem
+    limits.limit_time limits.limit_mem
     (Pp.print_list Pp.comma Pp.string) cmd;
   let libdir = Whyconf.libdir config in
   send_request ~libdir ~use_stdin ~id
-                            ~timelimit:limit.limit_time
-                            ~memlimit:limit.limit_mem
+                            ~timelimit:limits.limit_time
+                            ~memlimit:limits.limit_mem
                             ~cmd;
   id
 
@@ -601,7 +602,7 @@ let rec wait_on_call = function
       let _, ret = Unix.waitpid [] pid in
       editor_result ret
 
-let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_model
+let call_on_buffer ~command ~config ~limits ~res_parser ~filename ~get_model
     ~gen_new_file ?(inplace=false) buffer =
   let fin,cin =
     if gen_new_file then
@@ -615,12 +616,12 @@ let call_on_buffer ~command ~config ~limit ~res_parser ~filename ~get_model
       end
   in
   Buffer.output_buffer cin buffer; close_out cin;
-  call_on_file ~command ~config ~limit ~res_parser ~get_model ~inplace fin
+  call_on_file ~command ~config ~limits ~res_parser ~get_model ~inplace fin
 
 let call_editor ~config ~command fin =
   let command, use_stdin, _ =
     actualcommand
-      ~cleanup:false ~inplace:false ~config command empty_limit fin
+      ~cleanup:false ~inplace:false ~config command empty_limits fin
   in
   let exec = List.hd command in
   let argarray = Array.of_list command in

@@ -1,55 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="toy_compiler.mlw"/>
 <theory name="Compiler" proved="true">
  <goal name="soundness_gen&#39;vc" expl="VC for soundness_gen" proved="true">
- <transf name="split_goal_right" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="soundness_gen&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="67"/></proof>
+  <proof prover="1"><result status="valid" time="0.023659" steps="83"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="68"/></proof>
+  <proof prover="4"><result status="valid" time="0.021553" steps="3021"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="215"/></proof>
+  <proof prover="4"><result status="valid" time="0.027911" steps="7865"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="69"/></proof>
+  <proof prover="4"><result status="valid" time="0.020118" steps="3025"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="216"/></proof>
+  <proof prover="4"><result status="valid" time="0.026882" steps="7869"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="72"/></proof>
+  <proof prover="4"><result status="valid" time="0.023366" steps="3025"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="219"/></proof>
+  <proof prover="4"><result status="valid" time="0.020221" steps="7869"/></proof>
   </goal>
   <goal name="soundness_gen&#39;vc.7" expl="postcondition" proved="true">
-  <transf name="split_goal_right" proved="true" >
+  <transf name="split_vc" proved="true" >
    <goal name="soundness_gen&#39;vc.7.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.090000" steps="14418"/></proof>
+   <proof prover="4"><result status="valid" time="0.040300" steps="28858"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.1" expl="postcondition" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.020000" steps="201"/></proof>
+   <proof prover="2"><result status="valid" time="0.073925" steps="24803"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.2" expl="postcondition" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.080000" steps="202"/></proof>
+   <proof prover="2"><result status="valid" time="0.075303" steps="24865"/></proof>
    </goal>
    <goal name="soundness_gen&#39;vc.7.3" expl="postcondition" proved="true">
-   <proof prover="1" timelimit="1"><result status="valid" time="0.060000" steps="203"/></proof>
+   <proof prover="2"><result status="valid" time="0.075493" steps="23609"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="soundness&#39;vc" expl="VC for soundness" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="42"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="soundness&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.041077" steps="24523"/></proof>
+  </goal>
+  <goal name="soundness&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2" timelimit="30"><result status="valid" time="0.106012" steps="10679"/></proof>
+  </goal>
+ </transf>
  </goal>
 </theory>
 </file>

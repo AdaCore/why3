@@ -6,62 +6,98 @@ Require HighOrd.
 Require int.Int.
 Require map.Map.
 
-(* Why3 assumption *)
-Definition unit := unit.
-
 Axiom matrix : forall (a:Type), Type.
-Parameter matrix_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (matrix a).
+Parameter matrix_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (matrix a).
 Existing Instance matrix_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> (Z -> (Z ->
-  a)).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, matrix a ->
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> a.
 
-Parameter rows: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> Z.
+Parameter rows:
+  forall {a:Type} {a_WT:WhyType a}, matrix a -> Numbers.BinNums.Z.
 
-Parameter columns: forall {a:Type} {a_WT:WhyType a}, (matrix a) -> Z.
+Parameter columns:
+  forall {a:Type} {a_WT:WhyType a}, matrix a -> Numbers.BinNums.Z.
 
-Axiom matrix'invariant : forall {a:Type} {a_WT:WhyType a},
-  forall (self:(matrix a)), (0%Z <= (rows self))%Z /\
-  (0%Z <= (columns self))%Z.
-
-(* Why3 assumption *)
-Definition valid_index {a:Type} {a_WT:WhyType a} (a1:(matrix a)) (r:Z)
-  (c:Z): Prop := ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ ((0%Z <= c)%Z /\
-  (c < (columns a1))%Z).
+Axiom matrix'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:matrix a), (0%Z <= (rows self))%Z /\ (0%Z <= (columns self))%Z.
 
 (* Why3 assumption *)
-Inductive path: (matrix bool) -> Z -> Z -> Z -> Prop :=
-  | Path_empty : forall (m:(matrix bool)) (i:Z) (j:Z) (k:Z), ((((elts m) i)
-      j) = true) -> (path m i j k)
-  | Path_cons : forall (m:(matrix bool)) (i:Z) (x:Z) (j:Z) (k:Z),
-      ((0%Z <= x)%Z /\ (x < k)%Z) -> ((path m i x k) -> ((path m x j k) ->
-      (path m i j k))).
+Definition valid_index {a:Type} {a_WT:WhyType a} (a1:matrix a)
+    (r:Numbers.BinNums.Z) (c:Numbers.BinNums.Z) : Prop :=
+  ((0%Z <= r)%Z /\ (r < (rows a1))%Z) /\ (0%Z <= c)%Z /\ (c < (columns a1))%Z.
 
-Axiom weakening : forall (m:(matrix bool)) (i:Z) (j:Z) (k1:Z) (k2:Z),
-  ((0%Z <= k1)%Z /\ (k1 <= k2)%Z) -> ((path m i j k1) -> (path m i j k2)).
+(* Why3 assumption *)
+Definition get {a:Type} {a_WT:WhyType a} (a1:matrix a) (r:Numbers.BinNums.Z)
+    (c:Numbers.BinNums.Z) : a :=
+  elts a1 r c.
+
+Parameter update:
+  forall {a:Type} {a_WT:WhyType a}, matrix a -> Numbers.BinNums.Z ->
+  Numbers.BinNums.Z -> a -> matrix a.
+
+Axiom update'spec'1 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:matrix a) (r:Numbers.BinNums.Z) (c:Numbers.BinNums.Z) (v:a),
+  ((rows (update a1 r c v)) = (rows a1)).
+
+Axiom update'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:matrix a) (r:Numbers.BinNums.Z) (c:Numbers.BinNums.Z) (v:a),
+  ((columns (update a1 r c v)) = (columns a1)).
+
+Axiom update'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:matrix a) (r:Numbers.BinNums.Z) (c:Numbers.BinNums.Z) (v:a),
+  ((elts (update a1 r c v)) =
+   (map.Map.set (elts a1) r (map.Map.set (elts a1 r) c v))).
+
+(* Why3 assumption *)
+Inductive path: matrix Init.Datatypes.bool -> Numbers.BinNums.Z ->
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> Prop :=
+  | Path_empty :
+      forall (m:matrix Init.Datatypes.bool) (i:Numbers.BinNums.Z)
+        (j:Numbers.BinNums.Z) (k:Numbers.BinNums.Z),
+      ((elts m i j) = Init.Datatypes.true) -> path m i j k
+  | Path_cons :
+      forall (m:matrix Init.Datatypes.bool) (i:Numbers.BinNums.Z)
+        (x:Numbers.BinNums.Z) (j:Numbers.BinNums.Z) (k:Numbers.BinNums.Z),
+      (0%Z <= x)%Z /\ (x < k)%Z -> path m i x k -> path m x j k ->
+      path m i j k.
+
+Axiom weakening :
+  forall (m:matrix Init.Datatypes.bool) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (k1:Numbers.BinNums.Z) (k2:Numbers.BinNums.Z),
+  (0%Z <= k1)%Z /\ (k1 <= k2)%Z -> path m i j k1 -> path m i j k2.
 
 Hint Constructors path.
 
 (* Why3 goal *)
-Theorem decomposition : forall (m:(matrix bool)) (k:Z), (0%Z <= k)%Z ->
-  forall (i:Z) (j:Z), (path m i j (k + 1%Z)%Z) -> ((path m i j k) \/ ((path m
-  i k k) /\ (path m k j k))).
+Theorem decomposition :
+  forall (m:matrix Init.Datatypes.bool) (k:Numbers.BinNums.Z),
+  (0%Z <= k)%Z -> forall (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+  path m i j (k + 1%Z)%Z -> path m i j k \/ path m i k k /\ path m k j k.
 (* Why3 intros m k h1 i j h2. *)
 intros m k hk i j h.
 remember (k+1)%Z as t in h.
 induction h.
 left; apply Path_empty; auto.
 subst k0; intuition.
-assert (case: (x=k \/ x < k)%Z) by omega. destruct case.
-subst; eauto.
+generalize (Z.lt_total x k); intros [c|[c|c]].
 left; eauto.
-assert (case: (x=k \/ x < k)%Z) by omega. destruct case.
+subst; eauto.
+auto with zarith.
+generalize (Z.lt_total x k); intros [c|[c|c]].
+right; eauto.
 subst x.
 right; eauto.
+auto with zarith.
+generalize (Z.lt_total x k); intros [c|[c|c]].
 right; eauto.
-assert (case: (x=k \/ x < k)%Z) by omega. destruct case.
 subst; eauto.
-right; eauto.
+auto with zarith.
 Qed.
 

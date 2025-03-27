@@ -101,7 +101,9 @@ and interpret_result c pa pas =
      let goal = Session_itp.get_proof_attempt_parent session pa in
      let answer = r.Call_provers.pr_answer in
      if Gnat_config.debug_prover_errors &&
-        answer = Call_provers.HighFailure &&
+        match answer with
+        | Call_provers.HighFailure _ -> true
+        | _ -> false &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
      handle_vc_result c goal (answer = Call_provers.Valid)
@@ -165,27 +167,32 @@ let all_split_subp c subp =
    Gnat_checks.clear ()
 
 let maybe_giant_step_rac ctr parent models =
+  let th =
+    parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
+    Session_itp.theory_name |> Theory.restore_theory in
+  let pm = Pmodule.restore_module th in
   if not Gnat_config.giant_step_rac then
-    List.map (fun (_,a)-> (a, None)) models
+    begin match Check_ce.last_nonempty_model th.th_known models with
+    | None -> []
+    | Some m -> [(m, None)]
+    end
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
-    let pm =
-      parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
-      Session_itp.theory_name |> Theory.restore_theory |> Pmodule.restore_module
+    let rac_limits = Call_provers.empty_limits in
+    let rac_limits =
+      match Option.map float_of_int Gnat_config.rac_timelimit with
+      | None -> rac_limits
+      | Some t -> {rac_limits with limit_time = t}
     in
-    let check_term = Rac.Why.mk_check_term_lit cnf env
-        ?why_prover:Gnat_config.rac_prover () in
+    let why_prover = Option.map (fun p -> (p, rac_limits)) Gnat_config.rac_prover in
+    let check_term = Rac.Why.mk_check_term_lit cnf env ~why_prover () in
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
-    let timelimit = Option.map float_of_int Gnat_config.rac_timelimit in
-    let rac_results = Check_ce.get_rac_results ?timelimit ~compute_term
-        ~only_giant_step:true rac env pm models in
-    let models = List.map (fun (_,_,m,_,s) -> (m,s)) rac_results in
+    let models = Check_ce.models_from_giant_step  ~limits:rac_limits ~compute_term
+        rac env pm models in
     List.map (fun model ->
     match model with
-    | (m, _) when not Gnat_config.giant_step_rac ->
-        (Gnat_counterexamples.post_clean#model m, None)
     | (m, Check_ce.RAC_not_done reason) -> (
         if Gnat_config.debug then Loc.warning warn_gnat_rac_not_done "%s@." reason;
         (Gnat_counterexamples.post_clean#model m, None)
@@ -194,7 +201,9 @@ let maybe_giant_step_rac ctr parent models =
         let res = Check_ce.RAC_done (res_state, res_log) in
         Debug.dprintf Check_ce.debug_check_ce_rac_results "%a@."
           (Check_ce.print_rac_result ?verb_lvl:None) res;
-        (Gnat_counterexamples.post_clean#model m, Some res))
+        let m = Gnat_counterexamples.post_clean#model m in
+        (* Format.eprintf "Model of exec log:@ %a@." (Model_parser.print_model ~print_attrs:false) m; *)
+        (m, Some res))
   ) models)
 
 let report_messages c check =

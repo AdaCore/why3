@@ -1,0 +1,10 @@
+module residual.ResidualOCaml
+  syntax type char    "char"
+  syntax type ostring "string"
+  syntax type Regexp.word    "REMOVE"
+
+  syntax val eq       "%1 = %2"          prec 11 11 10
+  syntax val ([])     "String.get %1 %2" prec 4 3 3
+  syntax val length   "String.length %1" prec 4 3
+  syntax val decide_mem "REMOVE"
+end

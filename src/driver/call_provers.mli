@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -30,7 +30,7 @@ type prover_answer =
       (** The prover can't determine if the task is valid *)
   | Failure of string
       (** The prover reports a failure *)
-  | HighFailure
+  | HighFailure of string
       (** An error occured during the call to the prover or none
           of the given regexps match the output of the prover *)
 
@@ -104,7 +104,7 @@ type prover_result_parser = {
 
 (** {2 Functions for calling external provers} *)
 
-type resource_limit = {
+type resource_limits = {
   limit_time  : float;
   limit_mem   : int;
   limit_steps : int;
@@ -112,12 +112,12 @@ type resource_limit = {
 (* represents the three ways a prover run can be limited: in time, memory
    and/or steps *)
 
-val empty_limit : resource_limit
+val empty_limits : resource_limits
 (* the limit object which imposes no limits. Use this object to impose no
    limits, but also to know if some concrete time, steps or memlimit actually
    means "no limit" *)
 
-val limit_max : resource_limit -> resource_limit -> resource_limit
+val limit_max : resource_limits -> resource_limits -> resource_limits
 (* return the limit object whose components represent the maximum of the
    corresponding components of the arguments *)
 
@@ -147,14 +147,14 @@ val actualcommand :
   inplace : bool ->
   config  : Whyconf.main ->
   string ->
-  resource_limit ->
+  resource_limits ->
   string ->
   string list * bool * bool
 
 val call_on_buffer :
   command         : string ->
   config          : Whyconf.main ->
-  limit           : resource_limit ->
+  limits          : resource_limits ->
   res_parser      : prover_result_parser ->
   filename        : string ->
   get_model       : Printer.printing_info option ->

@@ -1,0 +1,34 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
+  - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/ref2.mlw", line 7, characters 11-16)
+File "bench/check-ce/ref2.mlw", line 7, characters 11-16:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (6 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+Unknown location:
+    _ = ()
+File ref2.mlw:
+  Line 4:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+  Line 5:
+    Normal execution of function `ref` with args:
+      contents = 1
+    Normal execution of function `ref'mk` with args:
+      contents = 1
+  Line 6:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 1}
+      v = 2
+  Line 7:
+    Property failure at assertion with:
+

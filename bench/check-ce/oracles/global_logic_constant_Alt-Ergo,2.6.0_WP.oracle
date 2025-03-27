@@ -1,0 +1,87 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24)
+File "bench/check-ce/global_logic_constant.mlw", line 9, characters 14-24:
+Sub-goal Postcondition of goal f1'vc.
+Prover result is: Unknown (unknown) (8 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File global_logic_constant.mlw:
+  Line 6:
+    v1 = (- 1)
+Unknown location:
+    _ = ()
+File global_logic_constant.mlw:
+  Line 8:
+    _ = ()
+    Execution of main function `f1` with env:
+      _ = ()
+      zero = 0
+      one = 1
+      v1 = (- 1)
+  Line 9:
+    Property failure at postcondition of `f1` with:
+      result = (- 1)
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24)
+File "bench/check-ce/global_logic_constant.mlw", line 15, characters 14-24:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown (unknown) (10 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File global_logic_constant.mlw:
+  Line 6:
+    Constant v1 initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    v1 = 0
+  Line 12:
+    v2 = {contents= (- 1)}
+Unknown location:
+    _ = ()
+File global_logic_constant.mlw:
+  Line 14:
+    _ = ()
+    Execution of main function `f2` with env:
+      v2 = {contents= (- 1)}
+      _ = ()
+      zero = 0
+      one = 1
+      v1 = 0
+  Line 16:
+    Normal execution of function `contents` with args:
+      arg = {contents= (- 1)}
+  Line 15:
+    Property failure at postcondition of `f2` with:
+      result = (- 1)
+

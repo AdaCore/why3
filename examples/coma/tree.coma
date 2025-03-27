@@ -1,0 +1,17 @@
+use int.Int
+use int.MinMax
+use bintree.Tree
+use bintree.Height
+
+let unTree (t: tree 'a)
+    (onNode (x: 'a) (l r: tree 'a) { t = Node l x r })
+    (onLeaf { t = Empty })
+  = any
+
+let rec height_cps (t: tree 'a) {} (ret (r:int) { r = height t })
+= unTree {t}
+    (fun (x: 'a) (l r: tree 'a) ->
+        height_cps {l} (fun (hl:int) ->
+        height_cps {r} (fun (hr:int) ->
+        ret {1 + max hl hr})))
+    (-> ret {0})

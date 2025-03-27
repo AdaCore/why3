@@ -1,0 +1,15 @@
+let var_and_ref =
+  any
+  [ &p : int = 0
+  | &q : int = 1
+  | &r : int = 1
+  |  x : int = 2
+  |  y : int = 3
+  |  z : int = 5
+  | &s : int = 8 ]
+
+let f =
+  [ &p <- 42 ]
+    any
+  [  x : int = 55
+  | &p : int = 34 ]

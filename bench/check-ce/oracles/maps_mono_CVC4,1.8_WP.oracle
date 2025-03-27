@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 45, characters 14-54)
 File "bench/check-ce/maps_mono.mlw", line 45, characters 14-54:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown (unknown + incomplete) (1447 steps).
+Prover result is: Unknown (unknown + incomplete) (1421 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,31 +19,33 @@ File int.mlw:
     one = 1
 File maps_mono.mlw:
   Line 44:
-    x = {contents= fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
-    x = {contents= fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
+    x = {contents=
+         fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
+    x = {contents=
+         fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
     Execution of main function `test_map` with env:
       x = {contents=
-           fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
+           fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
       zero = 0
       one = 1
   Line 47:
     Normal execution of function `(!)` with args:
       r = {contents=
-           fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
+           fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
+             fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
 File maps_mono.mlw:
   Line 47:
     Normal execution of function `set` with args:
-      f = fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0
+      f = fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
       r = {contents=
-           fun (x:int) -> if x = 0 then 3 else if x = 1 then 3 else 0}
+           fun (x1:int) -> if x1 = 0 then 3 else if x1 = 1 then 3 else 0}
       v = (fun y -> if pure { if y = x then True else False } then v
              else f y) with f = fun (x1:int) ->
                                  if x1 = 0 then 3
@@ -61,11 +63,11 @@ File maps_mono.mlw:
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `set1` cannot be evaluated)
 - Checked model 1: NC_SW
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 51, characters 14-88)
 File "bench/check-ce/maps_mono.mlw", line 51, characters 14-88:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
-Prover result is: Unknown (unknown + incomplete) (1532 steps).
+Prover result is: Unknown (unknown + incomplete) (1506 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -78,72 +80,72 @@ File int.mlw:
 File maps_mono.mlw:
   Line 50:
     x = {contents=
-         fun (x1:int) ->
-          if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-          else fun (x2:int) -> 0}
+         fun (x2:int) ->
+          if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+          else fun (x3:int) -> 0}
     x = {contents=
-         fun (x1:int) ->
-          if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-          else fun (x2:int) -> 0}
+         fun (x2:int) ->
+          if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+          else fun (x3:int) -> 0}
     Execution of main function `test_map_multidim1` with env:
       x = {contents=
-           fun (x1:int) ->
-            if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-            else fun (x2:int) -> 0}
+           fun (x2:int) ->
+            if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+            else fun (x3:int) -> 0}
       zero = 0
       one = 1
   Line 53:
     Normal execution of function `(!)` with args:
       r = {contents=
-           fun (x1:int) ->
-            if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-            else fun (x2:int) -> 0}
+           fun (x2:int) ->
+            if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+            else fun (x3:int) -> 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             fun (x1:int) ->
-              if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-              else fun (x2:int) -> 0}
+             fun (x2:int) ->
+              if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+              else fun (x3:int) -> 0}
 File maps_mono.mlw:
   Line 53:
     Normal execution of function `get` with args:
-      f = fun (x1:int) ->
-           if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-           else fun (x2:int) -> 0
+      f = fun (x2:int) ->
+           if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+           else fun (x3:int) -> 0
       x = 1
   Line 29:
     Normal execution of function `(@)` with args:
-      u = fun (x1:int) ->
-           if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-           else fun (x2:int) -> 0
+      u = fun (x2:int) ->
+           if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+           else fun (x3:int) -> 0
       u = 1
   Line 53:
     Normal execution of function `(!)` with args:
       r = {contents=
-           fun (x1:int) ->
-            if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-            else fun (x2:int) -> 0}
+           fun (x2:int) ->
+            if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+            else fun (x3:int) -> 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             fun (x1:int) ->
-              if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-              else fun (x2:int) -> 0}
+             fun (x2:int) ->
+              if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+              else fun (x3:int) -> 0}
 File maps_mono.mlw:
   Line 53:
     Normal execution of function `set` with args:
-      f = fun (x1:int) ->
-           if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-           else fun (x2:int) -> 0
+      f = fun (x2:int) ->
+           if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+           else fun (x3:int) -> 0
       x = 0
-      v = fun (x1:int) -> 0
+      v = fun (x2:int) -> 0
     Normal execution of function `(:=)` with args:
       r = {contents=
-           fun (x1:int) ->
-            if x1 = 0 then fun (x2:int) -> if x2 = 0 then 0 else 1
-            else fun (x2:int) -> 0}
+           fun (x2:int) ->
+            if x2 = 0 then fun (x3:int) -> if x3 = 0 then 0 else 1
+            else fun (x3:int) -> 0}
       v = (fun y -> if pure { if y = x1 then True else False } then v1
              else f1 y) with f1 = fun (x2:int) ->
                                    if x2 = 0
@@ -173,7 +175,7 @@ File maps_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 56, characters 14-88)
 File "bench/check-ce/maps_mono.mlw", line 56, characters 14-88:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown (unknown + incomplete) (1907 steps).
+Prover result is: Unknown (unknown + incomplete) (1881 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -261,8 +263,8 @@ File maps_mono.mlw:
            else if x2 = 1 then fun (x3:int) -> if x3 = 1 then 3 else 0
                 else fun (x3:int) -> 0
       x = 0
-      v = (fun y -> if pure { if y = x then True else False } then v
-             else f y) with f = fun (x2:int) -> if x2 = 0 then 3 else 1, x = 0, v = 3
+      v = (fun y1 -> if pure { if y1 = x then True else False } then v
+             else f y1) with f = fun (x2:int) -> if x2 = 0 then 3 else 1, x = 0, v = 3
     Normal execution of function `(:=)` with args:
       r = {contents=
            fun (x2:int) ->
@@ -322,7 +324,7 @@ File maps_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 63, characters 14-54)
 File "bench/check-ce/maps_mono.mlw", line 63, characters 14-54:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown (unknown + incomplete) (1447 steps).
+Prover result is: Unknown (unknown + incomplete) (1421 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -382,7 +384,7 @@ File maps_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_mono.mlw", line 68, characters 14-56)
 File "bench/check-ce/maps_mono.mlw", line 68, characters 14-56:
 Sub-goal Postcondition of goal proj_map_test2'vc.
-Prover result is: Unknown (unknown + incomplete) (1564 steps).
+Prover result is: Unknown (unknown + incomplete) (1538 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -395,40 +397,40 @@ File int.mlw:
 File maps_mono.mlw:
   Line 67:
     x = {contents=
-         fun (x2:int) ->
-          if x2 = 0 then True else if x2 = 1 then True else False}
+         fun (x3:int) ->
+          if x3 = 0 then True else if x3 = 1 then True else False}
     x = {contents=
-         fun (x2:int) ->
-          if x2 = 0 then True else if x2 = 1 then True else False}
+         fun (x3:int) ->
+          if x3 = 0 then True else if x3 = 1 then True else False}
     Execution of main function `proj_map_test2` with env:
       x = {contents=
-           fun (x2:int) ->
-            if x2 = 0 then True else if x2 = 1 then True else False}
+           fun (x3:int) ->
+            if x3 = 0 then True else if x3 = 1 then True else False}
       zero = 0
       one = 1
   Line 70:
     Normal execution of function `True` with args:
     Normal execution of function `(!)` with args:
       r = {contents=
-           fun (x2:int) ->
-            if x2 = 0 then True else if x2 = 1 then True else False}
+           fun (x3:int) ->
+            if x3 = 0 then True else if x3 = 1 then True else False}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
       arg = {contents=
-             fun (x2:int) ->
-              if x2 = 0 then True else if x2 = 1 then True else False}
+             fun (x3:int) ->
+              if x3 = 0 then True else if x3 = 1 then True else False}
 File maps_mono.mlw:
   Line 70:
     Normal execution of function `set` with args:
-      f = fun (x2:int) ->
-           if x2 = 0 then True else if x2 = 1 then True else False
+      f = fun (x3:int) ->
+           if x3 = 0 then True else if x3 = 1 then True else False
       x = 0
       v = true
     Normal execution of function `(:=)` with args:
       r = {contents=
-           fun (x2:int) ->
-            if x2 = 0 then True else if x2 = 1 then True else False}
+           fun (x3:int) ->
+            if x3 = 0 then True else if x3 = 1 then True else False}
       v = (fun y -> if pure { if y = x2 then True else False } then v2
              else f2 y) with f2 = fun (x3:int) ->
                                    if x3 = 0 then True

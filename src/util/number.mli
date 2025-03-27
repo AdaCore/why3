@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -153,8 +153,7 @@ val compute_float : real_constant -> float_format -> bool * BigInt.t * BigInt.t
 (** [compute_float c fp] checks that [c] is a float literal
     representable in the format [fp].
     @return a triple [s,e,m] with [s] the sign (true if negative, false if positive),
-    [m] the significand (without the hidden bit), and [e] the biased
-    exponent.
+    [e] the biased exponent[m], and the significand (without the hidden bit).
     @raise NonRepresentableFloat if not representable. *)
 
 val check_float : real_constant -> float_format -> unit

@@ -39,10 +39,10 @@ doc:
 	$(WHY3) session html .
 
 $(MAIN).byte: $(CMO) $(MAIN).cmo
-	ocamlc -g $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ $^
+	ocamlc -g $(INCLUDE) zarith.cma why3extract.cma -o $@ $^
 
 $(MAIN).opt: $(CMX) $(MAIN).cmx
-	$(OCAMLOPT) $(INCLUDE) $(BIGINTLIB).cmxa why3extract.cmxa -o $@ $^
+	$(OCAMLOPT) $(INCLUDE) zarith.cmxa why3extract.cmxa -o $@ $^
 
 $(MAIN).cmx: $(CMX)
 
@@ -61,7 +61,7 @@ $(JSMAIN).js: $(JSMAIN).byte
 	js_of_ocaml $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
-	$(JSOCAMLC) $(INCLUDE) $(BIGINTLIB).cma why3extract.cma -o $@ -linkpkg $^
+	$(JSOCAMLC) $(INCLUDE) zarith.cma why3extract.cma -o $@ -linkpkg $^
 
 %.cmo: %.ml
 	$(JSOCAMLC) $(INCLUDE) -annot -c $<

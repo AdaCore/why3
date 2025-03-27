@@ -59,7 +59,7 @@ val steps: config_prover:Whyconf.config_prover -> int
 val back_convert_steps : prover : string -> int -> int
 (* given the raw steps a prover has taken, reconvert them to SPARK steps *)
 
-val limit: prover:Whyconf.prover -> warning:bool -> Call_provers.resource_limit
+val limit: prover:Whyconf.prover -> warning:bool -> Call_provers.resource_limits
 
 type proof_mode =
     Progressive

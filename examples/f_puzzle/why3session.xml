@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Spass" version="3.9" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="4" name="Z3" version="4.3.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="3.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="7" name="Vampire" version="0.6" timelimit="5" steplimit="0" memlimit="4000"/>
 <prover id="8" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="4000"/>
 <file format="whyml" proved="true">
@@ -17,9 +17,9 @@
  <proof prover="0"><result status="valid" time="0.010000"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.000000"/></proof>
  <proof prover="2"><result status="valid" time="0.000000"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.010000" steps="8"/></proof>
  <proof prover="4"><result status="valid" time="0.000000"/></proof>
  <proof prover="5"><result status="valid" time="0.000000"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.010000" steps="8"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.000000"/></proof>
  <proof prover="8" memlimit="1000"><result status="valid" time="0.000000"/></proof>
  </goal>
@@ -36,19 +36,19 @@
  <goal name="L4" proved="true">
  <proof prover="1"><result status="valid" time="0.000000"/></proof>
  <proof prover="2"><result status="valid" time="0.000000"/></proof>
- <proof prover="6"><result status="valid" time="0.010000" steps="6"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="17"/></proof>
  </goal>
  <goal name="I2.base" proved="true">
  <proof prover="0"><result status="valid" time="0.300000"/></proof>
  <proof prover="1" memlimit="1000"><result status="valid" time="0.000000"/></proof>
+ <proof prover="3" memlimit="1000"><result status="valid" time="0.000000" steps="12"/></proof>
  <proof prover="4"><result status="valid" time="0.000000"/></proof>
  <proof prover="5"><result status="valid" time="0.000000"/></proof>
- <proof prover="6" memlimit="1000"><result status="valid" time="0.000000" steps="11"/></proof>
  <proof prover="7" memlimit="1000"><result status="valid" time="0.010000"/></proof>
  <proof prover="8" memlimit="1000"><result status="valid" time="0.010000"/></proof>
  </goal>
  <goal name="I2.induction_step" proved="true">
- <proof prover="6" timelimit="10" memlimit="1000"><result status="valid" time="0.170000" steps="287"/></proof>
+ <proof prover="3" timelimit="10" memlimit="1000"><result status="valid" time="0.170000" steps="736"/></proof>
  </goal>
  <goal name="L5" proved="true">
  <proof prover="0" memlimit="4000"><result status="valid" time="0.010000"/></proof>
@@ -56,14 +56,14 @@
  <proof prover="8"><result status="valid" time="0.510000"/></proof>
  </goal>
  <goal name="L6" proved="true">
- <proof prover="6"><result status="valid" time="0.010000" steps="66"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="155"/></proof>
  </goal>
  <goal name="G" proved="true">
  <proof prover="1"><result status="valid" time="0.000000"/></proof>
  <proof prover="2"><result status="valid" time="0.000000"/></proof>
+ <proof prover="3"><result status="valid" time="0.000000" steps="23"/></proof>
  <proof prover="4"><result status="valid" time="0.310000"/></proof>
  <proof prover="5" memlimit="4000"><result status="valid" time="0.140000"/></proof>
- <proof prover="6"><result status="valid" time="0.000000" steps="8"/></proof>
  </goal>
 </theory>
 </file>

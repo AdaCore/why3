@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -487,42 +487,77 @@ let split_proof_right ?known_map f = split_proof (right_proof known_map) f
 let split_intro_full  ?known_map f = split_pos (full_intro known_map)  f
 let split_intro_right ?known_map f = split_pos (right_intro known_map) f
 
-let split_goal sp pr f =
+let split_goal sp pr f : decl list list =
   let make_prop f = [create_prop_decl Pgoal pr f] in
   List.map make_prop (split_proof sp f)
 
-let split_axiom sp pr f =
-  let make_prop f =
-    let pr = create_prsymbol (id_clone pr.pr_name) in
-    create_prop_decl Paxiom pr f in
+let split_axiom (dependency_metas : Sls.t Mpr.t) sp pr f : Theory.tdecl list =
+  let make_prop lsdeps f acc : Theory.tdecl list =
+    let new_pr = create_prsymbol (id_clone pr.pr_name) in
+    let metas =
+      Sls.fold (fun ls acc ->
+          Theory.(create_meta Pdecl.meta_depends [MApr new_pr; MAls ls]) :: acc)
+        lsdeps acc
+    in
+    Theory.create_decl (create_prop_decl Paxiom new_pr f) :: metas
+  in
   let sp = { sp with asym_split = false; byso_split = false } in
   match split_pos sp f with
-    | [f] -> [create_prop_decl Paxiom pr f]
-    | fl  -> List.map make_prop fl
+    | [f] -> [Theory.create_decl (create_prop_decl Paxiom pr f)]
+    | fl  ->
+        let lsdeps : Sls.t =
+          try Mpr.find pr dependency_metas
+          with Not_found -> Sls.empty
+        in
+        List.fold_right (make_prop lsdeps) fl []
 
-let split_all sp d = match d.d_node with
-  | Dprop (Pgoal, pr,f) ->  split_goal  sp pr f
-  | Dprop (Paxiom,pr,f) -> [split_axiom sp pr f]
-  | _ -> [[d]]
+let split_all dependency_metas sp d : Theory.tdecl list list =
+  match d.d_node with
+  | Dprop (Pgoal, pr,f) -> List.map (List.map Theory.create_decl) (split_goal sp pr f)
+  | Dprop (Paxiom,pr,f) -> [split_axiom dependency_metas sp pr f]
+  | _ -> [[Theory.create_decl d]]
 
-let split_premise sp d = match d.d_node with
-  | Dprop (Paxiom,pr,f) ->  split_axiom sp pr f
-  | _ -> [d]
+let split_premise dependency_metas sp d  : Theory.tdecl list =
+  match d.d_node with
+  | Dprop (Paxiom,pr,f) -> split_axiom dependency_metas sp pr f
+  | _ -> [Theory.create_decl d]
 
 let prep_goal split = Trans.store (fun t ->
   let split = split (Some (Task.task_known t)) in
   let trans = Trans.goal_l (split_goal split) in
   Trans.apply trans t)
 
-let prep_all split = Trans.store (fun t ->
-  let split = split (Some (Task.task_known t)) in
-  let trans = Trans.decl_l (split_all split) None in
-  Trans.apply trans t)
+let get_dependency_metas l =
+  List.fold_left
+    (fun metas args ->
+       match args with
+       | Theory.[MApr pr; MAls ls] ->
+           Mpr.change
+             (function None -> Some (Sls.singleton ls)
+                     | Some s -> Some (Sls.add ls s))
+             pr
+             metas
+       | _ -> assert false (* wrongly typed meta, impossible *)
+    )
+    Mpr.empty l
 
-let prep_premise split = Trans.store (fun t ->
-  let split = split (Some (Task.task_known t)) in
-  let trans = Trans.decl (split_premise split) None in
-  Trans.apply trans t)
+let prep_all split =
+  Trans.on_meta Pdecl.meta_depends
+    (fun l ->
+       let dependency_metas = get_dependency_metas l in
+       Trans.store (fun t ->
+           let split = split (Some (Task.task_known t)) in
+           let trans = Trans.tdecl_l (split_all dependency_metas split) None in
+           Trans.apply trans t))
+
+let prep_premise split =
+  Trans.on_meta Pdecl.meta_depends
+    (fun l ->
+       let dependency_metas = get_dependency_metas l in
+       Trans.store (fun t ->
+           let split = split (Some (Task.task_known t)) in
+           let trans = Trans.tdecl (split_premise dependency_metas split) None in
+           Trans.apply trans t))
 
 let split_goal_full  = prep_goal full_proof
 let split_goal_right = prep_goal right_proof

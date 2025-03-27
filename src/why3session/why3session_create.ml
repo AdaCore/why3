@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,7 +77,7 @@ let run () =
             Whyconf.Args.exit_with_usage usage_msg
   in
   let main = Whyconf.get_main config in
-  let limit =
+  let limits =
     {
       Call_provers.limit_time =
         (match !opt_timelimit with
@@ -105,7 +105,6 @@ let run () =
   let errors = ref [] in
   let add_file_and_vcs_to_session f =
     let f = Filename.concat (Sys.getcwd()) f in
-    Format.eprintf "dir = %s, f = %s@." dir f;
     let fp = Sysutil.relativize_filename dir f in
     let file_is_detached,(theories,format) =
       try false,(Session_itp.read_file env f)
@@ -119,7 +118,7 @@ let run () =
       match opt_trans with
       | [] -> (* When no transformations are left, add proof attempts *)
            List.iter (fun p ->
-              let _ = graft_proof_attempt session g p.Whyconf.prover ~limit in
+              let _ = graft_proof_attempt session g p.Whyconf.prover ~limits in
               ()) provers
       | (tname, targs) :: more_trans -> (* Apply tname and call recursively *)
       let new_task_list =

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.4.1" alternative="noBV" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -13,7 +13,7 @@
 <prover id="10" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="13" name="Alt-Ergo" version="2.3.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="13" name="Alt-Ergo" version="2.3.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="14" name="CVC4" version="1.8" alternative="counterexamples" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="16" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="17" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
@@ -127,17 +127,18 @@
  </goal>
  <goal name="G9" proved="true">
  <proof prover="6"><result status="valid" time="0.010000" steps="54"/></proof>
- <proof prover="10"><result status="valid" time="1.460000" steps="3574"/></proof>
+ <proof prover="10"><result status="valid" time="1.460000" steps="3582"/></proof>
  </goal>
  <goal name="G10" proved="true">
  <proof prover="6"><result status="valid" time="0.010000" steps="58"/></proof>
- <proof prover="10"><result status="valid" time="1.380000" steps="3368"/></proof>
+ <proof prover="10"><result status="valid" time="1.380000" steps="3376"/></proof>
  </goal>
 </theory>
 <theory name="M121_039_nonlinear">
  <goal name="test&#39;vc" expl="VC for test">
  <transf name="split_goal_right" >
   <goal name="test&#39;vc.0" expl="assertion">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="test&#39;vc.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.060000"/></proof>
@@ -171,9 +172,10 @@
   <proof prover="2"><result status="valid" time="0.262247" steps="147001"/></proof>
   </goal>
   <goal name="test&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="9"><result status="valid" time="0.160000" steps="37136"/></proof>
+  <proof prover="9"><result status="valid" time="0.160000" steps="44825"/></proof>
   </goal>
   <goal name="test&#39;vc.7" expl="assertion">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="test&#39;vc.8" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.060000"/></proof>
@@ -188,7 +190,7 @@
   <proof prover="6"><result status="valid" time="1.100000" steps="2448375"/></proof>
   </goal>
   <goal name="test&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="3.169623" steps="9448219"/></proof>
+  <proof prover="6"><result status="valid" time="3.738524" steps="9448219"/></proof>
   </goal>
  </transf>
  </goal>
@@ -197,8 +199,10 @@
  <goal name="fti&#39;vc" expl="VC for fti">
  <transf name="split_goal_right" >
   <goal name="fti&#39;vc.0" expl="postcondition">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="fti&#39;vc.1" expl="postcondition">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="fti&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.040000"/></proof>
@@ -212,8 +216,10 @@
  <goal name="fti_purely_float&#39;vc" expl="VC for fti_purely_float">
  <transf name="split_vc" >
   <goal name="fti_purely_float&#39;vc.0" expl="postcondition">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="fti_purely_float&#39;vc.1" expl="postcondition">
+  <proof prover="13"><undone/></proof>
   </goal>
   <goal name="fti_purely_float&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="16"><result status="valid" time="0.040000" steps="233"/></proof>
@@ -225,18 +231,19 @@
  <goal name="wrong">
  <proof prover="4"><result status="unknown" time="0.080000" steps="8064"/></proof>
  <proof prover="7"><result status="unknown" time="0.010000" steps="2576"/></proof>
- <proof prover="11"><result status="timeout" time="1.000000" steps="10186"/></proof>
+ <proof prover="11"><result status="timeout" time="1.000000" steps="8238"/></proof>
+ <proof prover="13"><undone/></proof>
  <proof prover="14"><result status="unknown" time="0.060000" steps="9071"/></proof>
  </goal>
  <goal name="ok" proved="true">
  <proof prover="6"><result status="valid" time="0.010000" steps="2983"/></proof>
  <proof prover="12"><result status="valid" time="0.050000" steps="17373"/></proof>
- <proof prover="13"><result status="valid" time="0.290000" steps="829"/></proof>
+ <proof prover="13" timelimit="1" obsolete="true"><result status="valid" time="0.290000" steps="829"/></proof>
  </goal>
  <goal name="more" proved="true">
  <proof prover="6"><result status="valid" time="0.010000" steps="46"/></proof>
  <proof prover="12"><result status="valid" time="0.020000" steps="545"/></proof>
- <proof prover="13"><result status="valid" time="0.310000" steps="840"/></proof>
+ <proof prover="13" timelimit="1" obsolete="true"><result status="valid" time="0.310000" steps="840"/></proof>
  </goal>
 </theory>
 </file>

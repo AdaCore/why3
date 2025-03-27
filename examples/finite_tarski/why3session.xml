@@ -1,48 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.1.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="finite_tarski.mlw"/>
 <theory name="Tarski_rec" proved="true">
  <goal name="least_fix_point&#39;vc" expl="VC for least_fix_point" proved="true">
- <proof prover="1"><result status="valid" time="0.100000" steps="843"/></proof>
+ <proof prover="0"><result status="valid" time="0.100000" steps="470"/></proof>
  </goal>
 </theory>
 <theory name="Tarski_while" proved="true">
  <goal name="least_fix_point&#39;vc" expl="VC for least_fix_point" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="least_fix_point&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.000000" steps="6"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="6"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.4" expl="loop variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="125"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="151"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="28"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="41"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="132"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="70"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="61"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="66"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="26"/></proof>
   </goal>
   <goal name="least_fix_point&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="12687"/></proof>
   </goal>
  </transf>
  </goal>

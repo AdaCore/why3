@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -15,6 +15,9 @@ open Wstdlib
 open Pmodule
 open Compile
 open Theory
+
+module Main : functor () -> sig end
+ = functor () -> struct
 
 let usage_msg =
   "-D <driver> [<file>.<Module>*.<symbol>?|-]\n\
@@ -92,11 +95,7 @@ let opt_output = match opt_modu_flat, !opt_output with
   | Modular, None ->
       eprintf "Output directory (-o) is required for modular extraction.@.";
       exit 1
-  | Modular, Some s when not (Sys.file_exists s) ->
-      eprintf
-        "Option '-o' should be given an existing directory as argument.@.";
-      exit 1
-  | Modular, Some s when not (Sys.is_directory s) ->
+  | Modular, Some s when Sys.file_exists s && not (Sys.is_directory s) ->
       eprintf "Option '-o' should be given a directory as argument.@.";
       exit 1
   | Flat, Some s when Sys.file_exists s && Sys.is_directory s ->
@@ -123,6 +122,8 @@ let get_cout_old ?fname fg m = match opt_output with
       stdout, None
   | Some f ->
       let file = Filename.concat f (fg ?fname m) in
+      Debug.dprintf Pdriver.debug "extract module to file %s@." file ;
+      Sysutil.deep_mkdir (Filename.dirname file);
       let tname = m.mod_theory.th_name.Ident.id_string in
       Debug.dprintf Pdriver.debug "extract module %s to file %s@." tname file;
       let old = if Sys.file_exists file then begin
@@ -238,10 +239,20 @@ let print_mdecls ?fname m mdecls alldeps =
     end
     else false
 
-let find_module_path mm path m = match path with
-  | [] -> Mstr.find m mm
-  | path -> let mm = Env.read_library Pmodule.mlw_language env path in
-      mod_impl env (Mstr.find m mm)
+exception UnknownModule of string
+
+let () = Exn_printer.register (fun fmt e -> match e with
+      | UnknownModule s -> fprintf fmt "unknown module: %s" s
+      | _ -> raise e)
+
+let find_module_path mm path m =
+  try
+    match path with
+    | [] -> Mstr.find m mm
+    | path -> let mm = Env.read_library Pmodule.mlw_language env path in
+              mod_impl env (Mstr.find m mm)
+  with Not_found ->
+    raise (UnknownModule m)
 
 let find_module_id mm id =
   let (path, m, _) = Pmodule.restore_path id in find_module_path mm path m
@@ -337,7 +348,7 @@ let do_extract_module ?fname m =
       let m = find_module_path Mstr.empty path str_m in
       Ident.Hid.add visited_mod m.mod_theory.th_name ();
       Ident.Hid.add visited id ();
-    with Not_found -> () in
+    with UnknownModule _ | Not_found -> () in
   (* compute dependencies of current module [m] *)
   if recurs then begin try
     Ident.Hid.add visited_mod th_name ();
@@ -412,7 +423,7 @@ let rec visit ~recurs mm id =
         Ident.Hid.add visited id ();
         if recurs then Mltree.iter_deps (visit ~recurs mm) d;
         toextract := { info_rec = recurs; info_id = id } :: !toextract
-  with Not_found -> () end
+  with UnknownModule _ | Not_found -> () end
 
 let flat_extraction mm = function
   | File fname ->
@@ -425,7 +436,8 @@ let flat_extraction mm = function
         Mstr.add s m mm in
       Mstr.fold do_m mmf mm
   | Module (path, ms) ->
-      let m = find_module_path mm path ms in (* FIXME: catch Not_found here *)
+      let m = find_module_path mm path ms in
+      (* FIXME: catch UnknownModule here *)
       let m_t = translate_module m in
       let recurs = opt_rec_single = Recursive in
       Ident.Mid.iter (fun id _ -> visit ~recurs mm id) m_t.Mltree.mod_known;
@@ -468,7 +480,7 @@ let () =
           (try
              let m = find_module_id mm id in
              Ident.Sid.iter do_preludes m.mod_used
-           with Not_found -> ());
+           with UnknownModule _ | Not_found -> ());
           let pl = Ident.Mid.find_def [] id thprelude in
           let ipl = Ident.Mid.find_def [] id thexportpre in
           print_prelude pl;
@@ -499,3 +511,7 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.register_command "extract" (module Main)

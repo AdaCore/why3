@@ -1,13 +1,15 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
 #  on linking described in file LICENSE.                           #
 #                                                                  #
 ####################################################################
+
+.DELETE_ON_ERROR:
 
 VERBOSEMAKE ?= @enable_verbose_make@
 
@@ -26,10 +28,18 @@ prefix	    = @prefix@
 exec_prefix = @exec_prefix@
 datarootdir = @datarootdir@
 
+ifneq (@OCAML_OS_TYPE@,Win32)
 BINDIR  = $(DESTDIR)@bindir@
 LIBDIR  = $(DESTDIR)@libdir@
 DATADIR = $(DESTDIR)@datarootdir@
 MANDIR  = $(DESTDIR)@mandir@
+else
+# Convert every \ to / in Windows paths so that the \ do not need to be escaped
+BINDIR  = $(subst \,/,$(DESTDIR)@bindir@)
+LIBDIR  = $(subst \,/,$(DESTDIR)@libdir@)
+DATADIR = $(subst \,/,$(DESTDIR)@datarootdir@)
+MANDIR  = $(subst \,/,$(DESTDIR)@mandir@)
+endif
 TOOLDIR = $(LIBDIR)/why3/commands
 
 # OS specific stuff
@@ -105,7 +115,7 @@ EMACS = @EMACS@
 #PSVIEWER  = @PSVIEWER@
 #PDFVIEWER = @PDFVIEWER@
 
-EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @NUMINCLUDE@ @INFERINCLUDE@ @YOJSONINCLUDES@
+EXTINCLUDES = @WHY3INCLUDE@ @REINCLUDE@ @ZIPINCLUDE@ @MENHIRINCLUDE@ @BIGINTINCLUDE@ @INFERINCLUDE@ @YOJSONINCLUDES@
 
 # warnings are enabled and non fatal by default, except:
 # - disabled:
@@ -160,8 +170,8 @@ EXTOBJS =
 EXTLIBS = menhirLib
 endif
 
-EXTLIBS += @RELIB@ unix nums dynlink result easy_format biniou yojson @ZIPLIB@ @WHY3LIB@ @INFERLIB@
-EXTPKGS = menhirLib @RELIB@ unix num dynlink yojson @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTLIBS += @RELIB@ unix zarith dynlink result easy_format biniou yojson @ZIPLIB@ @WHY3LIB@ @INFERLIB@
+EXTPKGS = menhirLib @RELIB@ unix zarith dynlink yojson @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 
 EXTCMA	= $(addsuffix .cmo,$(EXTOBJS)) $(addsuffix .cma,$(EXTLIBS))
 EXTCMXA = $(addsuffix .cmx,$(EXTOBJS)) $(addsuffix .cmxa,$(EXTLIBS))
@@ -242,8 +252,8 @@ LIB_UTIL = exn_printer mysexplib config bigInt mlmpfr_wrapper util opt lists str
 	   pp extmap extset exthtbl weakhtbl diffmap hcpt \
 	   hashcons wstdlib getopt \
 	   json_base json_parser json_lexer \
-	   debug loc lexlib print_tree \
-	   cmdline sysutil rc plugin bigInt number constant vector pqueue
+	   debug loc print_tree \
+	   cmdline sysutil lexlib rc plugin bigInt number constant vector pqueue
 
 ifeq (@enable_re@,no)
 LIBGENERATED += src/util/re.ml
@@ -270,7 +280,7 @@ LIB_BDDINFER = bddparam abstract ast interp_expression infer why3infer
 endif
 
 LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
-              c ocaml cakeml
+              c ocaml cakeml java
 
 LIB_PARSER = ptree ptree_helpers glob typing \
 		parser_messages parser typing report lexer mlw_printer \
@@ -280,7 +290,7 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		args_wrapper reduction_engine compute \
 		remove_unused detect_polymorphism \
 		fold_defs eliminate_quantifiers \
-		eliminate_definition \
+		eliminate_definition extensional \
 		abstract_quantifiers eliminate_unknown_types \
 		eliminate_unknown_lsymbols eliminate_symbol \
 		eliminate_inductive eliminate_let eliminate_if \
@@ -290,16 +300,15 @@ LIB_TRANSFORM = simplify_formula inlining split_goal \
 		encoding_sort simplify_array filter_trigger \
 		abstraction close_epsilon lift_epsilon \
 		eliminate_gnatprove_guard_epsilon \
-		eliminate_epsilon intro_projections_counterexmp \
-		instantiate_predicate smoke_detector \
+		eliminate_epsilon instantiate_predicate smoke_detector \
 		prop_curry eliminate_literal \
 		generic_arg_trans_utils case apply subst \
 		introduction ind_itp destruct cut congruence \
 		rec_logic gnat_rewrite eliminate_unused gnat_split_conj \
                 gnat_split_disj gnat_trivial \
 		eliminate_unused_hypo eliminate_literal induction induction_pr \
-		intro_vc_vars_counterexmp prepare_for_counterexmp \
-		induction induction_pr reflection keep_only_arithmetic
+		induction induction_pr prepare_for_counterexmp \
+		reflection keep_only_arithmetic
 
 LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
 	      pvs isabelle \
@@ -317,9 +326,9 @@ LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
 	      $(addprefix src/driver/, $(LIB_DRIVER)) \
 	      $(addprefix src/mlw/, $(LIB_MLW)) \
 	      $(addprefix src/infer/, $(LIB_INFER)) \
-	      $(addprefix src/bddinfer/, $(LIB_BDDINFER)) \
 	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
 	      $(addprefix src/parser/, $(LIB_PARSER)) \
+	      $(addprefix src/bddinfer/, $(LIB_BDDINFER)) \
 	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
 	      $(addprefix src/printer/, $(LIB_PRINTER)) \
 	      $(addprefix src/session/, $(LIB_SESSION))
@@ -355,35 +364,35 @@ ifeq (@enable_mpfr@,yes)
 
 ifeq (@old_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_old.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else ifeq (@enable_mpfr@,yes)
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 else
 src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 # Ocamlzip
 
 ifeq (@enable_zip@,yes)
 src/session/compress.ml: src/session/compress_z.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else
 src/session/compress.ml: src/session/compress_none.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 # sexp_conv
 
 ifeq (@enable_sexp@, yes)
 src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 else
 src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	$(CMP_CP)
+	$(HIDE)$(CMP_CP)
 endif
 
 .PHONY: initialize_messages update-parsing-error-handling
@@ -409,17 +418,24 @@ clean::
 # debug optimisation ppx
 
 ifeq (@enable_ppx@,yes)
-src/util/ppx_debug_optim: src/util/debug_optim.ml
+src/util/ppx_debug_optim$(EXE): src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
 	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
 
-src/transform/reflection.cmx: src/util/ppx_debug_optim
-src/transform/reflection.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
-src/extract/mlinterp.cmx: src/util/ppx_debug_optim
-src/extract/mlinterp.cmx: OFLAGS += -ppx src/util/ppx_debug_optim
+ifeq (@OCAML_OS_TYPE@,Win32)
+# Relative calls to executable on Windows cannot use / as path separator
+PPX_DEBUG_OPTIM_EXE = src\\util\\ppx_debug_optim$(EXE)
+else
+PPX_DEBUG_OPTIM_EXE = src/util/ppx_debug_optim$(EXE)
+endif
+
+src/transform/reflection.cmx: src/util/ppx_debug_optim$(EXE)
+src/transform/reflection.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
+src/extract/mlinterp.cmx: src/util/ppx_debug_optim$(EXE)
+src/extract/mlinterp.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
 
 clean::
-	rm -f src/util/ppx_debug_optim
+	rm -f src/util/ppx_debug_optim$(EXE)
 endif
 
 # Re
@@ -471,10 +487,12 @@ install-data::
 	$(MKDIR_P) $(DATADIR)/why3/lang
 	$(MKDIR_P) $(DATADIR)/why3/stdlib
 	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach
+	$(MKDIR_P) $(DATADIR)/why3/stdlib/mach/java
 	$(MKDIR_P) $(DATADIR)/why3/drivers
 	$(MKDIR_P) $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) stdlib/*.mlw $(DATADIR)/why3/stdlib
 	$(INSTALL_DATA) stdlib/mach/*.mlw $(DATADIR)/why3/stdlib/mach
+	$(INSTALL_DATA) stdlib/mach/java/*.mlw $(DATADIR)/why3/stdlib/mach/java
 	$(INSTALL_DATA) drivers/*.drv drivers/*.gen $(DATADIR)/why3/drivers
 	$(INSTALL_DATA) extraction_drivers/*.drv $(DATADIR)/why3/extraction_drivers
 	$(INSTALL_DATA) LICENSE $(DATADIR)/why3/
@@ -486,6 +504,7 @@ install-data::
 	$(INSTALL_DATA) share/lang/why3.lang $(DATADIR)/why3/lang/why3.lang
 	$(INSTALL_DATA) share/lang/why3c.lang $(DATADIR)/why3/lang/why3c.lang
 	$(INSTALL_DATA) share/lang/why3py.lang $(DATADIR)/why3/lang/why3py.lang
+	$(INSTALL_DATA) share/lang/coma.lang $(DATADIR)/why3/lang/coma.lang
 
 ifeq (@enable_local@,yes)
 else
@@ -544,6 +563,8 @@ endif
 PLUGGENERATED = \
 	plugins/tptp/tptp_lexer.ml \
 	plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
+	plugins/coma/coma_lexer.ml \
+	plugins/coma/coma_parser.ml plugins/coma/coma_parser.mli \
 	plugins/python/py_lexer.ml \
 	plugins/python/py_parser.ml plugins/python/py_parser.mli \
 	plugins/microc/mc_lexer.ml \
@@ -558,6 +579,7 @@ PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
+PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
 PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
 PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
@@ -568,9 +590,10 @@ PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
 
 PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
 
-PLUGINS = genequlin dimacs tptp python microc cfg forward_propagation ada_terms gnat_json
+PLUGINS = genequlin dimacs tptp python microc coma cfg forward_propagation ada_terms gnat_json
 
 TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
+COMAMODULES = $(addprefix plugins/coma/, $(PLUG_COMA))
 PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
 MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
 CFGMODULES = $(addprefix plugins/cfg/, $(PLUG_CFG))
@@ -579,6 +602,9 @@ GNATJSONMODULES := $(addprefix plugins/gnat_json/, ptree_constructors gnat_ast g
 
 TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
 TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
+
+COMACMO = $(addsuffix .cmo, $(COMAMODULES))
+COMACMX = $(addsuffix .cmx, $(COMAMODULES))
 
 PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
 PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
@@ -609,8 +635,8 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(TPTPMODULES) $(PYTHONMODULES) $(MICROCMODULES) \
-	      $(CFGMODULES) \
+	      $(TPTPMODULES) $(COMAMODULES) \
+	      $(PYTHONMODULES) $(MICROCMODULES) $(CFGMODULES) \
 	      $(ADAMODULES) $(GNATJSONMODULES)
 
 PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
@@ -618,7 +644,7 @@ PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
 PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
 PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
 
-PLUGDIRS = parser printer transform strategies tptp python microc cfg ada_terms gnat_json
+PLUGDIRS = parser printer transform strategies tptp coma python microc cfg ada_terms gnat_json
 PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
 
 ifeq (@enable_stackify@,yes)
@@ -663,6 +689,8 @@ $(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.
 $(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cma: $(TPTPCMO)
+lib/plugins/coma.cmxs: $(COMACMX)
+lib/plugins/coma.cma: $(COMACMO)
 lib/plugins/python.cmxs: $(PYTHONCMX)
 lib/plugins/python.cma: $(PYTHONCMO)
 lib/plugins/microc.cmxs: $(MICROCCMX)
@@ -730,15 +758,36 @@ install-bin::
 	$(MKDIR_P) $(TOOLDIR)
 	$(INSTALL_DATA) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST)) $(TOOLDIR)
 
-install_local:: bin/why3 $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
-
-bin/%:	bin/%.@OCAMLBEST@
-	ln -sf $(notdir $<) $@
+install_local:: bin/why3$(EXE) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 
 install_local:: share/drivers share/extraction_drivers share/stdlib
 
+ifneq (@OCAML_OS_TYPE@,Win32)
+bin/why3$(EXE): bin/why3.@OCAMLBEST@
+	ln -sf $(notdir $<) $@
+
 share/drivers share/extraction_drivers share/stdlib: share/%:
 	ln -snf ../$* $@
+else
+# On Windows with --enable-local, why3 does not find the files inside of
+# symbolic link folders. Make copies instead, and since this is not a link
+# anymore, make the copies every time the compilation is run.
+
+.PHONY: share/drivers share/extraction_drivers share/stdlib
+
+bin/why3$(EXE): bin/why3.@OCAMLBEST@
+	cp $< $@
+
+share/drivers share/extraction_drivers share/stdlib: share/%:
+	cp -r $* share/
+
+ifeq (@enable_local@,yes)
+clean::
+	rm -rf share/drivers
+	rm -rf share/extraction_drivers
+	rm -rf share/stdlib
+endif
+endif
 
 MAKEINC += $(TOOLSDEP)
 
@@ -1138,7 +1187,7 @@ COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 COQLIBS_SET_FILES = Set Cardinal Fset FsetInduction FsetInt FsetSum SetApp SetAppInt SetImp SetImpInt
 COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
-COQLIBS_MAP_FILES = Map Const Occ MapPermut MapInjection
+COQLIBS_MAP_FILES = Map Const MapExt Occ MapPermut MapInjection
 COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
 
 COQLIBS_LIST_FILES = List Length Mem Nth NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt NthNoOpt RevAppend Combine Distinct NumOcc Permut
@@ -1762,27 +1811,24 @@ trywhy3-full.tar.gz: $(addprefix src/trywhy3/, $(TRYWHY3_FULL_PACK))
 trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
-	js_of_ocaml $(JSOO_DEBUG) $<
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror $<
 
 src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, json_base.cmo json_parser.cmo json_lexer.cmo bindings.cmo worker_proto.cmo shortener.cmo trywhy3.cmo)
-	$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
-	js_of_ocaml $(JSOO_DEBUG) --extern-fs -I . -I src/trywhy3 \
-		--file=trywhy3.conf:/ \
-		--file=try_alt_ergo.drv:/ \
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror -I . -I src/trywhy3 \
+	  --extern-fs --file=trywhy3.conf:/ --file=try_alt_ergo.drv:/ \
 	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
-	+dynlink.js +toplevel.js $<
+	  +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
 
 src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
 		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
-	$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
-
-src/trywhy3/%.cmo: src/trywhy3/%.ml
-	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
-
-src/trywhy3/%.cmi: src/trywhy3/%.mli
-	$(OCAMLFIND) ocamlc $(BFLAGS) -c $<
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
 
 $(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package js_of_ocaml
 
@@ -1816,17 +1862,16 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-JSOCAMLCW=$(OCAMLFIND) ocamlc -package js_of_ocaml -package js_of_ocaml-ppx \
-        -I src/ide
-
-src/ide/why3_js.cmo: src/ide/why3_js.ml lib/why3/why3.cma
-	$(JSOCAMLCW) $(BFLAGS) -c $<
+src/ide/why3_js.cmo: BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
 
 src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
-	$(JSOCAMLCW) $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
+	$(SHOW) 'Linking  $@'
+	$(HIDE)$(OCAMLFIND) ocamlc -package js_of_ocaml \
+	  $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
 
 src/ide/why3_js.js: src/ide/why3_js.byte
-	js_of_ocaml +dynlink.js +toplevel.js $<
+	$(SHOW) 'Js_of_ocaml $<'
+	$(HIDE)js_of_ocaml --Werror +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
 
 web_ide: src/ide/why3_js.js
 
@@ -1937,14 +1982,20 @@ DOC = index zebibliography genindex \
   foreword starting whyml api install manpages syntaxref vcgen \
   input_formats exec itp technical changes
 
-DOCRST = $(DOC:%=doc/%.rst) doc/manual.bib
+DOCRST = $(DOC:%=doc/%.rst) doc/whyml2java.inc doc/manual.bib
 
 LIBDOT = $(patsubst %,doc/generated/library-%.dot, int array)
 
 doc/generated/library-%.dot: stdlib/%.mlw
 	bin/why3 pp --output=dep $< | tred > $@
 
-predoc: $(DRVDOT) $(LIBDOT)
+predoc: $(DRVDOT) $(LIBDOT) java-examples
+
+java-examples:
+	${MAKE} -C doc/javaexamples all
+
+clean-java-examples:
+	${MAKE} -C doc/javaexamples clean
 
 update-doc-png:
 	export UBUNTU_MENUPROXY=0; \
@@ -1960,10 +2011,10 @@ doc: doc/html/index.html
 
 TESTSAPIDOC = $(addsuffix .ml, $(addprefix examples/use_api/, $(APITESTS)))
 
-doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) doc/conf.py
+doc/html/index.html: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) java-examples doc/conf.py
 	$(SPHINX) -b html -d doc/.doctrees doc doc/html
 
-doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) doc/conf.py
+doc/latex/manual.tex: $(DOCRST) $(DRVDOT) $(LIBDOT) $(TESTSAPIDOC) java-examples doc/conf.py
 	$(SPHINX) -b latex -d doc/.doctrees doc doc/latex
 
 ifeq (@enable_pdf_doc@,yes)
@@ -1993,7 +2044,7 @@ doc:
 
 endif
 
-clean-doc:
+clean-doc: clean-java-examples
 	rm -rf doc/html doc/latex
 	rm -rf doc/generated/*.dot
 
@@ -2021,7 +2072,8 @@ MODULESTODOC = \
 	mlw/ity mlw/expr mlw/pdecl mlw/pmodule mlw/vc \
 	mlw/pinterp_core mlw/rac mlw/pinterp mlw/check_ce \
 	session/session_itp session/controller_itp \
-	session/itp_communication session/itp_server
+	session/itp_communication session/itp_server \
+	session/strategy
 
 ifeq (@enable_bddinfer@,yes)
 	MODULESTODOC +=	bddinfer/why3infer
@@ -2093,7 +2145,8 @@ install:: install-bash
 .PHONY: stdlibdoc
 
 STDMACHLIBS = \
-	array bv c float fxp int matrix onetime peano tagset
+	array bv c float fxp int matrix onetime peano tagset \
+        java/lang java/util
 
 STDLIBS = \
 	algebra array \
@@ -2112,6 +2165,7 @@ STDLIBS = \
 	random real ref regexp relations \
 	seq set stack string \
 	tree \
+	ufloat \
 	witness \
 	$(addprefix mach/, $(STDMACHLIBS))
 
@@ -2200,6 +2254,11 @@ pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.m
 	$(SHOW) 'Menhir $^'
 	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
 	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
+
+pl%gins/coma/coma_parser.ml pl%gins/coma/coma_parser.mli: src/parser/parser_common.mly plugins/coma/coma_parser.mly
+	$(SHOW) 'Menhir $^'
+	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/coma/coma_parser $^
+	$(HIDE)for f in plugins/coma/coma_parser.mli plugins/coma/coma_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
 
 %.ml %.mli: %.mly
 	$(SHOW) 'Menhir $<'

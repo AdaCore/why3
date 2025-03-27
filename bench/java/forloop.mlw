@@ -1,0 +1,12 @@
+module ForLoop
+  use int.Int
+  use mach.java.lang.Integer
+  use mach.java.lang.Array
+
+  let all_equal_to (a : array integer) (x : integer) : bool =
+    for i = 0 to (length a - 1) do
+      if not (a[i] = x) then
+        return false;
+    done;
+    true
+end

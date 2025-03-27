@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -299,7 +299,7 @@ type sched_pa_rec =
   { spa_contr    : controller;
     spa_id       : proofNodeID;
     spa_pr       : Whyconf.prover;
-    spa_limit    : Call_provers.resource_limit;
+    spa_limits   : Call_provers.resource_limits;
     spa_pr_scr   : string option;
     spa_callback : (proof_attempt_status -> unit);
     spa_ores     : Call_provers.prover_result option
@@ -345,7 +345,7 @@ module Hprover = Whyconf.Hprover
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
 
-let _adapt_limits ~interactive ~use_steps limits a =
+let adapt_limits ~interactive ~use_steps limits a =
   let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
     let memlimit = limits.Call_provers.limit_mem in
@@ -383,7 +383,7 @@ let _adapt_limits ~interactive ~use_steps limits a =
          | Call_provers.StepLimitExceeded
          | Call_provers.Invalid -> increased_time, increased_mem, steplimit
          | Call_provers.Failure _
-         | Call_provers.HighFailure ->
+         | Call_provers.HighFailure _ ->
             (* correct ? failures are supposed to appear quickly anyway... *)
             timelimit, memlimit, steplimit
        end
@@ -412,10 +412,10 @@ let fuzzy_proof_time nres ores =
 
 let build_prover_call spa =
   let c = spa.spa_contr in
-  let limit = spa.spa_limit in
+  let limits = spa.spa_limits in
   let (config_pr,driver) = Hprover.find c.controller_provers spa.spa_pr in
   let with_steps =
-    Call_provers.(limit.limit_steps > empty_limit.limit_steps) in
+    Call_provers.(limits.limit_steps > empty_limits.limit_steps) in
   let command =
     Whyconf.get_complete_command config_pr ~with_steps in
   match Session_itp.get_task c.controller_session spa.spa_id with
@@ -429,7 +429,7 @@ let build_prover_call spa =
     let main = Whyconf.get_main c.controller_config in
     try
       let call = Driver.prove_task ?old:spa.spa_pr_scr ~inplace ~command
-          ~limit ~interactive ~config:main driver task in
+          ~limits ~interactive ~config:main driver task in
       let pa =
         { tp_id       = spa.spa_id;
           tp_callback = spa.spa_callback;
@@ -590,7 +590,7 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~notification =
+let schedule_proof_attempt ?proof_script_filename c id pr ~limits ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -617,12 +617,16 @@ let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~noti
     end;
     callback panid s
   in
-  let ores,proof_script =
+  let adaptlimits,ores,proof_script =
     try
       let h = get_proof_attempt_ids ses id in
       let pa = Hprover.find h pr in
       let a = get_proof_attempt_node ses pa in
       let old_res = a.proof_state in
+      let config_pr,_ = Hprover.find c.controller_provers pr in
+      let interactive = config_pr.Whyconf.interactive in
+      let use_steps = Call_provers.(limits.limit_steps <> empty_limits.limit_steps) in
+      let limits = adapt_limits ~interactive ~use_steps limits a in
       let script =
         if proof_script_filename = None then
           Option.map (fun s ->
@@ -632,15 +636,15 @@ let schedule_proof_attempt ?proof_script_filename c id pr ~limit ~callback ~noti
           else
             proof_script_filename
       in
-      old_res, script
-    with Not_found | Session_itp.BadID -> None,proof_script_filename
+      limits, old_res, script
+    with Not_found | Session_itp.BadID -> limits,None,proof_script_filename
   in
-  let panid = graft_proof_attempt ~limit ses id pr in
+  let panid = graft_proof_attempt ~limits ses id pr in
   let spa =
     { spa_contr    = c;
       spa_id       = id;
       spa_pr       = pr;
-      spa_limit    = limit;
+      spa_limits   = adaptlimits;
       spa_pr_scr   = proof_script;
       spa_callback = callback panid;
       spa_ores     = ores } in
@@ -692,8 +696,8 @@ let prepare_edition c ?file pn pr ~notification =
         | Some f -> f
         | None -> create_file_rel_path c pr pn
       in
-      let limit = Call_provers.empty_limit in
-      graft_proof_attempt session pn pr ~file ~limit
+      let limits = Call_provers.empty_limits in
+      graft_proof_attempt session pn pr ~file ~limits
   in
   update_goal_node notification session pn;
   let pa = get_proof_attempt_node session panid in
@@ -819,12 +823,12 @@ let call_one_prover c (p, timelimit, memlimit, steplimit) ~callback ~notificatio
   let timelimit = Option.value ~default:(Whyconf.timelimit main) timelimit in
   let memlimit = Option.value ~default:(Whyconf.memlimit main) memlimit in
   let steplimit = Option.value ~default:0 steplimit in
-  let limit = {
+  let limits = {
     Call_provers.limit_time = timelimit;
     limit_mem  = memlimit;
     limit_steps = steplimit;
   } in
-  schedule_proof_attempt c g p ~limit ~callback ~notification
+  schedule_proof_attempt c g p ~limits ~callback ~notification
 
 let run_strategy_on_goal
     c id strat ~callback_pa ~callback_tr ~callback ~notification ~removed =
@@ -900,8 +904,8 @@ let run_strategy_on_goal
   exec_strategy 0 strat id
 
 let run_strat_on_goal
-    c id strat ~callback_pa ~callback_tr  ~callback ~notification =
-  let rec exec_strategy tree id =
+    c id strat_name strat args ~callback_pa ~callback_tr  ~callback ~notification =
+  let rec exec_tree tree id =
     match tree with
     | Sdo_nothing -> ()
     | Sapply_trans(trname,args,substrats) ->
@@ -916,7 +920,7 @@ let run_strat_on_goal
           | TSdone tid ->
               List.iter2
                 (fun s id ->
-                 let run_next () = exec_strategy s id; false in
+                 let run_next () = exec_tree s id; false in
                  S.idle ~prio:0 run_next)
                 substrats
                 (get_sub_tasks c.controller_session tid)
@@ -931,7 +935,7 @@ let run_strat_on_goal
         | TSfailed(_, NoProgress) -> (* The transformation had no effect, we apply the next strat *)
           let t = get_task c.controller_session id in
           let tree = strat c.controller_env t in
-          exec_strategy tree id;
+          exec_tree tree id;
         | TSfailed(id, e) -> (* transformation failed *)
             callback (STSfatal (trname, id, e))
         | TSscheduled -> ()
@@ -940,7 +944,7 @@ let run_strat_on_goal
               (fun id ->
                let task = get_task c.controller_session id in
                let tree = strat c.controller_env task in
-               let run_next () = exec_strategy tree id; false in
+               let run_next () = exec_tree tree id; false in
                S.idle ~prio:0 run_next)
               (get_sub_tasks c.controller_session tid)
        in
@@ -964,7 +968,7 @@ let run_strat_on_goal
               already_done := !already_done - 1;
               if !already_done = 0 then begin
                 (* proof did not succeed, goto to next step *)
-                let run_next () = exec_strategy strat id; false in
+                let run_next () = exec_tree strat id; false in
                 S.idle ~prio:0 run_next
               end
            (* should not happen *)
@@ -974,17 +978,26 @@ let run_strat_on_goal
         List.iter (fun i -> call_one_prover c i ~callback ~notification id) is
   in
   let t = get_task c.controller_session id in
-  let tree = strat c.controller_env t in
-  exec_strategy tree id;
-  callback STShalt
+  let tree = match strat with
+    | Strat s -> s c.controller_env t
+    | StratWithArgs s ->
+        let _,table = get_task_name_table c.controller_session id in
+        let lang = file_format (get_encapsulating_file c.controller_session (APn id)) in
+        try
+          s args c.controller_env table lang t
+        with
+          e -> callback (STSfatal(strat_name, id, e)); Sdo_nothing
+in
+exec_tree tree id;
+callback STShalt
 
 
 
 let schedule_pa_with_same_arguments
     c (pa: proof_attempt_node) (pn: proofNodeID) ~callback ~notification =
   let prover = pa.prover in
-  let limit = pa.limit in
-  schedule_proof_attempt c pn prover ~limit ~callback ~notification
+  let limits = pa.limits in
+  schedule_proof_attempt c pn prover ~limits ~callback ~notification
 
 let schedule_tr_with_same_arguments
     c (tr: transID) (pn: proofNodeID) ~callback ~notification =
@@ -1170,7 +1183,7 @@ let find_prover notification c goal_id pr =
         end
 
 
-let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notification =
+let replay_proof_attempt c pr limits (parid: proofNodeID) id ~callback ~notification =
   (* The replay can be done on a different machine so we need
      to check more things before giving the attempt to the scheduler *)
   match find_prover notification c parid pr with
@@ -1183,7 +1196,7 @@ let replay_proof_attempt c pr limit (parid: proofNodeID) id ~callback ~notificat
      try
        if pr' <> pr then callback id (UpgradeProver pr');
        let _ = get_task c.controller_session parid in
-       schedule_proof_attempt c parid pr' ~limit ~callback ~notification
+       schedule_proof_attempt c parid pr' ~limits ~callback ~notification
      with Not_found ->
        callback id Detached
 
@@ -1218,7 +1231,7 @@ let print_report fmt (r: report) =
       (Call_provers.print_prover_result ~json:false) new_r
 
 (* TODO to be removed when we have a better way to print *)
-let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list) =
+let replay_print fmt (lr: (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list) =
   let pp_elem fmt (id, pr, rl, report) =
     fprintf fmt "ProofNodeID: %d, Prover: %a, Timelimit?: %.2f, Result: @[<h>%a@]"
       (Obj.magic id) Whyconf.print_prover pr
@@ -1294,7 +1307,7 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
         let parid = pa.parent in
         let pr = pa.prover in
         (* If use_steps, we give only steps as a limit *)
-        let step_limit = Call_provers.(empty_limit.limit_steps) in
+        let step_limit = Call_provers.(empty_limits.limit_steps) in
         let step_limit =
           if use_steps then
             match pa.proof_state with
@@ -1302,10 +1315,10 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
             | Some r -> r.Call_provers.pr_steps
           else step_limit
         in
-        let limit = Call_provers.{pa.limit with limit_steps = step_limit } in
-        replay_proof_attempt c pr limit parid id
+        let limits = Call_provers.{pa.limits with limit_steps = step_limit } in
+        replay_proof_attempt c pr limits parid id
                              ~callback:(fun id s ->
-                                        craft_report s parid limit pa;
+                                        craft_report s parid limits pa;
                                         callback id s;
                                         if !count = 0 then
                                           final_callback !found_upgraded_prover !report)
@@ -1361,11 +1374,10 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
     raise (CannotRunBisectionOn pa_id); (* proof attempt should be valid *)
   let goal_id = pa.parent in
   let prover = pa.prover in
-  let limit = { pa.limit with
-                Call_provers.limit_steps =
-                  Call_provers.empty_limit.Call_provers.limit_steps }
+  let limits = Call_provers.{ pa.limits with
+                limit_steps = empty_limits.limit_steps }
   in
-  let timelimit = ref limit.Call_provers.limit_time in
+  let timelimit = ref limits.Call_provers.limit_time in
   let set_timelimit res =
     timelimit := res.Call_provers.pr_time in
   let bisect_end rem =
@@ -1388,7 +1400,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
           | TSdone trid ->
              match get_sub_tasks ses trid with
              | [pn] ->
-                let limit = { limit with Call_provers.limit_time = !timelimit; } in
+                let limits = { limits with Call_provers.limit_time = !timelimit; } in
                 let callback paid st =
                   callback_pa paid st;
                   begin match st with
@@ -1405,7 +1417,7 @@ let bisect_proof_attempt ~callback_tr ~callback_pa ~notification ~removed c pa_i
                        (Call_provers.print_prover_result ~json:false) res
                   end
                 in
-                schedule_proof_attempt c pn prover ~limit ~callback ~notification
+                schedule_proof_attempt c pn prover ~limits ~callback ~notification
              | _ -> assert false
           end
         in
@@ -1452,7 +1464,7 @@ later on. We do has if proof fails. *)
          callback_tr "remove" [rem] st;
          match get_sub_tasks ses trid with
          | [pn] ->
-            let limit = { limit with Call_provers.limit_time = !timelimit; } in
+            let limits = { limits with Call_provers.limit_time = !timelimit; } in
             let callback paid st =
               callback_pa paid st;
               begin
@@ -1487,7 +1499,7 @@ later on. We do has if proof fails. *)
             in
             Debug.dprintf
               debug "[Bisect] running the prover on subtask@.";
-            schedule_proof_attempt c pn prover ~limit ~callback ~notification
+            schedule_proof_attempt c pn prover ~limits ~callback ~notification
          | _ -> assert false
       end
     in

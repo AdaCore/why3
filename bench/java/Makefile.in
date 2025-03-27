@@ -1,0 +1,281 @@
+include ../../share/Makefile.config
+
+WHY3 = ../../bin/why3.$(OCAMLBEST)
+
+DEBUG_ON=--debug extraction --debug java_extraction
+
+FAILING_JAVA_GENERATED_FILES=\
+  generated/HashCodeRedef.java \
+  ${dummy}
+
+JAVA_GENERATED_FILES=\
+  generated/Print.java \
+  generated/Unreachable.java \
+  generated/UnreachableFixed.java \
+  generated/MutRec.java \
+  generated/ForLoop.java \
+  generated/Return6.java \
+  generated/Return5.java \
+  generated/Return4.java \
+  generated/Return3.java \
+  generated/ClassA.java \
+  generated/RecursiveRecord.java \
+  generated/Return2.java \
+  generated/AllAreZeros.java \
+  generated/SimpleClass.java \
+  generated/org/why3/majority/MjrtyNotFoundException.java \
+  generated/org/why3/majority/Candidate.java \
+  generated/org/why3/majority/Mjrty.java \
+  generated/MaxIntegerTest.java \
+  generated/DefaultMethods.java \
+  generated/Exception2.java \
+  generated/EqualsRedef.java \
+  generated/IgnoreRes.java \
+  generated/Exception1.java \
+  generated/ExceptionCatch.java \
+  generated/ExceptionThrow.java \
+  generated/fr/lri/whyml2java/SimpleClass.java \
+  generated/fr/labri/whyml2java/DependantClass.java \
+  generated/fr/labri/AnInterface.java \
+  generated/Recursive.java \
+  generated/Return1.java \
+  generated/IfThenElse.java \
+  generated/ErrorMissingConstructor.java \
+  generated/AnImplementation.java \
+  generated/EnumClass.java \
+  ${dummy}
+
+RUNNABLE_CLASSES=\
+  MjrtyTest \
+  MutRec \
+  Print \
+  ${dummy}
+
+RUNNABLE_OUTPUTS=${RUNNABLE_CLASSES:%=generated/%.out}
+
+ERROR_FILES=\
+  generated/HashCodeRedef.java-err \
+  generated/EqualsRedef.java-err \
+  generated/org/why3/majority/Candidate.java-err \
+  generated/org/why3/majority/Mjrty.java-err \
+  ${dummy}
+
+CLASS_FILES=\
+  $(JAVA_GENERATED_FILES:%.java=%.class) \
+  generated/MjrtyTest.class
+
+WHY3_EXTRACT_JAVA=\
+  ${WHY3} ${DEBUG_${DEBUG_MODE}} extract -D java -L . --modular --recursive
+
+WHY3_CHECK=${WHY3} prove -L .
+
+GENERATED_FILES= \
+  ${JAVA_GENERATED_FILES} \
+  ${JAVA_GENERATED_FILES:%.java=%.java.bak} \
+  ${CLASS_FILES} \
+  ${JAVA_GENERATED_FILES:%.java=%.java-err} \
+  ${CLASS_FILES:%.class=%.class-err} \
+  generated/EnumClass\$$KindOfT.class \
+  ${RUNNABLE_OUTPUTS}
+
+
+DO_EXTRACTION= \
+  mkdir -p $$(dirname $@); \
+  module=$$(basename $< .mlw).$$(basename $@ .java); \
+  expected_err=$$(echo $@ | sed -e s/generated/expected/g)-err; \
+  echo "EXTRACT $${module} from $<"; \
+  ${WHY3_EXTRACT_JAVA} -o generated $${module} 2> $@-err ; \
+  if test -s $@-err -a ! -f $${expected_err}; then cat $@-err; echo; exit 1; fi
+
+all : extract non-regression compile run
+
+#
+#  Extraction of Java classes
+# ----------------------------
+extract : ${JAVA_GENERATED_FILES}
+
+generated/Print.java : print.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Unreachable.java : unreach.mlw
+	@ $(DO_EXTRACTION)
+
+generated/UnreachableFixed.java : unreach.mlw
+	@ $(DO_EXTRACTION)
+
+generated/MutRec.java : mutrec.mlw
+	@ $(DO_EXTRACTION)
+
+generated/org/why3/majority/Candidate.java : mjrty.mlw
+	@ $(DO_EXTRACTION)
+
+generated/org/why3/majority/Mjrty.java : mjrty.mlw
+	@ $(DO_EXTRACTION)
+
+generated/org/why3/majority/MjrtyNotFoundException.java : mjrty.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Recursive.java : recursive.mlw
+	@ $(DO_EXTRACTION)
+
+generated/ExceptionCatch.java : exceptions.mlw generated/ExceptionThrow.java
+	@ $(DO_EXTRACTION)
+
+generated/ExceptionThrow.java : exceptions.mlw generated/Exception1.java generated/Exception2.java
+	@ $(DO_EXTRACTION)
+
+generated/Exception1.java generated/Exception2.java : exceptions.mlw
+	@ $(DO_EXTRACTION)
+
+generated/SimpleClass.java : simple.mlw
+	@ $(DO_EXTRACTION)
+
+generated/fr/lri/whyml2java/SimpleClass.java : simple_with_package.mlw
+	@ $(DO_EXTRACTION)
+
+generated/fr/labri/whyml2java/DependantClass.java : depclass.mlw
+	@ $(DO_EXTRACTION)
+
+generated/ForLoop.java : forloop.mlw
+	@ $(DO_EXTRACTION)
+
+generated/AllAreZeros.java : all_are_zeros.mlw
+	@ $(DO_EXTRACTION)
+
+generated/EnumClass.java : enumclass.mlw
+	@ $(DO_EXTRACTION)
+
+generated/ErrorMissingConstructor.java : missing_constructor.mlw
+	@ $(DO_EXTRACTION)
+
+generated/yet/another/MissingUseClass.java : missing_use_class.mlw
+	@ $(DO_EXTRACTION)
+
+generated/IfThenElse.java : if_then_else.mlw
+	@ $(DO_EXTRACTION)
+
+generated/MaxIntegerTest.java : max_integer.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return1.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return2.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return3.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return4.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return5.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/Return6.java : returns.mlw
+	@ $(DO_EXTRACTION)
+
+generated/RecursiveRecord.java : rectype.mlw
+	@ $(DO_EXTRACTION)
+
+generated/IgnoreRes.java : ignore.mlw
+	@ $(DO_EXTRACTION)
+
+generated/fr/labri/AnInterface.java : implements.mlw
+	@ $(DO_EXTRACTION)
+
+generated/AnImplementation.java : implements.mlw
+	@ $(DO_EXTRACTION)
+
+generated/ClassA.java : defmethods.mlw
+	@ $(DO_EXTRACTION)
+
+generated/DefaultMethods.java : defmethods.mlw
+	@ $(DO_EXTRACTION)
+
+generated/HashCodeRedef.java : defmethods.mlw
+	@ $(DO_EXTRACTION)
+
+generated/HashCodeRedef.java-err : generated/HashCodeRedef.java
+
+generated/EqualsRedef.java  : defmethods.mlw
+	@ $(DO_EXTRACTION)
+
+generated/EqualsRedef.java-err : generated/EqualsRedef.java
+
+#
+# Non-regression of generated files
+# ---------------------------------
+non-regression : extract ${JAVA_GENERATED_FILES:%=%-nr} ${ERROR_FILES:%=%-nr}
+
+generated/%-nr : generated/%
+	@ echo -n DIFF $< ...
+	@ E="$<"; R="$(<:generated/%=expected/%)"; \
+    if cmp -s $$E $$R; then \
+      echo "ok" ; \
+    else \
+      echo "fail"; \
+      diff -u $$E $$R; \
+      exit 1; \
+    fi
+
+non-regression-update : extract
+	@ echo Copying generated files to expected results
+	@ for f in ${JAVA_GENERATED_FILES} ${ERROR_FILES}; do \
+      dst=$${f/generated/expected}; \
+      dir=$$(dirname $$dst); \
+      mkdir -p $${dir}; \
+      cp $$f $$dst; \
+    done
+
+#
+# Compilation of java files
+# -------------------------
+ifneq (@JAVAC@,no)
+compile : extract ${CLASS_FILES}
+
+
+generated/MjrtyTest.class : MjrtyTest.java
+	@- echo JAVAC $<
+	@ EXERR=expected/$$(basename $@)-err; \
+	  javac -cp generated -d generated $< 2> $@-err || (test -f $${EXERR} && cmp -s $${EXERR} $@-err)
+
+
+%.class : %.java
+	@- echo JAVAC $<
+	@ EXERR=expected/$$(basename $@)-err; \
+	  javac -cp generated $< 2> $@-err || (test -f $${EXERR} && cmp -s $${EXERR} $@-err)
+
+generated/fr/labri/whyml2java/DependantClass.class : \
+   generated/fr/lri/whyml2java/SimpleClass.class
+else
+compile :
+	@echo "No java compiler found during configuration."
+endif
+
+#
+# Running java programs
+# ---------------------
+ifneq (@JAVA@,no)
+run : compile
+	@ for cls in ${RUNNABLE_CLASSES}; do \
+          echo "Running $${cls}"; \
+          java -ea -cp generated $${cls} 2>&1 > generated/$${cls}.out || exit 1; \
+          if test -f expected/$${cls}.out; then \
+            if ! cmp -s expected/$${cls}.out generated/$${cls}.out; then \
+              echo "runnable class $${cls} produced unexpected output" 1>&2 ; \
+              diff expected/$${cls}.out generated/$${cls}.out; \
+              exit 1; \
+            fi; \
+          fi; \
+        done
+else
+run :
+	@echo "No JVM (java program) found during configuration."
+endif
+
+#
+# Removal of generated files
+# --------------------------
+clean:
+	@ rm -fr ${GENERATED_FILES} generated

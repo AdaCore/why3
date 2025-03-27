@@ -112,9 +112,7 @@ module InfMatrix
     type t = t, constant zero = tzero, axiom .
 
   use int.Int
-  clone export relations.MinMax with
-    type t = int, predicate le = (<=),
-    axiom . (* FIXME: replace with "goal" and prove *)
+  use export int.MinMax
 
   type mat
 
@@ -168,7 +166,7 @@ module InfMatrix
     lemma set_def_other_colz,
     axiom . (* FIXME: replace with "goal" and prove *)
 
-  let ghost function fcreate (r c: int) (f: int -> int -> t) : mat =
+  let function fcreate (r c: int) (f: int -> int -> t) : mat =
     create (fun _ -> max 0 c) (fun _ -> max 0 r) f
 
   lemma fcreate_get_ib:
@@ -307,7 +305,7 @@ module InfIntMatrix
 
   let constant zerof : int -> int -> int = fun _ _ -> 0
 
-  let ghost constant mzero : mat = fcreate 0 0 zerof
+  let constant mzero : mat = fcreate 0 0 zerof
 
   let ghost function zerorc (r c: int) : mat = fcreate r c zerof
 

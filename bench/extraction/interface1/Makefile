@@ -5,7 +5,7 @@ WHY3 = ../../../bin/why3.$(OCAMLBEST)
 .PHONY: extract doc
 
 main.opt: interface1.ml main.ml
-	ocamlopt $(INCLUDE) $(BIGINTLIB).cmxa $^ -o main.opt
+	ocamlopt $(INCLUDE) zarith.cmxa $^ -o main.opt
 
 extract: interface1.ml
 

@@ -1,0 +1,166 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+- Selected model 2: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 32-67)
+File "bench/check-ce/algebraic_types_mono.mlw", line 6, characters 58-63:
+Goal G.
+Prover result is: Unknown (unknown) (6 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type match_t: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Ssimple (Isymbol A1)))))
+with lsymbol match_t
+Warning: Error while checking function definition type match_t: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a11)) (Ssimple (Isymbol A1)))))
+with lsymbol match_t
+Warning: Error while interpreting index_t: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
+
+Warning: Error while interpreting B_proj_1: No variable in prover_vars matching qualified identifier (Qident (Isymbol (Sprover .k0)))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_mono.mlw", line 10, characters 21-26:
+Goal g2.
+Prover result is: Unknown (unknown) (4 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type match_t: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Ssimple (Isymbol A1)))))
+with lsymbol match_t
+Warning: Error while checking function definition type match_t: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a12)) (Ssimple (Isymbol A1)))))
+with lsymbol match_t
+Warning: Error while interpreting index_t: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
+
+Warning: Error while interpreting B_proj_1: No variable in prover_vars matching qualified identifier (Qident (Isymbol (Sprover .k2)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28)
+File "bench/check-ce/algebraic_types_mono.mlw", line 12, characters 21-28:
+Goal g4.
+Prover result is: Unknown (unknown) (5 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 12:
+    x = A
+    x = A
+    Execution of main function `g4'goal` with env:
+      x = A
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 12:
+    Property failure at postcondition of `g4'goal` with:
+      x = A
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31)
+File "bench/check-ce/algebraic_types_mono.mlw", line 16, characters 21-31:
+Goal g5.
+Prover result is: Unknown (unknown) (9 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File algebraic_types_mono.mlw:
+  Line 16:
+    x = (Au 1 0)
+    x = (Au 1 0)
+    Execution of main function `g5'goal` with env:
+      x = (Au 1 0)
+      zero = 0
+      one = 1
+Unknown location:
+    Normal execution of function `Tuple0` with args:
+File algebraic_types_mono.mlw:
+  Line 16:
+    Property failure at postcondition of `g5'goal1` with:
+      x = (Au 1 0)
+
+Warning: Error while checking function definition type match_mylist: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A1)))))
+with lsymbol match_mylist
+Warning: Error while interpreting len: No variable in bound_vars matching qualified identifier (Qident (Isymbol Nil))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_mono.mlw", line 25, characters 29-38:
+Goal g1.
+Prover result is: Unknown (unknown) (10 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while checking function definition type match_mylist: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a4)) (Ssimple (Isymbol A1)))))
+with lsymbol match_mylist
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_mono.mlw", line 27, characters 29-36:
+Goal g7.
+Prover result is: Unknown (unknown) (4 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

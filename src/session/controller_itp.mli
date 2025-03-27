@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -223,7 +223,7 @@ val schedule_proof_attempt :
   controller ->
   proofNodeID ->
   Whyconf.prover ->
-  limit:Call_provers.resource_limit ->
+  limits:Call_provers.resource_limits ->
   callback:(proofAttemptID -> proof_attempt_status -> unit) ->
   notification:notifier -> unit
 (** [schedule_proof_attempt ?proof_script_filename c id p ~timelimit
@@ -292,12 +292,14 @@ val run_strategy_on_goal :
 val run_strat_on_goal :
   controller ->
   proofNodeID ->
-  (Env.env -> Task.task -> Strategy.strat) ->
+  string ->
+  Strategy.gen_strat ->
+  string list ->
   callback_pa:(proofAttemptID -> proof_attempt_status -> unit) ->
   callback_tr:(string -> string list -> transformation_status -> unit) ->
   callback:(strategy_status -> unit) ->
   notification:notifier -> unit
-(** [run_strat_on_goal c id strat] executes asynchronously the
+(** [run_strat_on_goal c id strat_name strat] executes asynchronously the
     strategy [strat] on the goal [id].  [callback_pa] is called for
     each proof attempted (as in [schedule_proof_attempt]) and
     [callback_tr] is called for each transformation applied (as in
@@ -346,7 +348,7 @@ type report =
    TODO to be removed when we have a better way to print the result of replay *)
 val replay_print:
     Format.formatter ->
-      (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list ->
+      (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list ->
         unit
 
 val replay:
@@ -359,7 +361,7 @@ val replay:
     notification:notifier ->
     final_callback:
       (bool ->
-       (proofNodeID * Whyconf.prover * Call_provers.resource_limit * report) list
+       (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list
        -> unit) -> any: Session_itp.any option ->
     unit
 (** This function reruns all the proofs of the session under the given any (None

@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 8, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 8, characters 14-28:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown (unknown + incomplete) (460 steps).
+Prover result is: Unknown (unknown + incomplete) (437 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,27 +19,27 @@ File int.mlw:
     one = 1
 File maps_poly.mlw:
   Line 7:
-    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
-    x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
+    x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
     Execution of main function `test_map` with env:
-      x = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      x = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       zero = 0
       one = 1
   Line 10:
     Normal execution of function `(!)` with args:
-      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      arg = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
 File maps_poly.mlw:
   Line 10:
     Normal execution of function `set` with args:
-      f = fun (x:int) -> if x = 1 then 3 else 0
+      f = fun (x1:int) -> if x1 = 1 then 3 else 0
       x = 0
       v = 3
     Normal execution of function `(:=)` with args:
-      r = {contents= fun (x:int) -> if x = 1 then 3 else 0}
+      r = {contents= fun (x1:int) -> if x1 = 1 then 3 else 0}
       v = (fun y -> if pure { if y = x then True else False } then v
              else f y) with f = fun (x1:int) -> if x1 = 1 then 3 else 0, x = 0, v = 3
   Line 8:
@@ -50,14 +50,14 @@ File maps_poly.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC_SW
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
 - Checked model 1: NC_SW
-  - Concrete RAC: INCOMPLETE (terminated because unexpected arguments passed to (@))
+  - Concrete RAC: INCOMPLETE (fatal rac error: unexpected arguments passed to (@))
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 14, characters 14-34)
 File "bench/check-ce/maps_poly.mlw", line 14, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim1'vc.
-Prover result is: Unknown (unknown + incomplete) (553 steps).
+Prover result is: Unknown (unknown + incomplete) (530 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -109,7 +109,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 19, characters 14-34)
 File "bench/check-ce/maps_poly.mlw", line 19, characters 14-34:
 Sub-goal Postcondition of goal test_map_multidim2'vc.
-Prover result is: Unknown (unknown + incomplete) (647 steps).
+Prover result is: Unknown (unknown + incomplete) (624 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -236,7 +236,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 26, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 26, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test1'vc.
-Prover result is: Unknown (unknown + incomplete) (460 steps).
+Prover result is: Unknown (unknown + incomplete) (437 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -286,7 +286,7 @@ File maps_poly.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/maps_poly.mlw", line 31, characters 14-28)
 File "bench/check-ce/maps_poly.mlw", line 31, characters 14-28:
 Sub-goal Postcondition of goal proj_map_test2'vc.
-Prover result is: Unknown (unknown + incomplete) (441 steps).
+Prover result is: Unknown (unknown + incomplete) (418 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -363,15 +363,10 @@ File maps_poly.mlw:
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
-- Selected model 1: INCOMPLETE
+- Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Ident (/) is not yet declared`)
 File "bench/check-ce/maps_poly.mlw", line 50, characters 36-64:
 Goal g.
 Prover result is: Unknown (sat) (243 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Ident (/) is not yet declared`):
-File maps_poly.mlw:
-  Line 50:
-    m : real -> real = [|1/10 => -1.0; _ => 0.0|]
 

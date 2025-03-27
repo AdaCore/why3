@@ -93,7 +93,7 @@ struct
             | StepLimitExceeded -> "steplimitexceeded"
             | Unknown _ -> "unknown"
             | Failure _ -> "failure"
-            | HighFailure -> "highfailure"
+            | HighFailure _ -> "highfailure"
           in
           [("answer", String answer); ("time", StandardFloat time)]
       | _ -> []
@@ -243,7 +243,7 @@ let trivial_prover =
     prover_altern = "trivial"
   }
 
-let trivial_resource_limit =
+let trivial_resource_limits =
   { Call_provers.limit_time = 1.;
     limit_mem = 1000;
     limit_steps = 1;
@@ -259,7 +259,7 @@ let trivial_result =
   }
 
 let add_trivial_proof s goal_id =
-  let _ = Session_itp.graft_proof_attempt s goal_id trivial_prover ~limit:trivial_resource_limit in
+  let _ = Session_itp.graft_proof_attempt s goal_id trivial_prover ~limits:trivial_resource_limits in
   Session_itp.update_proof_attempt (fun _ -> ()) s goal_id trivial_prover trivial_result;
   Session_itp.update_goal_node (fun _ -> ()) s goal_id
 
@@ -480,7 +480,7 @@ let has_been_tried_by s (g: goal_id) (prover: Whyconf.prover) =
        options *)
     (not pa.Session_itp.proof_obsolete &&
      pa.Session_itp.proof_state <> None &&
-     pa.Session_itp.limit =
+     pa.Session_itp.limits =
        Gnat_config.limit ~prover ~warning:warn)
   with Not_found -> false
 
@@ -977,25 +977,25 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
         C.schedule_proof_attempt
           ?proof_script_filename:proof_script_filename
           c g prover
-          ~limit:Call_provers.empty_limit ~callback ~notification
+          ~limits:Call_provers.empty_limits ~callback ~notification
       | Some old_file ->
         let _paid, _file, _ores = C.prepare_edition c ~file:old_file
           g prover ~notification in
         C.schedule_proof_attempt
           c g prover
-          ~limit:Call_provers.empty_limit ~callback ~notification
+          ~limits:Call_provers.empty_limits ~callback ~notification
     end
   else
     let check = get_check_of_goal g in
     let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
-    let limit =
+    let limits =
       match limit with
       | None -> Gnat_config.limit ~prover ~warning:warn
       | Some x -> x in
     C.schedule_proof_attempt
       ?proof_script_filename:proof_script_filename
       c g prover
-      ~limit ~callback ~notification
+      ~limits ~callback ~notification
 
 let goal_has_splits session (goal: goal_id) =
   let goal_transformations = Session_itp.get_transformations session goal in
@@ -1204,7 +1204,7 @@ let compute_replay_limit_from_pas pas =
   match pas with
   | { Call_provers.pr_steps = steps } ->
     let steps = steps + steps / 10 + 1 in
-    { Call_provers.empty_limit with
+    { Call_provers.empty_limits with
       Call_provers.limit_steps = steps }
 
 let for_some_proof_attempt pred map =
@@ -1271,14 +1271,14 @@ and replay_goal c goal =
           None in
       Option.iter (fun prover ->
           let pa_node = Session_itp.get_proof_attempt_node session pa in
-          let limit =
+          let limits =
             match pa_node.Session_itp.proof_state with
             | Some pas when pas.Call_provers.pr_answer = Call_provers.Valid ->
                 compute_replay_limit_from_pas pas
             | _ -> assert false in
           C.schedule_proof_attempt
             c goal prover
-            ~limit ~callback:(fun _ _ -> ())
+            ~limits ~callback:(fun _ _ -> ())
             ~notification:(fun _ -> ())) prover
 
 

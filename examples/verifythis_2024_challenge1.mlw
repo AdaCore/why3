@@ -1,0 +1,429 @@
+
+(** {1 VerifyThis 2024, challenge 1, Smart Array Copy by Shuffled Subsegments}
+
+  See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+  Team YYY: Jean-Christophe Filliâtre (CNRS)
+
+  Summary:
+  - Smart Array Copy version 0 implemented and verified
+  - Smart Array Copy version 1 implemented and verified
+  - Smart Array Copy version 2 not implemented
+*)
+
+use int.Int
+use int.EuclideanDivision
+use array.Array
+
+(** Permutations
+
+  Two key ideas here:
+  - A permutation is contained in a *prefix* of length `l`
+    of some array `p`.
+  - Function `permute` also returns the inverse permutation,
+    as a ghost output.
+ *)
+
+predicate permutation (l: int) (p: array int) =
+  0 <= l <= length p &&
+  (forall i. 0 <= i < l -> 0 <= p[i] < l) &&
+  (forall i j. 0 <= i < l -> 0 <= j < l -> i <> j -> p[i] <> p[j])
+
+predicate permutation_pair (l: int) (p invp: array int) =
+  permutation l p && permutation l invp &&
+  (forall i. 0 <= i < l -> p[invp[i]] = i) &&
+  (forall i. 0 <= i < l -> invp[p[i]] = i)
+
+val permute (l: int) : (p: array int, ghost invp: array int)
+  requires { l > 0 }
+  ensures  { length p = length invp = l }
+  ensures  { permutation_pair l p invp }
+
+val function identity (l: int) : array int
+  requires { l > 0 }
+  ensures  { length result = l }
+  ensures  { forall i. 0 <= i < l -> result[i] = i }
+  ensures  { permutation_pair l result result }
+
+(** The array elements belong to some uninterpreted type.
+    (In particular, they won't be confused with array indices.) *)
+type elt
+
+(** Shortcut predicates *)
+predicate valid_chunk (a: array elt) (ofs len: int) =
+  0 <= ofs <= ofs+len <= length a
+
+predicate copy (src dst: array elt) (ofs len: int) =
+  valid_chunk src ofs len && length src = length dst &&
+  forall i. ofs <= i < ofs+len -> dst[i] = src[i]
+
+(** Helper lemma function: when all subsegments are copied,
+    the whole segment is copied *)
+let lemma all_subsegments (start k l: int) (src dst: array elt)
+  (sigma invsigma: array int)
+  requires { k > 0 && l > 0 }
+  requires { valid_chunk src start (k*l) }
+  requires { length dst = length src }
+  requires { forall j. 0 <= j < l ->
+               copy src dst (start + sigma[j]*k) k }
+  requires { permutation_pair l sigma invsigma }
+  ensures  { copy src dst start (k*l) }
+= let m = k*l in
+  assert { forall i. start <= i < start + m ->
+    dst[i] = src[i]
+    (* key idea here: Euclidean division + permutation inverse *)
+    by let q = div (i - start) k in
+       let r = mod (i - start) k in
+       let j = invsigma[q] in
+       i = start + q*k + r
+    so i = start + sigma[j]*k + r
+  }
+
+(** Smart Array Copy version 0 *)
+
+let smart_array_copy_0 (n k l q r: int) (src dst: array elt) : unit
+  requires { length src = length dst = n > 0 }
+  requires { k > 0 && l > 0 && q >= 0 && 0 <= r < k*l }
+  requires { n = q * k*l + r }
+  writes   { dst }
+  ensures  { copy src dst 0 n }
+= let m = k*l in
+  for s = 0 to q - 1 do
+    invariant { copy src dst 0 (s*m) }
+    let start = s*m in
+    let sigma, invsigma = permute l in
+    for j = 0 to l - 1 do
+      invariant { copy src dst 0 (s*m) }
+      invariant {
+        forall j'. 0 <= j' < j -> copy src dst (start + sigma[j']*k) k }
+      let startj = start + sigma[j]*k in
+      for i = 0 to k - 1 do
+        invariant { copy src dst 0 (s*m) }
+        invariant {
+          forall j'. 0 <= j' < j -> copy src dst (start + sigma[j']*k) k }
+        invariant { copy src dst startj i }
+        dst[startj + i] <- src[startj + i]
+      done
+    done;
+    all_subsegments start k l src dst sigma invsigma
+  done;
+  let last = q*m in
+  for i = 0 to r - 1 do
+    invariant { copy src dst 0 (q*m) }
+    invariant { copy src dst last i }
+    dst[last + i] <- src[last + i]
+  done
+
+(** Smart Array Copy version 0, variant
+
+  This time we introduce a function `copy_chunk` that copies a chunk
+  from `src` to `dst`, possibly at different offsets. Will be reused
+  later in version 1. *)
+
+predicate copy_to (src dst: array elt) (ofss ofsd len: int) =
+  valid_chunk src ofss len && valid_chunk dst ofsd len && length src = length dst &&
+  (forall i. 0 <= i < len -> dst[ofsd + i] = src[ofss + i]) &&
+  (forall i. ofsd <= i < ofsd+len -> dst[i] = src[i + (ofss - ofsd)])
+
+let copy_chunk (src dst: array elt) (ofss ofsd len: int) : unit
+  requires { length src = length dst }
+  requires { valid_chunk src ofss len }
+  requires { valid_chunk dst ofsd len }
+  writes   { dst }
+  ensures  { copy_to src dst ofss ofsd len }
+  (* frame *)
+  ensures  { forall i. 0 <= i < ofsd -> dst[i] = (old dst)[i] }
+  ensures  { forall i. ofsd+len <= i < length dst -> dst[i] = (old dst)[i] }
+= for i = 0 to len - 1 do
+    invariant { copy_to src dst ofss ofsd i }
+    invariant { forall i. 0 <= i < ofsd -> dst[i] = (old dst)[i] }
+    invariant { forall i. ofsd+len <= i < length dst -> dst[i] = (old dst)[i] }
+    dst[ofsd + i] <- src[ofss + i]
+  done
+
+(** Re-implementation of Smart Array Copy version 0 using `copy_chunk` *)
+let smart_array_copy_0b (n k l q r: int) (src dst: array elt) : unit
+  requires { length src = length dst = n > 0 }
+  requires { k > 0 && l > 0 && q >= 0 && 0 <= r < k*l }
+  requires { n = q * k*l + r }
+  writes   { dst }
+  ensures  { copy src dst 0 n }
+= let m = k*l in
+  for s = 0 to q - 1 do
+    invariant { copy src dst 0 (s*m) }
+    let start = s*m in
+    let sigma, invsigma = permute l in
+    for j = 0 to l - 1 do
+      invariant { copy src dst 0 (s*m) }
+      invariant {
+        forall j'. 0 <= j' < j -> copy src dst (start + sigma[j']*k) k }
+      let startj = start + sigma[j]*k in
+      copy_chunk src dst startj startj k
+    done;
+    all_subsegments start k l src dst sigma invsigma
+  done;
+  let last = q*m in
+  copy_chunk src dst last last r
+
+(** Smart Array Copy version 1
+
+    The situation is as follows. We have already copied `s` segments,
+    each of length `m = kl`, and we are currently copying the `l`
+    subsegments of the next segment from `src` to `dst`.
+
+                       <------------segment s-------------->
+                        sm   sigma[j]                      (s+1)m
+    +------------------+-----------------------------------+-----------------+
+src |  already copied  |  ?  | ... |  ?  | done|  ?  | done|                 |
+    +------------------+-----------------------------------+-----------------+
+         ^   |                  |
+        p|   |invp              +-----------------+
+         |   V                                    V
+    +------------------+-----------------------------------+-----------------+
+dst |  already copied  |     |     |     |     | ... |     |                 |
+    +------------------+-----------------------------------+-----------------+
+                                            tau[sigma[j]]
+
+    The arrays `p` and `invp` maintain the permutations between `src`
+    and `dst` (`p` maps indices from `dst` to `src`, and `invp` in the
+    other way back).  These permutations are only defined for the
+    segments and subsegments already copied.
+
+*)
+
+(** We have copied `src[..size]` into `dst[..size]`,
+    according to a permutation given by `p`/`invp`. *)
+predicate copy_perm (src dst: array elt) (size: int) (p invp: array int) =
+  valid_chunk src 0 size && length src = length dst &&
+  permutation_pair size p invp &&
+  (forall i. 0 <= i < size -> 0 <=    p[i] < size) &&
+  (forall i. 0 <= i < size -> 0 <= invp[i] < size) &&
+  (forall i. 0 <= i < size -> dst[i] = src[p[i]]) &&
+  (forall i. 0 <= i < size -> src[i] = dst[invp[i]])
+
+(** We have copied subsegment `sigma[j]` to `tau[sigma[j]]`,
+    and `p`/`invp` are set accordingly. *)
+predicate copy_subsegment (src dst: array elt) (s k l j: int)
+    (sigma tau p invp: array int) =
+  (* k > 0 && 0 <= j < l && s >= 0 && *)
+  let start  = s*(k*l) in
+  let starts = start + sigma[j]*k in
+  let startd = start + tau[sigma[j]]*k in
+  copy_to src dst starts startd k &&
+  (forall i. 0 <= i < k -> p[startd+i] = starts+i) &&
+  (forall i. 0 <= i < k -> invp[starts+i] = startd+i)
+
+(** Distinct subsegments are indeed distinct, in both source
+    (`sigma`) and destination (`sigma` then `tau`). *)
+let lemma distinct_subsegments (s k l j1 j2: int) (sigma tau: array int)
+  requires { k > 0 && l > 0 && s >= 0 }
+  requires { 0 <= j1 < l && 0 <= j2 < l && j1 <> j2 }
+  requires { permutation l sigma }
+  requires { permutation l tau }
+  ensures  {
+    let start  = s*(k*l) in
+    let starts1 = start + sigma[j1]*k in
+    let startd1 = start + tau[sigma[j1]]*k in
+    let starts2 = start + sigma[j2]*k in
+    let startd2 = start + tau[sigma[j2]]*k in
+    forall i. 0 <= i < k -> starts1+i <> starts2+i && startd1+i <> startd2+i }
+= ()
+
+(** Framing lemmas *)
+
+predicate frame (a1 a2: array 'a) (ofs len: int) =
+  length a2 = length a1 &&
+  (forall i. 0 <= i < ofs -> a2[i] = a1[i]) &&
+  (forall i. ofs+len <= i < length a2 -> a2[i] = a1[i])
+
+let lemma frame_permutation_pair (start start1 start2 k: int) (op p oinvp invp: array int)
+  requires { length op = length p = length oinvp = length invp }
+  requires { 0 <= start <= start1 <= start1 + k <= length p }
+  requires { 0 <= start <= start2 <= start2 + k <= length p }
+  requires { permutation_pair start op oinvp }
+  requires { frame op    p    start1 k }
+  requires { frame oinvp invp start2 k }
+  ensures  { permutation_pair start p  invp }
+= ()
+
+let lemma frame_subsegment (src odst dst: array elt) (s k l j1 j2: int)
+     (sigma tau op p oinvp invp: array int)
+  requires { k > 0 && l > 0 && s >= 0 }
+  requires { 0 <= j1 < l && 0 <= j2 < l && j1 <> j2 }
+  requires { length op = length p = length oinvp = length invp >= (s+1)*(k*l) }
+  requires { permutation l sigma }
+  requires { permutation l tau }
+  requires { copy_subsegment src odst s k l j1 sigma tau op oinvp }
+  requires { frame odst  dst  (s*(k*l) + tau[sigma[j2]]*k) k }
+  requires { frame op    p    (s*(k*l) + tau[sigma[j2]]*k) k }
+  requires { frame oinvp invp (s*(k*l) +     sigma[j2] *k) k }
+  ensures  { copy_subsegment src dst s k l j1 sigma tau p invp }
+= ()
+
+(** Find the subsegment in `src` contains `i`. *)
+let lemma decompose_sigma (s k l: int) (sigma invsigma: array int) (i: int) :
+  (j: int, r: int)
+  requires { k > 0 && l > 0 && s >= 0 }
+  requires { permutation_pair l sigma invsigma }
+  requires { s*(k*l) <= i < (s+1)*(k*l) }
+  ensures  { 0 <= j < l && 0 <= r < k }
+  ensures  { i = s*(k*l) + sigma[j]*k + r }
+= let m = k*l in
+  let start = s*m in
+  let q = div (i - start) k in
+  let r = mod (i - start) k in
+  let j = invsigma[q] in
+  assert { 0 <= j < l && 0 <= r < k };
+  assert { i = start + q*k + r };
+  assert { i = start + sigma[j]*k + r };
+  (j, r)
+
+(** Find the subsegment in `dst` contains `i`. *)
+let lemma decompose_tau_sigma (s k l: int) (sigma invsigma tau invtau: array int) (i: int) :
+  (j: int, r: int)
+  requires { k > 0 && l > 0 && s >= 0 }
+  requires { permutation_pair l sigma invsigma }
+  requires { permutation_pair l tau   invtau   }
+  requires { s*(k*l) <= i < (s+1)*(k*l) }
+  ensures  { 0 <= j < l && 0 <= r < k }
+  ensures  { i = s*(k*l) + tau[sigma[j]]*k + r }
+= let (j, r) = decompose_sigma s k l tau invtau i in
+  (invsigma[j], r)
+
+(** And now for the most difficult part: once all subsegments are copied,
+    we have copied the the whole segment. This is similar to `all_subsegments`
+    above, but much harder, for we have permutations to be taken into
+    account now. *)
+let lemma all_subsegments_perm (src dst: array elt)
+    (s k l: int) (sigma invsigma tau invtau p invp: array int)
+  requires { k > 0 && l > 0 && s >= 0 }
+  requires { length src = length dst = length p = length invp >= (s+1)*(k*l) }
+  requires { permutation_pair l sigma invsigma }
+  requires { permutation_pair l tau   invtau   }
+  requires { copy_perm src dst (s*(k*l)) p invp }
+  requires { permutation_pair (s*(k*l)) p invp }
+  requires { forall j. 0 <= j < l ->
+               copy_subsegment src dst s k l j sigma tau p invp }
+  ensures  { permutation_pair ((s+1)*(k*l)) p invp }
+  ensures  { copy_perm src dst ((s+1)*(k*l)) p invp }
+= let m = k*l in
+  let start = s*m in
+  assert { start = (s*l) * k };
+  let lemma mulk (j1 j2: int) requires { j1 < j2 } ensures { j1*k <= j2*k - k }
+  = () in
+  let lemma decompose1 (i: int) : (j: int, r: int) requires { start <= i < start+m }
+    ensures { 0 <= j < l && 0 <= r < k && i = start + sigma[j]*k + r }
+  = decompose_sigma s k l sigma invsigma i in
+  let lemma decompose2 (i: int) : (j: int, r: int) requires { start <= i < start+m }
+    ensures { 0 <= j < l && 0 <= r < k && i = start + tau[sigma[j]]*k + r }
+  = decompose_tau_sigma s k l sigma invsigma tau invtau i in
+  let lemma pi_good (i: int) requires { start <= i < start+m }
+    ensures { start <= p[i] < start+m }
+  = let j, r = decompose2 i in
+    assert { copy_subsegment src dst s k l j sigma tau p invp };
+    assert { p[i] = start + sigma[j]*k + r } in
+  let lemma invpi_good (i: int) requires { start <= i < start+m }
+    ensures { start <= invp[i] < start+m by
+              mod 0 1 = 0  (* to keep div/mod in the context *) }
+  = let j, r = decompose1 i in
+    assert { copy_subsegment src dst s k l j sigma tau p invp };
+    assert { invp[i] = start + tau[sigma[j]]*k + r } in
+  let lemma p_injective (i1 i2: int) requires { start <= i1 < start+m }
+    requires { start <= i2 < start+m } requires { i1 <> i2 }
+    ensures { p[i1] <> p[i2] }
+  = let j1, r1 = decompose2 i1 in
+    assert { copy_subsegment src dst s k l j1 sigma tau p invp };
+    assert { p[i1] = start + sigma[j1]*k + r1 };
+    let j2, r2 = decompose2 i2 in
+    assert { copy_subsegment src dst s k l j2 sigma tau p invp };
+    assert { p[i2] = start + sigma[j2]*k + r2 };
+    if sigma[j1] < sigma[j2] then (
+      mulk sigma[j1] sigma[j2]
+    ) else if sigma[j1] > sigma[j2] then (
+      mulk sigma[j2] sigma[j1]
+    ) else (
+      assert { r1 <> r2 }
+    ) in
+  let lemma invp_injective (i1 i2: int) requires { start <= i1 < start+m }
+    requires { start <= i2 < start+m } requires { i1 <> i2 }
+    ensures { invp[i1] <> invp[i2] }
+  = let j1, r1 = decompose1 i1 in
+    assert { copy_subsegment src dst s k l j1 sigma tau p invp };
+    assert { invp[i1] = start + tau[sigma[j1]]*k + r1 };
+    let j2, r2 = decompose1 i2 in
+    assert { copy_subsegment src dst s k l j2 sigma tau p invp };
+    assert { invp[i2] = start + tau[sigma[j2]]*k + r2 };
+    if tau[sigma[j1]] < tau[sigma[j2]] then (
+      mulk tau[sigma[j1]] tau[sigma[j2]]
+    ) else if tau[sigma[j1]] > tau[sigma[j2]] then (
+      mulk tau[sigma[j2]] tau[sigma[j1]]
+    ) else (
+      assert { r1 <> r2 }
+    ) in
+  let lemma pinvp (i: int) requires { start <= i < start+m }
+    ensures { p[invp[i]] = i }
+  = let j, _r = decompose1 i in
+    assert { copy_subsegment src dst s k l j sigma tau p invp }
+  in
+  let lemma copy_i (i: int) requires { start <= i < start+m }
+    ensures { dst[i] = src[p[i]] }
+  = let j, _r = decompose2 i in
+    assert { copy_subsegment src dst s k l j sigma tau p invp };
+    pi_good i
+  in
+  ()
+
+let smart_array_copy_1 (n k l q r: int) (src dst: array elt) :
+  (ghost p: array int, ghost invp: array int)
+  requires { length src = length dst = n > 0 }
+  requires { k > 0 && l > 0 && q >= 0 && 0 <= r < k*l }
+  requires { n = q * k*l + r }
+  writes   { dst }
+  ensures  { copy_perm src dst n p invp }
+= let ghost p    = identity n in
+  let ghost invp = identity n in
+  let m = k*l in
+  for s = 0 to q - 1 do
+    invariant { permutation_pair (s*m) p invp }
+    invariant { copy_perm src dst (s*m) p invp }
+    let start = s*m in
+    assert { start+m <= n };
+    let sigma, invsigma = permute l in
+    let tau,   invtau   = permute l in
+    for j = 0 to l - 1 do
+      invariant { permutation_pair (s*m) p invp }
+      invariant { copy_perm src dst (s*m) p invp }
+      invariant { forall j'. 0 <= j' < j ->
+                  copy_subsegment src dst s k l j' sigma tau p invp }
+      let startsrc = start +     sigma[j] *k in
+      assert { startsrc + k <= start + m };
+      let startdst = start + tau[sigma[j]]*k in
+      assert { startdst + k <= start + m };
+      label L in
+      for i = 0 to k - 1 do
+        invariant { frame (dst  at L) dst  startdst k }
+        invariant { frame (p    at L) p    startdst k }
+        invariant { frame (invp at L) invp startsrc k }
+        invariant { permutation_pair (s*m) p invp }
+        invariant { copy_perm src dst (s*m) p invp }
+        invariant { copy_to src dst startsrc startdst i }
+        invariant { forall i'. 0 <= i' < i -> p[startdst+i'] = startsrc+i' }
+        invariant { forall i'. 0 <= i' < i -> invp[startsrc+i'] = startdst+i' }
+        invariant { forall j'. 0 <= j' < j ->
+                    copy_subsegment src dst s k l j' sigma tau p invp }
+        dst[startdst + i] <- src[startsrc + i];
+        p  [startdst + i] <-     startsrc + i;
+        invp[startsrc + i] <- startdst + i
+      done
+    done;
+    all_subsegments_perm src dst s k l sigma invsigma tau invtau p invp
+  done;
+  let last = q*m in
+  for i = 0 to r - 1 do
+    invariant { permutation_pair (last+i) p invp }
+    invariant { copy_perm src dst (last+i) p invp }
+    dst[last + i] <- src[last + i];
+    p[last + i] <- last + i;
+    invp[last + i] <- last + i
+  done;
+  (p, invp)

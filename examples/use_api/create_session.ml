@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -53,6 +53,12 @@ let provers =
     provers
     []
 
+(* default resource limits *)
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
+
 (* create an empty session in the current directory *)
 let session = Session_itp.empty_session "."
 
@@ -86,10 +92,7 @@ let add_proofs_attempts g =
     (fun (p,_driver) ->
       let _pa : Session_itp.proofAttemptID =
         Session_itp.graft_proof_attempt
-          ~limit:{Call_provers.empty_limit with
-                  Call_provers.limit_time = 5.;
-                               limit_mem = 1000 }
-          session g p.Whyconf.prover
+          ~limits session g p.Whyconf.prover
       in ())
     provers
 

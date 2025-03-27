@@ -32,7 +32,7 @@ use set_str.Set_str
 (* TODO handle spaces (leading and between digits)
         accept base 0 and deduce base from string prefix *)
 
-let wmpz_set_str (r: mpz_ptr) (sp: ptr char) (base: int32) : int32
+let partial wmpz_set_str (r: mpz_ptr) (sp: ptr char) (base: int32) : int32
   requires { valid_string sp }
   requires { strlen (pelts sp) (offset sp) * 8 + 63 <= max_int32 }
   requires { mpz.readers[r] = 0 }

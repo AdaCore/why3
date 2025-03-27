@@ -3,407 +3,101 @@ Goal array'vc.
 Prover result is: Valid (355 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 48, characters 4-16:
 Sub-goal Index in array bounds of goal f'vc.
-Prover result is: Step limit exceeded (3000041 steps).
+Prover result is: Unknown (sat) (444 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
   Line 8:
-    to_int :
-      t
-      ->
-      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
+    to_int : t -> int = [|{to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
+    two : t = {to_int => 2}
   Line 14:
-    three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|{Array.elts =
-             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-             Array.length = 0} =>
-            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|]|]
-  Line 19:
-    length :
-      array
-      ->
-      int = [|{Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0} =>
-              0;
-            _ => 0|]
-  Line 22:
-    mixfix [] : array -> int -> t = fun x!02 x!1 -> {Array.to_int => 3}
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun x!03 x!11 x!2 ->
-               {Array.elts =
-                [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-                Array.length = 0}
-  Line 33:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
+    three : t = {to_int => 3}
   Line 44:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
-  Line 48:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 3}|];
-               Array.length = 0}
+    a :  = {elts = [|_ => {to_int => 3}|]; length = 0}
+    a : array = {elts = [|_ => {to_int => 3}|]; length = 0}
 
+Warning: Error while interpreting mixfix_lbrb
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 47, characters 14-27:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (3000066 steps).
+Prover result is: Step limit exceeded (3000060 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File jlamp_array_mono.mlw:
-  Line 8:
-    to_int :
-      t
-      ->
-      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
+    two :  = <UNDEFINED>
   Line 14:
-    three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|{Array.elts =
-             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-             Array.length = 4} =>
-            [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-          {Array.elts =
-           [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-           Array.length = 4} =>
-          [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-          _ => [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
-  Line 19:
-    length :
-      array
-      ->
-      int = [|{Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4} =>
-              4;
-            {Array.elts =
-             [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-             Array.length = 4} =>
-            4; _ => 4|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun x!09 x!13 x!21 ->
-               if x!09 = {Array.elts =
-                          [|42 => {Array.to_int => 3};
-                          _ => {Array.to_int => 2}|];
-                          Array.length = 4} /\
-                  x!13 = 42 /\ x!21 = {Array.to_int => 2}
-               then {Array.elts =
-                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-                     Array.length = 4}
-               else {Array.elts =
-                     [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-                     Array.length = 4}
-  Line 32:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-    old a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
+    three :  = <UNDEFINED>
   Line 44:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-  Line 47:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
-    three : t = {Array.to_int => 3}
-  Line 48:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; _ => {Array.to_int => 2}|];
-               Array.length = 4}
+    a :  = <UNDEFINED>
+    a :  = <UNDEFINED>
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 54, characters 4-16:
 Sub-goal Index in array bounds of goal g'vc.
-Prover result is: Valid (614 steps).
+Prover result is: Valid (336 steps).
+
+Warning: Error while interpreting mixfix_lbrb: No lsymbol found for qualified identifier (Qident (Isymbol select))
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `g` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 53, characters 14-27:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Step limit exceeded (3000071 steps).
+Prover result is: Step limit exceeded (3000065 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `g` cannot be evaluated):
 File jlamp_array_mono.mlw:
-  Line 8:
-    to_int :
-      t
-      ->
-      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
+    two :  = <UNDEFINED>
   Line 14:
-    three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|{Array.elts =
-             [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-             Array.length = 43} =>
-            [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-          {Array.elts =
-           [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-           _ => {Array.to_int => 2}|];
-           Array.length = 43} =>
-          [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-          _ => {Array.to_int => 2}|];
-          _ => [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|]|]
-  Line 19:
-    length :
-      array
-      ->
-      int = [|{Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43} =>
-              43;
-            {Array.elts =
-             [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-             _ => {Array.to_int => 2}|];
-             Array.length = 43} =>
-            43; _ => 43|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun x!016 x!14 x!22 ->
-               if x!016 = {Array.elts =
-                           [|17 => {Array.to_int => 3};
-                           _ => {Array.to_int => 2}|];
-                           Array.length = 43} /\
-                  x!14 = 42 /\ x!22 = {Array.to_int => 2}
-               then {Array.elts =
-                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-                     _ => {Array.to_int => 2}|];
-                     Array.length = 43}
-               else {Array.elts =
-                     [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-                     _ => {Array.to_int => 2}|];
-                     Array.length = 43}
-  Line 32:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    old a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
+    three :  = <UNDEFINED>
   Line 50:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 53:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    three : t = {Array.to_int => 3}
-  Line 54:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 3}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
+    a :  = <UNDEFINED>
+    a :  = <UNDEFINED>
 
 File "bench/check-ce/jlamp_array_mono.mlw", line 60, characters 4-16:
 Sub-goal Index in array bounds of goal h'vc.
-Prover result is: Valid (614 steps).
+Prover result is: Valid (336 steps).
+
+Warning: Error while interpreting mixfix_lbrb: No lsymbol found for qualified identifier (Qident (Isymbol select))
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `h` cannot be evaluated)
 File "bench/check-ce/jlamp_array_mono.mlw", line 59, characters 14-27:
 Sub-goal Postcondition of goal h'vc.
-Prover result is: Step limit exceeded (3000071 steps).
+Prover result is: Step limit exceeded (3000065 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `h` cannot be evaluated):
 File jlamp_array_mono.mlw:
-  Line 8:
-    to_int :
-      t
-      ->
-      int = [|{Array.to_int => 2} => 2; {Array.to_int => 3} => 3; _ => 2|]
   Line 11:
-    two : t = {Array.to_int => 2}
+    two :  = <UNDEFINED>
   Line 14:
-    three : t = {Array.to_int => 3}
-  Line 18:
-    elts :
-      array
-      ->
-      int
-      ->
-      t = [|{Array.elts =
-             [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-             _ => {Array.to_int => 2}|];
-             Array.length = 43} =>
-            [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-            _ => {Array.to_int => 2}|];
-          {Array.elts =
-           [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-           _ => {Array.to_int => 2}|];
-           Array.length = 43} =>
-          [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-          _ => {Array.to_int => 2}|];
-          _ =>
-          [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-          _ => {Array.to_int => 2}|]|]
-  Line 19:
-    length :
-      array
-      ->
-      int = [|{Array.elts =
-               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43} =>
-              43;
-            {Array.elts =
-             [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-             _ => {Array.to_int => 2}|];
-             Array.length = 43} =>
-            43; _ => 43|]
-  Line 28:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      t
-      ->
-      array = fun x!023 x!15 x!23 ->
-               if x!023 = {Array.elts =
-                           [|42 => {Array.to_int => 2};
-                           17 => {Array.to_int => 3};
-                           _ => {Array.to_int => 2}|];
-                           Array.length = 43} /\
-                  x!15 = 17 /\ x!23 = {Array.to_int => 2}
-               then {Array.elts =
-                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-                     _ => {Array.to_int => 2}|];
-                     Array.length = 43}
-               else {Array.elts =
-                     [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-                     _ => {Array.to_int => 2}|];
-                     Array.length = 43}
-  Line 32:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 34:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    old a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
+    three :  = <UNDEFINED>
   Line 56:
-    a :
-      array = {Array.elts =
-               [|42 => {Array.to_int => 2}; 17 => {Array.to_int => 3};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-  Line 59:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
-    three : t = {Array.to_int => 3}
-  Line 60:
-    a :
-      array = {Array.elts =
-               [|17 => {Array.to_int => 2}; 42 => {Array.to_int => 2};
-               _ => {Array.to_int => 2}|];
-               Array.length = 43}
+    a :  = <UNDEFINED>
+    a :  = <UNDEFINED>
 
