@@ -164,7 +164,9 @@ let get_arg : type t. t vtype -> _ -> _ -> t = fun t rs v ->
       | Tconst (Constant.ConstStr s) -> s
       | _ -> assert false
       end
-  | _ -> assert false
+  | _, Vterm vt ->
+    Pinterp_core.cannot_evaluate "cannot interpret term %a as an argument" Pretty.print_term vt
+  | _, _ -> assert false
 
 let rec eval : type t. t vtype -> t -> _ -> _ list -> _ = fun t f rs l ->
   match t with
