@@ -179,11 +179,15 @@ let maybe_giant_step_rac ctr parent models =
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
     let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
-    let rac_limits = Call_provers.empty_limits in
+    let rac_limits =
+      match Gnat_config.prover_ce with
+      | Some pr -> Gnat_config.limit ~prover:pr ~warning:false
+      | None -> Call_provers.empty_limits
+    in
     let rac_limits =
       match Option.map float_of_int Gnat_config.rac_timelimit with
       | None -> rac_limits
-      | Some t -> {rac_limits with limit_time = t}
+      | Some t -> {rac_limits with Call_provers.limit_time = t}
     in
     let why_prover = Option.map (fun p -> (p, rac_limits)) Gnat_config.rac_prover in
     let check_term = Rac.Why.mk_check_term_lit cnf env ~why_prover () in
