@@ -373,8 +373,8 @@ term_arg_:
       match $3, $1 with
       | Qident id3, Qident id1  ->
          (* TODO we could be more precise or clean here *)
-         if Strings.has_prefix "First" id3.id_str ||
-              Strings.has_prefix "Last" id3.id_str then
+         if Strings.has_prefix ~prefix:"First" id3.id_str ||
+              Strings.has_prefix ~prefix:"Last" id3.id_str then
            Tidapp ($3, [mk_term_loc (Tident $1) id1.id_loc])
          else
            Tident (Qident (mk_id (id1.id_str ^ "'" ^ id3.id_str) $startpos $endpos))

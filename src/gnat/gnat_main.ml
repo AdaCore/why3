@@ -172,7 +172,7 @@ let maybe_giant_step_rac ctr parent models =
     Session_itp.theory_name |> Theory.restore_theory in
   let pm = Pmodule.restore_module th in
   if not Gnat_config.giant_step_rac then
-    begin match Check_ce.last_nonempty_model th.th_known models with
+    begin match Check_ce.last_nonempty_model th.Theory.th_known models with
     | None -> []
     | Some m -> [(m, None)]
     end
