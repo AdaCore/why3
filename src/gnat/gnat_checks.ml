@@ -51,7 +51,6 @@ module Logging : sig
 
   val init : unit -> unit
   val log : goal_id -> string -> Controller_itp.proof_attempt_status -> unit
-  val close : unit -> unit
 end =
 struct
 
@@ -59,8 +58,6 @@ struct
 
   let init () =
     outc := open_out (Gnat_config.unit_name ^ ".why3log")
-
-  let close () = close_out !outc
 
   let pas_to_json pas =
     let open Why3 in

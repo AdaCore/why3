@@ -428,7 +428,7 @@ let parse_check_string s l =
         Gnat_util.abort_with_message ~internal:true s
 
 let read_label s =
-    if Strings.has_prefix "GP_" s then
+    if Strings.has_prefix ~prefix:"GP_" s then
        match Gnat_util.colon_split s with
        | "GP_Check" :: rest ->
              Some (parse_check_string s rest)
@@ -513,7 +513,7 @@ let read_vc_labels acc s =
      if b.check_kind = Some VC_Loop_Invariant then begin
         Ident.Sattr.iter (fun x ->
            let s = x.Ident.attr_string in
-           if Strings.has_prefix "expl:" s then
+           if Strings.has_prefix ~prefix:"expl:" s then
               if s = "expl:loop invariant init" then
                  b.check_kind <- Some VC_Loop_Invariant_Init
               else

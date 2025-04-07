@@ -20,7 +20,7 @@ let only_first_field2 = function
   | [s1; s2] ->
       (* This recognize records corresponding to unconstrained array. We only
          want the first part of the record (the array). *)
-      Strings.has_prefix "elts" s1 && Strings.has_prefix "rt" s2
+      Strings.has_prefix ~prefix:"elts" s1 && Strings.has_prefix ~prefix:"rt" s2
   | _ -> false
 
 let get_field_attr attr =
@@ -29,10 +29,10 @@ let get_field_attr attr =
   | _ -> None
 
 let is_split_field f =
-  List.exists (fun s -> Strings.has_prefix s f)
+  List.exists (fun s -> Strings.has_prefix ~prefix:s f)
     ["us_split_fields"; "us_split_discrs"; "__split_discrs"; "__split_fields"]
 
-let is_rec_ext_field f = Strings.has_prefix "rec__ext" f
+let is_rec_ext_field f = Strings.has_prefix ~prefix:"rec__ext" f
 
 let for_field clean (f, v) =
   if is_split_field f then

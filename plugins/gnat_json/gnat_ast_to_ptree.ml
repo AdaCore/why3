@@ -1393,7 +1393,7 @@ let read_channel env path filename c =
         Gnat_ast_pretty.pp_file gnat_file
   end;
   let mlw_file = mlw_file gnat_file.theory_declarations in
-  let basename = Strings.remove_suffix ("."^gnat_json_file_ext) filename in
+  let basename = Strings.remove_suffix ~suffix:("."^gnat_json_file_ext) filename in
   let mlw_filename = basename ^".mlw" in
   let sexp_filename = basename ^".sexp" in
   (* Defer printing of mlw file until after the typing, to set the marker of located
