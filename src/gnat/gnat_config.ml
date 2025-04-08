@@ -157,7 +157,6 @@ let output_list_transforms () =
 
 let show_config () =
   Format.printf "enable_ide: %s@." Config.enable_ide;
-  Format.printf "enable_zarith: %s@." Config.enable_zarith;
   Format.printf "enable_zip: %s@." Config.enable_zip;
   Format.printf "enable_coq_libs: %s@." Config.enable_coq_libs;
   Format.printf "enable_coq_fp_libs: %s@." Config.enable_coq_fp_libs;
