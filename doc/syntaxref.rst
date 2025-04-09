@@ -75,11 +75,11 @@ a prime (:token:`qident`, used exclusively for type variables):
 
 .. productionlist::
     alpha: "a" - "z" | "A" - "Z"
-    suffix: (`alpha` | "'"* ("0" - "9" | "_")*)* "'"*
-    lident_nq: ("a" - "z") `suffix`* | "_" `suffix`+
-    uident_nq: ("A" - "Z") `suffix`*
+    suffix: (`alpha` | "'"* ("0" - "9" | "_"))* "'"*
+    lident_nq: ("a" - "z" | "_") `suffix`
+    uident_nq: ("A" - "Z") `suffix`
     ident_nq: `lident_nq` | `uident_nq`
-    qident: "'" ("a" - "z") `suffix`*
+    qident: "'" ("a" - "z") `suffix`
 
 
 Identifiers that contain a prime followed by a letter, such as
