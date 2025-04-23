@@ -296,7 +296,7 @@ let store_path, store_module, restore_path, restore_module_id =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
     let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
-    Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix) in
+    Wid.set id_to_path id (uc.uc_path, uc.uc_name.pre_name, prefix) in
   let store_module pmod  =
     let th = pmod.mod_theory in
     let id = th.th_name in

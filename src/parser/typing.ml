@@ -1912,7 +1912,7 @@ let close_module loc =
        let muc = clone_export muc mintf inst in
        let muc = close_scope ~import:false muc in
        let id_str =
-         Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.id_string in
+         Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
        let id = id_fresh id_str in
        let m' = create_module slice.env ~path:slice.path id in
        let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in
