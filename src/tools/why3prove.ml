@@ -209,43 +209,21 @@ let opt_driver = ref (match !opt_driver with
   | f::ef -> Some (None,f,["",ef])
   | [] -> None)
 
+let fail p =
+  Format.kfprintf (fun _fmt -> exit 1) Format.err_formatter p
+
 let () = try
   if Queue.is_empty opt_queue then
     Whyconf.Args.exit_with_usage usage_msg;
 
-  if !opt_prover <> None && !opt_driver <> None then begin
-    eprintf "Options '-P'/'--prover' and \
-      '-D'/'--driver' cannot be used together.@.";
-    exit 1
-  end;
+  if !opt_prover <> None && !opt_driver <> None then
+    fail "Options '-P'/'--prover' and '-D'/'--driver' cannot be used together.@.";
 
-  if !opt_output <> None && !opt_driver = None && !opt_prover = None then begin
-    eprintf
-      "Option '-o'/'--output' requires either a prover or a driver.@.";
-    exit 1
-  end;
-
-  if !opt_prover = None then begin
-    if !opt_timelimit <> None then begin
-      eprintf "Option '-t'/'--timelimit' requires a prover.@.";
-      exit 1
-    end;
-    if !opt_stepslimit <> None then begin
-      eprintf "Option '-t'/'--stepslimit' requires a prover.@.";
-      exit 1
-    end;
-    if !opt_memlimit <> None then begin
-      eprintf "Option '-m'/'--memlimit' requires a prover.@.";
-      exit 1
-    end;
-    if !opt_driver = None && not !opt_print_namespace then
-      opt_print_theory := true
-  end;
+  if !opt_output <> None && !opt_driver = None && !opt_prover = None then
+    fail "Option '-o'/'--output' requires either a prover or a driver.@.";
 
   let main = Whyconf.get_main config in
 
-  if !opt_timelimit = None then opt_timelimit := Some (Whyconf.timelimit main);
-  if !opt_memlimit  = None then opt_memlimit  := Some (Whyconf.memlimit main);
   begin match !opt_prover with
   | Some s ->
     let filter_prover = Whyconf.parse_filter_prover s in
@@ -253,10 +231,22 @@ let () = try
     let with_steps = !opt_stepslimit <> None in
     opt_command := Some (Whyconf.get_complete_command prover ~with_steps);
     let (d,f) = prover.driver in
-    opt_driver := Some(d,f,prover.extra_drivers)
+    opt_driver := Some(d,f,prover.extra_drivers);
+    if !opt_timelimit = None then
+      opt_timelimit := Some (if prover.interactive then 0. else Whyconf.timelimit main);
+    if !opt_memlimit = None then
+      opt_memlimit := Some (if prover.interactive then 0 else Whyconf.memlimit main);
   | None ->
-      ()
+    if !opt_timelimit <> None then
+      fail "Option '-t'/'--timelimit' requires a prover.@.";
+    if !opt_stepslimit <> None then
+      fail "Option '-t'/'--stepslimit' requires a prover.@.";
+    if !opt_memlimit <> None then
+      fail "Option '-m'/'--memlimit' requires a prover.@.";
+    if !opt_driver = None && not !opt_print_namespace then
+      opt_print_theory := true
   end;
+
   let add_meta task (meta,s) =
     let meta = lookup_meta meta in
     let args = match meta.meta_type, s with
