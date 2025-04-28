@@ -1622,6 +1622,24 @@ type pmodule_uc = {
   muc_impl : pmodule_uc0;
 }
 
+let mod_name m =
+  m.mod_intf.mod_theory.th_name
+
+let mod_theory m =
+  m.mod_intf.mod_theory
+
+let mod_export_intf m =
+  m.mod_intf.mod_export
+
+let mod_export_impl m =
+  m.mod_impl.mod_export
+
+let mod_known_intf m =
+  m.mod_intf.mod_known
+
+let mod_known_impl m =
+  m.mod_impl.mod_known
+
 let register_module, restore_module_id, restore_module =
   let table = Wid.create 16 in
   (fun inst intf impl ->

@@ -520,9 +520,9 @@ let built_in_modules =
   ]
 
 let add_builtin_mo env (l,n,t,d) =
-  let mo = (Pmodule.read_module env l n).mod_intf in
-  let exp = mo.Pmodule.mod_export in
-  let kn = mo.Pmodule.mod_known in
+  let mo = Pmodule.read_module env l n in
+  let exp = Pmodule.mod_export_intf mo in
+  let kn = Pmodule.mod_known_intf mo in
   List.iter
     (fun (id,r) ->
       let its = Pmodule.ns_find_its exp [id] in

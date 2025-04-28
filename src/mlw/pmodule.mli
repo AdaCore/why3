@@ -92,6 +92,31 @@ type pmodule = private {
   mod_intf : pmodule0;
   mod_impl : pmodule0;
 }
+(** A pmodule [m] consists of two old-style pmodule0. Its interface
+    [m.mod_intf] is the "logical" version of the module, to be used in most
+    place. It is a copy of [I] in the case of a [module A : I] module. Its
+    implementation [m.mod_impl] is the "execution" version of the module, to be
+    used during extraction or execution. It corresponds to the body of [A] in
+    the [module A : I] case. [m.mod_inst] maps the symbols from the interface
+    to the corresponding ones in the implementation. *)
+
+val mod_name : pmodule -> ident
+(** returns the name of the given pmodule, that is the name of is interface. *)
+
+val mod_theory : pmodule -> theory
+(** returns the pmodule's theory, that is, the theory of its interface. *)
+
+val mod_export_intf : pmodule -> namespace
+(** returns the mod_export field from the interface of this pmodule *)
+
+val mod_export_impl : pmodule -> namespace
+(** returns the mod_export field from the implementation of this pmodule *)
+
+val mod_known_intf : pmodule -> known_map
+(** returns the mod_known field from the interface of this pmodule *)
+
+val mod_known_impl : pmodule -> known_map
+(** returns the mod_known field from the implementation of this pmodule *)
 
 val empty_mod_inst: pmodule -> mod_inst
 

@@ -223,7 +223,7 @@ let () =
   printf "Theory are:@.";
   Wstdlib.Mstr.iter
     (fun _ m ->
-      printf "%a@." Pretty.print_theory m.Pmodule.mod_intf.Pmodule.mod_theory) mods
+      printf "%a@." Pretty.print_theory (Pmodule.mod_theory m)) mods
 
 (* Only use of this is to test clone_export *)
 let auto_clone task th =
@@ -233,13 +233,13 @@ let my_tasks : Task.task list =
   let mods =
     Wstdlib.Mstr.fold
       (fun _ m acc ->
-        let th = m.Pmodule.mod_intf.Pmodule.mod_theory in
+        let th = Pmodule.mod_theory m in
         (* Automatically clone all theories *)
         let task =
           auto_clone None th
         in
         List.rev_append
-          (Task.split_theory m.Pmodule.mod_intf.Pmodule.mod_theory None task) acc)
+          (Task.split_theory (Pmodule.mod_theory m) None task) acc)
       mods []
   in
   List.rev mods

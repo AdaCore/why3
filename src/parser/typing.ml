@@ -1587,10 +1587,11 @@ let find_module env file q =
         (try Mstr.find nm file with Not_found -> read_module env [] nm)
     | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm in
   if Debug.test_flag Glob.flag then
-    Glob.use ~kind:"theory" (qloc_last q) m.mod_intf.mod_theory.th_name;
+    Glob.use ~kind:"theory" (qloc_last q) (Pmodule.mod_name m);
   m
 
-let type_inst ({muc_intf= {muc_theory = tuc}} as muc) ({mod_intf= {mod_theory = t}} as m) s =
+let type_inst ({muc_intf= {muc_theory = tuc}} as muc) m s =
+  let t = Pmodule.mod_theory m in
   let add_inst s = function
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
@@ -1631,7 +1632,7 @@ let type_inst ({muc_intf= {muc_theory = tuc}} as muc) ({mod_intf= {mod_theory = 
         { s with mi_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
             (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.mi_ls }
     | CSvsym (p,q) ->
-        let rs1 = find_prog_symbol_ns m.mod_intf.mod_export p in
+        let rs1 = find_prog_symbol_ns (Pmodule.mod_export_intf m) p in
         let rs2 = find_prog_symbol muc q in
         begin match rs1, rs2 with
         | RS rs1, RS rs2 ->
@@ -1650,7 +1651,7 @@ let type_inst ({muc_intf= {muc_theory = tuc}} as muc) ({mod_intf= {mod_theory = 
             assert false (* should never happen *)
         end
     | CSxsym (p,q) ->
-        let xs1 = find_xsymbol_ns m.mod_intf.mod_export p in
+        let xs1 = find_xsymbol_ns (Pmodule.mod_export_intf m) p in
         let xs2 = find_xsymbol muc q in
         { s with mi_xs = Loc.try4 ~loc:(qloc p) Mxs.add_new
             (ClashSymbol xs1.xs_name.id_string) xs1 xs2 s.mi_xs }
@@ -1714,7 +1715,7 @@ let rec add_decl muc env file d =
       use_export muc (Loc.try3 ~loc find_module env file use)
   | Ptree.Dcloneexport (loc, use, inst) ->
       let m = Loc.try3 ~loc find_module env file use in
-      warn_clone_not_abstract (qloc use) m.mod_intf.mod_theory;
+      warn_clone_not_abstract (qloc use) (Pmodule.mod_theory m);
       clone_export ~loc muc m (type_inst muc m inst)
   | Ptree.Duseimport (loc,import,uses) ->
       let add_import muc (m, q) =
@@ -1728,7 +1729,7 @@ let rec add_decl muc env file d =
       let import = import || as_opt = None in
       let muc = open_scope muc (use_as qid as_opt).id_str in
       let m = Loc.try3 ~loc find_module env file qid in
-      warn_clone_not_abstract (qloc qid) m.mod_intf.mod_theory;
+      warn_clone_not_abstract (qloc qid) (Pmodule.mod_theory m);
       let muc = clone_export ~loc muc m (type_inst muc m inst) in
       let muc = close_scope muc ~import in
       muc
@@ -1747,7 +1748,7 @@ let type_module file env loc path (id,dl) =
   let add_decl_env_file muc d = add_decl muc env file d in
   let muc = List.fold_left add_decl_env_file muc dl in
   let m = Loc.try1 ~loc close_module muc in
-  let file = Mstr.add m.mod_intf.mod_theory.th_name.id_string m file in
+  let file = Mstr.add (Pmodule.mod_name m).id_string m file in
   file
 
 let type_mlw_file env path filename mlw_file =
@@ -1827,15 +1828,15 @@ let close_module loc =
     | None ->
        let m = Loc.try1 ~loc close_module (Option.get slice.muc) in
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m.mod_intf.mod_theory.th_name;
-       slice.file <- Mstr.add m.mod_intf.mod_theory.th_name.id_string m slice.file
+         Glob.def ~kind:"theory" (Pmodule.mod_name m);
+       slice.file <- Mstr.add (Pmodule.mod_name m).id_string m slice.file
     | Some mintf ->
        let muc = Option.get slice.muc in
        let m, mimpl = Loc.try2 ~loc close_module_with_intf muc mintf in
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m.mod_intf.mod_theory.th_name;
-       slice.file <- Mstr.add mimpl.mod_intf.mod_theory.th_name.id_string mimpl slice.file;
-       slice.file <- Mstr.add m.mod_intf.mod_theory.th_name.id_string m slice.file
+         Glob.def ~kind:"theory" (Pmodule.mod_name m);
+       slice.file <- Mstr.add (Pmodule.mod_name mimpl).id_string mimpl slice.file;
+       slice.file <- Mstr.add (Pmodule.mod_name m).id_string m slice.file
   end;
   slice.muc <- None;
   slice.muc_intf <- None

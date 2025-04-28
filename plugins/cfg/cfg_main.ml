@@ -98,7 +98,7 @@ module Typing = struct
     let add_decl_env_file muc d = add_decl muc env file d in
     let muc = List.fold_left add_decl_env_file muc dl in
     let m = Loc.try1 ~loc Pmodule.close_module muc in
-    let file = Mstr.add m.mod_intf.mod_theory.th_name.id_string m file in
+    let file = Mstr.add (Pmodule.mod_name m).id_string m file in
     file
 
   let type_mlw_file env path filename mlw_file =
