@@ -101,7 +101,7 @@ nightly-bench:
   variables:
     COMPILER: bench
   script:
-    - misc/ci-local.sh nightly-bench-reduced
+    - if test -n "$FULLBENCH" ; then misc/ci-local.sh nightly-bench ; else misc/ci-local.sh nightly-bench-reduced ; fi
   extends: .docker_template
 
 ce-bench:
