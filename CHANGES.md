@@ -1,5 +1,10 @@
 :x: marks a potential source of incompatibility
 
+API
+  * Type Pmodule.pmodule now includes both the interface and implementation
+    versions of a module for a better support of the `module Impl : Intf`
+    feature :x:
+
 Version 1.8.2, September 16, 2025
 ---------------------------
 
