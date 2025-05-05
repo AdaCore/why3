@@ -24,6 +24,7 @@ type check_kind =
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
    | VC_Initialization_Check
+   | VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -94,6 +95,7 @@ let is_warning_kind r =
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
    | VC_Initialization_Check
+   | VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -213,6 +215,7 @@ let check_kind_from_string s =
    | "VC_CEILING_PRIORITY_PROTOCOL" -> VC_Ceiling_Priority_Protocol
    | "VC_TASK_TERMINATION"          -> VC_Task_Termination
    | "VC_INITIALIZATION_CHECK"      -> VC_Initialization_Check
+   | "VC_VALIDITY_CHECK"            -> VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
    | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
@@ -288,6 +291,7 @@ let check_kind_to_ada kind =
    | VC_Ceiling_Priority_Protocol -> "VC_CEILING_PRIORITY_PROTOCOL"
    | VC_Task_Termination          -> "VC_TASK_TERMINATION"
    | VC_Initialization_Check      -> "VC_INITIALIZATION_CHECK"
+   | VC_Validity_Check            -> "VC_VALIDITY_CHECK"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
    | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
@@ -358,6 +362,7 @@ let check_kind_to_string kind =
    | VC_Ceiling_Priority_Protocol -> "ceiling__priority_protocol"
    | VC_Task_Termination          -> "task_termination"
    | VC_Initialization_Check      -> "initialization"
+   | VC_Validity_Check            -> "validity"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Default_Initial_Condition -> "default_initial_condition"
