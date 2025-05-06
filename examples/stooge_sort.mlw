@@ -1,0 +1,129 @@
+
+(** {1 Stooge Sort}
+
+    See https://en.wikipedia.org/wiki/Stooge_sort
+
+    This algorithm sorts an array of size `n` as follows:
+    - if `n<2`, do nothing;
+    - if `n=2`, swap the elements if necessary;
+    - otherwise, when `n >= 3`,
+      - sort the first two-thirds,
+      - sort the last two-thirds,
+      - sort the first two-thirds again.
+
+    This is a totally inefficient algorithm, but its verification
+    is interesting. First, one has to round the thirds in the right
+    way; second, there is a subtle step in the proof (see lemma
+    `key_lemma` below).
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.ComputerDivision
+use array.Array
+use array.ArraySwap
+use array.ArrayEq
+use array.ArrayPermut
+
+type elt
+
+val predicate le elt elt
+
+clone relations.TotalPreOrder with
+  type t = elt, predicate rel = le, axiom .
+
+clone export array.Sorted with type
+  elt = elt, predicate le = le, axiom .
+
+val lemma permutation (a1 a2: array elt) (lo hi: int)
+  : (pi: int -> int, inv: int -> int)
+  requires { permut_sub a1 a2 lo hi }
+  ensures  { forall i. lo <= i < hi -> lo <= pi i < hi }
+  ensures  { forall i1 i2. lo <= i1 < i2 < hi -> pi i1 <> pi i2 }
+  ensures  { forall i. lo <= i < hi -> lo <= inv i < hi }
+  ensures  { forall i1 i2. lo <= i1 < i2 < hi -> inv i1 <> inv i2 }
+  ensures  { forall i. lo <= i < hi -> a2[pi i] = a1[i] }
+  ensures  { forall i. lo <= i < hi -> a1[inv i] = a2[i] }
+  ensures  { forall i. lo <= i < hi -> pi (inv i) = i }
+  ensures  { forall i. lo <= i < hi -> inv (pi i) = i }
+
+use pigeon.Pigeonhole
+
+(* Key lemma: After the first two recursive calls, the elements
+   in the rightmost third are greater or equal than those of
+   the first two thirds.
+
+     <--- w ---> <--- >= w ---> <--- w --->
+    +-----------+--------------+-----------+
+    |        sorted            |           |
+    +-----------+--------------+-----------+
+    |           |          sorted          |
+    +-----------+--------------+-----------+
+              x               <=     y
+
+    This is obvious for the middle third (we just sorted the rightmost
+    two-thirds), but less obious for the leftmost third. It crucially
+    requires that the middle third be at least as large as the rightmost
+    one.
+*)
+
+let lemma key_lemma (a1 a2: array elt) (lo mid hi: int) : unit
+  requires { 0 <= lo <= mid <= hi <= length a1 = length a2 }
+  requires { mid - lo >= hi - mid }
+  requires { permut_sub a1 a2 lo hi }
+  ensures  {
+    forall i. mid <= i < hi -> exists j. a2[i] = a1[j] /\
+    (lo <= j < mid \/
+     mid <= j < hi /\ exists i1 i2. lo <= i1 < mid /\
+                                    lo <= i2 < mid /\ a2[i2] = a1[i1]) }
+= let lemma search (i: int) : (j: int)
+    requires { mid <= i < hi }
+    ensures  { a2[i] = a1[j] /\
+    (lo <= j < mid \/
+     mid <= j < hi /\ exists i1 i2. lo <= i1 < mid /\
+                                    lo <= i2 < mid /\ a2[i2] = a1[i1]) }
+  = let pi, inv = permutation a1 a2 lo hi in
+    let ii = inv i in
+    if ii < mid then return ii;
+    for k = lo to mid - 1 do
+      invariant { forall j. lo <= j < k -> mid <= pi j < hi }
+      if pi k < mid then return ii;
+    done;
+    pigeonhole (mid-lo) (hi-mid-1)
+      (fun (j:int) ->
+         let pj = pi (lo + j) in
+         if pj < i then pj-mid else pj-mid-1);
+    absurd
+  in
+  ()
+
+let rec stooge_sort_rec (a: array elt) (lo hi: int) : unit
+  requires { 0 <= lo <= hi <= length a }
+  variant  { hi - lo }
+  ensures  { sorted_sub a lo hi }
+  ensures  { permut_sub (old a) a lo hi }
+= if hi-lo = 2 && not (le a[lo] a[hi-1]) then
+    swap a lo (hi-1);
+  if hi-lo >= 3 then (
+    let w = div (hi - lo) 3 in
+    label L1 in
+    stooge_sort_rec a lo       (hi - w);
+    permut_sub_weakening'lemma (pure {a at L1}) a lo (hi-w) lo hi;
+    label L2 in
+    stooge_sort_rec a (lo + w) hi;
+    permut_sub_weakening'lemma (pure {a at L2}) a (lo+w) hi lo hi;
+    key_lemma (pure {a at L2}) a (lo+w) (hi-w) hi;
+    assert { forall i j. lo <= i < hi-w <= j < hi -> le a[i] a[j] };
+    label L3 in
+    stooge_sort_rec a lo       (hi - w);
+    permut_sub_weakening'lemma (pure {a at L3}) a lo (hi-w) lo hi;
+    assert { forall i j. lo <= i < lo+w <= j < hi -> le a[i] a[j] };
+  )
+
+let stooge_sort (a: array elt) : unit
+  ensures { sorted a }
+  ensures { permut_all (old a) a }
+= stooge_sort_rec a 0 (length a)
+
+

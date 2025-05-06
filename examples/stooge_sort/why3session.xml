@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="stooge_sort.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="key_lemma&#39;vc" expl="VC for key_lemma" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="key_lemma&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.010133" steps="4420"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.026804" steps="67637"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.011788" steps="6166"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.059046" steps="135"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.020314" steps="79544"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.026779" steps="67320"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.160979" steps="21075"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.7" expl="unreachable point" proved="true">
+  <proof prover="0"><result status="valid" time="0.154592" steps="19275"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.8" expl="out of loop bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.013062" steps="6403"/></proof>
+  </goal>
+  <goal name="key_lemma&#39;vc.9" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="key_lemma&#39;vc.9.0" expl="postcondition" proved="true">
+   <proof prover="3" timelimit="5"><result status="valid" time="0.228127" steps="651"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="stooge_sort_rec&#39;vc" expl="VC for stooge_sort_rec" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="stooge_sort_rec&#39;vc.0" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.020682" steps="60594"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.017079" steps="60307"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.022450" steps="57086"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.014724" steps="4781"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.4" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.033495" steps="7736"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.066963" steps="7742"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.009795" steps="5468"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.012732" steps="5481"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.025305" steps="7802"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.9" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.035649" steps="7831"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.025401" steps="7813"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.006721" steps="5502"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.028764" steps="7847"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.012989" steps="7846"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.010554" steps="7875"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.030111" steps="7920"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.009713" steps="5589"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.17" expl="assertion" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.035981" steps="20"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.18" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.033902" steps="8349"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.027657" steps="8351"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.006995" steps="5886"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.013586" steps="5899"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.027547" steps="8374"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.23" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.012931" steps="8413"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.24" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="stooge_sort_rec&#39;vc.24.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.014086" steps="8443"/></proof>
+   </goal>
+   <goal name="stooge_sort_rec&#39;vc.24.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.031807" steps="8"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.25" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="stooge_sort_rec&#39;vc.25.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.010215" steps="8450"/></proof>
+   </goal>
+   <goal name="stooge_sort_rec&#39;vc.25.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.036139" steps="5354"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.135999" steps="16690"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.27" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.021683" steps="58972"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.007829" steps="4751"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.29" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.028862" steps="74522"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.049749" steps="71778"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.31" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.009040" steps="5446"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.32" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.009660" steps="5459"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.33" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.031846" steps="75960"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.34" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.028447" steps="84132"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.35" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.035759" steps="81685"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.007231" steps="5480"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.37" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.023930" steps="84601"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.38" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.016273" steps="36204"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.39" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.027787" steps="90585"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.40" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.008121" steps="90337"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.41" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.010940" steps="5567"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.42" expl="assertion" proved="true">
+  <transf name="case" proved="true" arg1="(i &lt; lo+w)">
+   <goal name="stooge_sort_rec&#39;vc.42.0" expl="true case (assertion)" proved="true">
+   <transf name="instantiate" proved="true" arg1="Ensures" arg2="j">
+    <goal name="stooge_sort_rec&#39;vc.42.0.0" expl="true case (assertion)" proved="true">
+    <proof prover="0"><result status="valid" time="0.569792" steps="62179"/></proof>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="stooge_sort_rec&#39;vc.42.1" expl="false case (assertion)" proved="true">
+   <proof prover="2"><result status="valid" time="0.027651" steps="96426"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.43" expl="variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.031136" steps="95451"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.44" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.044510" steps="91074"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.45" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.019618" steps="5864"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.46" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.008984" steps="5877"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.47" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.045750" steps="94097"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.48" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.589165" steps="692"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.49" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.338499" steps="678"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.50" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="stooge_sort_rec&#39;vc.50.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.032542" steps="8391"/></proof>
+   </goal>
+   <goal name="stooge_sort_rec&#39;vc.50.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.008960" steps="88159"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.51" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.100536" steps="15432"/></proof>
+  </goal>
+  <goal name="stooge_sort_rec&#39;vc.52" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.031448" steps="74432"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="stooge_sort&#39;vc" expl="VC for stooge_sort" proved="true">
+ <proof prover="2"><result status="valid" time="0.026614" steps="59560"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
