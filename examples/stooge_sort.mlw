@@ -36,8 +36,11 @@ clone relations.TotalPreOrder with
 clone export array.Sorted with type
   elt = elt, predicate le = le, axiom .
 
-val lemma permutation (a1 a2: array elt) (lo hi: int)
+use map.MapPermutation
+
+let lemma permutation (a1 a2: array elt) (lo hi: int)
   : (pi: int -> int, inv: int -> int)
+  requires { lo <= hi }
   requires { permut_sub a1 a2 lo hi }
   ensures  { forall i. lo <= i < hi -> lo <= pi i < hi }
   ensures  { forall i1 i2. lo <= i1 < i2 < hi -> pi i1 <> pi i2 }
@@ -47,6 +50,7 @@ val lemma permutation (a1 a2: array elt) (lo hi: int)
   ensures  { forall i. lo <= i < hi -> a1[inv i] = a2[i] }
   ensures  { forall i. lo <= i < hi -> pi (inv i) = i }
   ensures  { forall i. lo <= i < hi -> inv (pi i) = i }
+= permutation a1.elts a2.elts lo hi
 
 use pigeon.Pigeonhole
 
