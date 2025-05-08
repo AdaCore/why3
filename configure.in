@@ -180,30 +180,37 @@ AC_MSG_CHECKING([executable suffix])
 if uname -s | grep -q CYGWIN ; then
   EXE=.exe
   STRIP='echo "no strip "'
+  BUILD_ENV_TYPE=Cygwin
   AC_MSG_RESULT([.exe <Cygwin>])
 elif uname -s | grep -q MINGW ; then
   EXE=.exe
   STRIP=strip
+  BUILD_ENV_TYPE=MinGW
   AC_MSG_RESULT([.exe <MinGW>])
 else
   EXE=
   STRIP=strip
+  BUILD_ENV_TYPE=Posix
   AC_MSG_RESULT([<none>])
 fi
 
-AC_PROG_CC
+# Check for ocamlc, as we need it to find the C compiler to use
+# we first look for it in the path; if not present, we fail
+AC_CHECK_PROG(OCAMLC,ocamlc,ocamlc,no)
+if test "$OCAMLC" = no ; then
+   AC_MSG_ERROR([cannot find ocamlc.])
+fi
+AC_MSG_CHECKING([ocaml os type])
+OCAML_OS_TYPE=$(OCAMLC -config-var os_type)
+AC_MSG_RESULT([$OCAML_OS_TYPE])
+
+AC_PROG_CC([ $(OCAMLC -config-var c_compiler) gcc cl.exe clang ])
 AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
 AC_DEFUN([AX_VERSION_GE], [AS_VERSION_COMPARE([$1],[$2],[$4],[$3],[$3])])
 
-# Check for Ocaml compilers
-
-# we first look for ocamlc in the path; if not present, we fail
-AC_CHECK_PROGS(OCAMLC,ocp-ocamlc ocamlc,no)
-if test "$OCAMLC" = no ; then
-   AC_MSG_ERROR([cannot find ocamlc.])
-fi
+# Check for the rest of Ocaml compilers
 
 # we extract Ocaml version number
 OCAMLVERSION=`$OCAMLC -v | sed -n -e 's|.*version *\(.*\)$|\1|p'`
@@ -214,7 +221,7 @@ AX_VERSION_GE([$OCAMLVERSION], 4.08.0, [],
 
 # Ocaml library path
 # old way: OCAMLLIB=`$OCAMLC -v | tail -1 | cut -f 4 -d ' ' | tr -d '\\r'`
-OCAMLLIB=`$OCAMLC -where | tr -d '\\r'`
+OCAMLLIB=$($OCAMLC -where | tr -d '\r' | tr '\\' '/')
 AC_MSG_NOTICE([ocaml library path is $OCAMLLIB])
 
 # then we look for ocamlopt; if not present, we issue a warning
@@ -320,16 +327,13 @@ if test "$enable_ocamlfind" != no; then
    if test "$OCAMLFIND" = no; then
       reason_ocamlfind=" (not found)"
    else
-      OCAMLFINDLIB=$(ocamlfind printconf stdlib)
-      #if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
-      #   found_ocamlfind=no
-      #   reason_ocamlfind=" (incompatible with OCaml)"
-      #   echo "but your ocamlfind is not compatible with your ocamlc:"
-      #   echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
-      #else
-      #   found_ocamlfind=yes
-      #fi
-      if test -n "$OCAMLFINDLIB"; then
+      OCAMLFINDLIB=$(ocamlfind printconf stdlib | tr -d '\r' | tr '\\' '/')
+      if test "$OCAMLFINDLIB" != "$OCAMLLIB"; then
+         found_ocamlfind=no
+         reason_ocamlfind=" (incompatible with OCaml)"
+         echo "but your ocamlfind is not compatible with your ocamlc:"
+         echo "ocamlfind: $OCAMLFINDLIB, ocamlc: $OCAMLLIB"
+      else
          found_ocamlfind=yes
       fi
    fi
@@ -344,7 +348,7 @@ fi
 
 if test "$enable_ocamlfind" != no; then
    #if ocamlfind is used it gives the install path for ocaml library
-   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir | tr -d '\r')
+   OCAMLINSTALLLIB=$($OCAMLFIND printconf destdir | tr -d '\r' | tr '\\' '/')
    enable_ocamlfind=yes
 else
    OCAMLINSTALLLIB=$OCAMLLIB
@@ -372,7 +376,11 @@ fi
 if test "$enable_local" = no; then
    LOCALDIR=''
 else
-   LOCALDIR="${PWD}"
+   if test "$OCAML_OS_TYPE" = Win32 -a "$BUILD_ENV_TYPE" = Cygwin; then
+      LOCALDIR="$(cygpath -m "$PWD" | tr -d '\r')"
+   else
+      LOCALDIR="$PWD"
+   fi
 fi
 
 # ppx
@@ -1161,8 +1169,10 @@ AC_SUBST(enable_verbose_make)
 
 AC_SUBST(EXE)
 AC_SUBST(STRIP)
+AC_SUBST(BUILD_ENV_TYPE)
 
 AC_SUBST(OCAMLC)
+AC_SUBST(OCAML_OS_TYPE)
 AC_SUBST(OCAMLOPT)
 AC_SUBST(OCAMLDEP)
 AC_SUBST(OCAMLLEX)
@@ -1307,6 +1317,9 @@ echo "    S-expressions support   : $enable_sexp$reason_sexp"
 echo "    Javascript support      : $enable_js_of_ocaml$reason_js_of_ocaml"
 echo "    MPFR support            : $enable_mpfr$reason_mpfr"
 echo "    Re support              : $enable_re$reason_re"
+echo "Build environment"
+echo "    OCaml OS Type           : $OCAML_OS_TYPE"
+echo "    Build environment type  : $BUILD_ENV_TYPE"
 echo "Components"
 echo "    Why3 library            : $enable_why3_lib"
 echo "    GTK IDE                 : $enable_ide$reason_ide"
