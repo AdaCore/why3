@@ -1,9 +1,9 @@
 name: Main workflow
 
-
 on:
   pull_request:
   push:
+  workflow_dispatch:
   schedule:
     # Prime the caches every Monday
     - cron: 0 1 * * MON
@@ -20,21 +20,21 @@ jobs:
           - ubuntu-latest
           - windows-latest
         ocaml-compiler:
-          - "4.11.2"
+          - "4.13.1"
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout tree
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
-        uses: ocaml/setup-ocaml@v2
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
@@ -43,7 +43,7 @@ jobs:
           opam exec -- bash ./fsf_build.sh staging
 
       - name: Upload package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: why3pack-${{matrix.os}}
           path: staging
