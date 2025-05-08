@@ -21,6 +21,7 @@
 
 use int.Int
 use int.ComputerDivision
+use map.MapPermutation
 use array.Array
 use array.ArraySwap
 use array.ArrayEq
@@ -35,22 +36,6 @@ clone relations.TotalPreOrder with
 
 clone export array.Sorted with type
   elt = elt, predicate le = le, axiom .
-
-use map.MapPermutation
-
-let lemma permutation (a1 a2: array elt) (lo hi: int)
-  : (pi: int -> int, inv: int -> int)
-  requires { lo <= hi }
-  requires { permut_sub a1 a2 lo hi }
-  ensures  { forall i. lo <= i < hi -> lo <= pi i < hi }
-  ensures  { forall i1 i2. lo <= i1 < i2 < hi -> pi i1 <> pi i2 }
-  ensures  { forall i. lo <= i < hi -> lo <= inv i < hi }
-  ensures  { forall i1 i2. lo <= i1 < i2 < hi -> inv i1 <> inv i2 }
-  ensures  { forall i. lo <= i < hi -> a2[pi i] = a1[i] }
-  ensures  { forall i. lo <= i < hi -> a1[inv i] = a2[i] }
-  ensures  { forall i. lo <= i < hi -> pi (inv i) = i }
-  ensures  { forall i. lo <= i < hi -> inv (pi i) = i }
-= permutation a1.elts a2.elts lo hi
 
 use pigeon.Pigeonhole
 
@@ -87,7 +72,7 @@ let lemma key_lemma (a1 a2: array elt) (lo mid hi: int) : unit
     (lo <= j < mid \/
      mid <= j < hi /\ exists i1 i2. lo <= i1 < mid /\
                                     lo <= i2 < mid /\ a2[i2] = a1[i1]) }
-  = let pi, inv = permutation a1 a2 lo hi in
+  = let pi, inv = permutation a1.elts a2.elts lo hi in
     let ii = inv i in
     if ii < mid then return ii;
     for k = lo to mid - 1 do
