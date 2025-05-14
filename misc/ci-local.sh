@@ -61,7 +61,7 @@ do
             ;;
         nightly-bench)
             bin/why3 config detect
-            sed -i why3.conf -e "s/running_provers_max = [0-9]*/running_provers_max = 1/"
+            sed -i why3.conf -e "s/running_provers_max = [0-9]*/running_provers_max = 4/"
             cat misc/bench-few-provers-why3-conf >> why3.conf
             COQVER=$(bin/why3 config list-provers | sed -n -e 's/Coq (\?\([0-9.]\+\).*/\1/p')
             if test "$COQVER" != "" ; then

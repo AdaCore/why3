@@ -101,8 +101,20 @@ nightly-bench:
   variables:
     COMPILER: bench
   script:
-    - if test -n "$FULLBENCH" ; then misc/ci-local.sh nightly-bench ; else misc/ci-local.sh nightly-bench-reduced ; fi
+    - misc/ci-local.sh nightly-bench-reduced
   extends: .docker_template
+
+nightly-bench-long:
+  timeout: 12h
+  stage: build
+  variables:
+    COMPILER: bench
+  script:
+    - misc/ci-local.sh nightly-bench
+  image: "$BUILD_IMAGE"
+  dependencies: []
+  tags:
+    - large
 
 ce-bench:
   stage: nightly
