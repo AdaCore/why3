@@ -20,14 +20,12 @@ Require list.Mem.
 Require list.Append.
 
 (* Why3 assumption *)
-Inductive distinct {a:Type} {a_WT:WhyType a}: Init.Datatypes.list a ->
-  Prop :=
-  | distinct_zero : distinct Init.Datatypes.nil
-  | distinct_one :
-      forall (x:a), distinct (Init.Datatypes.cons x Init.Datatypes.nil)
-  | distinct_many :
-      forall (x:a) (l:Init.Datatypes.list a), ~ list.Mem.mem x l ->
-      distinct l -> distinct (Init.Datatypes.cons x l).
+Fixpoint distinct {a:Type} {a_WT:WhyType a}
+  (l:Init.Datatypes.list a) {struct l}: Prop :=
+  match l with
+  | Init.Datatypes.nil|(Init.Datatypes.cons _ Init.Datatypes.nil) => True
+  | Init.Datatypes.cons x xs => ~ list.Mem.mem x xs /\ distinct xs
+  end.
 
 (* Why3 goal *)
 Lemma distinct_append {a:Type} {a_WT:WhyType a} :
@@ -40,18 +38,23 @@ intros l1 l2 h1 h2 h3.
 induction l1 as [|l1h l1t IHl1].
 exact h2.
 simpl.
-inversion h1 ; subst.
-- apply distinct_many with (2 := h2).
+simpl in h1.
+destruct l1t.
+- destruct l2.
+  easy.
+  split.
   apply h3.
-  now left.
-- apply distinct_many.
-  contradict H1.
-  apply Append.mem_append in H1.
-  destruct H1 as [H1|H1].
+  constructor. easy.
+  easy.
+- destruct h1.
+  split.
+  contradict H.
+  apply Append.mem_append in H.
+  destruct H as [H1|H1].
   exact H1.
   elim h3 with (2 := H1).
   now left.
-  apply IHl1 with (1 := H2).
+  apply IHl1 with (1 := H0).
   intros x Hx.
   apply h3.
   now right.
