@@ -59,7 +59,7 @@ do
             fi
             examples/regtests.sh --reduced-mode
             ;;
-        nightly-bench)
+        nightly-bench-long)
             bin/why3 config detect
             sed -i why3.conf -e "s/running_provers_max = [0-9]*/running_provers_max = 4/"
             cat misc/nightly-bench-provers-why3-conf >> why3.conf
@@ -67,7 +67,7 @@ do
             if test "$COQVER" != "" ; then
               sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
             fi
-            examples/regtests.sh
+            examples/regtests.sh --examples-mode
             ;;
     esac
     section_stop "test_$1"
