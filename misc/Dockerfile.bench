@@ -12,11 +12,19 @@ RUN apt-get update -yq && \
 
 # install provers
 ## CVC5 1.0.5
+https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
     chmod a+x /usr/local/bin/cvc5-1.0.5
 ## CVC5 1.1.2
-RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux -O /usr/local/bin/cvc5-1.1.2 && \
-    chmod a+x /usr/local/bin/cvc5-1.1.2
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-shared.zip && \
+    unzip cvc5-Linux-shared.zip && \
+    mv cvc5-Linux-shared/bin/cvc5 /usr/local/bin/cvc5-1.1.2 && \
+    rm -r cvc5-Linux-shared
+## CVC5 1.2.1
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.2.1/cvc5-Linux-x86_64-shared.zip && \
+    unzip cvc5-Linux-x86_64-shared.zip && \
+    mv cvc5-Linux-x86_64-shared/bin/cvc5 /usr/local/bin/cvc5-1.2.1 && \
+    rm -r cvc5-Linux-x86_64-shared
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8
