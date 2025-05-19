@@ -2,65 +2,65 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="10" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="binary_multiplication.mlw"/>
 <theory name="BinaryMultiplication" proved="true">
  <goal name="binary_mult&#39;vc" expl="VC for binary_mult" proved="true">
- <proof prover="0"><result status="valid" time="0.050000" steps="177"/></proof>
+ <proof prover="1"><result status="valid" time="0.050000" steps="729"/></proof>
  </goal>
 </theory>
 <theory name="BinaryMultiplication63" proved="true">
  <goal name="binary_mult&#39;vc" expl="VC for binary_mult" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="binary_mult&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2623"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="463"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2459"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="381"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.2" expl="division by zero" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2557"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="480"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.3" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="4879"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="4075"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.4" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="17165"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="17745"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.5" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="15791"/></proof>
+  <proof prover="2"><result status="valid" time="0.070000" steps="15669"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.6" expl="division by zero" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2626"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="2179"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.7" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="4991"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="5039"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.8" expl="integer overflow" proved="true">
-  <proof prover="3"><result status="valid" time="0.220000" steps="48369"/></proof>
+  <proof prover="2"><result status="valid" time="0.349016" steps="49750"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.9" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="5591"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="5770"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.170000" steps="36080"/></proof>
+  <proof prover="2"><result status="valid" time="0.170000" steps="34342"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="1.000000" steps="125812"/></proof>
+  <proof prover="2"><result status="valid" time="0.628122" steps="128599"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.12" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="5189"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="2991"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="18492"/></proof>
+  <proof prover="2"><result status="valid" time="0.080000" steps="18466"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.110000" steps="23876"/></proof>
+  <proof prover="2"><result status="valid" time="0.110000" steps="24244"/></proof>
   </goal>
   <goal name="binary_mult&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2842"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="687"/></proof>
   </goal>
  </transf>
  </goal>
