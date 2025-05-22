@@ -1,0 +1,115 @@
+Warning: Error while checking function definition type match_mode: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a31)) (Ssimple (Isymbol A1)))))
+with lsymbol match_mode
+Warning: Error while interpreting tqtisFinite: No variable in bound_vars matching qualified identifier (Qident (Isymbol t1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f` cannot be evaluated)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/float_div.mlw", line 24, characters 11-25:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (245 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Precondition of `f` cannot be evaluated):
+File ieee_float.mlw:
+  Line 934:
+    zeroF :  = <UNDEFINED>
+File float_div.mlw:
+  Line 19:
+    y :  = <UNDEFINED>
+    y :  = <UNDEFINED>
+
+Warning: Error while checking function definition type match_mode: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A1))
+  (Var (Qannotident (Isymbol (Sprover @a31)) (Ssimple (Isymbol A1)))))
+with lsymbol match_mode
+Warning: Error while interpreting tqtisFinite: No variable in bound_vars matching qualified identifier (Qident (Isymbol t1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f1` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f1` cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin mul because cannot interpret term epsilon x:t.
+t'real x = (1.0 /' 4.0) as an argument)
+  - Abstract RAC: INCOMPLETE (fatal rac error: cannot evaluate builtin mul because cannot interpret term epsilon x:t.
+t'real x = (1.0 /' 4.0) as an argument)
+File "bench/check-ce/float_div.mlw", line 40, characters 11-25:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (245 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: cannot evaluate builtin mul because cannot interpret term epsilon x:t.
+t'real x = (1.0 /' 4.0) as an argument):
+File bv.mlw:
+  Line 9:
+    pow2 :
+      int
+      ->
+      int = [|0 => 1; 1024 => 0; 1 => 2; 2 => 4; 3 => 8; 4 => 16; 5 => 32;
+            6 => 64; 7 => 128; 8 => 256; 9 => 512; 10 => 1024; 11 => 2048;
+            12 => 4096; 13 => 8192; 14 => 16384; 15 => 32768; 16 => 65536;
+            17 => 131072; 18 => 262144; 19 => 524288; 20 => 1048576;
+            21 => 2097152; 22 => 4194304; 23 => 8388608; 24 => 16777216;
+            25 => 33554432; 26 => 67108864; 27 => 134217728; 28 => 268435456;
+            29 => 536870912; 30 => 1073741824; 31 => 2147483648;
+            32 => 4294967296; 33 => 8589934592; 34 => 17179869184;
+            35 => 34359738368; 36 => 68719476736; 37 => 137438953472;
+            38 => 274877906944; 39 => 549755813888; 40 => 1099511627776;
+            41 => 2199023255552; 42 => 4398046511104; 43 => 8796093022208;
+            44 => 17592186044416; 45 => 35184372088832; 46 => 70368744177664;
+            47 => 140737488355328; 48 => 281474976710656;
+            49 => 562949953421312; 50 => 1125899906842624;
+            51 => 2251799813685248; 52 => 4503599627370496;
+            53 => 9007199254740992; 54 => 18014398509481984;
+            55 => 36028797018963968; 56 => 72057594037927936;
+            57 => 144115188075855872; 58 => 288230376151711744;
+            59 => 576460752303423488; 60 => 1152921504606846976;
+            61 => 2305843009213693952; 62 => 4611686018427387904;
+            63 => 9223372036854775808; 64 => 18446744073709551616;
+            _ =>
+            -179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368|]
+File ieee_float.mlw:
+  Line 94:
+    min :
+      t
+      ->
+      t
+      ->
+      t = (fun _arg_07 _arg_17 -> {t'real => Apply(infix /, 1.0 4.0)})
+  Line 95:
+    max :
+      t
+      ->
+      t
+      ->
+      t = (fun _arg_06 _arg_16 -> {t'real => Apply(infix /, 1.0 4.0)})
+  Line 194:
+    of_int :
+      mode
+      ->
+      int
+      ->
+      t = (fun _arg_05 _arg_15 -> {t'real => Apply(infix /, 1.0 4.0)})
+  Line 280:
+    from_real :
+      mode
+      ->
+      real
+      ->
+      t = (fun _arg_04 _arg_14 -> {t'real => Apply(infix /, 1.0 4.0)})
+  Line 678:
+    is_int : t -> bool = [|_ => true|]
+  Line 934:
+    zeroF : t = {t'real => Apply(infix /, 1.0 4.0)}
+File float_div.mlw:
+  Line 35:
+    y :  = {t'real => Apply(infix /, 1.0 4.0)}
+    y : t = {t'real => Apply(infix /, 1.0 4.0)}
+
