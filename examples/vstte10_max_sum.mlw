@@ -48,8 +48,12 @@ module MaxAndSum2
       invariant { s = sum a 0 i }
       invariant { is_max a 0 i m }
       invariant { s <= i * m }
+      let ghost old_m = m in
       if m < a[i] then m <- a[i];
-      s <- s + a[i]
+      begin ensures { i * old_m <= i * m }
+        compat_order_mult old_m m i
+      end;
+      s <- s + a[i];
     done;
     s, m
 
