@@ -1,7 +1,22 @@
 
 import "alt_ergo_smt.drv"
 
-(* Support for IEEE theory of floats in Alt-Ergo 2.6.0 *)
+(* Support for IEEE theory of floats in Alt-Ergo 2.6.0
+
+Disabled since the theory of Alt-Ergo does not match the one of
+SMT-LIB: there is no special values, operations do not overflow.
+
+Generally speaking, mapping the type Float.t to Real can never work, see issue
+[https://gitlab.inria.fr/why3/why3/-/issues/905]
+
+The settings below indeed might be appropriate for theories in
+ufloat.mlw library
+
+*)
+
+
+
+(*
 
 theory ieee_float.GenericFloat
 
@@ -29,9 +44,9 @@ theory ieee_float.Float32
 
   syntax function add  "(ae.float32 %1 (+ %2 %3))"
   syntax function sub  "(ae.float32 %1 (- %2 %3))"
-  syntax function mul  "(ae.float32 %1 (* %2 %3))"
+  syntax function mul  "(ae.float32 %1 ( * %2 %3))"
   syntax function div  "(ae.float32 %1 (/ %2 %3))"
-  syntax function fma  "(ae.float32 %1 (+ (* %2 %3) %4))"
+  syntax function fma  "(ae.float32 %1 (+ ( * %2 %3) %4))"
 
   syntax predicate le  "(<= %1 %2)"
   syntax predicate lt  "(< %1 %2)"
@@ -46,9 +61,9 @@ theory ieee_float.Float64
 
   syntax function add  "(ae.float64 %1 (+ %2 %3))"
   syntax function sub  "(ae.float64 %1 (- %2 %3))"
-  syntax function mul  "(ae.float64 %1 (* %2 %3))"
+  syntax function mul  "(ae.float64 %1 ( * %2 %3))"
   syntax function div  "(ae.float64 %1 (/ %2 %3))"
-  syntax function fma  "(ae.float64 %1 (+ (* %2 %3) %4))"
+  syntax function fma  "(ae.float64 %1 (+ ( * %2 %3) %4))"
 
   syntax predicate le  "(<= %1 %2)"
   syntax predicate lt  "(< %1 %2)"
@@ -56,3 +71,5 @@ theory ieee_float.Float64
   syntax predicate gt  "(> %1 %2)"
 
 end
+
+*)

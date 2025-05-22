@@ -41,6 +41,12 @@ module Int
   meta "remove_unused:keep" predicate (>)
   meta "remove_unused:keep" predicate (>=)
 
+  let ghost compat_order_mult (x y z:int)
+    requires { x <= y }
+    requires { 0 <= z }
+    ensures { x * z <= y * z }
+  = ()
+
 end
 
 (** {2 Absolute Value} *)
