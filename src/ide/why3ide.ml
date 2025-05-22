@@ -1104,6 +1104,8 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
       if f = "Task" then
         (0, task_view)
       else
+        begin
+          (* Format.eprintf "scroll_to_loc to loc='%a'@." Loc.pp_position loc; *)
         try
           let n, v, _, _ = get_source_view_table f in
           (n, v)
@@ -1118,6 +1120,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           let n, v = create_raw_source_view ~read_only:true f s in
           change_lang v (Filename.extension f);
           (n, v)
+        end
     in
 
     if force_tab_switch then (
@@ -1615,10 +1618,6 @@ let on_selected_row r =
     let id = get_node_id r#iter in
     let typ = get_node_type id in
     match typ with
-    | NGoal ->
-      let c = gconfig.show_full_context in
-      let show_uses_clones_metas = gconfig.show_uses_clones_metas in
-      send_request (Get_task (id, c, show_uses_clones_metas, true))
     | NProofAttempt ->
       let pa, _obs, _l = Hint.find node_id_pa id in
       let output_text =
@@ -1647,6 +1646,10 @@ let on_selected_row r =
       edited_view#scroll_to_mark `INSERT;
       counterexample_view#source_buffer#set_text "(not yet available)";
       counterexample_view#scroll_to_mark `INSERT;
+      let c = gconfig.show_full_context in
+      let show_uses_clones_metas = gconfig.show_uses_clones_metas in
+      send_request (Get_task (id, c, show_uses_clones_metas, true))
+    | NGoal ->
       let c = gconfig.show_full_context in
       let show_uses_clones_metas = gconfig.show_uses_clones_metas in
       send_request (Get_task (id, c, show_uses_clones_metas, true))
@@ -3028,11 +3031,12 @@ let treat_notification n =
          other cases, it should change nothing. *)
       if list_loc != [] then
         apply_loc_on_source list_loc goal_loc
-      else (
+      else begin
         erase_loc_all_view ();
         (* Still scroll to the ident (for example for modules) *)
+        (* Format.eprintf "before scroll_to_loc, loc = %a@." (Pp.print_option Loc.pp_position) goal_loc; *)
         scroll_to_loc ~force_tab_switch:true goal_loc
-      );
+      end;
       (* Scroll to the end of task text without any animation. We cannot use the
          scroll_to methods, as they eventually call
          gtk_adjustment_animate_to_value in GTK3. So, we manually call
