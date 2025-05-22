@@ -162,7 +162,9 @@ and string_skip_spaces buf = parse
 
   let resolve_file orig_file file =
     try
-      Sysutil.resolve_from_paths [Filename.dirname orig_file] file
+      let r = Sysutil.resolve_from_paths [Filename.dirname orig_file] file in
+      (* Format.eprintf "resolve_file %s %s -> %s@." orig_file file r; *)
+      r
     with
     | e ->
        Loc.warning warn_inexistent_file "inexistent file in source location: %a" Exn_printer.exn_printer e;

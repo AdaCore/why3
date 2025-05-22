@@ -456,41 +456,47 @@ let () =
 
 (* This section is used to get colored source as a function of the task *)
 
-let get_locations (task: Task.task) =
-  let list = ref [] in
-  let goal_loc = ref None in
+let relativize_loc =
   let file_cache = Hstr.create 17 in
-  let session_dir =
-    let d = get_server_data () in
-    Session_itp.get_dir d.cont.controller_session in
-  (* [relativize f] takes the file name [f] which can be absolute or
-     relative.  It returns a file name [g] that is absolute for the
-     same file. If [f] is relative, it is assumed relative to the
-     session directory.  FIXME: why is this code so complicated ?
-     probably this code removes "." and ".." from the path, but why do
-     so?  *)
+(* [relativize f] takes the file name [f] which can be absolute or
+   relative.  It returns a file name [g] that is absolute for the same
+   file. If [f] is relative, it is assumed relative to the session
+   directory.  FIXME: why is this code so complicated ?  probably this
+   code removes "." and ".." from the path, but why do so?  *)
   let relativize f =
     try Hstr.find file_cache f
     with Not_found ->
+      let session_dir =
+        let d = get_server_data () in
+        Session_itp.get_dir d.cont.controller_session
+      in
       let f = if Filename.is_relative f then
-                Filename.concat session_dir f
-              else f
+          Filename.concat session_dir f
+        else f
       in
       (* Format.eprintf "relativize: f is `%s`@." f; *)
       (* Format.eprintf "relativize: session_dir is `%s`@." session_dir; *)
       let path = Sysutil.relativize_filename session_dir f in
-      (* Format.eprintf "relativize: path is `%a`@." Sysutil.print_file_path path; *)
+      (* Format.eprintf "relativize: resulting path is `%a`@." Sysutil.print_file_path path; *)
       (* FIXME: this an abusive use of Sysutil.system_dependent_absolute_path *)
       let g = Sysutil.system_dependent_absolute_path session_dir path in
-      (* Format.eprintf "relativize: g is `%s`@." g; *)
+      (* Format.eprintf "relativize: absolute path is `%s`@.@." g; *)
       Hstr.replace file_cache f g;
-      g in
+      g
+  in
+  fun loc ->
+  let (f,bl,bc,el,ec) = Loc.get loc in
+  (* Format.eprintf "color_loc: former f is `%s`@." f; *)
+  let loc = Loc.user_position (relativize f) bl bc el ec in
+  (* let (f',_,_,_) = Loc.get loc in *)
+  (* Format.eprintf "color_loc: latter f is `%s`@." f'; *)
+  loc
+
+let get_locations (task: Task.task) =
+  let list = ref [] in
+  let goal_loc = ref None in
   let color_loc ~color ~loc =
-    let (f,bl,bc,el,ec) = Loc.get loc in
-    (* Format.eprintf "color_loc: former f is `%s`@." f; *)
-    let loc = Loc.user_position (relativize f) bl bc el ec in
-    (* let (f',_,_,_) = Loc.get loc in *)
-    (* Format.eprintf "color_loc: latter f is `%s`@." f'; *)
+    let loc = relativize_loc loc in
     list := (loc, color) :: !list
   in
   let get_goal_loc ~loc pr_loc =
@@ -499,8 +505,7 @@ let get_locations (task: Task.task) =
     let loc = Option.fold ~some:(fun x -> Some x) ~none:pr_loc loc in
     match loc with
     | Some loc ->
-        let (f,bl,bc,el,ec) = Loc.get loc in
-        let loc = Loc.user_position (relativize f) bl bc el ec in
+        let loc = relativize_loc loc in
         goal_loc := Some loc
     | _ -> () in
   let rec color_locs ~color formula =
@@ -1021,6 +1026,7 @@ end
           let th_id   = theory_name t in
           let th_name = th_id.Ident.id_string in
           let th_loc  = th_id.Ident.id_loc in
+          let th_loc = Option.map relativize_loc th_loc in
           P.notify (Task (nid, "Theory " ^ th_name, [], th_loc, lang))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
@@ -1068,6 +1074,7 @@ match pa.proof_state with
           let file_loc =
             let fp = Session_itp.system_path d.cont.controller_session f in
             Loc.user_position fp 1 0 1 0 in
+          let file_loc = relativize_loc file_loc in
           P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
