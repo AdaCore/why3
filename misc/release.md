@@ -45,6 +45,7 @@
 
 * prepare and upload the archive to https://gitlab.inria.fr/why3/releases
   - `make dist`
+  - important: make sure your have git-lfs installed
   - get the Git repository of the releases and move to it
     ```
     cp .../distrib/why3-$RELEASE.tar.gz releases/
@@ -56,7 +57,8 @@
 * update the repository, if this is the most recent release
   - forward the `stable` branch of the Why3 repository:
     `git push origin bugfix/v$VERSION:stable`
-  - merge back the changes to the `master` branch
+  - merge back the changes to the `master` branch. There might be
+    a conflict in `configure.in`: see below.
   - update the first line of `configure.in` using `$RELEASE+git`,
     commit and push the change to `master`
 
