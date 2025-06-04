@@ -1,5 +1,20 @@
 :x: marks a potential source of incompatibility
 
+Version 1.8.1, June 4, 2025
+---------------------------
+
+Core
+  * fix cloning of injective records
+
+Miscellaneous
+  * fix compilation error with GCC 15
+
+Provers
+  * fix soundness bug with floats in Alt-Ergo 2.6.x
+
+Plugins
+  * resurrect the BDD-infer loop invariant generation plug-in
+
 Version 1.8.0, December 11, 2024
 --------------------------------
 

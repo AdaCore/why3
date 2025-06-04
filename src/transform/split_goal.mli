@@ -1,12 +1,11 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
 (********************************************************************)
 
 val split_pos_full : ?known_map:Decl.known_map -> Term.term -> Term.term list
