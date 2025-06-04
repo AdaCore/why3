@@ -5,7 +5,8 @@
   - `RELEASE=1.3.0`
 
 * perform a sanity check
-  - check the BTS
+  - check the BTS: there should be no more open issues and MR in the milestone page
+       https://gitlab.inria.fr/why3/why3/-/milestones
   - check that the nightly bench is OK
   - `make xml-validate-local` (see below for `why3session.dtd`)
   - check `CHANGES.md`
@@ -13,7 +14,7 @@
   - run `make update-doc-png` and check if some pictures need to be updated
   - run `make doc/latex/manual.pdf` and check the manual
   - run `make dist` and check the content of `distrib/why3-X.X.X.tar.gz`
-  - check `lib/why3/META.in` (e.g., against `EXTPKGS` in `Makefile.in`)
+  - check `lib/why3/META.in` (in particular against `EXTPKGS` in `Makefile.in`)
   - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
   - check the gallery, especially the new examples (see below)
   - run the manual job `trywhy3-extra` to build Alt-Ergo for TryWhy3 if needed (see below)

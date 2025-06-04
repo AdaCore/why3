@@ -658,31 +658,44 @@ let show_about_window ~parent () =
                 "";
                 "with contributions of";
                 "";
+                "Lucas Baudin";
+                "Benedikt Becker";
+                "Cláudio Belo Lourenço";
                 "Stefan Berghofer";
                 "Sylvie Boldo";
+                "Paul Bonnot";
                 "Martin Clochard";
+                "Guillaume Cluzel";
                 "Simon Cruanes";
                 "Sylvain Dailler";
                 "Xavier Denis";
+                "Yacine El Haddad";
                 "Clément Fumex";
+                "Quentin Garchery";
                 "Léon Gondelman";
                 "David Hauzar";
                 "Daisuke Ishii";
+                "Benjamin Jorge";
                 "Jacques-Henri Jourdan";
                 "Johannes Kanig";
                 "Mikhail Mandrykin";
+                "Matteo Manighetti";
                 "David Mentré";
                 "Benjamin Monate";
+                "Solène Moreau";
                 "Kim Nguyễn";
                 "Thi-Minh-Tuyen Nguyen";
+                "Paul Patault";
                 "Mário Pereira";
+                "Gérald Point";
                 "Raphaël Rieu-Helft";
+                "Gabriel Scherer";
                 "Simão Melo de Sousa";
                 "Asma Tafat";
                 "Piotr Trojanek";
                 "Makarius Wenzel";
                ]
-      ~copyright:"Copyright 2010-2024 Inria, CNRS, Paris-Saclay University"
+      ~copyright:"Copyright 2010-2025 Inria, CNRS, Paris-Saclay University"
       ~license:("See file " ^ Filename.concat Config.datadir "LICENSE")
       ~website:"https://www.why3.org/"
       ~website_label:"https://www.why3.org/"
