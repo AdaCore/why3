@@ -385,15 +385,15 @@ fi
 
 # ppx
 if test "$enable_ocamlfind" = yes; then
-  AC_MSG_CHECKING([for compiler-libs using ocamlfind])
-  COMPILERLIBS=$($OCAMLFIND query compiler-libs 2> /dev/null | tr -d '\r')
-  if test -n "$COMPILERLIBS"; then
+  AC_MSG_CHECKING([for ppxlib using ocamlfind])
+  PPXLIB=$($OCAMLFIND query ppxlib 2> /dev/null | tr -d '\r')
+  if test -n "$PPXLIB"; then
     AC_MSG_RESULT([yes])
     enable_ppx=yes
   else
     AC_MSG_RESULT([no])
     enable_ppx=no
-    reason_ppx=" (compiler-libs not found)"
+    reason_ppx=" (ppxlib not found)"
   fi
 else
   enable_ppx=no
