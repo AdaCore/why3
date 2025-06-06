@@ -1,8 +1,8 @@
 # Making a release
 
 * assuming some variables
-  - `VERSION=1.3`
-  - `RELEASE=1.3.0`
+  - `VERSION=1.8`
+  - `RELEASE=1.8.1`
 
 * perform a sanity check
   - check the BTS: there should be no more open issues and MR in the milestone page
@@ -17,7 +17,10 @@
   - check `lib/why3/META.in` (in particular against `EXTPKGS` in `Makefile.in`)
   - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
   - check the gallery, especially the new examples (see below)
-  - run the manual job `trywhy3-extra` to build Alt-Ergo for TryWhy3 if needed (see below)
+  - run the manual job `trywhy3-extra` to build Alt-Ergo for TryWhy3
+    if needed (see below) this is done by opening the pipeline on the
+    gitlab site and manually click on the arrow on the right of the
+    job.
 
 * check/update authors and copyright
   - update the content of the About dialog in `src/ide/gconfig.ml`
@@ -60,15 +63,25 @@
   - merge back the changes to the `master` branch. There might be
     a conflict in `configure.in`: see below.
   - update the first line of `configure.in` using `$RELEASE+git`,
-    commit and push the change to `master`
+    commit and push the change to `master` (this requires to change
+    the settings/repository in gitlab: temporary allow Maintainers to
+    push into master)
 
 * update the website, if this is the most recent release
   - get the sources from https://gitlab.com/why3project/why3project.gitlab.io
   - update `index.html` with the new url for download
   - update `.gitlab-ci.yml` if the Alt-Ergo worker was rebuilt (job `trywhy3-extra`)
+    you need to put the right number in TRYWHY3_JOB with the pipeline where `trywhy3-extra` was run
   - update `why3session.dtd` with the current version
-  - wait for completion of the pipeline of the `stable` branch
+  - *wait for completion* of the pipeline of the `stable` branch
   - commit and push the changes, to trigger an update of the website
+    Last time this failed because the token to access Why3 project on
+    Inria gitlab expired.  Regenerate again a token from
+    https://gitlab.inria.fr/why3/why3/-/settings/access_tokens, give
+    it a name like `Why3WebSite` and access level `reporter` at least,
+    with rights `read_api` at least. Put the the new token in
+    https://gitlab.com/why3project/why3project.gitlab.io/-/settings/ci_cd#js-cicd-variables-settings
+    as the value of variable `UPSTREAM_TOKEN`
 
 * prepare and upload the OPAM packages to https://github.com/ocaml/opam-repository
   - reinitialize the repository if not fresh:
@@ -103,3 +116,4 @@
   - commit and push the modified files
 
 * announce the release using the features of `CHANGES.md`
+  Wait for the opam packages to appear, then announce on Zulip and on the mailing list
