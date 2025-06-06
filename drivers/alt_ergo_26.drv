@@ -1,30 +1,30 @@
 
+(* Since Alt-Ergo 2.6, the SMT input syntax is used *)
+
 import "alt_ergo_smt.drv"
 
-(* Support for IEEE theory of floats in Alt-Ergo 2.6.0
+(* Extra functions on Real numbers in Alt-Ergo 2.6 *)
 
-Disabled since the theory of Alt-Ergo does not match the one of
-SMT-LIB: there is no special values, operations do not overflow.
+theory real.PowerInt
+  syntax function power "(ae.pow %1 %2)"
+end
 
-Generally speaking, mapping the type Float.t to Real can never work, see issue
-[https://gitlab.inria.fr/why3/why3/-/issues/905]
+theory real.PowerReal
+  syntax function pow "(ae.pow %1 %2)"
+end
 
-The settings below indeed might be appropriate for theories in
-ufloat.mlw library
+theory real.Square
+  syntax function sqrt "(ae.sqrt_real %1)"
+end
+
+(* Partial support for IEEE theory of floats in Alt-Ergo 2.6
+
+It is partial because special values for infinities and NaN are not
+supported. Instead, a rounding function from Real to Real is provided,
+that never overflows (also called unbound floating-point
+representation)
 
 *)
-
-
-
-(*
-
-theory ieee_float.GenericFloat
-
-  syntax type t "Real"
-  syntax function to_real "%1"
-  remove prop Round_monotonic
-  remove prop Round_idempotent
-end
 
 theory ieee_float.RoundingMode
    syntax type mode "RoundingMode"
@@ -37,39 +37,15 @@ theory ieee_float.RoundingMode
    syntax predicate to_nearest "(or (= %1 RNE) (= %1 RNA))"
 end
 
+theory ieee_float.GenericFloat
+  remove prop Round_monotonic
+  remove prop Round_idempotent
+end
 
 theory ieee_float.Float32
-
   syntax function round "(ae.float32 %1 %2)"
-
-  syntax function add  "(ae.float32 %1 (+ %2 %3))"
-  syntax function sub  "(ae.float32 %1 (- %2 %3))"
-  syntax function mul  "(ae.float32 %1 ( * %2 %3))"
-  syntax function div  "(ae.float32 %1 (/ %2 %3))"
-  syntax function fma  "(ae.float32 %1 (+ ( * %2 %3) %4))"
-
-  syntax predicate le  "(<= %1 %2)"
-  syntax predicate lt  "(< %1 %2)"
-  syntax predicate ge  "(>= %1 %2)"
-  syntax predicate gt  "(> %1 %2)"
-
 end
 
 theory ieee_float.Float64
-
   syntax function round "(ae.float64 %1 %2)"
-
-  syntax function add  "(ae.float64 %1 (+ %2 %3))"
-  syntax function sub  "(ae.float64 %1 (- %2 %3))"
-  syntax function mul  "(ae.float64 %1 ( * %2 %3))"
-  syntax function div  "(ae.float64 %1 (/ %2 %3))"
-  syntax function fma  "(ae.float64 %1 (+ ( * %2 %3) %4))"
-
-  syntax predicate le  "(<= %1 %2)"
-  syntax predicate lt  "(< %1 %2)"
-  syntax predicate ge  "(>= %1 %2)"
-  syntax predicate gt  "(> %1 %2)"
-
 end
-
-*)
