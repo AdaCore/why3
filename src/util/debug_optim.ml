@@ -13,7 +13,7 @@ open Ast_mapper
 open Asttypes
 open Longident
 
-let ast_mapper argv =
+let ast_mapper =
   { Ast_mapper.default_mapper with
     expr = fun mapper expr ->
       match expr with
@@ -31,4 +31,9 @@ let ast_mapper argv =
            None
       | other -> default_mapper.expr mapper other; }
 
-let () = register "Debug hook" ast_mapper
+let () =
+  Ppxlib.Driver.register_transformation_using_ocaml_current_ast "Debug hook"
+    ~impl:(ast_mapper.structure ast_mapper)
+
+let () =
+  Ppxlib.Driver.run_as_ppx_rewriter ()
