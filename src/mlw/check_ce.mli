@@ -81,8 +81,9 @@ val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 val oracle_of_model : Pdecl.known_map -> Model_parser.model -> Pinterp_core.oracle
 (** Create an oracle from a (prover model-derived) candidate counterexample. *)
 
-val model_of_exec_log : known_map:(Decl.decl Ident.Mid.t) -> prover_model:model -> Log.exec_log -> model
-(** [model_of_exec_log ~known_map ~prover_model log] populates a {!Model_parser.model} from an
+val model_of_exec_log : env:Env.env -> known_map:Decl.known_map ->
+  prover_model:model -> Log.exec_log -> model
+(** [model_of_exec_log ~env ~known_map ~prover_model log] populates a {!Model_parser.model} from an
    execution log [log], using information about record declaration from [known_map] *)
 
 (* val find_ls : Theory.theory -> Loc.position -> Term.lsymbol *)
@@ -181,7 +182,8 @@ val best_giant_step_result : (model * rac_result) list -> (model * rac_result) o
                               > RAC_not_done _
     *)
 
-val last_nonempty_model : (Decl.known_map) -> (Call_provers.prover_answer * model) list -> model option
+val last_nonempty_model : env:Env.env -> known_map:Decl.known_map ->
+  (Call_provers.prover_answer * model) list -> model option
 (** Select the last non-empty model from the list of models, and builds
     concrete terms based on the terms it contains. Helper function for the
     cases where counterexample checking has not been requested. *)

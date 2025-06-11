@@ -571,7 +571,7 @@ let concrete_of_ls ls =
   ls.ls_name.id_string
 
 let concrete_bv_of_bigint bv_value bv_length =
-  let bv_verbatim = Format.asprintf "#b%a" (Number.print_in_base 2 (Some bv_length)) bv_value 
+  let bv_verbatim = Format.asprintf "#b%a" (Number.print_in_base 2 (Some bv_length)) bv_value
   in {bv_value; bv_length; bv_verbatim}
 
 let concrete_of_constant c ty =
@@ -620,63 +620,102 @@ let concrete_of_constant c ty =
       end
   | Constant.ConstStr s -> concrete_const (String s)
 
+let concrete_float_special fp value =
+  concrete_const (Float { float_exp_size = fp.Number.fp_exponent_digits;
+                          float_significand_size = fp.Number.fp_significand_digits;
+                          float_val = value })
+
 (* Also converts some concrete epsilon terms (was previously done in model_parser):
    - when it represents a record,
    - when it represents the projection of a value
    - when it represents a function that can be unfolded
    to a function literal (used notably for arrays) *)
-let rec concrete_term_of_term (known_map:Decl.known_map) (m : concrete_syntax_term Mvs.t) =
+let rec concrete_term_of_term ~(env:Env.env) ~(known_map:Decl.known_map) (m : concrete_syntax_term Mvs.t) : term -> concrete_syntax_term =
   function tm ->
     match tm.t_node with
     | Term.Tconst c -> concrete_of_constant c (Option.get tm.t_ty)
     | Term.Tvar v -> (try Mvs.find v m with Not_found -> concrete_var (concrete_string_from_vs v))
+    | Term.Tapp (lsymb, _) when ls_equal lsymb Term.fs_bool_true -> concrete_const (Boolean true)
+    | Term.Tapp (lsymb, _) when ls_equal lsymb Term.fs_bool_false -> concrete_const (Boolean false)
     | Term.Tapp (lsymb, ts) ->
-      if ls_equal lsymb Term.fs_bool_true then concrete_const (Boolean true)
-      else if ls_equal lsymb Term.fs_bool_false then concrete_const (Boolean false)
-      else
-      begin match get_record known_map m lsymb ts with
-      | Some t -> t
-      | None ->
-        let ts_concrete = List.map (concrete_term_of_term known_map m) ts in
-        let ls_name = concrete_of_ls lsymb in
-        concrete_apply ls_name ts_concrete
-      end
+        begin
+          try
+            let ty = match tm.t_ty with None -> raise Not_found | Some ty -> ty in
+            let ts = match ty.Ty.ty_node with Ty.Tyapp (ts, _) -> ts | _ -> raise Not_found in
+            let fp  = match ts.Ty.ts_def with
+              | Ty.Float fp -> fp
+              | _ -> raise Not_found
+            in
+            let exp_size = fp.Number.fp_exponent_digits in
+            let significand_size = fp.Number.fp_significand_digits in
+            (* TODO: make this search only once! *)
+            let plus_infinity_ls, minus_infinity_ls, nan_ls =
+              try
+                let float_lib = "Float" ^ string_of_int (exp_size + significand_size) in
+                let th =
+                  Env.read_theory env [ "ieee_float" ] float_lib
+                in
+                Theory.ns_find_ls th.Theory.th_export [ "plus_infinity" ],
+                Theory.ns_find_ls th.Theory.th_export [ "minus_infinity" ],
+                Theory.ns_find_ls th.Theory.th_export [ "not_a_number" ]
+              with _ -> raise Not_found
+            in
+            if ls_equal lsymb plus_infinity_ls then concrete_float_special fp Plus_infinity else
+            if ls_equal lsymb minus_infinity_ls then concrete_float_special fp Minus_infinity else
+            if ls_equal lsymb nan_ls then concrete_float_special fp NaN else
+              raise Not_found
+          with Not_found ->
+            begin match get_record ~env ~known_map m lsymb ts with
+              | Some t -> t
+              | None ->
+                  let ts_concrete = List.map (concrete_term_of_term ~env ~known_map m) ts in
+                  let ls_name = concrete_of_ls lsymb in
+                  concrete_apply ls_name ts_concrete
+            end
+        end
     | Term.Tif (tif, t1, t2) ->
-        concrete_if (concrete_term_of_term known_map m tif) (concrete_term_of_term known_map m t1)
-          (concrete_term_of_term known_map m t2)
+        concrete_if
+          (concrete_term_of_term ~env ~known_map m tif)
+          (concrete_term_of_term ~env ~known_map m t1)
+          (concrete_term_of_term ~env ~known_map m t2)
     | Term.Tlet (t, bo) ->
       let v, bo = t_open_bound bo in
       let vstring = concrete_string_from_vs v in
       let updated_m = Mvs.add v (concrete_var vstring) m in
-      concrete_let vstring (concrete_term_of_term known_map updated_m bo)
-        (concrete_term_of_term known_map updated_m t)
+      concrete_let vstring (concrete_term_of_term ~env ~known_map updated_m bo)
+        (concrete_term_of_term ~env ~known_map updated_m t)
     | Term.Teps t ->
       begin match Term.t_open_lambda tm with
       | [], _, _ ->
         (* | Epsilon (eps_x, eps_term) -> *)
         let vs, t' = Term.t_open_bound t in
-        begin match get_opt_record known_map m vs t' with
+        begin match get_opt_record ~env ~known_map m vs t' with
         | Some fields_values -> concrete_record fields_values
         | None ->
-          begin match get_opt_coercion known_map m vs t' with
+          begin match get_opt_coercion ~env ~known_map m vs t' with
           | Some (proj_name, v_proj) -> concrete_proj proj_name v_proj
           | None ->
+              (* support special values *)
             let vstring = concrete_string_from_vs vs in
-            let t'_concrete = concrete_term_of_term known_map (Mvs.add vs (concrete_var vstring) m) t' in
+            let t'_concrete =
+              concrete_term_of_term ~env ~known_map (Mvs.add vs (concrete_var vstring) m) t'
+            in
             (* TODO an epsilon at this stage is probably an error *)
             concrete_epsilon  vstring t'_concrete
           end
         end
       | [vs], _trig, t' ->
-        begin match get_opt_coercion known_map m vs t' with
+        begin match get_opt_coercion ~env ~known_map m vs t' with
         | Some (proj_name, v_proj) -> concrete_proj proj_name v_proj
         | None ->
-          begin match get_opt_fun_literal known_map m vs t' with
+          begin match get_opt_fun_literal ~env ~known_map m vs t' with
             | Some (elts,others) ->
                 concrete_function_literal elts others
           | None ->
             let vstring = concrete_string_from_vs vs in
-            let t'_concrete = concrete_term_of_term known_map (Mvs.add vs (concrete_var vstring) m) t' in
+            let t'_concrete =
+              concrete_term_of_term ~env ~known_map (Mvs.add vs (concrete_var vstring) m) t'
+            in
             concrete_function [vstring] t'_concrete
           end
         end
@@ -686,7 +725,7 @@ let rec concrete_term_of_term (known_map:Decl.known_map) (m : concrete_syntax_te
           List.fold_left2 (fun acc v cv ->
             Mvs.add v (concrete_var cv) acc) m vsl concrete_vars
         in
-        let t'_concrete = concrete_term_of_term known_map updated_map t' in
+        let t'_concrete = concrete_term_of_term ~env ~known_map updated_map t' in
         concrete_function concrete_vars t'_concrete
       end
     | Term.Tquant (quant, tq) -> let vs,_, t = t_open_quant tq in
@@ -695,16 +734,18 @@ let rec concrete_term_of_term (known_map:Decl.known_map) (m : concrete_syntax_te
           | Term.Texists -> Exists
         in
         concrete_quant quantifier (List.map (fun v -> concrete_string_from_vs v) vs)
-          (concrete_term_of_term known_map m t)
+          (concrete_term_of_term ~env ~known_map m t)
     | Term.Tbinop (op, t1, t2) ->
       let op = match op with Tand -> And | Tor -> Or | Timplies -> Implies | Tiff -> Iff in
-      concrete_binop op (concrete_term_of_term known_map m t1) (concrete_term_of_term known_map m t2)
-    | Term.Tnot t -> concrete_not (concrete_term_of_term known_map m t)
+      concrete_binop op
+        (concrete_term_of_term ~env ~known_map m t1)
+        (concrete_term_of_term ~env ~known_map m t2)
+    | Term.Tnot t -> concrete_not (concrete_term_of_term ~env ~known_map m t)
     | Term.Ttrue -> concrete_const (Boolean true)
     | Term.Tfalse -> concrete_const (Boolean false)
     | Term.Tcase (_, _) -> concrete_failure "case not supported" (`Term tm)
 
-and get_record known_map m lsymb args =
+and get_record ~(env:Env.env) ~(known_map:Decl.known_map) m lsymb args : concrete_syntax_term option =
   (* Gets the list of record field and value from a term of the form `record'mk t1 ... tn`
      The names for the record fields are obtained from the pmodule *)
   if Strings.has_suffix ~suffix:"'mk" lsymb.ls_name.id_string then begin
@@ -743,7 +784,7 @@ and get_record known_map m lsymb args =
         fields args
     then
 *)
-    let fields_args = List.map (concrete_term_of_term known_map m) args in
+    let fields_args = List.map (concrete_term_of_term ~env ~known_map m) args in
       let fields_values =
         List.combine
           (List.map (fun ls ->
@@ -762,7 +803,8 @@ and get_record known_map m lsymb args =
     end
   else None
 
-and get_opt_record _pm _env _vs _t' = None
+and get_opt_record ~(env:Env.env) ~(known_map:Decl.known_map) _mvs _vs _t' =
+  ignore env; ignore known_map; None
  (*  (* check if t is of the form epsilon x:ty. x.f1 = v1 /\ ... /\ x.fn = vn
   with f1,...,fn the fields associated to type ty *)
   let exception UnexpectedPattern in
@@ -801,7 +843,8 @@ and get_opt_record _pm _env _vs _t' = None
       raise UnexpectedPattern
   with UnexpectedPattern -> None *)
 
-and get_opt_coercion known_map env vs t =
+and get_opt_coercion ~(env:Env.env) ~(known_map:Decl.known_map) mvs (vs:vsymbol) (t:term) :
+  (string * concrete_syntax_term) option =
   (* special case for type coercions:
    if t is of the form epsilon x:ty. proj x = v, use Proj v as concrete term *)
   Debug.dprintf debug_concrete_term "[get_opt_coercion] vs.vs_ty = %a@."
@@ -818,13 +861,13 @@ and get_opt_coercion known_map env vs t =
     match proj.t_node with
     | Tapp (proj_ls, [x]) when t_equal x (t_var vs)
              && is_proj_for_ty vs.vs_ty proj_ls ->
-      let concrete_proj_v = concrete_term_of_term known_map env term_value in
+      let concrete_proj_v = concrete_term_of_term ~env ~known_map mvs term_value in
       let ls_name = concrete_of_ls proj_ls in
       Some (ls_name, concrete_proj_v)
     | _ -> None)
   | _ -> None
 
-and get_opt_fun_literal known_map env vs t' =
+and get_opt_fun_literal ~(env:Env.env) ~(known_map:Decl.known_map) mvs vs t' =
   (* Unfold a concrete term of the form:
   if x = ct0 then ct1 else if x = ct0' then ct1' else ... else ct2
   to the following result:
@@ -832,24 +875,26 @@ and get_opt_fun_literal known_map env vs t' =
   others = ct2 *)
   (* Format.printf "get_opt_fun_literal (bvar = %a) %a@." Pretty.print_vs vs Pretty.print_term t'; *)
   let res =
-  let rec unfold env vs t' =
+  let rec unfold mvs vs t' =
     match t'.t_node with
     | Tif ({t_node = Tapp (ls, [x;y])}, t1, t2)
         when ls_equal ls ps_equ &&
         (t_equal (t_var vs) x || t_equal (t_var vs) y) ->
-      let (elts, others) = unfold env vs t2 in
-      let index = (if t_equal (t_var vs) x then concrete_term_of_term known_map env y else concrete_term_of_term known_map env x) in
-      let value = concrete_term_of_term known_map env t1 in
+      let (elts, others) = unfold mvs vs t2 in
+      let index = (if t_equal (t_var vs) x then
+                     concrete_term_of_term ~env ~known_map mvs y
+                   else concrete_term_of_term ~env ~known_map mvs x) in
+      let value = concrete_term_of_term ~env ~known_map mvs t1 in
       ({ elts_index = index; elts_value = value } :: elts, others)
     | _ ->
-      let t'_concrete = concrete_term_of_term known_map env t' in
+      let t'_concrete = concrete_term_of_term ~env ~known_map mvs t' in
       ([], t'_concrete)
   in
   if t_v_occurs vs t' = 0 then
-    let t'_concrete = concrete_term_of_term known_map env t' in
+    let t'_concrete = concrete_term_of_term ~env ~known_map mvs t' in
     Some ([],t'_concrete)
   else
-    match unfold env vs t' with
+    match unfold mvs vs t' with
     | [], _ -> None
     | elts, others -> Some (elts,others)
   in
@@ -858,7 +903,7 @@ and get_opt_fun_literal known_map env vs t' =
   | Some x -> Format.printf "get_opt_fun_literal: Some@."; Some x
   | None -> Format.printf "get_opt_fun_literal: None@."; None *)
 
-let rec concrete_of_cexp (known_map:Decl.known_map)
+let rec concrete_of_cexp ~(env:Env.env) ~(known_map:Decl.known_map)
   (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t)
   (c:cexp) : concrete_syntax_term =
   match c.c_node with
@@ -866,19 +911,19 @@ let rec concrete_of_cexp (known_map:Decl.known_map)
     let get_pv pv = Mpv.find_def (concrete_var (concrete_string_from_vs pv.pv_vs)) pv mpv in
     concrete_apply (id_name rs.rs_name) (List.map get_pv pvsymbols)
 | Cpur (_, _) -> concrete_failure "Cannot convert Cpur to concrete term" (`Cexp c)
-| Cfun e -> concrete_of_expr known_map mpv mv e
+| Cfun e -> concrete_of_expr ~env ~known_map mpv mv e
 | Cany -> concrete_failure "Cannot convert Cany to concrete term" (`Cexp c)
 
-and concrete_of_expr (known_map:Decl.known_map) (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
+and concrete_of_expr ~(env:Env.env) ~(known_map:Decl.known_map) (mpv : concrete_syntax_term Mpv.t) (mv : concrete_syntax_term Mvs.t) (e: expr) =
   match e.e_node with
 | Econst c -> concrete_of_constant c (Ity.ty_of_ity e.e_ity)
 | Evar v -> (Mpv.find_def (concrete_var (concrete_string_from_vs v.pv_vs)) v mpv)
-| Eexec (cexp, _) -> concrete_of_cexp known_map mpv mv cexp
+| Eexec (cexp, _) -> concrete_of_cexp ~env ~known_map mpv mv cexp
 | Eassign _ -> concrete_failure "Cannot convert Eassign to concrete term" (`Expr e)
 | Elet (_, _) -> concrete_failure "Cannot convert Elet to concrete term" (`Expr e)
 | Eif (e, e1, e2) ->
-    concrete_if (concrete_of_expr known_map mpv mv e)
-      (concrete_of_expr known_map mpv mv e1) (concrete_of_expr known_map mpv mv e2)
+    concrete_if (concrete_of_expr ~env ~known_map mpv mv e)
+      (concrete_of_expr ~env ~known_map mpv mv e1) (concrete_of_expr ~env ~known_map mpv mv e2)
 | Ematch (_, _, _) -> concrete_failure "Cannot convert Ematch to concrete term" (`Expr e)
 | Ewhile (_, _, _, _) -> concrete_failure "Cannot convert Ewhile to concrete term" (`Expr e)
 | Efor (_, _, _, _, _) -> concrete_failure "Cannot convert Efor to concrete term" (`Expr e)
@@ -886,27 +931,27 @@ and concrete_of_expr (known_map:Decl.known_map) (mpv : concrete_syntax_term Mpv.
 | Eexn (_, _) -> concrete_failure "Cannot convert Eexn to concrete term" (`Expr e)
 | Eassert (_, _) -> concrete_failure "Cannot convert Eassert to concrete term" (`Expr e)
 | Eghost _ -> concrete_failure "Cannot convert Eghost to concrete term" (`Expr e)
-| Epure t -> concrete_term_of_term known_map mv t
+| Epure t -> concrete_term_of_term ~env ~known_map mv t
 | Eabsurd -> concrete_failure "Cannot convert Eabsurd to concrete term" (`Expr e)
 
-let rec value_to_concrete_term known_map v =
+let rec value_to_concrete_term ~env ~known_map v =
   let open Value in
   match v_desc v with
   | Vnum i -> concrete_of_constant (Constant.ConstInt Number.{ il_kind = ILitUnk; il_int = i }) Ty.ty_int
   | Vstring s -> concrete_const (String s)
   | Vbool b -> concrete_const (Boolean b)
-  | Vproj (ls, v) -> concrete_proj (id_name ls.ls_name) (value_to_concrete_term known_map v)
+  | Vproj (ls, v) -> concrete_proj (id_name ls.ls_name) (value_to_concrete_term ~env ~known_map v)
   | Varray a ->
     let aux i v = {
       elts_index= concrete_const (Integer {
                   int_value= Number.{il_kind = ILitUnk; il_int = BigInt.of_int i};
                   int_verbatim= string_of_int i });
-      elts_value= value_to_concrete_term known_map v }
+      elts_value= value_to_concrete_term ~env ~known_map v }
     in
     concrete_function_literal (List.mapi aux (Array.to_list a))
       (* Others is not handled *)  concrete_undefined;
   | Vconstr (Some rs, frs, fs) -> (
-    let vs = List.map (fun f -> value_to_concrete_term known_map (field_get f)) fs in
+    let vs = List.map (fun f -> value_to_concrete_term ~env ~known_map (field_get f)) fs in
     if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
       (* same test for record-ness as in smtv2.ml *)
       let ns = List.map (fun rs -> id_name rs.rs_name) frs in
@@ -914,16 +959,16 @@ let rec value_to_concrete_term known_map v =
     else
       concrete_apply (id_name rs.rs_name) vs )
   | Vconstr (None, frs,fs) -> (* TODO if I understand correctly, this is a record as well *)
-    let vs = List.map (fun f -> value_to_concrete_term known_map (field_get f)) fs in
+    let vs = List.map (fun f -> value_to_concrete_term ~env ~known_map (field_get f)) fs in
     let ns = List.map (fun rs -> id_name rs.rs_name) frs in
     concrete_record (List.combine ns vs)
   (* Why does the Vfun case happen? Also, I didn't see these values show up in the end *)
   | Vfun (_vars, bvar, e) ->
-      concrete_of_expr known_map Mpv.empty
+      concrete_of_expr ~env ~known_map Mpv.empty
         (Mvs.of_list [bvar, concrete_var (concrete_string_from_vs bvar)]) e
   | Vpurefun _  -> concrete_failure "Cannot convert Vpurefun to concrete term" (`Value v)
   | Vundefined -> concrete_undefined
-  | Vterm t -> concrete_term_of_term known_map Mvs.empty t
+  | Vterm t -> concrete_term_of_term ~env ~known_map Mvs.empty t
   | Vreal r ->
     let dummy_real = Number.real_literal ~radix:10 ~neg:false ~int:"42" ~frac:"" ~exp:None in
     concrete_const
@@ -964,7 +1009,7 @@ let debug_print_derived_model = Debug.register_info_flag "print-derived-model"
     field names.
     TODO fail if the log doesn't fail at the location of the original model
     *)
-let model_of_exec_log ~known_map ~prover_model log =
+let model_of_exec_log ~env ~known_map ~prover_model log =
   let me_of_log_entry loc id value =
     (* If the log entry corresponds to an element that is present in the model
     log, we reuse that element and substitute the concrete value. This is not
@@ -976,11 +1021,11 @@ let model_of_exec_log ~known_map ~prover_model log =
     match search_model_element_for_id prover_model ~loc id with
   | Some me ->
       Some {me with
-            me_concrete_value = value_to_concrete_term known_map value;
+            me_concrete_value = value_to_concrete_term ~env ~known_map value;
             me_attrs = id.id_attrs}
   | None ->
       Some (model_element_of_unmatched_log_entry ~loc id
-        (value_to_concrete_term known_map value) value.Pinterp_core.Value.v_ty)
+        (value_to_concrete_term ~env ~known_map value) value.Pinterp_core.Value.v_ty)
     with Concrete_term_failure msg -> Loc.warning warn_concrete_term "%s" msg;
       None
   in
@@ -1129,7 +1174,7 @@ let models_from_rac ~limits ?verb_lvl ?compute_term rac env pm models =
           ~giant_step_result:(giant_state,giant_log)
         in
         let known_map = pm.Pmodule.mod_theory.Theory.th_known in
-        let derived_model = model_of_exec_log ~known_map ~prover_model normal_log
+        let derived_model = model_of_exec_log ~env ~known_map ~prover_model normal_log
         in derived_model, verdict
     in model,normal_res,giant_res,verdict
   in
@@ -1140,7 +1185,7 @@ let models_from_giant_step ~limits ?verb_lvl ?compute_term rac env pmodule prove
     match giant_result with
     | RAC_done (_, log) ->
         let known_map = pmodule.Pmodule.mod_theory.Theory.th_known in
-        let derived_model = model_of_exec_log ~known_map ~prover_model log in
+        let derived_model = model_of_exec_log ~env ~known_map ~prover_model log in
         derived_model,giant_result
     | RAC_not_done _ -> prover_model,giant_result
   in
@@ -1206,16 +1251,16 @@ let best_giant_step_result = fun models ->
   let not_empty (m,_) = not (Model_parser.is_model_empty m) in
   List.nth_opt (List.sort compare (List.filter not_empty models)) 0
 
-let last_nonempty_model pm models =
+let last_nonempty_model ~(env:Env.env) ~(known_map:Decl.known_map) models =
   let not_empty (_,m) = not (Model_parser.is_model_empty m) in
   let models = List.filter not_empty models in
   let models = List.rev models in
   let all_elems m =
     List.map (fun me -> {me with me_concrete_value =
-                                 concrete_term_of_term pm Mvs.empty me.me_value})
+                                 concrete_term_of_term ~env ~known_map Mvs.empty me.me_value})
       (get_model_elements m)
   in
-  let add_me_to_file f line me = 
+  let add_me_to_file f line me =
       Wstdlib.Mint.change (function None -> Some [me] | Some l -> Some (me :: l)) line f in
   let add_me_to_files files_map me =
     match Option.map Loc.get me.me_location with

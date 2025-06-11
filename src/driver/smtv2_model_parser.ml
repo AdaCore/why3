@@ -829,42 +829,37 @@ module FromModelToTerm = struct
               (Constant.real_const_from_string ~radix:10 ~neg:false ~int:"0"
                  ~frac:"0" ~exp:None) ty
         | Float_NaN ->
-            let is_nan_ls =
+            (* TODO: make this search in env only once! *)
+            let nan_ls =
               try
                 let th =
                   Env.read_theory env.why3_env [ "ieee_float" ] float_lib
                 in
-                Theory.ns_find_ls th.Theory.th_export [ "is_nan" ]
-              with _ -> error "No lsymbol found in theory for is_nan@."
+                Theory.ns_find_ls th.Theory.th_export [ "not_a_number" ]
+              with _ -> error "No lsymbol found in theory for not_a_number@."
             in
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let f = t_app is_nan_ls [ t_var x ] None in
-            t_eps_close x f
+            t_app nan_ls [] (Some ty)
         | Float_Plus_Infinity ->
-            let is_plus_infinite_ls =
+            let plus_infinity_ls =
               try
                 let th =
                   Env.read_theory env.why3_env [ "ieee_float" ] float_lib
                 in
-                Theory.ns_find_ls th.Theory.th_export [ "is_plus_infinity" ]
-              with _ -> error "No lsymbol found in theory for is_plus_infinity@."
+                Theory.ns_find_ls th.Theory.th_export [ "plus_infinity" ]
+              with _ -> error "No lsymbol found in theory for plus_infinity@."
             in
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let f = t_app is_plus_infinite_ls [ t_var x ] None in
-            t_eps_close x f
+            t_app plus_infinity_ls [ ] (Some ty)
         | Float_Minus_Infinity ->
-            let is_plus_infinite_ls =
+            let minus_infinity_ls =
               try
                 let th =
                   Env.read_theory env.why3_env [ "ieee_float" ] float_lib
                 in
-                Theory.ns_find_ls th.Theory.th_export [ "is_minus_infinity" ]
+                Theory.ns_find_ls th.Theory.th_export [ "minus_infinity" ]
               with _ ->
-                error "No lsymbol found in theory for is_minus_infinity@."
+                error "No lsymbol found in theory for minus_infinity@."
             in
-            let x = create_vsymbol (Ident.id_fresh "x") ty in
-            let f = t_app is_plus_infinite_ls [ t_var x ] None in
-            t_eps_close x f
+            t_app minus_infinity_ls [ ] (Some ty)
         | Float_Error ->
             error "Error while interpreting float constant %a@." print_constant
               c)
