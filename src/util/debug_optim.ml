@@ -8,32 +8,35 @@
 (*  on linking described in file LICENSE.                           *)
 (********************************************************************)
 
-open Parsetree
-open Ast_mapper
-open Asttypes
-open Longident
+module Exp = Ppxlib.Ast_builder.Default
 
-let ast_mapper =
-  { Ast_mapper.default_mapper with
-    expr = fun mapper expr ->
+let test_flag ~loc =
+  Exp.pexp_ident ~loc { txt = Ldot ((Lident "Debug"), "test_flag"); loc  }
+let debug_no_expansion ~loc =
+  Exp.pexp_ident ~loc { txt = Ldot ((Lident "Debug"), "dprintf_no_expansion");
+loc  }
+
+let expand_dprintf =
+  Ppxlib.Context_free.Rule.special_function'
+  (Ldot (Lident "Debug","dprintf"))
+ (fun expr ->
       match expr with
       | { pexp_desc =
           Pexp_apply ({ pexp_desc =
                         Pexp_ident { txt = Ldot (Lident "Debug", "dprintf")}},
-                      flag :: _args) } as app ->
-         let open Ast_helper in
-         Exp.ifthenelse
-           (Exp.apply
-              (Exp.ident { txt = Ldot (Lident "Debug", "test_flag");
-                           loc = Location.none (*TODO*) })
-              [flag])
-           app
-           None
-      | other -> default_mapper.expr mapper other; }
+                      ((flag :: _) as args))
+                      ;
+                      pexp_loc = loc } ->
+        Some
+         (Exp.pexp_ifthenelse ~loc
+           (Exp.pexp_apply ~loc (test_flag ~loc) [flag])
+           (Exp.pexp_apply ~loc (debug_no_expansion ~loc) args)
+           None)
+      | other -> None)
 
 let () =
-  Ppxlib.Driver.register_transformation_using_ocaml_current_ast "Debug hook"
-    ~impl:(ast_mapper.structure ast_mapper)
+  Ppxlib.Driver.register_transformation "Debug hook"
+    ~rules:[expand_dprintf]
 
 let () =
   Ppxlib.Driver.run_as_ppx_rewriter ()
