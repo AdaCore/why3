@@ -11,12 +11,12 @@ Prover result is: Unknown (unknown + incomplete) (5643 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 5:
@@ -46,12 +46,12 @@ Prover result is: Unknown (unknown + incomplete) (5569 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 7:
@@ -81,12 +81,12 @@ Prover result is: Unknown (unknown + incomplete) (5356 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 9:
@@ -116,12 +116,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 11:
@@ -151,12 +151,12 @@ Prover result is: Unknown (unknown + incomplete) (5551 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 13:
@@ -186,28 +186,27 @@ Prover result is: Unknown (unknown + incomplete) (5049 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 15:
-    x = epsilon x8:t. is_nan x8
-    x = epsilon x8:t. is_nan x8
+    x = not_a_number
+    x = not_a_number
     Execution of main function `g6'goal` with env:
-      { lsenv = []; vsenv = [ x = epsilon x8:t. is_nan x8 ];
+      { lsenv = []; vsenv = [ x = not_a_number ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 15:
     Property failure at postcondition of `g6'goal` with env:
-      { lsenv = []; vsenv = [ x = epsilon x8:t. is_nan x8, result = () ];
-        rsenv = [ zeroF = UNDEFINED ];
-        idenv = [ x = epsilon x8:t. is_nan x8 ] }
+      { lsenv = []; vsenv = [ x = not_a_number, result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = not_a_number ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -222,12 +221,12 @@ Prover result is: Unknown (unknown + incomplete) (23854 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 17:
@@ -258,29 +257,28 @@ Prover result is: Unknown (unknown + incomplete) (455 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 19:
-    x = epsilon x16:t. is_plus_infinity x16
-    x = epsilon x16:t. is_plus_infinity x16
+    x = plus_infinity
+    x = plus_infinity
     Execution of main function `g8'goal` with env:
-      { lsenv = []; vsenv = [ x = epsilon x16:t. is_plus_infinity x16 ];
+      { lsenv = []; vsenv = [ x = plus_infinity ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 19:
     Property failure at postcondition of `g8'goal` with env:
-      { lsenv = [];
-        vsenv = [ x = epsilon x16:t. is_plus_infinity x16, result = () ];
+      { lsenv = []; vsenv = [ x = plus_infinity, result = () ];
         rsenv = [ zeroF = UNDEFINED ];
-        idenv = [ RNE = UNDEFINED, x = epsilon x16:t. is_plus_infinity x16 ] }
+        idenv = [ RNE = UNDEFINED, x = plus_infinity ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -295,12 +293,12 @@ Prover result is: Unknown (unknown + incomplete) (14003 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 21:
@@ -331,12 +329,12 @@ Prover result is: Unknown (unknown + incomplete) (35568 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 24:
@@ -367,12 +365,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 26:
@@ -402,12 +400,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 29:
@@ -437,12 +435,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 892:
+  Line 908:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 892:
+  Line 908:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 32:
@@ -472,12 +470,12 @@ Prover result is: Unknown (unknown + incomplete) (12570 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 41:
@@ -507,12 +505,12 @@ Prover result is: Unknown (unknown + incomplete) (12549 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 43:
@@ -542,12 +540,12 @@ Prover result is: Unknown (unknown + incomplete) (12271 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 45:
@@ -577,12 +575,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 47:
@@ -612,12 +610,12 @@ Prover result is: Unknown (unknown + incomplete) (12807 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 49:
@@ -648,28 +646,27 @@ Prover result is: Unknown (unknown + incomplete) (11952 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 51:
-    x = epsilon x24:t1. is_nan1 x24
-    x = epsilon x24:t1. is_nan1 x24
+    x = not_a_number1
+    x = not_a_number1
     Execution of main function `g6'goal` with env:
-      { lsenv = []; vsenv = [ x = epsilon x24:t1. is_nan1 x24 ];
+      { lsenv = []; vsenv = [ x = not_a_number1 ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
   Line 51:
     Property failure at postcondition of `g6'goal2` with env:
-      { lsenv = []; vsenv = [ x = epsilon x24:t1. is_nan1 x24, result = () ];
-        rsenv = [ zeroF = UNDEFINED ];
-        idenv = [ x = epsilon x24:t1. is_nan1 x24 ] }
+      { lsenv = []; vsenv = [ x = not_a_number1, result = () ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = not_a_number1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -684,12 +681,12 @@ Prover result is: Unknown (unknown + incomplete) (47561 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 53:
@@ -709,24 +706,40 @@ File floats.mlw:
         idenv = [ RNE = UNDEFINED, x = ((- 0x1.FFFFFFFFFFFFFp58):t1) ] }
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal2` cannot be evaluated)
-- Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
-  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `g8'goal3` cannot be evaluated)
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
 File "bench/check-ce/floats.mlw", line 55, characters 24-60:
 Goal g8.
 Prover result is: Unknown (unknown + incomplete) (455 steps).
-The following counterexample model could not be verified
-  (both RAC terminated because Postcondition of `g8'goal3` cannot be evaluated):
+The program does not comply to the verification goal, for example during the
+  following execution:
 File ieee_float.mlw:
-  Line 934:
-    zeroF :  = <UNDEFINED>
+  Line 950:
+    Constant zeroF initialization
+  Line 63:
+    (giant-step) execution of unimplemented function with args: []
+    result = UNDEFINED
+  Line 950:
+    zeroF = UNDEFINED
 File floats.mlw:
   Line 55:
-    x :  = (epsilon x26. Apply(is_plus_infinity, x26))
-    x : t1 = (epsilon x27. Apply(is_plus_infinity, x27))
+    x = plus_infinity1
+    x = plus_infinity1
+    Execution of main function `g8'goal` with env:
+      { lsenv = []; vsenv = [ x = plus_infinity1 ];
+        rsenv = [ zeroF = UNDEFINED ]; idenv = [] }
+Unknown location:
+    Normal execution of function `Tuple0` with args: []
+File floats.mlw:
+  Line 55:
+    Property failure at postcondition of `g8'goal2` with env:
+      { lsenv = []; vsenv = [ x = plus_infinity1, result = () ];
+        rsenv = [ zeroF = UNDEFINED ];
+        idenv = [ RNE = UNDEFINED, x = plus_infinity1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -741,12 +754,12 @@ Prover result is: Unknown (unknown + incomplete) (31228 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 57:
@@ -778,12 +791,12 @@ Prover result is: Unknown (unknown + incomplete) (125590 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 60:
@@ -815,12 +828,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 62:
@@ -850,12 +863,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 65:
@@ -887,12 +900,12 @@ Prover result is: Unknown (unknown + incomplete) (443 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     Constant zeroF initialization
   Line 63:
     (giant-step) execution of unimplemented function with args: []
     result = UNDEFINED
-  Line 934:
+  Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
   Line 68:

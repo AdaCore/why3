@@ -437,7 +437,7 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         if !opt_check_ce_model then select_ce env th res.pr_models
         else
           Option.bind
-            (Check_ce.last_nonempty_model known_map res.pr_models)
+            (Check_ce.last_nonempty_model ~env ~known_map res.pr_models)
             (fun m -> Some (m, Not_checked))
         in
           printf "%a@." (print_result !opt_json)

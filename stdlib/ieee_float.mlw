@@ -151,6 +151,22 @@ module GenericFloat
   axiom is_not_finite: forall x:t.
     not (is_finite x) <-> (is_infinite x \/ is_nan x)
 
+  (** some constants for special values
+
+    it is not specified that these are unique, i.e. it is not true that
+
+    forall x. is_nan x -> x = not_a_number
+
+  *)
+  constant plus_infinity : t
+  axiom plus_infinity_spec: is_plus_infinity plus_infinity
+
+  constant minus_infinity : t
+  axiom minus_infinity_spec: is_minus_infinity minus_infinity
+
+  constant not_a_number : t
+  axiom not_a_number_spec: is_nan not_a_number
+
 
 
   (** {3 Conversions from other sorts} *)

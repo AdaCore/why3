@@ -126,7 +126,7 @@ let () = printf "@[On task2, CVC4,1.7 answers %a@."
 
 let () = printf "@[A candidate counterexample obtained from the prover is@\n%t@]@."
     (fun fmt ->
-       match Check_ce.last_nonempty_model (Task.task_known task2)
+       match Check_ce.last_nonempty_model ~env ~known_map:(Task.task_known task2)
                result1.Call_provers.pr_models with
        | Some m -> Json_base.print_json fmt (Model_parser.json_model m)
        | None -> fprintf fmt "unavailable")
@@ -176,7 +176,7 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
+  let why_prover = Some ("Alt-Ergo,^2.6.*$",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let results = Check_ce.models_from_rac ~limits rac env pm models in
@@ -190,7 +190,7 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
+  let why_prover = Some ("Alt-Ergo,^2.6.*$",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
     (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let rac_results = Check_ce.models_from_giant_step ~limits
