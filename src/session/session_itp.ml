@@ -32,7 +32,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  theory_parent_name            : fileID;
+  mutable theory_parent_name    : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -825,6 +825,9 @@ let update_theory_node notification s th =
         Loc.errorm "[Fatal] Session_itp.update_theory_node: parent missing@."
     end
 
+let warn_missing_parent =
+  Loc.register_warning "warn_missing_parent" "Warn for missing parents node in session"
+
 let rec update_goal_node notification s id =
   let tr_list = get_transformations s id in
   let pa_list = get_proof_attempts s id in
@@ -849,8 +852,8 @@ let rec update_goal_node notification s id =
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
       | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
-                  Loc.warning (Loc.register_warning "warn_missing_parent" "Warn for missing parents node in session")
-                  "Session_itp.update_goal_node: parent missing@.";
+                  Loc.warning warn_missing_parent
+                    "Session_itp.update_goal_node: parent missing@.";
                   Printexc.print_backtrace stderr;
                   assert false
     end
@@ -1205,6 +1208,7 @@ let load_file session old_provers f =
       let def_fmt =
         Env.get_format (Format.asprintf "%a" Sysutil.print_file_path path) in
       string_attribute_def "format" f def_fmt in
+    Debug.dprintf debug "[Session_itp.load_file] fid=%d, path=%a@." fid Sysutil.print_file_path path;
     let mf = { file_id = fid;
                file_path = path;
                file_format = fmt;
@@ -1519,7 +1523,11 @@ let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
   in
-  assert (detached_theory.theory_parent_name = parent_name);
+  (* parent name must be updated since it refers to the file id from
+     old session, which can be different, in particular after
+     resizing hashtable `session_files`.  See MR
+     https://gitlab.inria.fr/why3/why3/-/merge_requests/1231 *)
+  detached_theory.theory_parent_name <- parent_name;
   detached_theory.theory_goals <- goalsID;
   detached_theory.theory_is_detached <- true;
   detached_theory
@@ -1766,7 +1774,6 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
     (theories:Theory.theory list) format : file =
   (* let fn = Sysutil.relativize_filename s.session_dir fn in *)
-  Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." Sysutil.print_file_path fn;
 (*
   if Hfile.mem s.session_files fn then
     begin
@@ -1777,6 +1784,7 @@ let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
   else
 *)
   let fid = gen_fileID s in
+  Debug.dprintf debug "[Session_itp.add_file_section] fid= %d, fn = %a@." fid Sysutil.print_file_path fn;
     let f = { file_id = fid;
               file_path = fn;
               file_format = format;
