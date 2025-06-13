@@ -30,6 +30,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | "++" -> "\\mathbin{+\\mkern-10mu+}"
     | "<=" -> "\\le"
     | ">=" -> "\\ge"
+    | "*" -> "\\times"
     | s -> s
 
   (** Optionally extract trailing numbers and quotes, after an optional single or double
@@ -55,21 +56,21 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
 
   (** Requirements *)
 
-  type command_shape = {name: string; name': string; arity: int}
+  type command_shape = {name: string; name': string; arity: int; iscomment: bool}
 
   module Requirements = Set.Make (struct type t = command_shape let compare = compare end)
 
   let requirements = ref Requirements.empty
 
-  let record_command_shape name name' arity =
-    requirements := Requirements.add {name; name'; arity} !requirements
+  let record_command_shape ~iscomment name name' arity =
+    requirements := Requirements.add {name; name'; arity; iscomment} !requirements
 
   (** {2 Printers} *)
   let pp_command' ~suffix fmt base =
     fprintf fmt "\\%s%s%s" prefix (sanitize base) suffix
 
   (** Print a string as a LaTeX command *)
-  let pp_command ~arity ~is_field fmt name =
+  let pp_command ~iscomment ~arity ~is_field fmt name =
     if match sn_decode name with | SNword _ -> false | _ -> true then
       failwith ("pp_command: argument not word: "^name);
     let name, name', suffix =
@@ -92,22 +93,22 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       else
         (assert (not is_field);
          name^string_of_int arity, name, "") in
-    record_command_shape name name' arity;
+    record_command_shape ~iscomment name name' arity;
     pp_command' ~suffix fmt name
 
-  let pp_var' ~arity fmt s =
-    pp_command ~arity ~is_field:false fmt s
+  let pp_var' ~iscomment ~arity fmt s =
+    pp_command ~iscomment ~arity ~is_field:false fmt s
 
   let pp_var ~arity fmt id =
-    pp_var' ~arity fmt id.id_str
+    pp_var' ~iscomment:false ~arity fmt id.id_str
 
   let pp_field fmt id =
-    pp_command ~arity:0 ~is_field:true fmt id.id_str
+    pp_command ~iscomment:false ~arity:0 ~is_field:true fmt id.id_str
 
   let pp_str str fmt () =
     fprintf fmt str
 
-  let pp_command_shape ~comment_macros fmt {name; name'; arity} =
+  let pp_command_shape ~comment_macros fmt {name; name'; arity; iscomment} =
     let rec mk_args acc = function
       | 0 -> acc
       | n -> mk_args (sprintf "#%d" n::acc) (pred n) in
@@ -117,9 +118,11 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       else
         let args = mk_args [] n in
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_print_string) args in
-    fprintf fmt "%s\\newcommand{%a}[%d]{\\mathsf{%s}%a}@."
+    fprintf fmt "%s\\newcommand{%a}[%d]{\\%s{%s}%a}@."
       (if comment_macros then "% " else "")
-      (pp_command' ~suffix:"") name arity (sanitize name') pp_args arity
+      (pp_command' ~suffix:"") name arity
+      (if iscomment then "textit" else "mathsf")
+      (sanitize name') pp_args arity
 
   (** {2 Pretty-print inductive definition to latex }*)
 
@@ -215,6 +218,8 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         pp_print_string fmt "\\top"
     | Tfalse ->
         pp_print_string fmt "\\bot"
+    | Tconst (Constant.ConstStr s) ->
+        fprintf fmt "\\texttt{\\detokenize{\"%s\"}}" s
     | Tconst n ->
         Constant.print_def fmt n
     | Tident qid ->
@@ -249,7 +254,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
          | SNword s, ts ->
              let arity = List.length ts in
              let pp_args = pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_term) in
-             fprintf fmt "%a%a" (pp_var' ~arity) s pp_args ts
+             fprintf fmt "%a%a" (pp_var' ~iscomment:false ~arity) s pp_args ts
          | SNinfix s, [t1; t2] ->
              fprintf fmt "%a %s %a" pp_term t1 (sanitize_op s) pp_term t2
          | SNprefix s, [t]
@@ -279,7 +284,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
              fprintf fmt "%a%a" (pp_var ~arity) (id_of_qualid qid)
                (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_term)) ts
          | None ->
-             fprintf fmt "%a %a" pp_term t1 pp_term t2)
+             fprintf fmt "%a~%a" pp_term t1 pp_term t2)
     | Tnot {term_desc=Tinfix (t1, op, t2)} when
         sn_decode op.id_str = SNinfix "=" ->
         fprintf fmt "%a \\neq %a" pp_term t1 pp_term t2
@@ -403,7 +408,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
           let arity = List.length params in
           fprintf fmt "%a%a & %a" (pp_var ~arity) id
             (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_param)) params
-            (pp_var' ~arity:0) ("comment" ^ id.id_str)
+            (pp_var' ~iscomment:true ~arity:0) ("comment" ^ id.id_str)
         in
         fprintf fmt "%a" (Pp.print_list pp_sep pp_constr) dl
     | _ -> ()
