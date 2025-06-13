@@ -1,7 +1,7 @@
 Warning: Error while checking function definition type match_mode: Function arity mismatch when interpreting
 (Function ()
   (Ssimple (Isymbol A1))
-  (Var (Qannotident (Isymbol (Sprover @a31)) (Ssimple (Isymbol A1)))))
+  (Var (Qannotident (Isymbol (Sprover @a33)) (Ssimple (Isymbol A1)))))
 with lsymbol match_mode
 Warning: Error while interpreting tqtisFinite: No variable in bound_vars matching qualified identifier (Qident (Isymbol t1))
 
@@ -14,11 +14,11 @@ Warning: Error while interpreting tqtisFinite: No variable in bound_vars matchin
   - Abstract RAC: NORMAL
 File "bench/check-ce/float_div.mlw", line 24, characters 11-25:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown) (245 steps).
+Prover result is: Unknown (unknown) (255 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `f` cannot be evaluated):
 File ieee_float.mlw:
-  Line 934:
+  Line 950:
     zeroF :  = <UNDEFINED>
 File float_div.mlw:
   Line 19:
@@ -28,8 +28,8 @@ File float_div.mlw:
 Warning: Error while checking function definition type match_mode: Function arity mismatch when interpreting
 (Function ()
   (Ssimple (Isymbol A1))
-  (Var (Qannotident (Isymbol (Sprover @a31)) (Ssimple (Isymbol A1)))))
-with lsymbol match_mode
+  (Var (Qannotident (Isymbol (Sprover @a33)) (Ssimple (Isymbol A1)))))
+with lsymbol match_mode1
 Warning: Error while interpreting tqtisFinite: No variable in bound_vars matching qualified identifier (Qident (Isymbol t1))
 
 <check_ce:categorization>Categorizations of models:
@@ -43,7 +43,7 @@ t'real x = (1.0 /' 4.0) as an argument)
 t'real x = (1.0 /' 4.0) as an argument)
 File "bench/check-ce/float_div.mlw", line 40, characters 11-25:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (unknown) (245 steps).
+Prover result is: Unknown (unknown) (255 steps).
 The following counterexample model could not be verified
   (both RAC fatal rac error: cannot evaluate builtin mul because cannot interpret term epsilon x:t.
 t'real x = (1.0 /' 4.0) as an argument):
@@ -90,23 +90,29 @@ File ieee_float.mlw:
       t
       ->
       t = (fun _arg_06 _arg_16 -> {t'real => Apply(infix /, 1.0 4.0)})
-  Line 194:
+  Line 161:
+    plus_infinity : t = {t'real => Apply(infix /, 1.0 4.0)}
+  Line 164:
+    minus_infinity : t = {t'real => Apply(infix /, 1.0 4.0)}
+  Line 167:
+    not_a_number : t = {t'real => Apply(infix /, 1.0 4.0)}
+  Line 210:
     of_int :
       mode
       ->
       int
       ->
       t = (fun _arg_05 _arg_15 -> {t'real => Apply(infix /, 1.0 4.0)})
-  Line 280:
+  Line 296:
     from_real :
       mode
       ->
       real
       ->
       t = (fun _arg_04 _arg_14 -> {t'real => Apply(infix /, 1.0 4.0)})
-  Line 678:
+  Line 694:
     is_int : t -> bool = [|_ => true|]
-  Line 934:
+  Line 950:
     zeroF : t = {t'real => Apply(infix /, 1.0 4.0)}
 File float_div.mlw:
   Line 35:

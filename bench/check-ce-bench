@@ -314,10 +314,12 @@ for file in $files; do
           ;;
       "float_div")
           skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "floats")
           skipae=yes
-          altergosteps=1000
+          altergosteps=100
           altergostepsrac=$altergosteps
           cvc5stepsrac=10000
           z3steps=100000
