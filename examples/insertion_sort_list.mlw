@@ -1,5 +1,5 @@
 
-(* Sorting a list of integers using insertion sort *)
+(** Sorting a list using insertion sort *)
 
 module InsertionSort
 
@@ -32,5 +32,61 @@ module InsertionSort
     | Nil -> Nil
     | Cons x r -> insert x (insertion_sort r)
     end
+
+end
+
+(** In the following variant, we use a single recursive function
+    (with tail calls only).
+
+    Author: Andrei Paskevich (Univ Paris-Saclay)
+*)
+
+module SingleFunction
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Permut
+
+  type elt
+  val predicate le elt elt
+  val predicate eq (x y: elt) ensures { result <-> x=y }
+
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+  clone list.Sorted with
+    type t = elt, predicate le  = le, goal Transitive.Trans
+
+  let predicate ge (x y: elt) = le y x
+  clone list.Sorted as R with
+    type t = elt, predicate le  = ge, goal Transitive.Trans
+
+  let predicate gt (x y: elt) = ge x y && not (eq x y)
+
+  let rec sort (ul dl sl cl: list elt) : list elt
+    requires { sorted sl }
+    requires { R.sorted dl }
+    requires { R.sorted cl }
+    requires { match ul, cl with Cons u _, Cons v _ -> gt u v | _ -> true end }
+    requires { match sl, cl with Cons u _, Cons v _ -> ge u v | _ -> true end }
+    requires { match sl, dl with Cons u _, Cons v _ -> ge u v | _ -> true end }
+    requires { cl <> Nil -> dl = Nil /\ ul <> Nil }
+    variant  { ul,dl,sl,cl }
+    ensures  { sorted result }
+    ensures  { forall v. num_occ v result = num_occ v ul + num_occ v dl +
+                                            num_occ v sl + num_occ v cl }
+  = match ul,dl,sl,cl with
+    | _, Cons v dx,         _, _ ->                sort ul dx (Cons v sl) cl
+    | Cons u ux, _, Cons v sx, _ -> if gt u v then sort ul dl sx (Cons v cl)
+                                              else sort ux cl (Cons u sl) dl
+    | Cons u ux, _,         _, _ ->                sort ux cl (Cons u sl) dl
+    | Nil, Nil, _, Nil           -> sl
+    | _, _, _, _                 -> absurd
+    end
+
+  let insertion_sort (ul: list elt) : list elt
+    ensures  { sorted result }
+    ensures  { permut result ul }
+  = sort ul Nil Nil Nil
 
 end

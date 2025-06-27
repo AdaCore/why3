@@ -4,6 +4,8 @@
 <why3session shape_version="6">
 <prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="11" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.5" timelimit="11" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="insertion_sort_list.mlw"/>
 <theory name="InsertionSort" proved="true">
@@ -28,6 +30,415 @@
  </goal>
  <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
  <proof prover="1"><result status="valid" time="0.110000" steps="385"/></proof>
+ </goal>
+</theory>
+<theory name="SingleFunction" proved="true">
+ <goal name="Sorted.Transitive.Trans" proved="true">
+ <proof prover="4"><result status="valid" time="0.026623" steps="1576"/></proof>
+ </goal>
+ <goal name="R.Transitive.Trans" proved="true">
+ <proof prover="4"><result status="valid" time="0.011816" steps="22472"/></proof>
+ </goal>
+ <goal name="gt&#39;vc" expl="VC for gt" proved="true">
+ <proof prover="4"><result status="valid" time="0.006938" steps="2354"/></proof>
+ </goal>
+ <goal name="sort&#39;vc" expl="VC for sort" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="sort&#39;vc.0" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.009111" steps="12268"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.033318" steps="42869"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015656" steps="43024"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007695" steps="3143"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007138" steps="4596"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007712" steps="4605"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.114511" steps="11872"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008762" steps="3208"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.013959" steps="12249"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015710" steps="42850"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015464" steps="43005"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.011740" steps="3139"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010898" steps="4588"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.13" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008911" steps="4597"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.116756" steps="11790"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.019177" steps="3204"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.16" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.013832" steps="12071"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.030429" steps="41653"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.011061" steps="3135"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.028773" steps="42271"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.149161" steps="10820"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.489657" steps="525064"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010134" steps="4669"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.23" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.013862" steps="4725"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.24" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.015921" steps="12277"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.25" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.319764" steps="381414"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.26" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.006993" steps="3143"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.27" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009060" steps="3148"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.28" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.013720" steps="4615"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.29" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.018923" steps="4646"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.30" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007887" steps="4663"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.31" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008875" steps="3217"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.32" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.014176" steps="12165"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.33" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007017" steps="42128"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.34" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007950" steps="39579"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.35" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015058" steps="3139"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.36" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012209" steps="4588"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.37" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015959" steps="4597"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.38" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.526664" steps="522208"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.39" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007017" steps="3204"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.40" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.014928" steps="12140"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.41" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012872" steps="42105"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.42" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009945" steps="39556"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.43" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.011210" steps="3135"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.44" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007218" steps="4580"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.45" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010803" steps="4589"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.46" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.509981" steps="522183"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.47" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008037" steps="3200"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.48" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.008757" steps="12249"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.49" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.023146" steps="41513"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.50" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.014855" steps="3130"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.51" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.005990" steps="3135"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.52" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010115" steps="4590"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.53" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.023825" steps="4621"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.54" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.006886" steps="4638"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.55" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009086" steps="3204"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.56" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.012146" steps="9513"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.57" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.021044" steps="9341"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.58" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.026727" steps="9356"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.59" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008819" steps="3147"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.60" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.013076" steps="4658"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.61" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.112037" steps="11756"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.62" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010248" steps="9474"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.63" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.010705" steps="6088"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.64" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.013068" steps="6206"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.65" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.017824" steps="6110"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.66" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.020741" steps="6119"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.67" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012097" steps="3143"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.68" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.014803" steps="4586"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.69" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.129792" steps="11535"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.70" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.014620" steps="6195"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.71" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008119" steps="4724"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.72" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.008811" steps="12454"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.73" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.027967" steps="42663"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.74" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012936" steps="3139"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.75" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.021288" steps="43379"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.76" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.113929" steps="11374"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.77" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.117518" steps="12102"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.78" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009115" steps="4669"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.79" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009936" steps="4725"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.80" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.016177" steps="12683"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.81" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="1.063553" steps="1099713"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.82" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.016540" steps="3147"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.83" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008818" steps="3152"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.84" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009954" steps="4615"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.85" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.011009" steps="4646"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.86" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009794" steps="43494"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.87" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007175" steps="3221"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.88" expl="unreachable point" proved="true">
+  <proof prover="4"><result status="valid" time="0.006925" steps="6066"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.89" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.011878" steps="12402"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.90" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.024058" steps="12232"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.91" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.029074" steps="12251"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.92" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008098" steps="3143"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.93" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012874" steps="4666"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.94" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.131273" steps="11702"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.95" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007785" steps="12395"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.96" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.006874" steps="6401"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.97" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.014747" steps="6312"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.98" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.027844" steps="6216"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.99" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.024122" steps="6225"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.100" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009976" steps="3139"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.101" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.015095" steps="4586"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.102" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.116525" steps="11211"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.103" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.007937" steps="6301"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.104" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.005842" steps="4722"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.105" expl="variant decrease" proved="true">
+  <proof prover="4"><result status="valid" time="0.007616" steps="12491"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.106" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.031008" steps="42345"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.107" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.008914" steps="3134"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.108" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012080" steps="3139"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.109" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009260" steps="4594"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.110" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.011297" steps="4625"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.111" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.009918" steps="42640"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.112" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.005974" steps="3208"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.113" expl="unreachable point" proved="true">
+  <proof prover="4"><result status="valid" time="0.009635" steps="6183"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.114" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.012611" steps="15101"/></proof>
+  </goal>
+  <goal name="sort&#39;vc.115" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="sort&#39;vc.115.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.160970" steps="20177"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.180371" steps="17901"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.2" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.145202" steps="917"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.3" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.075897" steps="9457"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.4" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.153406" steps="17047"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.5" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.107912" steps="14834"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.6" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.153164" steps="14233"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.7" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.013982" steps="97427"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.8" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.129160" steps="11826"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.9" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.079141" steps="6544"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.10" expl="postcondition" proved="true">
+   <proof prover="1" timelimit="1"><result status="valid" time="0.148832" steps="731"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.11" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.190244" steps="11658"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.12" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.085639" steps="11160"/></proof>
+   </goal>
+   <goal name="sort&#39;vc.115.13" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.401538" steps="46313"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="insertion_sort&#39;vc" expl="VC for insertion_sort" proved="true">
+ <proof prover="3"><result status="valid" time="0.109557" steps="12089"/></proof>
  </goal>
 </theory>
 </file>
