@@ -286,15 +286,22 @@ let sp_let env v t sp rd =
 
 (* variant decrease preconditions *)
 
+let get_constructors env ty = match ty.ty_node with
+  | Tyapp (ts,_) -> let itd = find_its_defn env.known_map (restore_its ts) in
+      let get_cs rs = match rs.rs_logic with RLls s -> s | _ -> raise Exit in
+      begin try List.map get_cs itd.itd_constructors with Exit -> [] end,
+      ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) ty
+  | Tyvar _ -> [], Mtv.empty
+
 let decrease_alg env loc old_t t =
   let oty = t_type old_t and nty = t_type t in
-  let quit () = Loc.errorm ?loc "no default order for %a" Pretty.print_ty nty in
-  let ts = match oty with {ty_node = Tyapp (ts,_)} -> ts | _ -> quit () in
-  let itd = find_its_defn env.known_map (restore_its ts) in
-  let get_cs rs = match rs.rs_logic with RLls cs -> cs | _ -> quit () in
-  let csl = List.map get_cs itd.itd_constructors in
-  if csl = [] then quit ();
-  let sbs = ty_match Mtv.empty (ty_app ts (List.map ty_var ts.ts_args)) oty in
+  let csl, sbs = get_constructors env oty in
+  if csl = [] then
+    Loc.errorm ?loc "no default order for %a" Pretty.print_ty oty;
+  let add_scalar cs acc = if cs.ls_args = [] then
+    t_or_simp (t_equ t (fs_app cs [] nty)) acc else acc in
+  let sct = if ty_equal oty nty then
+    List.fold_right add_scalar csl t_false else t_false in
   let add_arg fty acc =
     let fty = ty_inst sbs fty in
     if ty_equal fty nty then
@@ -302,7 +309,8 @@ let decrease_alg env loc old_t t =
       pat_var vs, t_or_simp (t_equ (t_var vs) t) acc
     else pat_wild fty, acc in
   let add_cs cs =
-    let pl, f = Lists.map_fold_right add_arg cs.ls_args t_false in
+    let sct = if cs.ls_args = [] then t_false else sct in
+    let pl, f = Lists.map_fold_right add_arg cs.ls_args sct in
     t_close_branch (pat_app cs pl oty) f in
   t_case old_t (List.map add_cs csl)
 
