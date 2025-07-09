@@ -100,7 +100,6 @@ module ZipperInsertion
 
   use int.Int
   use list.List
-  use list.Length
   use list.NumOcc
   use list.Permut
 
@@ -131,10 +130,10 @@ module ZipperInsertion
     requires { ul = Nil -> lu /\ ur }
     requires { ll = Nil -> lu }
     requires { rl = Nil -> ur }
-    variant  { ul, (if lu then length ll else 0),
-                   (if ur then length rl else 0),
-                   (if lu then 0 else length ll),
-                   (if ur then 0 else length rl) }
+    variant  { ul, (if lu then ll else Nil),
+                   (if ur then rl else Nil),
+                   (if lu then Nil else ll),
+                   (if ur then Nil else rl) }
     ensures  { sorted result }
     ensures  { forall v. num_occ v result = num_occ v ll +
                              num_occ v ul + num_occ v rl }
@@ -168,10 +167,10 @@ module ZipperInsertion
     requires { ul = Nil -> lu /\ ur }
     requires { ll = Nil -> lu }
     requires { rl = Nil -> ur }
-    variant  { ul, (if lu then length ll else 0),
-                   (if ur then length rl else 0),
-                   (if lu then 0 else length ll),
-                   (if ur then 0 else length rl) }
+    variant  { ul, (if lu then ll else Nil),
+                   (if ur then rl else Nil),
+                   (if lu then Nil else ll),
+                   (if ur then Nil else rl) }
     ensures  { sorted result }
     ensures  { forall v. num_occ v result = num_occ v ll +
                              num_occ v ul + num_occ v rl }
