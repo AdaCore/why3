@@ -16,17 +16,17 @@ RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-
     chmod a+x /usr/local/bin/cvc5-1.0.5 && \
     cvc5-1.0.5 --version
 ## CVC5 1.1.2
-RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-shared.zip && \
-    unzip cvc5-Linux-shared.zip && \
-    mv cvc5-Linux-shared/bin/cvc5 /usr/local/bin/cvc5-1.1.2 && \
-    rm -r cvc5-Linux-shared && \
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-static.zip && \
+    unzip cvc5-Linux-static.zip && \
+    mv cvc5-Linux-static/bin/cvc5 /usr/local/bin/cvc5-1.1.2 && \
+    rm -r cvc5-Linux-static && \
     cvc5-1.1.2 --version
 ## CVC5 1.2.1
-RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.2.1/cvc5-Linux-x86_64-shared.zip && \
-    unzip cvc5-Linux-x86_64-shared.zip && \
-    mv cvc5-Linux-x86_64-shared/bin/cvc5 /usr/local/bin/cvc5-1.2.1 && \
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.2.1/cvc5-Linux-x86_64-static.zip && \
+    unzip cvc5-Linux-x86_64-static.zip && \
+    mv cvc5-Linux-x86_64-static/bin/cvc5 /usr/local/bin/cvc5-1.2.1 && \
     ls -l /usr/local/bin && \
-    rm -r cvc5-Linux-x86_64-shared && \
+    rm -r cvc5-Linux-x86_64-static && \
     cvc5-1.2.1 --version
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
