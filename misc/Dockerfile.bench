@@ -7,7 +7,7 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git libgmp-dev opam pkg-config unzip wget zlib1g-dev libgcc-s1 && \
+    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git libgmp-dev opam pkg-config unzip wget zlib1g-dev libgcc-s1 libstdc++6 && \
     apt-get clean
 
 # install provers
