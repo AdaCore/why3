@@ -74,6 +74,7 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4
     mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
     ls -l /usr/local/bin && \
     rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35 && \
+    ldd -v /usr/local/bin/z3-4.13.2 && \
     z3-4.13.2 --version
 
 ## list installed provers
@@ -82,7 +83,7 @@ RUN ls -l /usr/local/bin
 # create user
 RUN adduser --disabled-password --gecos '' why3
 USER why3
-ENV HOME /home/why3
+ENV HOME=/home/why3
 WORKDIR /home/why3
 
 # install opam
