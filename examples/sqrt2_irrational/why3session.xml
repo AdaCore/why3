@@ -8,72 +8,37 @@
 <file format="whyml" proved="true">
 <path name=".."/><path name="sqrt2_irrational.mlw"/>
 <theory name="Top" proved="true">
- <goal name="simplify&#39;vc" expl="VC for simplify" proved="true">
- <proof prover="3"><result status="valid" time="0.017520" steps="29701"/></proof>
- </goal>
  <goal name="sqrt2_irrational&#39;vc" expl="VC for sqrt2_irrational" proved="true">
  <transf name="split_vc" proved="true" >
-  <goal name="sqrt2_irrational&#39;vc.0" expl="witness existence" proved="true">
-  <proof prover="2"><result status="valid" time="0.095775" steps="10236"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.087679" steps="723"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.099630" steps="10559"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.1" expl="witness existence" proved="true">
+  <proof prover="2"><result status="valid" time="0.054968" steps="2065"/></proof>
   </goal>
   <goal name="sqrt2_irrational&#39;vc.2" expl="assertion" proved="true">
-  <transf name="subst" proved="true" arg1="a">
-   <goal name="sqrt2_irrational&#39;vc.2.0" expl="assertion" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.022198" steps="30995"/></proof>
-   </goal>
-  </transf>
+  <proof prover="1"><result status="valid" time="0.187576" steps="1513"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.3" expl="witness existence" proved="true">
-  <proof prover="2"><result status="valid" time="0.107580" steps="10284"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="1"><result status="valid" time="0.109496" steps="2064"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.140637" steps="10604"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.4" expl="witness existence" proved="true">
+  <proof prover="2"><result status="valid" time="0.107580" steps="2183"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.5" expl="assertion" proved="true">
-  <transf name="subst" proved="true" arg1="b">
-   <goal name="sqrt2_irrational&#39;vc.5.0" expl="assertion" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.022496" steps="34234"/></proof>
-   </goal>
-  </transf>
+  <goal name="sqrt2_irrational&#39;vc.5" expl="variant decrease" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.020115" steps="12903"/></proof>
   </goal>
   <goal name="sqrt2_irrational&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.085817" steps="1825"/></proof>
+  <proof prover="3"><result status="valid" time="0.009051" steps="5948"/></proof>
   </goal>
   <goal name="sqrt2_irrational&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.009316" steps="5182"/></proof>
+  <proof prover="3"><result status="valid" time="0.008928" steps="5984"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.8" expl="variant decrease" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.020115" steps="34702"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.010892" steps="6065"/></proof>
   </goal>
-  <goal name="sqrt2_irrational&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.009051" steps="3850"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.008928" steps="3855"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010892" steps="3870"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.087679" steps="2599"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.13" expl="witness existence" proved="true">
-  <proof prover="2"><result status="valid" time="0.054968" steps="5254"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.187576" steps="4677"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.236063" steps="5509"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.087797" steps="7981"/></proof>
-  </goal>
-  <goal name="sqrt2_irrational&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.241828" steps="5884"/></proof>
+  <goal name="sqrt2_irrational&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.034892" steps="189"/></proof>
   </goal>
  </transf>
  </goal>
