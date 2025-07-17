@@ -7,31 +7,14 @@
 use int.Int
 use int.EuclideanDivision
 use number.Parity
-use number.Divisibility
-use number.Gcd
-
-let lemma simplify (x y m: int) : unit
-  requires { x * m = y * m } requires { m <> 0 } ensures { x = y }
-= ()
 
 let rec lemma sqrt2_irrational (a b: int) : unit
   requires { 1 <= a } requires { 1 <= b }
   requires { a*a = 2*b*b } ensures { false }
   variant  { a+b }
-= let g = gcd a b in
-  if g > 1 then (
-    let a' = any int ensures { a = result * g } in
-    assert { a' >= 1 };
-    assert { a' < a };
-    let b' = any int ensures { b = result * g } in
-    assert { b' >= 1 };
-    assert { b' < b };
-    simplify (a'*a') (2*b'*b') (g*g);
-    sqrt2_irrational a' b'
-  ) else (
-    assert { even a by even (a*a) };
-    let a' = any int ensures { a = 2 * result } in
-    assert { even (b*b) };
-    assert { even b };
-    assert { divides 2 b };
-  )
+= assert { even a by even (a*a) };
+  let a' = any int ensures { a = 2 * result } in
+  assert { even (b*b) };
+  assert { even b };
+  let b' = any int ensures { b = 2 * result } in
+  sqrt2_irrational a' b'
