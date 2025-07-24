@@ -648,19 +648,43 @@ let vc_map2 fn v w = match v,w with
   | TB (vf,vg), TB(wf,wg)  -> TB (fn vf wf, fn vg wg)
   | _ -> invalid_arg "vc_map2"
 
+type cell = { csh: cell ref Mhs.t; cg: formula }
+let c_dummy = ref { csh = Mhs.empty; cg = Fany }
+
 let dl_split flat pl dl =
   if flat || List.length dl = 1 then [pl,dl] else
   let [@warning "-8"] head (Pc (h,_,_),_) = h in
   let iter fn (_,g) =
-    let rec inspect sh = function
-      | Fsym h -> if not (Shs.mem h sh) then fn h
-      | Flam (pl,_,f) | Fall (pl,f) ->
-          inspect (Shs.union sh (lh_of_pl pl)) f
+    let rec inspect sh st = function
+      | Fsym h ->
+          (* h may be external or dummy, therefore
+             we inspect every term on the stack *)
+          let pop ({contents = {csh; cg}} as r) =
+            r := !c_dummy; inspect csh [] cg in
+          let () = match Mhs.find h sh with
+            | exception Not_found -> fn h
+            | r -> pop r in
+          List.iter pop st
+      | Flam (pl,_,f) ->
+          let rec move sh pl st = match pl,st with
+            | Pc (g,_,_)::pl, r::st ->
+                move (Mhs.add g r sh) pl st
+            | Pc (g,_,_)::pl, [] ->
+                move (Mhs.add g c_dummy sh) pl st
+            | _::pl, st -> move sh pl st
+            | [], st -> inspect sh st f in
+          move sh pl st
+      | Fall (pl,f) ->
+          let lh = lh_of_pl pl in
+          let nh = Mhs.map (fun _ -> c_dummy) lh in
+          inspect (Mhs.set_union nh sh) st f
       | Fcut (_,_,f) | Fneu (f,_) | Fagt (f,_)
-      | Fagv (f,_) | Fagr (f,_) -> inspect sh f
-      | Fagc (f,g) | Fand (f,g) -> inspect sh f; inspect sh g
+      | Fagv (f,_) | Fagr (f,_) -> inspect sh st f
+      | Fagc (f,g) -> let c = {csh = sh; cg = g} in
+                      inspect sh (ref c :: st) f
+      | Fand (f,g) -> inspect sh st f; inspect sh st g
       | Fany -> () in
-    inspect Shs.empty g in
+    inspect Mhs.empty [] g in
   let module SCC = MakeSCC(Hhs) in
   List.map (fun (_,dl) -> List.split dl) @@
     SCC.scc head iter @@ List.combine pl dl
