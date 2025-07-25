@@ -263,7 +263,7 @@ let check_kind_from_string s =
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
        let s = Format.sprintf "unknown VC kind: %s@." s in
-       Gnat_util.abort_with_message ~internal:true s
+       raise (Invalid_argument s)
 
 let check_kind_to_ada kind =
    match kind with
@@ -577,19 +577,26 @@ let to_filename fmt check =
 let parse_line_spec s =
    try
      let args = Re.Str.split (Re.Str.regexp_string ":") s in
-     match args with
+     let rev_args = List.rev args in
+     match rev_args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true
         ("limit-line: incorrect line specification - missing ':'")
-     | [fn;line] ->
-         let line = int_of_string line in
-         Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | [fn;line;col;check] ->
-         let line = int_of_string line in
-         let col = int_of_string col in
-         let check = check_kind_from_string check in
-         let loc = Gnat_loc.mk_loc fn line col None in
-         Limit_Check (mk_check check 0 loc false)
+     | [_] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-line: incorrect line specification - missing line information")
+     | may_check::may_col::rest ->
+         try
+           let check = check_kind_from_string may_check in
+           let col = int_of_string may_col in
+           let loc = Gnat_loc.parse_loc_line_only (List.rev rest) in
+           let loc = Gnat_loc.set_col loc col in
+           (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+           Limit_Check (mk_check check 0 (List.rev loc) false)
+        with Invalid_argument _ ->
+           (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+          let loc = Gnat_loc.parse_loc_line_only args in
+          Limit_Line (List.rev loc)
      | _ ->
       Gnat_util.abort_with_message ~internal:true
       (
@@ -606,20 +613,21 @@ let parse_line_spec s =
 let parse_region_spec s =
    try
      let args = Re.Str.split (Re.Str.regexp_string ":") s in
-     match args with
+     match List.rev args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true
         ("limit-region: incorrect region specification - missing ':'")
-     | [fn;l_start;l_end] ->
+     | l_end::l_start::fn::rest ->
+         let loc = Gnat_loc.parse_loc_line_only (List.rev rest) in
          let l_start = int_of_string l_start in
          let l_end = int_of_string l_end in
-         Gnat_loc.mk_region fn l_start l_end
+         (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+         Gnat_loc.mk_region (List.rev loc) fn l_start l_end
      | _ ->
       Gnat_util.abort_with_message ~internal:true
       (
         "limit-region: incorrect line specification -\
-         invalid parameter number, must be \
-         3")
+         invalid parameter number")
   with
    | e when Debug.test_flag Debug.stack_trace -> raise e
    | Failure "int_of_string" ->
