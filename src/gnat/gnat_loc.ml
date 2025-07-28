@@ -37,6 +37,9 @@ let print_loc fmt l =
   let colon fmt () = Format.fprintf fmt ":" in
   Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.nothing ~sep:colon simple_print_loc fmt l
 
+let print_line_loc fmt l =
+   Format.fprintf fmt "%a%s:%d" print_context l.ctxt l.file l.line
+
 let print_region fmt l =
    Format.fprintf fmt "%a%s:%d:%d" print_loc l.context l.rfile l.first_line l.last_line
 
@@ -51,7 +54,7 @@ let in_region r l =
   match l with
   | [] -> raise (Invalid_argument "empty loc")
   | hd :: rest ->
-      equal_line r.context rest && 
+      equal_line r.context rest &&
       hd.file = r.rfile && r.first_line <= hd.line && hd.line <= r.last_line
 
 let equal_loc l1 l2 =
@@ -74,17 +77,6 @@ let rec compare_loc a b =
 let orig_loc l =
    (* the original source is always the last source location *)
    List.hd l
-
-
-let print_line_loc fmt l =
-   Format.fprintf fmt "%a%s:%d" print_context l.ctxt l.file l.line
-
-let print_loc fmt l =
-  let colon fmt () = Format.fprintf fmt ":" in
-  Pp.print_list_delim ~start:Pp.nothing ~stop:Pp.nothing ~sep:colon simple_print_loc fmt l
-
-let print_region fmt l =
-   Format.fprintf fmt "%s:%d:%d" l.rfile l.first_line l.last_line
 
 let parse_loc =
    let rec parse_loc_list acc ~first l =
