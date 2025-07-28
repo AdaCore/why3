@@ -208,7 +208,7 @@ let add_to_check ~toplevel ex go =
          Gnat_loc.equal_line l (Gnat_expl.get_loc check)
       | Gnat_expl.Limit_Check c ->
          (c.Gnat_expl.check_kind = Gnat_expl.get_check_kind check)
-         && (Gnat_loc.equal_orig_loc c.Gnat_expl.sloc (Gnat_expl.get_loc check))
+         && (Gnat_loc.equal_loc c.Gnat_expl.sloc (Gnat_expl.get_loc check))
    ) Gnat_config.limit_lines
    in
    let filter_region =
