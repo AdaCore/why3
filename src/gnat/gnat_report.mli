@@ -90,7 +90,7 @@ open Why3
    - "old"
    - "result"
 
-   The field "proof_attempts" basically contains a copy of the session
+   The field "check_tree" basically contains a copy of the session
    tree in JSON format. It's a tree structure whose nodes are goals,
    transformations and proof attempts:
 
