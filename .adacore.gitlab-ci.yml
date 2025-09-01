@@ -20,6 +20,7 @@ stages:
 
 .common_test:
   stage: build
+  interruptible: true
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "schedule"
       when: always
@@ -47,3 +48,17 @@ windows:
     - cpu:2
     - mem:4
     - disk:100
+
+submodule:
+  stage: build
+  interruptible: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: always
+    - when: never
+  services:
+    - image:pe-base
+    - cpu:2
+  script:
+    - python update-submodule.py
+
