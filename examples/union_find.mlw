@@ -1,11 +1,12 @@
 
-(** Union-Find
+(** {1 Union-Find}
 
-   This file contains a proof of a union-find implementation based on the
-   following data structure:
-
+    This file contains a proof of a union-find implementation based on the
+    following data structure:
+    {h<pre>
      type 'a content = Link of 'a elem | Root of int * 'a
      and  'a elem    = 'a content ref
+    </pre>}
 
    That is, every element is either a root, containing a rank of type int
    and a value of type 'a (a single value for the whole class), or a link
@@ -17,19 +18,27 @@
 	    Simão Melo de Sousa (Univ Beira Interior)
 *)
 
-(** Custom memory model.
+(** {2 Custom memory model}
 
-   An OCaml type such as
+    An OCaml type such as
 
-     type 'a content = Link of 'a content ref | Root of int * 'a
+      type 'a content = Link of 'a content ref | Root of int * 'a
 
-   cannot be defined in Why3 (it is a recursive, mutable type, and therefore
-   would contain regions at arbitrary depths).
+    cannot be defined in Why3 (it is a recursive, mutable type, and therefore
+    would contain regions at arbitrary depths).
 
-   Therefore, we build a custom memory model for this type in the module
-   below. Its types and operations are later mapped to the OCaml type above,
-   using a custom driver (see file uf.drv).
+    Therefore, we build a custom memory model for this type in the module
+    below. Its types and operations could be later mapped to the OCaml type
+    above, using a custom driver such as
+    {h<pre>
+    syntax type loc_ref  "%1 ref"
+    syntax val (==)      "%1 == %2"
+    syntax val alloc_ref "ref %1"
+    syntax val get_ref   "!%1"
+    syntax val set_ref   "%1 := %2"
+    </pre>}
 *)
+
 module Mem
 
   use int.Int
@@ -74,31 +83,33 @@ module Mem
 
 end
 
-(** Implementation.
+(** {2 Implementation}
 
-   The tricky part in verifying union-find is the termination of find.
-   For that purpose, we maintain a ``distance'' associated to any element
-   (in field dst; see below). Distances stricly increase when we follow link
-   pointers. We also maintain a maximal value for the distances (in field
-   maxd).
+    The tricky part in verifying union-find is the termination of find.
+    For that purpose, we maintain a ``distance'' associated to any element
+    (in field dst; see below). Distances stricly increase when we follow link
+    pointers. We also maintain a maximal value for the distances (in field
+    maxd).
 
-   For example, if we have three consecutive link pointers, we could have
-   distances as follows
-
+    For example, if we have three consecutive link pointers, we could have
+    distances as follows
+    {h<pre>
      x(0) --> y(1) --> z(2) --> r(3)
+    </pre>}
 
-   Whenever we do path compression, we do not change distances. If for
-   instance we perform find(x) above, we then have all x, y, z now linked
-   to r. That's fine, as distances are still stricly increasing.
+    Whenever we do path compression, we do not change distances. If for
+    instance we perform find(x) above, we then have all x, y, z now linked
+    to r. That's fine, as distances are still stricly increasing.
 
-   Whenever we perform a union, for instance linking the representative x
-   of one class to the representative y of another class, we change the
-   distance of y to 1+max(distance(x), distance(y)) and we increase maxd,
-   so as to maintain the invariant.
+    Whenever we perform a union, for instance linking the representative x
+    of one class to the representative y of another class, we change the
+    distance of y to 1+max(distance(x), distance(y)) and we increase maxd,
+    so as to maintain the invariant.
 
-   Now, we it comes to prove the termination of find(x), we simply use
-   maxd-distance(x) as a variant.
+    Now, we it comes to prove the termination of find(x), we simply use
+    maxd-distance(x) as a variant.
 *)
+
 module Impl
 
   use int.Int
@@ -151,6 +162,16 @@ module Impl
        dst  = (fun _ -> 0);
        maxd = 0;
      }
+
+  let create () : uf 'a
+    ensures { S.is_empty result.dom }
+  = { memo = empty_memory ();
+      dom  = S.empty;
+      rep  = (fun x -> x);
+      img  = (fun _ -> any 'a);
+      dst  = (fun _ -> 0);
+      maxd = 0;
+    }
 
   let make (ghost uf: uf 'a) (v: 'a) : elem 'a
     ensures { not (mem result (old (dom uf))) }

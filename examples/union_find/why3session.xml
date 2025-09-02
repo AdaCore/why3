@@ -5,6 +5,7 @@
 <prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.2.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="union_find.mlw"/>
 <theory name="Mem" proved="true">
@@ -15,6 +16,9 @@
 <theory name="Impl" proved="true">
  <goal name="uf&#39;vc" expl="VC for uf" proved="true">
  <proof prover="2"><result status="valid" time="0.073027" steps="246"/></proof>
+ </goal>
+ <goal name="create&#39;vc" expl="VC for create" proved="true">
+ <proof prover="4"><result status="valid" time="0.147230" steps="14642"/></proof>
  </goal>
  <goal name="make&#39;vc" expl="VC for make" proved="true">
  <proof prover="2"><result status="valid" time="0.461089" steps="1717"/></proof>
