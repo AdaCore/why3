@@ -176,7 +176,7 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
+  let why_prover = Some ("Alt-Ergo,2.6.2",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let model, clsf = Opt.get_exn (Failure "No good model found")
@@ -189,7 +189,7 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
+  let why_prover = Some ("Alt-Ergo,2.6.2",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
     (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let rac_results = Check_ce.get_rac_results ~limits ~only_giant_step:true

@@ -2502,3 +2502,4 @@ Lemma Extensionality : forall (x:t) (y:t), eq_sub x y 0%Z size -> (x = y).
   intros x y.
   apply Extensionality_aux.
 Qed.
+
