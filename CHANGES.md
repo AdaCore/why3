@@ -1,5 +1,17 @@
 :x: marks a potential source of incompatibility
 
+Version 1.8.2, September 12, 2025
+---------------------------
+
+Provers
+  * fix soundness bug with floats in Alt-Ergo 2.6.x (issue #905)
+
+Sessions
+  * fix issue with file identifiers in sessions (MR !1231)
+
+Extraction
+  * restore compatibility of OCaml extraction with js_of_ocaml
+
 Version 1.8.1, June 4, 2025
 ---------------------------
 
@@ -8,9 +20,6 @@ Core
 
 Miscellaneous
   * fix compilation error with GCC 15
-
-Provers
-  * fix soundness bug with floats in Alt-Ergo 2.6.x
 
 Plugins
   * resurrect the BDD-infer loop invariant generation plug-in
