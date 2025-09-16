@@ -388,10 +388,10 @@ for file in $files; do
           ;;
     esac
     if [ "$skipae" = "yes" ] ; then
-          echo "Skipping unreproducible run of Alt-Ergo 2.6.2 on $filedir/$filebase.mlw";
+          echo "Skipping unreproducible run of Alt-Ergo 2.6.0 on $filedir/$filebase.mlw";
     else
-      run Alt-Ergo,2.6.2 $filedir $filebase true  $altergosteps $altergostepsrac
-      run Alt-Ergo,2.6.2 $filedir $filebase false  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.0 $filedir $filebase true  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.0 $filedir $filebase false  $altergosteps $altergostepsrac
     fi
     if [ "$skipcvc4" = "yes" ] ; then
           echo "Skipping unreproducible run of CVC4 1.8 on $filedir/$filebase.mlw";
