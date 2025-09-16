@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -874,9 +874,9 @@ let print_constructor_decl info is_record fmt (ls,args) =
                   let field_trace =
                     try
                       let attr = Sattr.choose (Sattr.filter (fun l ->
-                        Strings.has_prefix "model_trace:" l.attr_string)
+                        Strings.has_prefix ~prefix:"model_trace:" l.attr_string)
                         pr.ls_name.id_attrs) in
-                      Strings.remove_prefix "model_trace:" attr.attr_string
+                      Strings.remove_prefix ~prefix:"model_trace:" attr.attr_string
                     with
                       Not_found -> ""
                   in
@@ -897,7 +897,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
 
   info.constr_proj_id <-
     Mls.add ls (List.map (fun x -> x.field_name) field_names) info.constr_proj_id;
-  if Strings.has_suffix "'mk" ls.ls_name.id_string then
+  if Strings.has_suffix ~suffix:"'mk" ls.ls_name.id_string then
     begin try
       let args = List.map Option.get args in
       info.record_fields <- Mls.add ls args info.record_fields
@@ -1020,7 +1020,12 @@ let print_task version args ?old:_ fmt task =
     let m = Task.find_meta_tds task meta_supports_minimize in
     not (Task.HStdecl.is_empty m)
   in
-  let vc_loc = Intro_vc_vars_counterexmp.get_location_of_vc task in
+  let g,_ = Task.task_separate_goal task in
+  let vc_loc =
+    Theory.(match g.td_node with
+        | Decl { d_node = Dprop (_,_,t) } -> t.t_loc
+        | _ -> None)
+  in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
   let vc_info = {vc_inside = false; vc_loc; vc_func_name = None} in
   let info = {
@@ -1035,7 +1040,7 @@ let print_task version args ?old:_ fmt task =
     type_sorts = Mstr.empty;
     ty_tysymbol = Mts.empty;
     info_version = version;
-    meta_model_projection = Task.on_tagged_ls Theory.meta_projection task;
+    meta_model_projection = Task.on_tagged_ls Theory.meta_model_projection task;
     meta_record_def = Task.on_tagged_ls Theory.meta_record task;
     record_fields = Mls.empty;
     constr_proj_id = Mls.empty;

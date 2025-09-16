@@ -43,16 +43,20 @@ Parameter mixfix_lblsmnrb:
   forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
   array a.
 
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
 Axiom mixfix_lblsmnrb'spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
-  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)) /\
   ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
 
 Parameter make:
   forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
 
-Axiom make'spec :
+Axiom make_spec :
   forall {a:Type} {a_WT:WhyType a},
   forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
@@ -144,11 +148,13 @@ Axiom next_is_maximal :
 Axiom next_1_0 :
   forall (p:array char), (1%Z <= (length p))%Z -> is_next p 1%Z 0%Z.
 
+Require Import Lia.
+
 (* Why3 goal *)
 Theorem initnext'vc :
   forall (p:array char), (1%Z <= (length p))%Z ->
   let m := length p in
-  let next := make m 0%Z in
+  forall (next:array Numbers.BinNums.Z),
   (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < m)%Z ->
    ((mixfix_lbrb next i) = 0%Z)) /\
   ((length next) = m) -> (1%Z < m)%Z ->
@@ -172,6 +178,9 @@ Theorem initnext'vc :
   matches p (i - j1)%Z p 0%Z j1 -> forall (z:Numbers.BinNums.Z),
   ((j1 + 1%Z)%Z < z)%Z /\ (z < (i + 1%Z)%Z)%Z ->
   ~ matches p ((i + 1%Z)%Z - z)%Z p 0%Z z.
+(* Why3 intros p h1 m next (h2,h3) h4 next1 h5 (h6,h7) j i next2 h8
+        ((h9,(h10,h11)),(h12,(h13,h14))) h15 h16 h17 j1 h18 (h19,(h20,h21))
+        h22 z (h23,h24). *)
 Proof.
 intros p h1 m next (h2,h3) h4 next1 h5 h6 j i next2 h7
 ((h8,(h9,h10)),(h11,(h12,h13))) h14 h15 h16 j1 h17 (h18,(h19,h20)) h21 z
@@ -184,18 +193,18 @@ intros j i next4 ((hj,hi),(h0,(h1,h2))).
 intros hi' _ _ neq j0 _.
 intros j1 hji1; subst j1.
 *)
-assert (hji: (0 < j <= i)%Z) by omega.
+assert (hji: (0 < j <= i)%Z) by lia.
 generalize (h13 j hji); clear h13.
 unfold is_next. intros (hn1, (hn2, hn3)).
 (*
 intros z hz.
 *)
-assert (casez: (j+1 < z \/ z <= j+1)%Z) by omega. destruct casez.
+assert (casez: (j+1 < z \/ z <= j+1)%Z) by lia. destruct casez.
 
 (* j+1 < z *)
-apply h12; omega.
+apply h12; lia.
 
-assert (casez: (z = j+1 \/ z < j+1)%Z) by omega. destruct casez.
+assert (casez: (z = j+1 \/ z < j+1)%Z) by lia. destruct casez.
 
 (* z = j+1 *)
 subst z.
@@ -208,21 +217,22 @@ intro. absurd (elts p i = elts p j); intuition.
 (* z < j+1 *)
 clear H. red; intro h.
 absurd (matches p (j - (z-1)) p 0 (z-1))%Z.
-apply (hn3 (z-1)%Z); omega.
+apply (hn3 (z-1)%Z); lia.
 clear hn2 hn3.
 apply matches_trans with p (i+1-z)%Z.
 
 unfold matches; subst; simpl.
 subst m.
-repeat split; try omega. intros.
+repeat split; try lia. intros.
 unfold matches in h11. simpl in h11.
 destruct h11 as (hy1, (hy2, hy3)).
-assert (hi0: (0 <= j+1-z+i0 < j)%Z) by omega.
+assert (hi0: (0 <= j+1-z+i0 < j)%Z) by lia.
 generalize (hy3 (j+1-z+i0) hi0)%Z.
 ring_simplify (i - j + (j + 1 - z + i0))%Z.
 ring_simplify (j - (z - 1) + i0)%Z.
 ring_simplify (j + 1 - z + i0)%Z. ring_simplify (i + 1 - z + i0)%Z.
 auto.
 apply  matches_right_weakening with z; auto.
-omega.
+lia.
 Qed.
+

@@ -1,0 +1,160 @@
+
+use int.Int
+use bintree.AVL
+use coma.Std
+
+let unTree (t: tree) (onNode [] (l:tree) (x: elt) (r:tree)) (onLeaf) =
+  any
+  [ node (h: int) (x: elt) (l r: tree) ->
+        { t = N h l x r } (! onNode {l} {x} {r})
+  | leaf ->
+        { t = E } (! onLeaf) ]
+
+let rotate_left (t: tree) (return (r: tree)) =
+  unTree {t} (fun (a:tree) (x:elt) (r:tree) ->
+  unTree {r} (fun (b:tree) (y:elt) (c:tree) ->
+  return {node (node a x b) y c})
+  fail) fail
+
+let rotate_right (t: tree) (return (r: tree)) =
+  unTree {t} (fun (l:tree) (y:elt) (c:tree) ->
+  unTree {l} (fun (a:tree) (x:elt) (b:tree) ->
+  return {node a x (node b y c)})
+  fail) fail
+
+let join_right (l: tree) (x: elt) (r: tree) (return (t: tree)) =
+   { bst l && tree_lt l x } { bst r && lt_tree x r }
+   { wf l && wf r } { avl l && avl r } { height l >= height r + 2 } (!
+   any
+   )
+   [ return (t: tree) ->
+      { bst t } { forall y. mem y t <-> (mem y l || y=x || mem y r) }
+      { wf t } { avl t }
+      { height t = height l ||
+        height t = height l + 1 && match t with
+          | N _ rl _ rr ->
+              height rl = height l - 1 && height rr = height l
+          | _ -> false end }
+      (! return {t}) ]
+
+(* TODO join_right, join_left
+= match l with
+  | N _ ll lx lr ->
+      if ht lr <= ht r + 1 then
+        let t = node lr x r in
+        if ht t <= ht ll + 1 then node ll lx t
+        else rotate_left (node ll lx (rotate_right t))
+      else
+        let t = join_right lr x r in
+        let t' = node ll lx t in
+        if ht t <= ht ll + 1 then t' else rotate_left t'
+        (* The CRITICAL postcondition is used here, when `rotate_left`
+           is used, to show that the rotated tree is indeed an AVL. *)
+  | E -> absurd
+  end
+*)
+
+let join_left (l: tree) (x: elt) (r: tree) (return (t: tree)) =
+   { bst l && tree_lt l x } { bst r && lt_tree x r }
+   { wf l && wf r } { avl l && avl r } { height r >= height l + 2 } (!
+   any
+   )
+   [ return (t: tree) ->
+      { bst t } { forall y. mem y t <-> (mem y l || y=x || mem y r) }
+      { wf t } { avl t }
+      { height t = height r ||
+        height t = height r + 1 && match t with
+          | N _ rl _ rr ->
+              height rr = height r - 1 && height rl = height r
+          | _ -> false end }
+      (! return {t}) ]
+(*
+= match r with
+  | N _ rl rx rr ->
+      if ht rl <= ht l + 1 then
+        let t = node l x rl in
+        if ht t <= ht rr + 1 then node t rx rr
+        else rotate_right (node (rotate_left t) rx rr)
+      else
+        let t = join_left l x rl in
+        let t' = node t rx rr in
+        if ht t <= ht rr + 1 then t' else rotate_right t'
+  | E -> absurd
+  end
+ *)
+
+let join (l: tree) (x: elt) (r: tree) (return (r: tree)) =
+  { bst l && tree_lt l x } { bst r && lt_tree x r }
+  { wf l && wf r } { avl l && avl r } (!
+  if { ht l > ht r + 1 }
+     (-> join_right {l} {x} {r} return)
+     (-> if { ht r > ht l + 1 } (-> join_left {l} {x} {r} return)
+                                (-> return {node l x r})))
+  [ return (t:tree)
+      { wf t && avl t }
+      { bst t }
+      { forall y. mem y t <-> (mem y l || y=x || mem y r) }
+    -> return {t} ]
+
+let rec split_last (t: tree) (return (r: tree) (m: elt)) =
+  unTree {t}
+    (fun (l: tree) (x: elt) (r: tree) ->
+       { wf t && bst t && avl t } (!
+       if {r=E} (-> return {l} {x})
+                (-> split_last {r} (fun (r':tree) (m:elt) ->
+                    join {l} {x} {r'} (fun (r:tree) ->
+                    return {r} {m}))))
+       [ return (r: tree) (m: elt)
+         { wf r && bst r && avl r }
+         { forall x. mem x t <-> (mem x r && lt x m || x=m) }
+         { tree_lt r m }
+         -> return {r} {m} ])
+    fail
+
+(* no need for a spec here => join2 is fully inlined *)
+let join2 (l r: tree) (return (t: tree)) =
+  if {l=E} (-> return {r})
+           (-> split_last {l} (fun (l:tree) (k:elt) ->
+               join {l} {k} {r} return))
+
+let rec split (t: tree) (y: elt) (return (l: tree) (b: bool) (r: tree)) =
+  unTree {t}
+    (fun (l:tree) (x:elt) (r:tree) ->
+       { wf t && bst t && avl t }
+       (!
+       if {y=x} (-> return {l} {true} {r})
+                (-> if {lt y x} (-> split {l} {y} (fun (ll:tree) (b:bool) (lr:tree) ->
+                                    join {lr} {x} {r} (fun (r':tree) ->
+                                    return {ll} {b} {r'})))
+                                (-> split {r} {y} (fun (rl:tree) (b:bool) (rr:tree) ->
+                                    join {l} {x} {rl} (fun (l':tree) ->
+                                    return {l'} {b} {rr}))))
+       )
+       [return (l: tree) (b: bool) (r: tree) ->
+         { wf l && bst l && avl l } { wf r && bst r && avl r }
+         { tree_lt l y } { lt_tree y r }
+         { forall x. mem x t <-> (mem x l || mem x r || b && x=y) }
+         (! return {l} {b} {r}) ]
+    )
+    (-> return {E} {false} {E})
+
+let insert (x: elt) (t: tree) (return (r: tree)) =
+  { wf t && bst t && avl t } (!
+    split {t} {x} (fun (l:tree) (_b:bool) (r:tree) ->
+    join {l} {x} {r} return)
+  )
+  [ return (r:tree) ->
+      { wf r && bst r && avl r }
+      { forall y. mem y r <-> (mem y t || y=x) }
+      (! return {r}) ]
+
+let delete (x: elt) (t: tree) (return (r: tree)) =
+  { wf t && bst t && avl t } (!
+    split {t} {x} (fun (l: tree) (b: bool) (r: tree) ->
+    join2 {l} {r} return)
+  )
+  [ return (r:tree) ->
+      { wf r && bst r && avl r }
+      { forall y. mem y r <-> (mem y t && y<>x) }
+      (! return {r}) ]
+

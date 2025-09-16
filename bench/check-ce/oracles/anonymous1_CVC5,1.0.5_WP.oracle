@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/anonymous1.mlw", line 6, characters 10-19)
 File "bench/check-ce/anonymous1.mlw", line 6, characters 10-19:
 Sub-goal Assertion of goal f'vc.
-Prover result is: Unknown (sat) (198 steps).
+Prover result is: Unknown (sat) (138 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,20 +19,20 @@ File int.mlw:
     one = 1
 File anonymous1.mlw:
   Line 4:
-    x = 0
-    x = 0
+    x = (- 2)
+    x = (- 2)
     Execution of main function `f` with env:
-      x = 0
+      x = (- 2)
       zero = 0
       one = 1
   Line 5:
     Normal execution of function `h` with args:
-      y = 0
+      y = (- 2)
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (- 2)
       _ = 2
   Line 6:
     Property failure at assertion with:
-      x = 0
-      w = 2
+      x = (- 2)
+      w = 0
 

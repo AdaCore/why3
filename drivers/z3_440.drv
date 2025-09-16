@@ -22,9 +22,7 @@ import "discrimination.gen"
    these unused-ce-related variables, even in the context.  *)
 transformation "counterexamples_dependent_intros"
 
-transformation "inline_trivial"
-transformation "eliminate_builtin"
-transformation "remove_unused_keep_constants"
+import "common-transformations.gen"
 transformation "detect_polymorphism"
 transformation "eliminate_definition_conditionally"
 transformation "eliminate_inductive"
@@ -34,11 +32,6 @@ transformation "eliminate_literal"
 
 transformation "simplify_formula"
 (*transformation "simplify_trivial_quantification"*)
-
-(* Prepare for counter-example query: get rid of some quantifiers (makes it
-possible to query model values of the variables in premises) and introduce
-counter-example projections  *)
-transformation "prepare_for_counterexmp"
 
 transformation "discriminate_if_poly"
 transformation "encoding_smt_if_poly"

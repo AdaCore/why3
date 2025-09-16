@@ -83,7 +83,8 @@ why3_vc mem_singleton
 
 why3_vc empty_is_empty
   using assms
-  by (meson extensionality infix_eqeq_def is_empty_empty set.Set.is_empty_def)
+  by (metis Collect_empty_eq Collect_empty_eq_bot is_empty_empty mem_def set.Set.is_empty_def)
+
 
 why3_vc subset_inter_1
   by (simp add: set.Set.subset_def mem_def)
@@ -97,14 +98,15 @@ why3_vc subset_union_1
 why3_vc subset_union_2
   by (simp add: set.Set.subset_def mem_def)
 
-why3_vc disjoint_diff_eq
-  by (smt diffqtdef disjoint_def extensionality infix_eqeq_def mem_def)
-
 why3_vc disjoint_diff_s2
   by (simp add: disjoint_def mem_def)
 
 why3_vc disjoint_inter_empty
   by (simp add: disjoint_def mem_def set.Set.is_empty_def)
+
+why3_vc disjoint_diff_eq
+  by (smt diffqtdef disjoint_diff_s2 disjoint_inter_empty empty_is_empty 
+      inf.absorb_iff2 inf.cobounded2 inf.idem inf_absorb1 interqtdef le_fun_def)
 
 why3_vc filter_def
   by (metis filteri_def mem_def)

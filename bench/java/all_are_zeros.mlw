@@ -1,0 +1,92 @@
+module AllAreZeros
+
+  use ref.Ref
+  use int.Int
+  use mach.java.lang.Integer
+  use mach.java.lang.Array
+
+  predicate all_are_zeros_spec_range (t : array integer) (i j : int) =
+    forall k. i <= k < j -> t[k] = 0
+  
+  predicate all_are_zeros_spec_loc (t : array integer) (i : int) =
+    all_are_zeros_spec_range t 0 i 
+
+  predicate all_are_zeros_spec (t : array integer) =
+    all_are_zeros_spec_loc t (length t)
+
+  let all_zeros_1 (t: array integer) : bool
+    ensures { result = all_are_zeros_spec t }
+  =    
+    let i : ref integer = ref 0 in
+    while (!i < length t) do
+      invariant { 0 <= !i <= max_integer }
+      invariant { all_are_zeros_spec_loc t !i }
+      variant { length t - !i }
+      if (t[!i] <> 0) then
+    	 return false;
+      i := !i + 1
+    done;
+    true
+
+  let function all_zeros_2 (t: array integer) : bool
+    ensures { result = all_are_zeros_spec t }  
+  =
+    for i = 0 to length t - 1 do
+     invariant { all_are_zeros_spec_loc t i }
+     if (t[i] <> 0) then
+    	 return false;
+     done;
+     true
+
+  let all_zeros_3 (t: array integer) : bool
+    ensures { result = all_are_zeros_spec t }  
+  =
+    let res = ref true in
+    let i : ref integer = ref 0 in
+    while (!i < length t) do
+      invariant { 0 <= !i <= length t }
+      invariant { !res <-> all_are_zeros_spec_loc t !i }
+      variant { length t - !i }
+      if (t[!i] <> 0) then
+        res := false;
+      i := !i + 1
+    done;
+    if not all_zeros_2 t then (* completely useless but just to test
+                              method call. *)
+       return (not !res);
+   !res
+
+let all_zeros_4 (t: array integer) : bool
+    ensures { result = all_are_zeros_spec t }  
+=
+  let nzi = ref (-1) in
+  let i = ref 0 in
+  while (!i < length t && !nzi = -1) do
+    invariant { 0 <= !i <= length t }
+    invariant { !nzi = -1 <-> all_are_zeros_spec_loc t !i }
+    variant { length t - !i }
+    if (t[!i] <> 0) then
+    begin
+    	 nzi := !i;
+    end;
+     i := !i + 1
+   done;
+   (!nzi = - 1)
+
+let rec all_zeros_5_rec [@java:visibility:private] (t: array integer) (i : integer): bool
+	requires { 0 <= i <= length t }
+	requires { all_are_zeros_spec_loc t i }  	
+	ensures { result = all_are_zeros_spec_range t i (length t) }  
+	variant { length t - i }
+= 
+	if i = length t then 
+		return true;
+	if t[i] <> 0 then
+		return false;
+	return all_zeros_5_rec t (i+1)
+
+let rec all_zeros_5 (t: array integer) : bool
+    ensures { result = all_are_zeros_spec t }  
+=
+	all_zeros_5_rec t 0
+end

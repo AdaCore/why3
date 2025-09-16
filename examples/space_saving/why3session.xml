@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Eprover" version="2.0" timelimit="15" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="space_saving.mlw"/>
 <theory name="Top" proved="true">
+ <goal name="s&#39;vc" expl="VC for s" proved="true">
+ <proof prover="2"><result status="valid" time="0.025721" steps="3344"/></proof>
+ </goal>
  <goal name="space_saving_2&#39;vc" expl="VC for space_saving_2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="space_saving_2&#39;vc.0" expl="loop invariant init" proved="true">
@@ -130,94 +133,71 @@
  </transf>
  </goal>
  <goal name="minimum&#39;vc" expl="VC for minimum" proved="true">
- <proof prover="0"><result status="valid" time="0.030000" steps="35951"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="34580"/></proof>
  </goal>
  <goal name="increment&#39;vc" expl="VC for increment" proved="true">
- <proof prover="2" timelimit="1"><result status="valid" time="0.729202" steps="100852"/></proof>
- <transf name="split_vc" proved="true" >
-  <goal name="increment&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="58581"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.1" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="3269"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="3269"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000" steps="113458"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="85335"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000" steps="123007"/></proof>
-  </goal>
-  <goal name="increment&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.291242" steps="702488"/></proof>
-  </goal>
- </transf>
+ <proof prover="2" timelimit="1"><result status="valid" time="0.729202" steps="97586"/></proof>
  </goal>
  <goal name="find&#39;vc" expl="VC for find" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="32544"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="28979"/></proof>
  </goal>
  <goal name="minimum_k&#39;vc" expl="VC for minimum_k" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="112678"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="111309"/></proof>
  </goal>
  <goal name="space_saving_k&#39;vc" expl="VC for space_saving_k" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="space_saving_k&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="30079"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="29041"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.1" expl="array creation size" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="35730"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="34200"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="74256"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="72221"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="51622"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="49051"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="50311"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="47738"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="51948"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="49375"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="54312"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="51739"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.7" expl="thm" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="53934"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="51529"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="51953"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="49548"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="5692"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="5422"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.10" expl="thm" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="space_saving_k&#39;vc.10.0" expl="thm" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000" steps="55385"/></proof>
+   <proof prover="0"><result status="valid" time="0.030000" steps="52820"/></proof>
    </goal>
    <goal name="space_saving_k&#39;vc.10.1" expl="VC for space_saving_k" proved="true">
    <transf name="case" proved="true" arg1="(occurs v e)">
     <goal name="space_saving_k&#39;vc.10.1.0" expl="true case" proved="true">
-    <proof prover="0"><result status="valid" time="0.020000" steps="3873"/></proof>
+    <proof prover="0"><result status="valid" time="0.020000" steps="3687"/></proof>
     </goal>
     <goal name="space_saving_k&#39;vc.10.1.1" expl="false case" proved="true">
     <transf name="assert" proved="true" arg1="(occ v s 0 n &lt;= c[minimum c])">
      <goal name="space_saving_k&#39;vc.10.1.1.0" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="0.030000" steps="53577"/></proof>
+     <proof prover="0"><result status="valid" time="0.030000" steps="51172"/></proof>
      </goal>
      <goal name="space_saving_k&#39;vc.10.1.1.1" expl="false case" proved="true">
      <transf name="assert" proved="true" arg1="(k * occ v s 0 n &lt;= n)">
       <goal name="space_saving_k&#39;vc.10.1.1.1.0" expl="asserted formula" proved="true">
-      <proof prover="4"><result status="valid" time="1.568979"/></proof>
+      <proof prover="4"><result status="valid" time="1.542753"/></proof>
       </goal>
       <goal name="space_saving_k&#39;vc.10.1.1.1.1" expl="false case" proved="true">
-      <proof prover="0"><result status="valid" time="0.010000" steps="3889"/></proof>
+      <proof prover="0"><result status="valid" time="0.010000" steps="3703"/></proof>
       </goal>
      </transf>
      </goal>
@@ -228,48 +208,48 @@
   </transf>
   </goal>
   <goal name="space_saving_k&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="3861"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="3675"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="18730"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="17818"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="58643"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="56052"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="15319"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="14599"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="58763"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="56180"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.16" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="space_saving_k&#39;vc.16.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.020000" steps="61331"/></proof>
+   <proof prover="0"><result status="valid" time="0.020000" steps="58740"/></proof>
    </goal>
    <goal name="space_saving_k&#39;vc.16.1" expl="loop invariant preservation" proved="true">
-   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="1.501719" steps="157692"/></proof>
+   <proof prover="3" timelimit="10" memlimit="4000"><result status="valid" time="2.988107" steps="271127"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="space_saving_k&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.140000" steps="15936"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.140000" steps="15708"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.050000" steps="458"/></proof>
+  <proof prover="5" timelimit="1"><result status="valid" time="0.050000" steps="468"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.19" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="space_saving_k&#39;vc.19.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="0.122653" steps="31708"/></proof>
+   <proof prover="2"><result status="valid" time="0.122653" steps="31267"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="space_saving_k&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="54873"/></proof>
+  <proof prover="0"><result status="valid" time="0.020000" steps="52392"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.21" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="55960"/></proof>
+  <proof prover="0"><result status="valid" time="0.030000" steps="53479"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.22" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.020000" steps="55928"/></proof>
@@ -294,10 +274,10 @@
   <proof prover="3"><result status="valid" time="0.150000" steps="26706"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.27" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.769294" steps="5476"/></proof>
+  <proof prover="5"><result status="valid" time="0.417346" steps="5173"/></proof>
   </goal>
   <goal name="space_saving_k&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="2.701100" steps="292152"/></proof>
+  <proof prover="2"><result status="valid" time="3.079743" steps="292152"/></proof>
   </goal>
  </transf>
  </goal>

@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection.mlw", line 23, characters 11-48)
 File "bench/check-ce/model_projection.mlw", line 23, characters 11-48:
 Sub-goal Assertion of goal g1'vc.
-Prover result is: Unknown (sat) (278 steps).
+Prover result is: Unknown (sat) (255 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,11 +19,11 @@ File int.mlw:
     one = 1
 File model_projection.mlw:
   Line 6:
-    to_map = fun (_arg_16:t) -> fun (x:int) -> if x = 14 then 42 else 0
+    to_map = fun (_arg_14:t) -> fun (x:int) -> if x = 14 then 42 else 0
   Line 9:
-    get = fun (_arg_16:t) (_arg_24:int) -> 41
+    get = fun (_arg_14:t) (_arg_24:int) -> 41
   Line 13:
-    set = fun (_arg_16:t) (_arg_24:int) (_arg_32:int) -> epsilon x:t.
+    set = fun (_arg_14:t) (_arg_24:int) (_arg_32:int) -> epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
   Line 19:
     y = {d= epsilon x:t.
@@ -34,9 +34,9 @@ File model_projection.mlw:
   Line 21:
     _ = ()
     Execution of main function `g1` with env:
-      to_map = fun (_arg_16:t) -> fun (x:int) -> if x = 14 then 42 else 0
-      get = fun (_arg_16:t) (_arg_24:int) -> 41
-      set = fun (_arg_16:t) (_arg_24:int) (_arg_32:int) -> epsilon x:t.
+      to_map = fun (_arg_14:t) -> fun (x:int) -> if x = 14 then 42 else 0
+      get = fun (_arg_14:t) (_arg_24:int) -> 41
+      set = fun (_arg_14:t) (_arg_24:int) (_arg_32:int) -> epsilon x:t.
              to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
       y = {d= epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)}

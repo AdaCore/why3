@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="map.coma"/>
+<theory name="Map" proved="true">
+ <goal name="vc_case" proved="true">
+ <proof prover="1"><result status="valid" time="0.020581" steps="355"/></proof>
+ </goal>
+ <goal name="vc_map3" proved="true">
+ <proof prover="1"><result status="valid" time="0.015465" steps="355"/></proof>
+ </goal>
+ <goal name="vc_map2" proved="true">
+ <proof prover="1"><result status="valid" time="0.056921" steps="113551"/></proof>
+ </goal>
+ <goal name="vc_test2" proved="true">
+ <proof prover="0"><result status="valid" time="0.043268" steps="5183"/></proof>
+ </goal>
+ <goal name="vc_test3" proved="true">
+ <proof prover="1"><result status="valid" time="0.179070" steps="357189"/></proof>
+ </goal>
+</theory>
+<theory name="MapS" proved="true">
+ <goal name="vc_map2" proved="true">
+ <proof prover="0"><result status="valid" time="0.121648" steps="31461"/></proof>
+ </goal>
+ <goal name="vc_test4" proved="true">
+ <proof prover="1"><result status="valid" time="0.041983" steps="62714"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

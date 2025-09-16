@@ -1,0 +1,22 @@
+
+module M
+
+use int.Int
+
+type t
+
+function f t : int
+
+meta "model_projection" function f
+
+function g t : int
+
+meta "model_projection" function g
+
+
+let test(x:t) (y:t) : unit
+=  assert { f x > 10 \/ f y > 17 \/ g x < 23 \/ g y < 41 }
+
+
+
+end

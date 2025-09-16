@@ -7,26 +7,14 @@
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 27, characters 45-49:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (2321 steps).
+Prover result is: Unknown (unknown + incomplete) (2019 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x118 $x28 -> 3
-    length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun $x113 $x24 ->
-                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-  Line 27:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -38,30 +26,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 27, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (2350 steps).
+Prover result is: Unknown (unknown + incomplete) (2060 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x139 $x218 -> 3
-    length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun $x134 $x214 ->
-                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    i : int = -1
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -72,35 +45,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 27, characters 5-81:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (2466 steps).
+Prover result is: Unknown (unknown + incomplete) (2136 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x160 $x228 -> 3
-    length : array basic_record -> int = [|_ => 0|]
-  Line 20:
-    mixfix [] :
-      array
-      basic_record
-      ->
-      int
-      ->
-      basic_record = fun $x155 $x224 ->
-                      {flag = true; first_val = 3; sec_val = 5}
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    i : int = -1
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -111,26 +64,14 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (3087 steps).
+Prover result is: Unknown (unknown + incomplete) (3021 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x180 $x239 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -142,30 +83,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (3163 steps).
+Prover result is: Unknown (unknown + incomplete) (3090 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1101 $x250 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    i : int = -1
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -176,35 +102,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 28, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (3255 steps).
+Prover result is: Unknown (unknown + incomplete) (3175 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1122 $x261 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    i : int = -1
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -215,35 +121,14 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 64-68:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (4730 steps).
+Prover result is: Unknown (unknown + incomplete) (4634 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1143 $x272 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -255,39 +140,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 21-25:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (4820 steps).
+Prover result is: Unknown (unknown + incomplete) (4717 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1164 $x283 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    i : int = -1
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -298,44 +159,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 29, characters 5-82:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (4912 steps).
+Prover result is: Unknown (unknown + incomplete) (4802 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1185 $x294 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    i : int = -1
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 29, characters 21-30 : bool = true
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -346,44 +178,14 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 74-78:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (7076 steps).
+Prover result is: Unknown (unknown + incomplete) (6950 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1206 $x2105 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
-    i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 29, characters 21-30 : bool = true
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 30:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
 
 <check_ce:categorization>Categorizations of models:
@@ -395,48 +197,15 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 41-45:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (7182 steps).
+Prover result is: Unknown (unknown + incomplete) (7049 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1227 $x2116 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 29, characters 21-30 : bool = true
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 30:
-    i : int = -1
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -447,57 +216,19 @@ File array_records_poly.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 30, characters 5-92:
 Sub-goal Index in array bounds of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (7276 steps).
+Prover result is: Unknown (unknown + incomplete) (7136 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1248 $x2127 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = -1
     i : int = -1
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 29, characters 21-30 : bool = true
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 30:
-    i : int = -1
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 30, characters 41-57 : int = 23
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
 
 File "bench/check-ce/array_records_poly.mlw", line 31, characters 13-35:
 Sub-goal Assertion of goal var_overwrite'vc.
-Prover result is: Valid (6110 steps).
+Prover result is: Valid (5958 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -508,52 +239,13 @@ Prover result is: Valid (6110 steps).
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `var_overwrite` cannot be evaluated)
 File "bench/check-ce/array_records_poly.mlw", line 25, characters 15-36:
 Sub-goal Postcondition of goal var_overwrite'vc.
-Prover result is: Unknown (unknown + incomplete) (9959 steps).
+Prover result is: Unknown (unknown + incomplete) (9798 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `var_overwrite` cannot be evaluated):
-File array.mlw:
-  Line 17:
-    length : ty -> uni -> int = fun $x1269 $x2138 -> 3
-    length : array basic_record -> int = [|_ => 0|]
 File array_records_poly.mlw:
   Line 23:
+    a :  = [|_ => <UNDEFINED>|]
+    a :  = [|_ => <UNDEFINED>|]
+    i :  = 0
     i : int = 0
-  Line 25:
-    i : int = 0
-  Line 27:
-    result of call at line 27, characters 13-81 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 27, characters 21-30 : bool = true
-    result of call at line 27, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-    result of call at line 27, characters 45-61 : int = 3
-    result of call at line 27, characters 45-49 :
-      basic_record = {flag = true; first_val = 3; sec_val = 5}
-  Line 28:
-    result of call at line 28, characters 13-82 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 28, characters 21-30 : bool = true
-    result of call at line 28, characters 21-25 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-    result of call at line 28, characters 64-81 : int = 69
-    result of call at line 28, characters 64-68 :
-      basic_record = {flag = true; first_val = 3; sec_val = 69}
-  Line 29:
-    result of call at line 29, characters 13-82 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 29, characters 21-30 : bool = true
-    result of call at line 29, characters 21-25 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-    result of call at line 29, characters 64-81 : int = 69
-    result of call at line 29, characters 64-68 :
-      basic_record = {flag = true; first_val = 42; sec_val = 69}
-  Line 30:
-    result of call at line 30, characters 13-92 :
-      basic_record = {flag = false; first_val = 23; sec_val = 69}
-    result of call at line 30, characters 41-57 : int = 23
-    result of call at line 30, characters 41-45 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
-    result of call at line 30, characters 74-91 : int = 69
-    result of call at line 30, characters 74-78 :
-      basic_record = {flag = true; first_val = 23; sec_val = 69}
 

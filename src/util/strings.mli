@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -42,19 +42,16 @@ val join : string -> string list -> string
 val pad_right : char -> string -> int -> string
 (** Chop or pad the given string on the right up to the given length. *)
 
-val has_prefix : string -> string -> bool
-(** [has_prefix pref s] returns true if [s] starts with prefix [pref]. *)
+val has_prefix : prefix:string -> string -> bool
+(** [has_prefix prefix s] returns true if [s] starts with prefix [prefix]. *)
 
-val remove_prefix : string -> string -> string
+val remove_prefix : prefix:string -> string -> string
 (** [remove_prefix pref s] removes the prefix [pref] from [s].
     @raise Not_found if [s] does not start with [pref]. *)
 
-val has_suffix : string -> string -> bool
-(** [has_suffix suff s] returns true if [s] ends with suffix [suff]. *)
+val has_suffix : suffix:string -> string -> bool
+(** [has_suffix suffix s] returns true if [s] ends with suffix [suffix]. *)
 
-val remove_suffix : string -> string -> string
+val remove_suffix : suffix:string -> string -> string
 (** [remove_suffix suff s] removes the suffix [suff] from [s].
     @raise Not_found if [s] does not end with [suff]. *)
-
-val ends_with : string -> string -> bool
-(** Test if a string ends with another. *)

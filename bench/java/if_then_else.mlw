@@ -1,0 +1,11 @@
+module IfThenElse
+  use mach.java.lang.Integer
+  
+  let test_ite (b0 : bool) (b1 : bool) : integer =
+    let x = if b0 then
+               if b1 then 2 else 0
+             else
+               if b1 then 3 else 1 in
+    2 * x
+
+end

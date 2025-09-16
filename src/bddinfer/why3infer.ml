@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (**
 
@@ -52,8 +62,6 @@ open Ast
 open Abstract
 
 let verbose_level = ref 0 (* see .mli for details *)
-
-let debug_bddinfer = Debug.register_flag "bddinfer" ~desc:"BDD-infer"
 
 exception Error of string * string
 
@@ -1022,9 +1030,9 @@ let rec mlw_expr_to_simple_expr (* ctx vars *)e =
      unsupported "mlw_expr_to_simple_expr: Efor"
   | Eassert(k,t) -> mk_instr tag (SEassert(k,t))
   (* ad-hoc support for "break" *)
-  | Eraise(xs, _e1) when xs.Ity.xs_name.Ident.id_string = "'Break" ->
+  | Eraise(xs, _e1) when xs.Ity.xs_name.Ident.id_string = Ptree_helpers.break_id ->
      mk_instr tag SEbreak
-  | Eexn(xs, e1) when xs.Ity.xs_name.Ident.id_string = "'Break" ->
+  | Eexn(xs, e1) when xs.Ity.xs_name.Ident.id_string = Ptree_helpers.break_id ->
     let open Ity in
     begin
       match e1.e_node with
@@ -1139,7 +1147,7 @@ let f_decl_rs ctx rs name acc : func FuncMap.t =
                let d = Term.Mvs.find pv.pv_vs ctx.env in
                d.why_var
              with Not_found ->
-               translation_error "add_write: missing pv in ctx"
+               translation_error "add_write: missing pv `%s` in ctx" pv.pv_vs.Term.vs_name.Ident.id_string
            in
            let (_,ty) = type_of pv.pv_ity in
            VarMap.add v ty writes
@@ -1559,29 +1567,45 @@ let report ~verbosity report =
   | Some(reason,expl) ->
      Format.printf "BDD-infer failure: %s, %s@." reason expl
   | None ->
-  (* generated loop invariants *)
-  Wstdlib.Mstr.iter
-    (fun tag (inv,doms) ->
-      Format.printf "@[<hov 2>Invariant for loop [%s] is@ @[%a@]@]@."
-        tag Pretty.print_term inv;
-      Format.printf "@[<hov 2>Domains for loop [%s] are@ @[%a@]@]@."
-        tag print_domains doms)
-    report.engine_invariants_and_domains;
-  if verbosity >= 1 then
-    match report.engine_subreport with
-    | Some r -> Infer.report ~verbosity r
-    | None -> ()
+      if verbosity >= 1 then
+        (* generated loop invariants *)
+        Wstdlib.Mstr.iter
+          (fun tag (inv,doms) ->
+             Format.printf "@[<hov 2>[BDDinfer] inferred invariant for loop [%s] is@ @[%a@]@]@."
+               tag Pretty.print_term inv;
+             Format.printf "@[<hov 2>[BDDinfer] inferred domains for loop [%s] are@ @[%a@]@]@."
+               tag print_domains doms)
+          report.engine_invariants_and_domains;
+      if verbosity >= 2 then
+        match report.engine_subreport with
+        | Some r ->
+            Format.printf "[BDDinfer] internal info available (verbosity %d):@." verbosity;
+            Infer.report ~verbosity r;
+            Format.printf "[BDDinfer] end of internal info.@."
+        | None ->
+            Format.printf "[BDDinfer] no internal info available (verbosity %d).@." verbosity
 
 let default_hook r =
-  if Debug.test_flag debug_bddinfer then
-    report ~verbosity:1 r
+  report ~verbosity:!verbose_level r
 
 let hook_report = ref default_hook
 
 let infer_loop_invs attrs env tkn mkn e cty =
-  if not (Ident.Sattr.exists (fun a -> Strings.has_prefix "bddinfer" a.Ident.attr_string) attrs)
-  then []
-  else
+  let do_infer =
+    Ident.Sattr.fold
+      (fun a acc ->
+         try
+           let suf = Strings.remove_prefix "bddinfer" a.Ident.attr_string in
+           begin try
+             let n = int_of_string (Strings.remove_prefix ":" suf) in
+             verbose_level := n
+             with _ -> ()
+           end;
+           true
+         with Not_found -> acc)
+      attrs false
+  in
+  if do_infer then
     begin
       let last_report = ref empty_report in
       loop_tags_counter := 0;
@@ -1591,6 +1615,7 @@ let infer_loop_invs attrs env tkn mkn e cty =
       !hook_report !last_report;
       l
     end
+  else []
 
 let register_hook f = hook_report := f
 

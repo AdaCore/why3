@@ -387,7 +387,7 @@ eapply h2; eauto.
 eapply Hind; eauto.
 generalize (steps_non_neg _ _ _ _ _ _ _ h3).
 generalize (steps_non_neg _ _ _ _ _ _ _ h4).
-omega.
+auto with zarith.
 
 inversion H0; subst; clear H0.
 apply assigns_refl.

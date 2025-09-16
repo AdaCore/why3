@@ -1,0 +1,153 @@
+
+(** {1 VerifyThis 2024, challenge 0, The Rope Data Structure}
+
+  See https://www.pm.inf.ethz.ch/research/verifythis.html
+
+  Team YYY: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use seq.Seq
+use seq.FreeMonoid
+
+(** abstract type of characters *)
+type char
+
+(** strings are sequences of characters *)
+type str = seq char
+
+(** Ropes are implemented here as an immutable data strcuture. *)
+type rope =
+  | Leaf str
+  | Node int rope rope
+
+(** Function `to_str` is a logic function (keyword `function`)
+    that can be used in programs as well (keyword `let`).  *)
+let rec function to_str (r: rope) : str =
+  match r with
+  | Leaf s       -> s
+  | Node _ rl rr -> to_str rl ++ to_str rr
+  end
+
+(** We introduce a `valid` predicate to express that the weight
+    stored in `Node` is indeed the length of the left subrope. *)
+predicate valid (r: rope) =
+  match r with
+  | Leaf _s       -> true
+  | Node wl rl rr -> wl = length (to_str rl) && valid rl && valid rr
+  end
+
+(** Length of a rope, descending along the right spine. *)
+let rec str_len (r: rope) : int
+  requires { valid r }
+  variant  { r }
+  ensures  { result = length (to_str r) }
+= match r with
+  | Leaf s -> length s
+  | Node wl _ rr -> wl + str_len rr
+  end
+
+(** Rope concatenation (see below for the optimized version). *)
+let concat (left right: rope) : rope
+  requires { valid left }
+  requires { valid right }
+  ensures  { valid result }
+  ensures  { to_str result = to_str left ++ to_str right }
+= Node (str_len left) left right
+
+(** Splitting a rope at a given position. *)
+let rec split (r: rope) (i: int) : (left : rope, right: rope)
+  requires { valid r }
+  requires { 0 <= i <= length (to_str r) }
+  variant  { r }
+  ensures  { valid left }
+  ensures  { valid right }
+  ensures  { to_str r = to_str left ++ to_str right }
+  ensures  { length (to_str left) = i }
+= match r with
+  | Leaf s ->
+      (Leaf s[..i], Leaf s[i..])
+  | Node wl rl rr ->
+      if i < wl then
+        let rll, rlr = split rl i in
+        (rll, concat rlr rr)
+      else if i > wl then
+        let rrl, rrr = split rr (i - wl) in
+        (concat rl rrl, rrr)
+      else
+        (rl, rr)
+  end
+
+(** Deleting characters `i..i+len`. *)
+let delete (r: rope) (i len: int) : rope
+  requires { valid r }
+  requires { 0 <= i <= length (to_str r) }
+  requires { 0 <= len <= length (to_str r) - i }
+  ensures  { valid result }
+  ensures  { to_str result = (to_str r)[..i] ++ (to_str r)[i+len..] }
+= let left, remaining = split r i in
+  let _, right = split remaining len in
+  concat left right
+
+(** Predicate `is_short` is left uninterpreted, as required. *)
+val predicate is_short (r: str)
+
+(** Optimized concatenation.
+    Note that the contract of `concat2` is that of `concat`. *)
+let concat2 (left right: rope) : rope
+  requires { valid left }
+  requires { valid right }
+  ensures  { valid result }
+  ensures  { to_str result = to_str left ++ to_str right }
+= match right with
+  | Leaf sr ->
+     if is_short sr then match left with
+       | Leaf sl ->
+          if is_short sl then Leaf (sl ++ sr) else concat left right
+       | Node wl rl (Leaf sl) ->
+          if is_short sl then Node wl rl (Leaf (sl ++ sr))
+          else concat left right
+       | _ -> concat left right
+     end else concat left right
+  | _ -> concat left right
+  end
+
+(** Inserting a rope at position `i`. *)
+let insert (r: rope) (i: int) (to_insert: str) : rope
+  requires { valid r }
+  requires { 0 <= i <= length (to_str r) }
+  ensures  { valid result }
+  ensures  { to_str result = (to_str r)[..i] ++ to_insert ++ (to_str r)[i..] }
+= let left, right = split r i in
+  concat left (concat (Leaf to_insert) right)
+
+(** The lizard examples *)
+
+val constant char_l: char
+val constant char_i: char
+val constant char_z: char
+val constant char_a: char
+val constant char_r: char
+val constant char_d: char
+
+let constant str_lizard: str =
+  cons char_l (cons char_i (cons char_z (
+  cons char_a (cons char_r (cons char_d empty)))))
+
+let constant str_lard : str =
+  cons char_l (cons char_a (cons char_r (cons char_d empty)))
+
+let test_delete (r: rope) : rope
+  requires { valid r }
+  requires { to_str r = str_lizard }
+  ensures  { to_str result = str_lard }
+= delete r 1 2
+
+let constant str_iz : str =
+  cons char_i (cons char_z empty)
+
+let test_insert (r: rope) : rope
+  requires { valid r }
+  requires { to_str r = str_lard }
+  ensures  { to_str result == str_lizard }
+= insert r 1 str_iz

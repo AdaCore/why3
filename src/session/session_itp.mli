@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -79,7 +79,7 @@ type proof_attempt_node =
   private {
       parent                 : proofNodeID;
       mutable prover         : Whyconf.prover;
-      limit                  : Call_provers.resource_limit;
+      limits                 : Call_provers.resource_limits;
       mutable proof_state    : Call_provers.prover_result option;
       (* None means that there is a prover call in progress *)
       mutable proof_obsolete : bool;
@@ -219,7 +219,7 @@ val merge_files_gen : ignore_shapes:bool ->
 
 
 val graft_proof_attempt : ?file:Sysutil.file_path -> session -> proofNodeID ->
-  Whyconf.prover -> limit:Call_provers.resource_limit -> proofAttemptID
+  Whyconf.prover -> limits:Call_provers.resource_limits -> proofAttemptID
 (** [graft_proof_attempt s id pr file l] adds a proof attempt with prover
     [pr] and limits [l] in the session [s] as a child of the task
     [id]. If there already a proof attempt with the same prover, it

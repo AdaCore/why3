@@ -1,0 +1,118 @@
+module Return1
+  use int.Int
+  use mach.java.lang.Integer
+
+  type t = {
+    mutable a : integer;
+    mutable b : integer;
+  }
+
+  let g(_ : integer) : unit =
+     ()
+
+  let f(self [@W:unused_variable:N] : t) (_ : integer) : unit =
+    ()
+
+end
+
+
+module Return2
+  use int.Int
+  use mach.java.lang.Integer
+
+  type t = {
+    mutable a : integer;
+    mutable b : integer;
+  }
+
+  let g(_ : integer) : unit =
+     ()
+
+  let f(self [@W:unused_variable:N] : t) (i : integer) : unit =
+      g i 
+
+
+end
+
+module Return3
+  use int.Int
+  use mach.java.lang.Integer
+
+  type t = {
+    mutable a : integer;
+    mutable b : integer;
+  }
+
+  let g(_ _ : integer) : unit =
+     ()
+     
+  let f(self [@W:unused_variable:N] : t) (i j : integer) : unit =    
+    let b = i < j in
+    if b then
+      g i j    
+    
+
+     
+
+end
+
+module Return4
+  use int.Int
+  use mach.java.lang.Integer
+
+  type t = {
+    mutable a : integer;
+    mutable b : integer;
+  }
+
+  let g(_ _ : integer) : unit =
+     ()
+     
+  let f(self [@W:unused_variable:N] : t) (i j : integer) : unit =  
+    let b = i < j in
+    if b then begin
+      g i j;
+      return;      
+    end;
+    g j i
+  
+
+end
+
+module Return5
+  use int.Int
+  use mach.java.lang.Array
+  use mach.java.lang.Integer
+
+  let f (v : array integer) : unit
+  = 
+    for i = 0 to v.length -1 do
+      v[i] <- i
+    done
+
+  let h (v : array integer) : unit
+  = 
+    for i = 0 to v.length -1 do
+      v[i] <- i+1
+    done
+
+  let g (v : array integer) : unit
+  =
+    if v.length > 5 then
+    begin
+      f v;
+      return;
+    end;
+    h v  
+end
+
+
+module Return6
+  use int.Int
+  use mach.java.lang.Integer
+
+  let f( a b : integer) : bool
+  = if a < b then 
+      return not (a <b );
+    return a < b; 
+end

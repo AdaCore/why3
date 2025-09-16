@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -10,6 +10,8 @@
 (********************************************************************)
 
 open Why3
+
+module Main () = struct
 
 module P = struct
 
@@ -58,20 +60,20 @@ let decode s =
 (* TODO make it cleaner and less inefficient with adapted functions *)
 let interp_request args =
   match args with
-  | args when Strings.has_prefix "reload" args -> Reload_req
-  | args when Strings.has_prefix "list-provers" args ->
+  | args when Strings.has_prefix ~prefix:"reload" args -> Reload_req
+  | args when Strings.has_prefix ~prefix:"list-provers" args ->
       Command_req (root_node,"list-provers")
-  | args when Strings.has_prefix "command=" args ->
-      let com = Strings.remove_prefix "command=" args in
+  | args when Strings.has_prefix ~prefix:"command=" args ->
+      let com = Strings.remove_prefix ~prefix:"command=" args in
       (match (Strings.bounded_split ',' com 2) with
       | n :: com :: [] ->
           Command_req (int_of_string n, com)
       | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'"))
-  | args when Strings.has_prefix "gettask_" args ->
+  | args when Strings.has_prefix ~prefix:"gettask_" args ->
      let c = false in
      let show_uses_clones_metas = false in
      let loc = true in
-     Get_task (int_of_string (Strings.remove_prefix "gettask_" args),c,show_uses_clones_metas,loc)
+     Get_task (int_of_string (Strings.remove_prefix ~prefix:"gettask_" args),c,show_uses_clones_metas,loc)
   | _ -> invalid_arg ("Why3web.interp_request '" ^ args ^ "'")
 
 let handle_script s args =
@@ -157,3 +159,7 @@ let () =
     S.init_server config env dir;
     Queue.iter (fun f -> P.push_request (Add_file_req f)) files;
     Wserver.main_loop None 6789 handler stdin_handler
+
+end
+
+let () = Whyconf.register_command "web" (module Main)

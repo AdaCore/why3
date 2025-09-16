@@ -1,0 +1,8 @@
+
+use int.Int
+use real.RealInfix
+use real.FromInt
+
+goal g : from_int 42 = 42.0
+
+goal g2 : forall n. from_int (n+42) = (from_int n) +. 42.0

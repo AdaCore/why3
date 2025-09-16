@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -41,12 +41,12 @@ let pp_env pp_key pp_value fmt l =
     let delims = Pp.nothing, Pp.nothing in
     pp_bindings ~delims ~sep:Pp.comma pp_key pp_value fmt l
 
-exception Incomplete of string
+exception Cannot_evaluate of string
 
-let incomplete f =
+let cannot_evaluate f =
   kasprintf (fun reason ->
-      Debug.dprintf debug_trace_exec "Incomplete: %s@." reason;
-      raise (Incomplete reason)) f
+      Debug.dprintf debug_trace_exec "Cannot evaluate: %s@." reason;
+      raise (Cannot_evaluate reason)) f
 
 let ity_components ity = match ity.ity_node with
   | Ityapp (ts, l1, l2)
@@ -104,9 +104,9 @@ end = struct
 
   let rec compare_values v1 v2 =
     if v1.v_desc = Vundefined then
-      incomplete "undefined value of type %a cannot be compared" print_ty v1.v_ty;
+      cannot_evaluate "undefined value of type %a cannot be compared" print_ty v1.v_ty;
     if v2.v_desc = Vundefined then
-      incomplete "undefined value of type %a cannot be compared" print_ty v2.v_ty;
+      cannot_evaluate "undefined value of type %a cannot be compared" print_ty v2.v_ty;
     let v_ty v = v.v_ty and v_desc v = v.v_desc in
     cmp [cmptr v_ty ty_compare; cmptr v_desc compare_desc] v1 v2
   and compare_desc d1 d2 =
@@ -201,6 +201,8 @@ let unit_value =
 let term_value ity t =
   value (ty_of_ity ity) (Vterm t)
 
+let v_inst v mt = { v with v_ty = ty_inst mt v.v_ty }
+
 (**********************************************************************)
 
 let range_value ity n =
@@ -209,7 +211,7 @@ let range_value ity n =
       begin try
           Number.(check_range { il_kind = ILitUnk; il_int = n } r)
         with Number.OutOfRange _ ->
-          raise (Incomplete "value out of range")
+          cannot_evaluate "value out of range"
       end
   | _ -> ()
   end;
@@ -263,7 +265,7 @@ and print_value' fmt v =
   | Vconstr (Some rs, fs, vs) ->
       if is_rs_tuple rs then
         fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
-      else if Strings.has_suffix "'mk" rs.rs_name.id_string then
+      else if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
         let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
         fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
@@ -332,7 +334,7 @@ module Log = struct
     | Iter_loop of exec_mode
     | Exec_main of (rsymbol * value_or_invalid Mls.t * value Mvs.t * value_or_invalid Mrs.t)
     | Exec_stucked of (string * value Mid.t)
-    | Exec_failed of (string * value Mid.t)
+    | Exec_failed of (string * value_or_invalid Mrs.t * value_or_invalid Mls.t * value Mvs.t * value Mid.t)
     | Exec_ended
 
   type log_entry = {
@@ -379,8 +381,10 @@ module Log = struct
     let mrs = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) mrs in
     log_entry log_uc (Exec_main (rs,mls,mvs,mrs)) loc
 
-  let log_failed log_uc s mvs loc =
-    log_entry log_uc (Exec_failed (s,mvs)) loc
+  let log_failed log_uc s rsenv lsenv vsenv mvs loc =
+    let lsenv = Mls.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) lsenv in
+    let rsenv = Mrs.map (fun v -> try Value (Lazy.force v) with _ -> Invalid) rsenv in
+    log_entry log_uc (Exec_failed (s,rsenv,lsenv,vsenv,mvs)) loc
 
   let log_stucked log_uc s mvs loc =
     log_entry log_uc (Exec_stucked (s,mvs)) loc
@@ -463,9 +467,13 @@ module Log = struct
           (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
           (print_list vs2string) (Mvs.bindings mvs)
           (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
-    | Exec_failed (msg,mid) ->
-       fprintf fmt "@[<h2>Property failure at %s with:%a@]"
-         msg (print_list id2string) (Mid.bindings mid)
+    | Exec_failed (msg,mrs,mls,mvs,mid) ->
+       fprintf fmt "@[<h2>Property failure at %s with:%a%a%a%a@]"
+         msg
+         (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
+         (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
+         (print_list vs2string) (Mvs.bindings mvs)
+         (print_list id2string) (Mid.bindings mid)
     | Exec_stucked (msg,mid) ->
        fprintf fmt "@[<h2>Execution got stuck at %s with:%a@]"
          msg (print_list id2string) (Mid.bindings mid)
@@ -554,11 +562,13 @@ module Log = struct
                                           (List.map (key_value vs2string) (Mvs.bindings mvs))]);
                 "globals", List (List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs))
               ]
-        | Exec_failed (reason,mid) ->
+        | Exec_failed (reason,mrs,mls,mvs,mid) ->
             Record [
                 "kind", String "FAILED";
                 "reason", String reason;
-                "state", List (List.map (key_value id2string) (Mid.bindings mid))
+                "state", List (List.concat [List.map (key_value id2string) (Mid.bindings mid);
+                                            List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs);
+                                            List.map (key_value_or_undefined ls2string) (Mls.bindings mls)])
               ]
         | Exec_stucked (reason,mid) ->
             Record [
@@ -594,39 +604,36 @@ module Log = struct
      4 : + termination of execution
      5 : + log information about initialization of global vars
    *)
-  let print_log ?(verb_lvl=4) ~json fmt entry_log =
-    if json then
-      Json_base.print_json fmt (json_log entry_log)
-    else
-      let entry_log = List.filter (fun le ->
+  let print_log ?(verb_lvl=4) fmt entry_log =
+    let entry_log = List.filter (fun le ->
+          match le.log_desc with
+          | Val_assumed _ | Res_assumed _ | Const_init _ | Exec_main _ -> true
+          | Exec_call _ | Exec_pure _ | Exec_any _
+               when verb_lvl > 1 -> true
+          | Iter_loop _ when verb_lvl > 2 -> true
+          | Exec_failed _ | Exec_stucked _ | Exec_ended
+               when verb_lvl > 3 -> true
+          | _ -> false) entry_log in
+    (* if verb_lvl < 5 remove log about initialization of global vars *)
+    let entry_log =
+      if verb_lvl < 5 then
+        Lists.drop_while (fun le ->
             match le.log_desc with
-            | Val_assumed _ | Res_assumed _ | Const_init _ | Exec_main _ -> true
-            | Exec_call _ | Exec_pure _ | Exec_any _
-                 when verb_lvl > 1 -> true
-            | Iter_loop _ when verb_lvl > 2 -> true
-            | Exec_failed _ | Exec_stucked _ | Exec_ended
-                 when verb_lvl > 3 -> true
-            | _ -> false) entry_log in
-      (* if verb_lvl < 5 remove log about initialization of global vars *)
-      let entry_log =
-        if verb_lvl < 5 then
-          Lists.drop_while (fun le ->
-              match le.log_desc with
-                Exec_main _ -> false | _ -> true) entry_log
-        else entry_log in
-      let entry_log =
-        let on_file e = Option.map (fun (f,_,_,_,_) -> f) (Option.map Loc.get e.log_loc) in
-        let on_line e = Option.map (fun (_,l,_,_,_) -> l) (Option.map Loc.get e.log_loc) in
-        List.map (fun (f, es) -> f, consecutives on_line es)
-          (consecutives on_file entry_log) in
-      let pp_entries = Pp.(print_list newline print_log_entry_desc) in
-      let pp_lines fmt (opt_line, entries) = match opt_line with
-        | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
-        | None -> pp_entries fmt entries in
-      let pp_files fmt (opt_file, l) = match opt_file with
-        | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
-        | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
-      Pp.(print_list newline pp_files) fmt entry_log
+              Exec_main _ -> false | _ -> true) entry_log
+      else entry_log in
+    let entry_log =
+      let on_file e = Option.map (fun (f,_,_,_,_) -> f) (Option.map Loc.get e.log_loc) in
+      let on_line e = Option.map (fun (_,l,_,_,_) -> l) (Option.map Loc.get e.log_loc) in
+      List.map (fun (f, es) -> f, consecutives on_line es)
+        (consecutives on_file entry_log) in
+    let pp_entries = Pp.(print_list newline print_log_entry_desc) in
+    let pp_lines fmt (opt_line, entries) = match opt_line with
+      | Some line -> fprintf fmt "@[<v2>Line %d:@\n%a@]" line pp_entries entries
+      | None -> pp_entries fmt entries in
+    let pp_files fmt (opt_file, l) = match opt_file with
+      | Some file -> fprintf fmt "@[<v2>File %s:@\n%a@]" (Filename.basename file) Pp.(print_list newline pp_lines) l
+      | None -> fprintf fmt "@[<v4>Unknown location:@\n%a@]" Pp.(print_list newline pp_lines) l in
+    Pp.(print_list newline pp_files) fmt entry_log
 
   let sort_log_by_loc log =
     let insert f l e sofar =
@@ -655,7 +662,7 @@ module Log = struct
           try
             let rs_path,_,_ = Pmodule.restore_path rs.rs_name in
             let rs_path = Env.locate_library env rs_path in
-            Strings.has_prefix !Whyconf.stdlib_path rs_path
+            Strings.has_prefix ~prefix:!Whyconf.stdlib_path rs_path
           with
           | Not_found | Env.LibraryNotFound _
           | Env.AmbiguousPath _ | Invalid_argument _ -> false in
@@ -690,6 +697,7 @@ type env = {
   why_env  : Env.env;
   pmodule  : Pmodule.pmodule;
   funenv   : (cexp * rec_defn list option) Mrs.t;
+  tvenv    : Ty.ty Mtv.t;
   vsenv    : value Mvs.t;
   lsenv    : value Lazy.t Mls.t; (* global logical functions and constants *)
   rsenv    : value Lazy.t Mrs.t; (* global constants *)
@@ -698,7 +706,8 @@ type env = {
 }
 
 let mk_empty_env env pmodule =
-  {pmodule; funenv= Mrs.empty; vsenv= Mvs.empty; lsenv= Mls.empty; rsenv= Mrs.empty;
+  {pmodule; funenv= Mrs.empty; tvenv = Mtv.empty;
+   vsenv= Mvs.empty; lsenv= Mls.empty; rsenv= Mrs.empty;
    premises= mk_empty_premises (); why_env= env; log_uc= Log.empty_log_uc ()}
 
 let snapshot_env env =
@@ -729,7 +738,22 @@ let bind_pvs ?register pv v_t ctx =
   ctx
 
 let multibind_pvs ?register l tl ctx =
+(*
+  let aux mt pv v =
+    ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
+  let mt =
+    List.fold_left2 aux ctx.env.tvenv rs.rs_cty.cty_args arg_vs in
+*)
+  let aux ctx pv v =
+    let mt = ctx.tvenv in
+    let mt = ty_match mt pv.pv_vs.vs_ty (ty_inst mt (v_ty v)) in
+    bind_pvs ?register pv v { ctx with tvenv = mt }
+  in
+    List.fold_left2 aux ctx l tl
+
+(*
   List.fold_left2 (fun ctx pv v -> bind_pvs ?register pv v ctx) ctx l tl
+*)
 
 type check_value = ity -> value -> unit
 
@@ -775,7 +799,7 @@ let register_exec_main env rs =
     env.rsenv rs.rs_name.id_loc
 
 let register_failure env loc reason mvs =
-  Log.log_failed env.log_uc reason (Mid.map snapshot mvs) loc
+  Log.log_failed env.log_uc reason env.rsenv env.lsenv env.vsenv (Mid.map snapshot mvs) loc
 
 let register_stucked env loc reason mvs =
   Log.log_stucked env.log_uc reason (Mid.map snapshot mvs) loc
@@ -799,7 +823,7 @@ type cntr_ctx = {
 
 let describe_cntr_ctx ctx =
   asprintf "%s%a"
-    (Strings.remove_prefix "expl:" ctx.attr.attr_string)
+    (Strings.remove_prefix ~prefix:"expl:" ctx.attr.attr_string)
     (Pp.print_option (fun fmt -> fprintf fmt " %s")) ctx.desc
 
 let report_cntr_title fmt (ctx, msg) =
@@ -839,6 +863,15 @@ exception Fail of cntr_ctx * Term.term
 
 exception Stuck of cntr_ctx * Loc.position option * string
 
+exception Cannot_decide of cntr_ctx * Term.term list * string
+
+exception FatalRACError of Log.log_uc * string
+
+let fatal_rac_error l f =
+  kasprintf (fun reason ->
+      Debug.dprintf debug_trace_exec "RAC fatal error: %s@." reason;
+      raise (FatalRACError (l,reason))) f
+
 let stuck ?loc ctx f =
   kasprintf (fun reason ->
       Debug.dprintf debug_trace_exec "Stuck: %s@." reason;
@@ -847,8 +880,8 @@ let stuck ?loc ctx f =
 type check_term =
   ?vsenv:(Term.vsymbol * Term.term) list -> cntr_ctx -> Term.term -> unit
 
-let check_term_dummy ?vsenv:_ _ _ =
-  incomplete "check_term_dummy"
+let check_term_dummy ?vsenv:_ ctx t =
+  raise (Cannot_decide (ctx, [t], "check_term_dummy"))
 
 type rac = {
   check_term        : check_term;
@@ -867,13 +900,19 @@ let warn_rac_incomplete =
 
 let check_term rac ?vsenv cntr_ctx t =
   try rac.check_term ?vsenv cntr_ctx t
-  with Incomplete reason when rac.ignore_incomplete ->
+  with Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
+    Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (cntr_ctx, [t], reason)) (get_raw_backtrace ()))
 
 let check_terms rac ctx ts =
   try List.iter (rac.check_term ctx) ts
-  with Incomplete reason when rac.ignore_incomplete ->
+  with Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
+    Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, ts, reason)) (get_raw_backtrace ()))
 
 (* Check a post-condition [t] by binding the result variable to
    the term [vt] representing the result value.
@@ -884,13 +923,17 @@ let check_post rac ctx v post =
   let vsenv = Mvs.add vs v ctx.cntr_env.vsenv in
   let ctx = {ctx with cntr_env= {ctx.cntr_env with vsenv}} in
   try rac.check_term ctx t
-  with Incomplete reason when rac.ignore_incomplete ->
+  with
+  | Cannot_decide (_,_,reason) when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, [post], reason)) (get_raw_backtrace ()))
 
 let check_posts rac ctx v posts =
   try List.iter (check_post rac ctx v) posts
-  with Incomplete reason when rac.ignore_incomplete ->
+  with
+  | Cannot_evaluate reason when rac.ignore_incomplete ->
     Loc.warning warn_rac_incomplete "%s.@." reason
+  | Cannot_evaluate reason -> Printexc.(raise_with_backtrace (Cannot_decide (ctx, posts, reason)) (get_raw_backtrace ()))
 
 let check_type_invs rac ?loc ~giant_steps env ity v =
   let ts = match ity.ity_node with
@@ -910,8 +953,10 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
       | Vconstr (_, fs, vs) ->
           List.fold_right2 Mrs.add fs (List.map field_get vs) Mrs.empty
       | Vundefined ->
-          incomplete "type invariant for undefined value of type %a cannot be checked"
-            print_ty v.v_ty;
+          let desc = asprintf "of type %a" print_ity ity in
+          let ctx = mk_cntr_ctx env ?loc:loc ~desc ~giant_steps:(Some giant_steps) Vc.expl_type_inv in
+          let reason = asprintf "type invariant for undefined value of type %a cannot be checked" print_ty v.v_ty in
+          raise (Cannot_decide (ctx, def.Pdecl.itd_invariant, reason))
       | _ -> failwith "check_type_invs: value is not record" in
     let bind_field env rs =
       try bind_pvs (Option.get rs.rs_field) (Mrs.find rs fs_vs) env
@@ -1080,14 +1125,14 @@ let ty_app_arg ts ix ty = match ty.ty_node with
   | _ -> kasprintf failwith "@[<h>ty_arg: not a type application of %a: %a@]"
            print_ts ts print_ty ty
 
-let t_undefined ty =
-  t_eps_close (create_vsymbol (id_fresh "undefined") ty) t_true
+let t_undefined str ty =
+  t_eps_close (create_vsymbol (id_fresh str) ty) t_true
 
 let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) list * term =
   let ty = ty_inst ty_mt (v_ty v) in
   match v_desc v with
   | Vundefined ->
-      vsenv, t_undefined ty
+      vsenv, t_undefined "vundefined" ty
   | Vnum i ->
       if ty_equal ty ty_int || is_range_ty ty then
         vsenv, t_const (Constant.int_const i) ty
@@ -1104,7 +1149,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       Option.iter (ty_equal_check ty) t.t_ty;
       vsenv, t
   | Vreal _ | Vfloat _ | Vfloat_mode _ -> (* TODO *)
-      vsenv, t_undefined ty
+      vsenv, t_undefined "vreal_vfloat" ty
   | Vproj (ls, x) ->
       (* TERM: epsilon v. rs v = x *)
       let vs = create_vsymbol (id_fresh "v") ty in
@@ -1139,7 +1184,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
             begin
               match rs_kind rs with
               | RKfunc -> t_app_from_constr rs fs
-              | RKnone when Strings.has_suffix "'mk" rs.rs_name.id_string ->
+              | RKnone when Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string ->
                   t_eps_from_constr field_rss fs
               | _ -> kasprintf failwith "Cannot construct term for constructor \
                                         %a that is not a function" print_rs rs
@@ -1176,7 +1221,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
         let ls_update = Theory.ns_find_ls ns [Ident.op_update ""] in
         let t_length = t_nat_const (Array.length arr) in
         let ty_elt = ty_app_arg ts_array 0 ty in
-        let t0 = fs_app ls_make [t_length; t_undefined ty_elt] ty in
+        let t0 = fs_app ls_make [t_length; t_undefined "varray_others" ty_elt] ty in
         let rec loop vsenv sofar ix =
           if ix = Array.length arr then vsenv, sofar
           else

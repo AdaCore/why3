@@ -68,11 +68,12 @@ easy.
 injection h9. clear h9.
 intros.
 subst.
-assert (hj: (0 <= j+1)%Z) by omega.
+assert (hj: (0 <= j+1)%Z).
+  auto with zarith.
 replace (i + 1 + j)%Z with (i + (j + 1))%Z by ring.
 rewrite <- (h3 _ hj).
 destruct (Nth.nth'def (j+1)%Z (cons z o1)) as [_ ->].
 now ring_simplify (j+1-1)%Z.
-omega.
+auto with zarith.
 Qed.
 

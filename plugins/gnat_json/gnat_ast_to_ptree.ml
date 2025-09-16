@@ -454,6 +454,12 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
 
   let curr_attrs = Curr.mk_attrs () in
 
+  let mk_binder labels (node : binder_id) =
+     let Binder b = node.desc in
+     let name = Opt.force (conversion_error node.info.id "empty quantifier binder") b.name in
+     mk_binder_of_identifier (curr_attrs @ List.filter_map mk_label labels) (mk_pty_of_type b.arg_type) name
+  in
+
   let res = match node.desc with
 
     (* Preds, Expr *)
@@ -466,10 +472,9 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
            let for_triggers (node : triggers_id) =
              let Triggers r = node.desc in
              List.map for_trigger (list_of_nonempty r.triggers) in
-           let curr_attrs = Curr.mk_attrs () in
            let binders =
-             List.map (mk_binder_of_identifier (curr_attrs @ List.filter_map mk_label r.labels) (mk_pty_of_type r.var_type))
-               (list_of_nonempty r.variables) in
+             List.map (mk_binder r.labels)
+               (list_of_nonempty r.binders) in
            let triggers = Option.value ~default:[] (Option.map for_triggers r.triggers) in
            let body = mk_term_of_pred r.pred  in
            T.mk_quant Dterm.DTforall binders triggers body)
@@ -477,10 +482,8 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
     | Existential_quantif r ->
         term_only "existential quantif"
           (let binders =
-             List.map
-               (mk_binder_of_identifier (List.filter_map mk_label r.labels)
-                  (mk_pty_of_type r.var_type))
-               (list_of_nonempty r.variables) in
+             List.map (mk_binder r.labels)
+               (list_of_nonempty r.binders) in
            let body = mk_term_of_pred r.pred in
            T.mk_quant Dterm.DTexists binders [] body)
 
@@ -1390,7 +1393,7 @@ let read_channel env path filename c =
         Gnat_ast_pretty.pp_file gnat_file
   end;
   let mlw_file = mlw_file gnat_file.theory_declarations in
-  let basename = Strings.remove_suffix ("."^gnat_json_file_ext) filename in
+  let basename = Strings.remove_suffix ~suffix:("."^gnat_json_file_ext) filename in
   let mlw_filename = basename ^".mlw" in
   let sexp_filename = basename ^".sexp" in
   (* Defer printing of mlw file until after the typing, to set the marker of located

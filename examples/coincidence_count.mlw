@@ -137,6 +137,7 @@ module CoincidenceCountBag
         incr c
       end
     done;
+    assert { inter (drop a i) (drop b j) = empty_bag };
     c
 
 end

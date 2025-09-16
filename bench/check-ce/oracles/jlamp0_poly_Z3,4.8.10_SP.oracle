@@ -7,7 +7,7 @@
   - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0_poly.mlw", line 8, characters 6-8)
 File "bench/check-ce/jlamp0_poly.mlw", line 12, characters 13-26:
 Sub-goal Assertion of goal p1'vc.
-Prover result is: Step limit exceeded (3000057 steps).
+Prover result is: Step limit exceeded (3000054 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -64,7 +64,7 @@ File jlamp0_poly.mlw:
   - Abstract RAC: STUCK (failure in precondition of `p1` at "bench/check-ce/jlamp0_poly.mlw", line 8, characters 6-8)
 File "bench/check-ce/jlamp0_poly.mlw", line 10, characters 15-29:
 Sub-goal Postcondition of goal p1'vc.
-Prover result is: Step limit exceeded (3000106 steps).
+Prover result is: Step limit exceeded (3000103 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -134,7 +134,7 @@ File jlamp0_poly.mlw:
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Step limit exceeded (3000033 steps).
+Prover result is: Step limit exceeded (3000030 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -173,18 +173,18 @@ File jlamp0_poly.mlw:
 
 File "bench/check-ce/jlamp0_poly.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant init of goal p2'vc.
-Prover result is: Valid (134 steps).
+Prover result is: Valid (124 steps).
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
+- Checked model 0: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
-- Checked model 1: BAD_CE
+- Selected model 1: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/jlamp0_poly.mlw", line 24, characters 16-18:
 Sub-goal Loop variant decrease of goal p2'vc.
-Prover result is: Step limit exceeded (3000121 steps).
+Prover result is: Step limit exceeded (3000115 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -197,7 +197,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Step limit exceeded (3000114 steps).
+Prover result is: Step limit exceeded (3000111 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -211,10 +211,7 @@ File jlamp0_poly.mlw:
   Line 6:
     a = {contents= 0}
   Line 15:
-    Constant c initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    c = {contents= 0}
+    c = {contents= 10}
 Unknown location:
     _ = ()
 File jlamp0_poly.mlw:
@@ -222,41 +219,41 @@ File jlamp0_poly.mlw:
     _ = ()
     Execution of main function `p2` with env:
       a = {contents= 0}
-      c = {contents= 0}
+      c = {contents= 10}
       _ = ()
       zero = 0
       one = 1
   Line 20:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
+      r = {contents= 10}
       v = 1
   Line 22:
     Property failure at loop invariant init with:
       c = {contents= 1}
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
+- Checked model 0: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
-- Checked model 1: BAD_CE
+- Selected model 1: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/jlamp0_poly.mlw", line 23, characters 18-31:
 Sub-goal Loop invariant preservation of goal p2'vc.
-Prover result is: Step limit exceeded (3000121 steps).
+Prover result is: Step limit exceeded (3000118 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
+- Checked model 0: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
-- Checked model 1: BAD_CE
+- Selected model 1: BAD_CE
   - Concrete RAC: FAILURE (loop invariant init at "bench/check-ce/jlamp0_poly.mlw", line 22, characters 18-31)
   - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
 File "bench/check-ce/jlamp0_poly.mlw", line 19, characters 15-28:
 Sub-goal Postcondition of goal p2'vc.
-Prover result is: Step limit exceeded (3000077 steps).
+Prover result is: Step limit exceeded (3000074 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

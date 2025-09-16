@@ -1,0 +1,50 @@
+use int.Int
+use int.MinMax
+use list.List
+use list.FoldLeft
+
+(** {Logical definitions} *)
+
+type forest = list tree
+with tree   = Node int forest
+
+function size_forest (f: forest) : int
+= match f with
+  | Nil      -> 0
+  | Cons t f -> size_tree t + size_forest f
+  end
+with size_tree (t: tree) : int
+= match t with
+  | Node _ f -> 1 + size_forest f
+  end
+
+let unForest (f: forest)
+  (cons (t: tree) (ff: forest) { f = Cons t ff })
+  (nil  { f = Nil })
+= any
+
+(** {Coma} *)
+
+use coma.Std
+
+let unTree (t: tree) (fo [] (v: int) (f: forest) { t = Node v f }) = any
+
+let rec ht (t: tree) (out (n:int)) =
+  unTree {t} (fun (_v:int) (f: forest) -> hf {f} out)
+
+with hf (f: forest) (out (n:int)) =
+  hf_aux {f} . fun (l: list int) -> out {fold_left max 0 l}
+
+with hf_aux (f: forest) (out (l: list int)) =
+  unForest {f}
+     (fun (t: tree) (ff: forest) ->
+        ht {t} (fun (n: int) ->
+        hf_aux {ff} (fun (l: list int) ->
+        out {Cons (n+1) l})))
+     (-> out {Nil: list int})
+
+let cons (t: tree) (f: forest) =
+  hf {Cons t f} . fun (h_fo: int) ->
+  hf {f}        . fun (h_f:  int) ->
+  ht {t}        . fun (h_t:  int) ->
+  { h_fo = max h_t h_f } (! halt)

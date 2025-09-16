@@ -2,12 +2,12 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
-- Checked model 1: BAD_CE
-  - Concrete RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32_mono.mlw", line 9, characters 6-18)
-  - Abstract RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32_mono.mlw", line 9, characters 6-18)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
 File "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Step limit exceeded (100045 steps).
+Prover result is: Unknown (sat) (1193 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -38,6 +38,8 @@ File bv32_mono.mlw:
     Property failure at postcondition of `dummy_update` with:
       r = {c= (132:t)}
 
+Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 17, characters 14-30)
@@ -47,7 +49,7 @@ File bv32_mono.mlw:
   - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
 File "bench/check-ce/bv32_mono.mlw", line 17, characters 14-30:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (100049 steps).
+Prover result is: Step limit exceeded (100046 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

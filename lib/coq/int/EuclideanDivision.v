@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -79,13 +79,11 @@ destruct cases as [h4 | [h5 | h6]]; auto.
 assert (y * div x y <= y * (q - 1))%Z.
  apply  Zmult_le_compat_l; auto with zarith.
 replace (y*(q-1))%Z with (q*y - y)%Z in H by ring.
-elimtype False.
-lia.
+exfalso; lia.
 assert (y * div x y >= y * (q + 1))%Z.
  apply  Zmult_ge_compat_l; auto with zarith.
 replace (y*(q+1))%Z with (q*y + y)%Z in H by ring.
-elimtype False.
-lia.
+exfalso; lia.
 Qed.
 
 (* Why3 goal *)

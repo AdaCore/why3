@@ -1,0 +1,14 @@
+module IgnoreRes
+  [@java:class_kind:abstract]
+
+  type t = {
+    mutable x : bool;
+    mutable d : bool;
+  }
+
+  val f (self : t) : bool
+    writes { self }
+
+  let g (self : t) : unit =
+    let _ = f self in ()
+end

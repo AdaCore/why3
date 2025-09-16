@@ -1,0 +1,45 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/return_value_below_if_when_vc_sp.mlw", line 7, characters 12-65)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/return_value_below_if_when_vc_sp.mlw", line 7, characters 12-65)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/return_value_below_if_when_vc_sp.mlw", line 7, characters 12-65)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/return_value_below_if_when_vc_sp.mlw", line 7, characters 12-65)
+File "bench/check-ce/return_value_below_if_when_vc_sp.mlw", line 7, characters 12-65:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown (unknown) (10 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File return_value_below_if_when_vc_sp.mlw:
+  Line 6:
+    b = true
+    y = 42
+    b = true
+    y = 42
+    Execution of main function `f` with env:
+      b = true
+      y = 42
+      zero = 0
+      one = 1
+  Line 8:
+    (giant-step) execution of unimplemented function `bool_neq`
+      x = 42
+      y = 0
+    result of `bool_neq` = true
+  Line 7:
+    Property failure at postcondition of `f` with:
+      True = UNDEFINED
+      b = true
+      y = 42
+      result = true
+

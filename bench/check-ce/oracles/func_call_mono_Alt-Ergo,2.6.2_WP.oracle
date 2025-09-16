@@ -1,0 +1,53 @@
+File "bench/check-ce/func_call_mono.mlw", line 10, characters 12-25:
+Sub-goal Postcondition of goal g'vc.
+Prover result is: Valid (13 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call_mono.mlw", line 10, characters 12-25)
+- Selected model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call_mono.mlw", line 16, characters 11-18)
+- Checked model 2: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call_mono.mlw", line 16, characters 11-18)
+File "bench/check-ce/func_call_mono.mlw", line 16, characters 11-18:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (15 steps).
+The contracts of the following functions/loops are too weak :
+  - Function 'g' at "bench/check-ce/func_call_mono.mlw", line 15, characters 2-6
+, for example during the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File func_call_mono.mlw:
+  Line 6:
+    Constant z initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {c= 0}
+    z = {c= 0}
+Unknown location:
+    _ = ()
+File func_call_mono.mlw:
+  Line 13:
+    _ = ()
+    Execution of main function `f` with env:
+      z = {c= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 15:
+    Normal execution of function `Tuple0` with args:
+    Giant-step execution of function `g` with args:
+      _ = ()
+    z = {c= 2}
+    result of `g` = ()
+  Line 16:
+    Property failure at assertion with:
+      z = {c= 2}
+

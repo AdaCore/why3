@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -141,7 +141,7 @@ module_decl_no_head_parsing_only:
 use_clone:
 | USE EXPORT tqualid
     { let loc = floc $startpos $endpos in
-      let decl = Ptree.Duseexport $3 in
+      let decl = Ptree.Duseexport (loc, $3) in
       Typing.add_decl loc decl
     }
 | CLONE EXPORT tqualid clone_subst

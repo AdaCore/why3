@@ -254,6 +254,18 @@ why3_vc Exp_log
 
 why3_vc Exp_sum by (simp add: Transcendental.exp_add)
 
+why3_vc exp_increasing
+  using assms by auto 
+
+why3_vc exp_positive
+  by auto
+
+why3_vc exp_inv
+  by (simp add: exp_minus)
+
+why3_vc exp_sum_opposite
+  by (simp add: exp_minus exp_plus_inverse_exp)
+
 why3_vc Log_exp by auto
 
 why3_vc Log_mul
@@ -263,6 +275,15 @@ why3_vc Log_mul
 why3_vc Log_one by auto
 
 why3_vc Exp_zero by auto
+
+why3_vc log_increasing
+  using H1 H2 by auto
+
+why3_vc log2_increasing
+  using H1 H2 divide_real_def log2_def by auto
+
+why3_vc log10_increasing
+  using H1 H2 divide_real_def log10_def by force
 
 why3_end
 

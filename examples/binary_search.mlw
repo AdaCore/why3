@@ -233,3 +233,58 @@ module Complexity
     -1
 
 end
+
+(* Search in a two-dimensional grid where all rows and columns are
+   sorted.  Here is an example:
+
+                            j
+     +---+---+---+---+---+-->
+     | 1 | 3 | 4 | 4 | 7*|
+     +---+---+---+---+---+
+     | 1 | 4 | 6 | 6 | 8*|
+     +---+---+---+---+---+
+     | 2 | 5 | 7 | 9*|11*|
+     +---+---+---+---+---+
+     | 4 | 8 | 8*|12*|13 |
+     +---+---+---+---+---+
+     |         *
+   i v
+
+  Algorithm: start from the upper right corner and then move left
+  (resp. down) when the value is greater (resp. smaller) than the
+  value we search for.
+
+  In the example above, the stars depict the elements that are
+  examined when we search for the value 10. Here we end up outside of
+  the grid and thus the search is unsuccessful.
+*)
+
+module TwoDimensional
+
+  use int.Int
+  use matrix.Matrix
+
+  let search (m: matrix int) (v: int) : bool
+    requires  { [@expl: rows are sorted] forall i. 0 <= i < rows m ->
+                forall j1 j2. 0 <= j1 <= j2 < columns m ->
+                get m i j1 <= get m i j2  }
+    requires  { [@expl: columns are sorted] forall j. 0 <= j < columns m ->
+                forall i1 i2. 0 <= i1 <= i2 < rows m ->
+                get m i1 j <= get m i2 j  }
+    ensures   { result <->
+      exists i j. 0 <= i < rows m && 0 <= j < columns m && get m i j = v }
+  = let ref i = 0 in
+    let ref j = columns m - 1 in
+    while i < rows m && 0 <= j do
+      invariant {  0 <= i <= rows    m }
+      invariant { -1 <= j <  columns m }
+      invariant { forall i' j'. 0 <= i' < rows m -> 0 <= j' < columns m ->
+                  i' < i || j' > j -> get m i' j' <> v }
+      variant   { rows m - i + j }
+      let x = get m i j in
+      if x = v then return true;
+      if x < v then i <- i + 1 else j <- j - 1
+    done;
+    return false
+
+end

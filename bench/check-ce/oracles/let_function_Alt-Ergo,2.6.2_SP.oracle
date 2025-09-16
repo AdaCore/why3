@@ -1,0 +1,45 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/let_function.mlw", line 6, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/let_function.mlw", line 6, characters 12-24)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/let_function.mlw", line 6, characters 12-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/let_function.mlw", line 6, characters 12-24)
+File "bench/check-ce/let_function.mlw", line 6, characters 12-24:
+Sub-goal Postcondition of goal main_f'vc.
+Prover result is: Unknown (unknown) (17 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File let_function.mlw:
+  Line 5:
+    y = 42
+    y = 42
+    Execution of main function `main_f` with env:
+      y = 42
+      zero = 0
+      one = 1
+  Line 8:
+    Normal execution of function `f` with args:
+      x = 42
+  Line 3:
+    Normal execution of function `(+)` with args:
+      _ = 42
+      _ = 1
+  Line 9:
+    Normal execution of function `(+)` with args:
+      _ = 43
+      _ = 1
+  Line 6:
+    Property failure at postcondition of `main_f` with:
+      result = 44
+

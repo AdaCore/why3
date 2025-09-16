@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -898,7 +898,7 @@ let oneway_union t1 t2 = match t1, t2 with
   | _, Diverges | Diverges, _ -> Diverges
   | _ -> Partial
 
-type effect = {
+type effekt = {
   eff_reads  : Spv.t;         (* known variables *)
   eff_writes : Spv.t Mreg.t;  (* writes to fields *)
   eff_taints : Sreg.t;        (* ghost code writes *)
@@ -1105,7 +1105,7 @@ let eff_assign asl =
     Mreg.fold add_write mpl acc in
   let resets,_,_ = Mint.fold add_level m (Sreg.empty,Mreg.empty,Mreg.empty) in
   (* construct the effect *)
-  let effect = {
+  let effekt = {
     eff_reads  = reads;
     eff_writes = Mreg.map Mpv.domain writes;
     eff_taints = taint;
@@ -1116,8 +1116,8 @@ let eff_assign asl =
     eff_oneway = Total;
     eff_ghost  = ghost } in
   (* verify that we can rebuild every value *)
-  check_writes effect reads;
-  effect
+  check_writes effekt reads;
+  effekt
 
 let eff_reset_overwritten ({eff_writes = wr} as e) =
   if not (Sreg.is_empty e.eff_resets) then
@@ -1297,21 +1297,21 @@ type cty = {
   cty_post   : post list;
   cty_xpost  : post list Mxs.t;
   cty_oldies : pvsymbol Mpv.t;
-  cty_effect : effect;
+  cty_effect : effekt;
   cty_result : ity;
   cty_mask   : mask;
   cty_freeze : ity_subst;
 }
 
-let cty_unsafe args pre post xpost oldies effect result mask freeze = {
+let cty_unsafe args pre post xpost oldies effekt result mask freeze = {
   cty_args   = args;
   cty_pre    = pre;
   cty_post   = post;
   cty_xpost  = xpost;
   cty_oldies = oldies;
-  cty_effect = effect;
+  cty_effect = effekt;
   cty_result = result;
-  cty_mask   = mask_adjust effect result mask;
+  cty_mask   = mask_adjust effekt result mask;
   cty_freeze = freeze;
 }
 
@@ -1358,7 +1358,7 @@ let check_post exn ity post =
     | _ -> raise exn) post
 
 let create_cty ?(mask=MaskVisible) ?(defensive=false)
-               args pre post xpost oldies effect result =
+               args pre post xpost oldies effekt result =
   let exn = Invalid_argument "Ity.create_cty" in
   (* pre, post, and xpost are well-typed *)
   check_pre pre; check_post exn result post;
@@ -1375,27 +1375,27 @@ let create_cty ?(mask=MaskVisible) ?(defensive=false)
     if not (gh && o == ity_purify t) then raise exn) oldies;
   let preads = spec_t_fold t_freepvs sarg pre [] Mxs.empty in
   let qreads = spec_t_fold t_freepvs Spv.empty [] post xpost in
-  let effect = eff_read_post effect qreads in
-  let oldies = Mpv.set_inter oldies effect.eff_reads in
-  let effect = eff_bind oldies effect in
+  let effekt = eff_read_post effekt qreads in
+  let oldies = Mpv.set_inter oldies effekt.eff_reads in
+  let effekt = eff_bind oldies effekt in
   let preads = Mpv.fold (Util.const Spv.add) oldies preads in
   if not (Mpv.set_disjoint preads oldies) then raise exn;
-  let effect = eff_read_pre preads effect in
-  let xreads = Spv.diff effect.eff_reads sarg in
+  let effekt = eff_read_pre preads effekt in
+  let xreads = Spv.diff effekt.eff_reads sarg in
   let freeze = Spv.fold freeze_pv xreads isb_empty in
-  let freeze = Sxs.fold freeze_xs effect.eff_raises freeze in
-  check_tvs effect.eff_reads effect.eff_raises result pre post xpost;
+  let freeze = Sxs.fold freeze_xs effekt.eff_raises freeze in
+  check_tvs effekt.eff_reads effekt.eff_raises result pre post xpost;
   (* remove exceptions whose postcondition is False *)
   let is_false q = match open_post q with
     | _, {t_node = Tfalse} -> true | _ -> false in
   let filter _ () = function
     | [q] when is_false q -> None | _ -> Some () in
-  let raises = Mxs.diff filter effect.eff_raises xpost in
-  let effect = { effect with eff_raises = raises } in
+  let raises = Mxs.diff filter effekt.eff_raises xpost in
+  let effekt = { effekt with eff_raises = raises } in
   (* remove writes/taints invalidated by resets *)
-  let effect = { effect with
-    eff_writes = Mreg.set_inter effect.eff_writes effect.eff_covers;
-    eff_taints = Mreg.set_inter effect.eff_taints effect.eff_covers} in
+  let effekt = { effekt with
+    eff_writes = Mreg.set_inter effekt.eff_writes effekt.eff_covers;
+    eff_taints = Mreg.set_inter effekt.eff_taints effekt.eff_covers} in
   (* remove effects on unknown regions. We reset eff_taints
      instead of simply filtering the existing set in order
      to get rid of non-ghost writes into ghost regions.
@@ -1409,27 +1409,27 @@ let create_cty ?(mask=MaskVisible) ?(defensive=false)
      be removed (we cannot create a real regular alias to a
      ghost location), but it is simpler to just recast them
      as ghost, to keep the type signature consistent. *)
-  let rknown = read_regs effect.eff_reads in
+  let rknown = read_regs effekt.eff_reads in
   let vknown = ity_rch_regs rknown result in
   let add_xs xs s = ity_rch_regs s xs.xs_ity in
   let vknown = Sxs.fold add_xs raises vknown in
-  let effect = reset_taints { effect with
-    eff_writes = Mreg.set_inter effect.eff_writes rknown;
-    eff_covers = Mreg.set_inter effect.eff_covers rknown;
-    eff_resets = Mreg.set_inter effect.eff_resets vknown} in
+  let effekt = reset_taints { effekt with
+    eff_writes = Mreg.set_inter effekt.eff_writes rknown;
+    eff_covers = Mreg.set_inter effekt.eff_covers rknown;
+    eff_resets = Mreg.set_inter effekt.eff_resets vknown} in
   (* only spoil the escaping type variables *)
-  let escape = eff_escape effect result in
+  let escape = eff_escape effekt result in
   let escape = Sity.fold_left ity_rch_vars Stv.empty escape in
-  let spoils = Stv.inter effect.eff_spoils escape in
-  let effect = { effect with eff_spoils = spoils } in
+  let spoils = Stv.inter effekt.eff_spoils escape in
+  let effekt = { effekt with eff_spoils = spoils } in
   (* be defensive in abstract function declarations *)
-  let effect = if not defensive then effect else
+  let effekt = if not defensive then effekt else
     let resets = Mreg.set_diff vknown rknown in
-    let resets = Mreg.set_union effect.eff_resets resets in
-    { effect with eff_resets = resets; eff_spoils = escape } in
+    let resets = Mreg.set_union effekt.eff_resets resets in
+    { effekt with eff_resets = resets; eff_spoils = escape } in
   (* remove the formal parameters from eff_reads *)
-  let effect = { effect with eff_reads = xreads } in
-  cty_unsafe args pre post xpost oldies effect result mask freeze
+  let effekt = { effekt with eff_reads = xreads } in
+  cty_unsafe args pre post xpost oldies effekt result mask freeze
 
 let create_cty_defensive = create_cty ~defensive:true
 let create_cty           = create_cty ~defensive:false

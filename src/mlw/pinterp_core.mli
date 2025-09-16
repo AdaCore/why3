@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -89,6 +89,8 @@ val field : value -> field
 val field_get : field -> value
 val field_set : field -> value -> unit
 
+val v_inst : value -> Ty.ty Ty.Mtv.t -> value
+
 (** {4 Constructors}
 
     Non defensive API for building [value]s: there are no checks that
@@ -142,7 +144,7 @@ module Log : sig
     | Iter_loop of exec_mode
     | Exec_main of (Expr.rsymbol * value_or_invalid Term.Mls.t * value Term.Mvs.t * value_or_invalid Expr.Mrs.t)
     | Exec_stucked of (string * value Ident.Mid.t)
-    | Exec_failed of (string * value Ident.Mid.t)
+    | Exec_failed of (string * value_or_invalid Expr.Mrs.t * value_or_invalid Term.Mls.t * value Term.Mvs.t * value Ident.Mid.t)
     | Exec_ended
 
   type log_entry = private {
@@ -150,7 +152,7 @@ module Log : sig
     log_loc  : Loc.position option;
   }
 
-  type exec_log
+  type exec_log = log_entry list
   type log_uc
 
   val log_val : log_uc -> Ident.ident -> value -> Loc.position option -> unit
@@ -164,8 +166,8 @@ module Log : sig
   val log_iter_loop : log_uc -> exec_mode -> Loc.position option -> unit
   val log_exec_main : log_uc -> Expr.rsymbol -> value Lazy.t Term.Mls.t -> value Term.Mvs.t -> value Lazy.t Expr.Mrs.t ->
                       Loc.position option -> unit
-  val log_failed : log_uc -> string -> value Ident.Mid.t ->
-                   Loc.position option -> unit
+  val log_failed : log_uc -> string -> value Lazy.t Expr.Mrs.t -> value Lazy.t Term.Mls.t ->
+                      value Term.Mvs.t -> value Ident.Mid.t -> Loc.position option -> unit
   val log_stucked : log_uc -> string -> value Ident.Mid.t ->
                     Loc.position option -> unit
   val log_exec_ended : log_uc -> Loc.position option -> unit
@@ -180,7 +182,7 @@ module Log : sig
 
   val sort_log_by_loc : exec_log -> log_entry list Wstdlib.Mint.t Wstdlib.Mstr.t
   val json_log : exec_log -> Json_base.json
-  val print_log : ?verb_lvl:int -> json:bool -> exec_log Pp.pp
+  val print_log : ?verb_lvl:int -> exec_log Pp.pp
 
   (** Used for counterexamples.
       Returns the list of function calls and loops that are executed in the log.
@@ -213,6 +215,8 @@ type env = {
   pmodule  : Pmodule.pmodule;
   funenv   : (Expr.cexp * Expr.rec_defn list option) Expr.Mrs.t;
   (** local functions *)
+  tvenv    : Ty.ty Ty.Mtv.t;
+  (** current instances of type variables *)
   vsenv    : value Term.Mvs.t;
   (** local variables *)
   lsenv    : value Lazy.t Term.Mls.t;
@@ -245,12 +249,12 @@ val multibind_pvs : ?register:(Ident.ident -> value -> unit) ->
 
 (** {3 Exception for incomplete execution (and RAC)} *)
 
-exception Incomplete of string
+exception Cannot_evaluate of string
 (** Raised when the execution in {!Pinterp} is incomplete (not implemented or not
-    possible), or when a check cannot be decided during the RAC. *)
+    possible) *)
 
-(** @raise Incomplete with the formatted string as reason *)
-val incomplete : ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** @raise Cannot_evaluate with the formatted string as reason *)
+val cannot_evaluate : ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 (** {3 Term of value} *)
 
@@ -363,6 +367,16 @@ exception Fail of cntr_ctx * Term.term
 exception Stuck of cntr_ctx * Loc.position option * string
 (** Caused by invalid assumptions *)
 
+exception Cannot_decide of cntr_ctx * Term.term list * string
+(** The check cannot be decided (for example, because the execution is
+    incomplete *)
+
+exception FatalRACError of Log.log_uc * string
+(** The RAC couldn't continue execution because of a fatal error *)
+
+val fatal_rac_error : Log.log_uc -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+(** Raise a {!FatalRACError} with a formatted string. *)
+
 val stuck : ?loc:Loc.position -> cntr_ctx ->
   ('a, Format.formatter, unit, 'b) format4 -> 'a
 (** Raise an exception {!Stuck} with a formatted string. *)
@@ -452,7 +466,7 @@ val check_variant : rac -> Ident.Sattr.elt -> Loc.position option ->
 
 (** {2 Auxiliaries} *)
 
-val t_undefined : Ty.ty -> Term.term
+val t_undefined : string -> Ty.ty -> Term.term
 
 val ty_app_arg : Ty.tysymbol -> int -> Ty.ty -> Ty.ty
 (** [ty_app_arg ts n ty] returns the [n]-th argument of the type application of

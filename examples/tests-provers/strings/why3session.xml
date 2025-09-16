@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="1" name="CVC4" version="1.8" alternative="strings" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -63,6 +63,7 @@
  </goal>
  <goal name="TestLt5">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1708"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestLt6" proved="true">
  <proof prover="1"><result status="valid" time="0.030000" steps="1599"/></proof>
@@ -86,7 +87,7 @@
  <proof prover="1"><result status="valid" time="0.020000" steps="1590"/></proof>
  </goal>
  <goal name="substring_contains" proved="true">
- <proof prover="4"><result status="valid" time="0.010000" steps="29"/></proof>
+ <proof prover="4" obsolete="true"><result status="valid" time="0.010000" steps="29"/></proof>
  </goal>
  <goal name="TestIndefof1" proved="true">
  <proof prover="1"><result status="valid" time="0.030000" steps="1600"/></proof>
@@ -139,12 +140,14 @@
  <goal name="to_int_lt_0">
  <proof prover="1"><result status="timeout" time="5.000000" steps="430664"/></proof>
  <proof prover="2" timelimit="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="4"><undone/></proof>
  <proof prover="6"><result status="timeout" time="1.000000" steps="117443"/></proof>
  <proof prover="7"><result status="timeout" time="1.000000" steps="12232"/></proof>
  </goal>
  <goal name="to_int_gt_9">
  <proof prover="1"><result status="timeout" time="5.000000" steps="436811"/></proof>
  <proof prover="2" timelimit="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="4"><undone/></proof>
  <proof prover="6"><result status="timeout" time="1.000000" steps="102102"/></proof>
  <proof prover="7"><result status="timeout" time="1.000000" steps="12185"/></proof>
  </goal>
@@ -188,7 +191,7 @@
  <proof prover="1"><result status="valid" time="0.030000" steps="1956"/></proof>
  </goal>
  <goal name="TestProvedInAltergo2" proved="true">
- <proof prover="4"><result status="valid" time="0.010000" steps="17"/></proof>
+ <proof prover="4" obsolete="true"><result status="valid" time="0.010000" steps="17"/></proof>
  </goal>
 </theory>
 <theory name="TestInput">
@@ -197,24 +200,31 @@
  </goal>
  <goal name="T1">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T2">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T3">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T4">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T5">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T6">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T7">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T10" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="1594"/></proof>
@@ -227,21 +237,27 @@
  </goal>
  <goal name="T16">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T17">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T19">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T20">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T21">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T22">
  <proof prover="1"><result status="unknown" time="0.040000" steps="1703"/></proof>
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="T23" proved="true">
  <proof prover="1"><result status="valid" time="0.030000" steps="1594"/></proof>
@@ -291,6 +307,7 @@
  <proof prover="1"><result status="valid" time="0.020000" steps="1658"/></proof>
  </goal>
  <goal name="concat_exists">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestUnion1" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="1700"/></proof>
@@ -305,6 +322,7 @@
  <proof prover="1"><result status="valid" time="0.020000" steps="1721"/></proof>
  </goal>
  <goal name="in_union">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestInter1" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="1687"/></proof>
@@ -328,6 +346,7 @@
  <proof prover="2"><result status="valid" time="0.010000" steps="10820"/></proof>
  </goal>
  <goal name="star1">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="star2" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="1811"/></proof>
@@ -339,6 +358,7 @@
  <proof prover="1"><result status="valid" time="0.020000" steps="1849"/></proof>
  </goal>
  <goal name="plus_star">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestAllChar" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="1925"/></proof>
@@ -386,6 +406,7 @@
  <proof prover="2"><result status="valid" time="0.010000" steps="4975"/></proof>
  </goal>
  <goal name="range_not_singleton">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestPower1" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="2268"/></proof>
@@ -394,6 +415,7 @@
  <proof prover="1"><result status="valid" time="0.020000" steps="2272"/></proof>
  </goal>
  <goal name="TestPower3">
+ <proof prover="4"><undone/></proof>
  </goal>
  <goal name="TestLoop1" proved="true">
  <proof prover="1"><result status="valid" time="0.020000" steps="2285"/></proof>

@@ -22,7 +22,7 @@ use int.Abs
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_mul (w u v: mpz_ptr) : unit
+let partial wmpz_mul (w u v: mpz_ptr) : unit
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[u] + mpz.abs_size[v] <= max_int32 }
@@ -302,7 +302,7 @@ use mach.int.Int64
 use mpz_getset.Set
 use bool.Bool
 
-let wmpz_mul_si (prod mult: mpz_ptr) (small_mult:int64)
+let partial wmpz_mul_si (prod mult: mpz_ptr) (small_mult:int64)
   requires { mpz.alloc[prod] >= 1 /\ mpz.alloc[mult] >= 1 }
   requires { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
   requires { mpz.abs_size[mult] + 1 <= max_int32 }
@@ -356,7 +356,7 @@ let wmpz_mul_si (prod mult: mpz_ptr) (small_mult:int64)
   release_writer prod pp
 
 
-let wmpz_mul_ui (prod mult: mpz_ptr) (small_mult:uint64)
+let partial wmpz_mul_ui (prod mult: mpz_ptr) (small_mult:uint64)
   requires { mpz.alloc[prod] >= 1 /\ mpz.alloc[mult] >= 1 }
   requires { mpz.readers[prod] = 0 /\ mpz.readers[mult] = 0 }
   requires { mpz.abs_size[mult] + 1 <= max_int32 }

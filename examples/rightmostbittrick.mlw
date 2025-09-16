@@ -30,6 +30,8 @@ module Rmbt
     let ghost p_bv = rightmost_position_set x in
     ghost p := t'int p_bv;
     assert { nth_bv (neg x) p_bv };
-    bw_and x (neg x)
+    let r = bw_and x (neg x) in
+    assert  { eq_sub_bv r zeros (add p_bv (1:t)) (sub (63:t) p_bv) };
+    r
 
 end

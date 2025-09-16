@@ -16,7 +16,7 @@ shopt -s nullglob
 
 suffix=
 
-categories="badfiles bddinfer drivers execution extraction goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
+categories="badfiles bddinfer drivers execution extraction_ocaml extraction_c extraction_java goodfiles inferloop invalidgoals list mlwprinter rac realizations replay replay-without-shapes stdlib steplimit memlimit validgoals validsplitgoals stackify"
 
 enabled_categories=""
 
@@ -64,6 +64,8 @@ goods () {
     case $1 in
         *python) ext=py;;
         *micro-c) ext=c;;
+        *coma) ext=coma;;
+        *coma/good) ext=coma;;
     esac
     for f in $1/*.{why,mlw,mlcfg} $1/*.$ext ; do
         printf "  $f... "
@@ -298,7 +300,7 @@ replay_without_shape () {
 }
 
 execute () {
-    pgm="bin/why3$suffix execute"
+    pgm="bin/why3$suffix execute --rac-timelimit=60"
     printf "  $1... "
     if $pgm "$@" > /dev/null; then
         echo "ok"
@@ -372,6 +374,25 @@ extract_and_run () {
     echo "ok"
 }
 
+extract_c () {
+    printf "  $1: extract... "
+    if bin/why3$suffix extract -D c "$1" -o bench/tmp.c; then
+        printf "compile... ";
+        if gcc -c bench/tmp.c; then
+            rm -f bench/tmp.c
+            printf " OK.\n"
+        else
+            rm -f bench/tmp.c
+            printf " failed.\n"
+            exit 1
+        fi
+    else
+        rm -f bench/tmp.c
+        printf " failed.\n"
+        exit 1
+    fi
+}
+
 extract_and_test_c () {
     dir=$1
     shift
@@ -402,6 +423,48 @@ extract_and_test_c () {
         echo "failed!"
         echo $dir/build/tests
         $dir/build/tests
+        exit 1
+    fi
+    echo "ok"
+}
+
+extract_and_test_java () {
+    dir=$1
+    shift
+    make="make BENCH=yes -C $dir"
+    printf "  $dir... clean... "
+    if ! $make clean > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make clean
+        $make clean
+        exit 1
+    fi
+    printf "extract... "
+    if ! $make extract > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make extract
+        $make extract
+        exit 1
+    fi
+    printf "non-regression... "
+    if ! $make non-regression > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make non-regression
+        $make non-regression
+        exit 1
+    fi
+    printf "compile... "
+    if ! $make compile > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make compile
+        $make compile
+        exit 1
+    fi
+    printf "execute... "
+    if ! $make run > /dev/null 2>&1; then
+        echo "failed!"
+        echo $make run
+        $make run
         exit 1
     fi
     echo "ok"
@@ -458,6 +521,7 @@ if enabled stdlib; then
 echo "=== Checking stdlib ==="
 goods stdlib
 goods stdlib/mach
+goods stdlib/mach/java
 echo ""
 fi
 
@@ -477,6 +541,7 @@ bads bench/programs/bad-typing --type-only
 warns bench/programs/warn-typing --type-only
 goods bench/typing/x-bad --type-only
 plugin_bads bench/plugins/mlcfg/bad --parse-only mlcfg
+plugin_bads bench/plugins/coma/bad "" coma
 echo ""
 fi
 
@@ -505,10 +570,14 @@ goods examples/verifythis_2016_matrix_multiplication "-L examples/verifythis_201
 goods examples/double_wp "-L examples/double_wp"
 goods examples/ring_decision "-L examples/ring_decision"
 goods examples/multiprecision "-L examples/multiprecision"
+goods examples/c_cursor "-L examples/c_cursor"
 goods examples/prover "-L examples/prover --warn-off=unused_variable"
 goods examples/python
 goods examples/micro-c
 goods bench/plugins/mlcfg
+goods examples/coma
+goods bench/plugins/coma/good
+
 echo ""
 fi
 
@@ -649,12 +718,13 @@ fi
 echo ""
 fi
 
-if enabled extraction; then
+if enabled extraction_ocaml; then
 echo "=== Checking extraction to OCaml ==="
 extract bench/extraction cmo
 extract_and_run bench/extraction/test
 extract_and_run bench/extraction/interface1
 extract_and_run examples/split_string
+extract_and_run examples/residual
 extract_and_run examples/euler001 1000000
 extract_and_run examples/gcd 6 15
 extract_and_run examples/vstte10_max_sum
@@ -665,10 +735,20 @@ if test -n "$has_ocamlfind"; then
     extract_and_run examples/prover
 fi
 echo ""
+fi
 
+if enabled extraction_c; then
 echo "=== Checking extraction to C ==="
+extract_c examples/tests/c_extraction.mlw
 extract_and_test_c examples/multiprecision
 extract_and_test_c examples/c_cursor
+extract_and_test_c bench/extraction/852_int16
+echo ""
+fi
+
+if enabled extraction_java; then
+echo "=== Checking extraction to Java ==="
+extract_and_test_java bench/java
 echo ""
 fi
 
@@ -703,12 +783,14 @@ replay examples/multiprecision "-L examples/multiprecision --merging-only"
 replay examples/prover "-L examples/prover --merging-only --warn-off=unused_variable"
 #replay examples/in_progress --merging-only
 replay examples/mlcfg --merging-only
+replay examples/coma --merging-only
 echo ""
 fi
 
 if enabled stackify && test -n "$has_stackify"; then
     echo "=== Checking stackify ==="
     replay examples/stackify --merging-only
+    echo ""
 fi
 
 
@@ -727,6 +809,7 @@ fi
 if enabled realizations; then
     echo "=== Checking realizations ==="
     bench/check_realizations.sh || exit $?
+    echo ""
 fi
 
 if enabled mlwprinter; then

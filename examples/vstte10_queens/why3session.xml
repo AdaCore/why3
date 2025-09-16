@@ -2,29 +2,29 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="3.2" timelimit="8" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_queens.mlw"/>
 <theory name="NQueens" proved="true">
  <goal name="eq_board_set" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="24"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="30"/></proof>
  </goal>
  <goal name="eq_board_sym" proved="true">
- <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="14"/></proof>
+ <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="16"/></proof>
  </goal>
  <goal name="eq_board_trans" proved="true">
- <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="24"/></proof>
+ <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="26"/></proof>
  </goal>
  <goal name="eq_board_extension" proved="true">
- <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="24"/></proof>
+ <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.010000" steps="29"/></proof>
  </goal>
  <goal name="consistent_row_eq" proved="true">
- <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.060000" steps="47"/></proof>
+ <proof prover="0" timelimit="20" memlimit="0"><result status="valid" time="0.060000" steps="54"/></proof>
  </goal>
  <goal name="check_is_consistent&#39;vc" expl="VC for check_is_consistent" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="97"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="91"/></proof>
  </goal>
  <goal name="solution_eq_board" proved="true">
  <proof prover="2"><result status="valid" time="0.060000"/></proof>
@@ -32,13 +32,13 @@
  <goal name="bt_queens&#39;vc" expl="VC for bt_queens" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="bt_queens&#39;vc.0" expl="exceptional postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="2"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="3920"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="19"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="16"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.3" expl="index in array bounds" proved="true">
   <proof prover="0"><result status="valid" time="0.010000" steps="20"/></proof>
@@ -56,7 +56,7 @@
   <proof prover="3"><result status="valid" time="0.080000" steps="15349"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000" steps="124"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="206"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.9" expl="exceptional postcondition" proved="true">
   <proof prover="0"><result status="valid" time="0.010000" steps="0"/></proof>
@@ -65,30 +65,30 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="7715"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.382343" steps="1717"/></proof>
+  <proof prover="0"><result status="valid" time="0.207324" steps="1117"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.12" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.000000" steps="3568"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="83"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="66"/></proof>
   </goal>
   <goal name="bt_queens&#39;vc.14" expl="out of loop bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="0"><result status="valid" time="0.010000" steps="5"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="queens&#39;vc" expl="VC for queens" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="108"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="70"/></proof>
  </goal>
  <goal name="test8&#39;vc" expl="VC for test8" proved="true">
  <proof prover="0"><result status="valid" time="0.000000" steps="2"/></proof>
  </goal>
  <goal name="count_bt_queens&#39;vc" expl="VC for count_bt_queens" proved="true">
- <proof prover="0"><result status="valid" time="0.690099" steps="1839"/></proof>
+ <proof prover="0"><result status="valid" time="0.168391" steps="1925"/></proof>
  </goal>
  <goal name="count_queens&#39;vc" expl="VC for count_queens" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="18"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="21"/></proof>
  </goal>
  <goal name="test_count_8&#39;vc" expl="VC for test_count_8" proved="true">
  <proof prover="0"><result status="valid" time="0.000000" steps="2"/></proof>
@@ -96,16 +96,16 @@
 </theory>
 <theory name="NQueens63" proved="true">
  <goal name="check_is_consistent&#39;vc" expl="VC for check_is_consistent" proved="true">
- <proof prover="0"><result status="valid" time="0.055650" steps="509"/></proof>
+ <proof prover="0"><result status="valid" time="0.055650" steps="504"/></proof>
  </goal>
  <goal name="count_bt_queens&#39;vc" expl="VC for count_bt_queens" proved="true">
- <proof prover="0"><result status="valid" time="0.375992" steps="1430"/></proof>
+ <proof prover="0"><result status="valid" time="0.205286" steps="1122"/></proof>
  </goal>
  <goal name="count_queens&#39;vc" expl="VC for count_queens" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="45"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="47"/></proof>
  </goal>
  <goal name="test_count_8&#39;vc" expl="VC for test_count_8" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="8"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="10"/></proof>
  </goal>
 </theory>
 </file>

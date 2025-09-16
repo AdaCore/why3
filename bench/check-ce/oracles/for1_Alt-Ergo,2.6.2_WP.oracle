@@ -1,0 +1,59 @@
+File "bench/check-ce/for1.mlw", line 7, characters 18-24:
+Sub-goal Loop invariant init of goal f'vc.
+Prover result is: Valid (5 steps).
+
+File "bench/check-ce/for1.mlw", line 7, characters 18-24:
+Sub-goal Loop invariant preservation of goal f'vc.
+Prover result is: Valid (21 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
+- Checked model 1: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
+- Checked model 2: SW
+  - Concrete RAC: NORMAL
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/for1.mlw", line 4, characters 12-22)
+File "bench/check-ce/for1.mlw", line 4, characters 12-22:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown (unknown) (15 steps).
+The contracts of the following functions/loops are too weak :
+  - Loop at "bench/check-ce/for1.mlw", line 6, character 4 to line 9, character 8
+, for example during the following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+Unknown location:
+    _ = ()
+File for1.mlw:
+  Line 3:
+    _ = ()
+    Execution of main function `f` with env:
+      _ = ()
+      zero = 0
+      one = 1
+  Line 5:
+    Giant-step execution of function `ref` with args:
+      contents = 0
+    result of `ref` = {contents= 0}
+  Line 6:
+    Giant-step iteration of loop
+    x = {contents= 0}
+    i = 2
+  Line 10:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+  Line 4:
+    Property failure at postcondition of `f` with:
+      result = 0
+
+File "bench/check-ce/for1.mlw", line 4, characters 12-22:
+Goal f'vc.
+Prover result is: Valid (4 steps).
+

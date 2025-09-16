@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Coq" version="8.11.2" timelimit="0" steplimit="0" memlimit="0"/>
+<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Coq" version="8.19.2" timelimit="0" steplimit="0" memlimit="0"/>
 <prover id="8" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="queens.mlw"/>
 <theory name="NQueensSetsTermination" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="t&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="8"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="14"/></proof>
   </goal>
   <goal name="t&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="1"><result status="valid" time="0.000000" steps="0"/></proof>
   </goal>
   <goal name="t&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="9"><result status="valid" time="0.100000" steps="737"/></proof>
+  <proof prover="1"><result status="valid" time="0.100000" steps="482"/></proof>
   </goal>
   <goal name="t&#39;vc.3" expl="loop variant decrease" proved="true">
-  <proof prover="9"><result status="valid" time="0.020000" steps="121"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="119"/></proof>
   </goal>
   <goal name="t&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.020000" steps="46"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="69"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Solution" proved="true">
  <goal name="partial_solution_eq_prefix" proved="true">
- <proof prover="9"><result status="valid" time="0.010000" steps="63"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="69"/></proof>
  </goal>
  <goal name="no_duplicate" proved="true">
  <proof prover="2"><result status="valid" time="0.020000" steps="11143"/></proof>
@@ -43,79 +42,76 @@
  <goal name="t3&#39;vc" expl="VC for t3" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="t3&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="9"><result status="valid" time="0.862784" steps="4221"/></proof>
+  <proof prover="1"><result status="valid" time="0.270099" steps="1988"/></proof>
   </goal>
   <goal name="t3&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.020000" steps="87"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="145"/></proof>
   </goal>
   <goal name="t3&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="22"/></proof>
   </goal>
   <goal name="t3&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="26"/></proof>
   </goal>
   <goal name="t3&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="23"/></proof>
   </goal>
   <goal name="t3&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="24"/></proof>
   </goal>
   <goal name="t3&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
   </goal>
   <goal name="t3&#39;vc.7" expl="variant decrease" proved="true">
-  <proof prover="9"><result status="valid" time="0.100000" steps="522"/></proof>
+  <proof prover="1"><result status="valid" time="0.100000" steps="601"/></proof>
   </goal>
   <goal name="t3&#39;vc.8" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;vc.8.0" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="42"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="42"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.1" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.100000" steps="460"/></proof>
+   <proof prover="1"><result status="valid" time="0.100000" steps="581"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.2" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="42"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="42"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.3" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.040000" steps="163"/></proof>
+   <proof prover="1"><result status="valid" time="0.040000" steps="235"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.4" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.040000" steps="163"/></proof>
+   <proof prover="1"><result status="valid" time="0.040000" steps="235"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.5" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.517001" steps="2224"/></proof>
+   <proof prover="1"><result status="valid" time="0.296394" steps="2636"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.6" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.675719" steps="978"/></proof>
+   <proof prover="1"><result status="valid" time="0.675719" steps="7060"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,(!),(==),subset,is_empty,singleton,disjoint,eq_sol,partial_solution,solution,lt_sol,sorted,d,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,add_def,mem_singleton,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,mk&#39;spec,choose&#39;spec,partial_solution_eq_prefix,no_duplicate,H17,H16,H14,H13,H12,H11,Ensures11,Ensures10,Assert,H10,H9,H7,H6,H5,H4,LoopInvariant3,LoopInvariant2,LoopInvariant,H3,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures">
     <goal name="t3&#39;vc.8.6.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.000000" steps="22"/></proof>
-    <proof prover="9"><result status="valid" time="0.010000" steps="38"/></proof>
+    <proof prover="1"><result status="valid" time="0.000000" steps="55"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="t3&#39;vc.8.7" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.560000" steps="2044"/></proof>
+   <proof prover="1"><result status="valid" time="0.295901" steps="3902"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.8" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="1.170000" steps="943"/></proof>
+   <proof prover="1"><result status="valid" time="1.995672" steps="15037"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,(!),(==),subset,is_empty,singleton,disjoint,eq_sol,partial_solution,solution,lt_sol,sorted,d,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,mk&#39;spec,choose&#39;spec,partial_solution_eq_prefix,no_duplicate,H16,H15,H14,H12,H11,H10,Ensures11,Ensures10,Assert,H9,H8,H6,H5,H4,H3,LoopInvariant3,LoopInvariant2,LoopInvariant,H2,Ensures7,Ensures6,Ensures5,Ensures3,Ensures1,Ensures,H1">
     <goal name="t3&#39;vc.8.8.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.000000" steps="21"/></proof>
-    <proof prover="9"><result status="valid" time="0.010000" steps="38"/></proof>
+    <proof prover="1"><result status="valid" time="0.000000" steps="56"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="t3&#39;vc.8.9" expl="precondition" proved="true">
-   <proof prover="9"><result status="valid" time="1.020000" steps="2934"/></proof>
+   <proof prover="1"><result status="valid" time="0.435262" steps="3375"/></proof>
    </goal>
    <goal name="t3&#39;vc.8.10" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.540000" steps="654"/></proof>
+   <proof prover="1"><result status="valid" time="1.955307" steps="15008"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,(!),(==),subset,is_empty,singleton,disjoint,eq_sol,partial_solution,solution,lt_sol,sorted,d,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,mk&#39;spec,choose&#39;spec,partial_solution_eq_prefix,no_duplicate,H16,H15,H14,H13,H11,H10,Ensures11,Ensures10,Assert,H9,H8,H6,H5,H4,H3,LoopInvariant3,LoopInvariant2,LoopInvariant,H2,Ensures6,Ensures4,Ensures3,Ensures2,Ensures1,Ensures,H1">
     <goal name="t3&#39;vc.8.10.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.000000" steps="21"/></proof>
-    <proof prover="9"><result status="valid" time="0.010000" steps="38"/></proof>
+    <proof prover="1"><result status="valid" time="0.000000" steps="54"/></proof>
     </goal>
    </transf>
    </goal>
@@ -124,19 +120,19 @@
     <goal name="t3&#39;vc.8.11.0" expl="precondition" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="t3&#39;vc.8.11.0.0" expl="precondition" proved="true">
-     <proof prover="9"><result status="valid" time="0.240000" steps="1006"/></proof>
+     <proof prover="1"><result status="valid" time="0.240000" steps="1368"/></proof>
      </goal>
      <goal name="t3&#39;vc.8.11.0.1" expl="precondition" proved="true">
-     <proof prover="9"><result status="valid" time="0.210000" steps="673"/></proof>
+     <proof prover="1"><result status="valid" time="0.210000" steps="1110"/></proof>
      </goal>
      <goal name="t3&#39;vc.8.11.0.2" expl="precondition" proved="true">
-     <proof prover="9"><result status="valid" time="0.720000" steps="2478"/></proof>
+     <proof prover="1"><result status="valid" time="0.292926" steps="3243"/></proof>
      </goal>
      <goal name="t3&#39;vc.8.11.0.3" expl="precondition" proved="true">
-     <proof prover="9"><result status="valid" time="0.720478" steps="2359"/></proof>
+     <proof prover="1"><result status="valid" time="0.312696" steps="3245"/></proof>
      </goal>
      <goal name="t3&#39;vc.8.11.0.4" expl="precondition" proved="true">
-     <proof prover="9"><result status="valid" time="0.550000" steps="2358"/></proof>
+     <proof prover="1"><result status="valid" time="0.306536" steps="3240"/></proof>
      </goal>
     </transf>
     </goal>
@@ -145,55 +141,54 @@
   </transf>
   </goal>
   <goal name="t3&#39;vc.9" expl="loop variant decrease" proved="true">
-  <proof prover="9"><result status="valid" time="0.030000" steps="67"/></proof>
+  <proof prover="1"><result status="valid" time="0.030000" steps="101"/></proof>
   </goal>
   <goal name="t3&#39;vc.10" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;vc.10.0" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.020000" steps="58"/></proof>
+   <proof prover="1"><result status="valid" time="0.020000" steps="58"/></proof>
    </goal>
    <goal name="t3&#39;vc.10.1" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.020000" steps="58"/></proof>
+   <proof prover="1"><result status="valid" time="0.020000" steps="58"/></proof>
    </goal>
    <goal name="t3&#39;vc.10.2" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="58"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="58"/></proof>
    </goal>
    <goal name="t3&#39;vc.10.3" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.030000" steps="72"/></proof>
+   <proof prover="1"><result status="valid" time="0.030000" steps="106"/></proof>
    </goal>
    <goal name="t3&#39;vc.10.4" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="1.450000" steps="2170"/></proof>
+   <proof prover="1"><result status="valid" time="4.000833" steps="35355"/></proof>
    <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,(!),(==),subset,is_empty,singleton,disjoint,eq_sol,partial_solution,solution,lt_sol,sorted,d,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,add_def,mem_singleton,remove_def,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,diff_def,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,mk&#39;spec,choose&#39;spec,no_duplicate,H21,H20,H19,H17,H15,H14,Ensures15,Ensures14,Assert,H13,H12,H10,H8,H7,LoopInvariant3,LoopInvariant1,LoopInvariant,H6,Ensures11,Ensures8,Ensures7,Ensures6,Ensures5,H,Ensures3">
     <goal name="t3&#39;vc.10.4.0" expl="loop invariant preservation" proved="true">
-    <proof prover="0"><result status="valid" time="0.010000" steps="44"/></proof>
-    <proof prover="9"><result status="valid" time="0.050000" steps="83"/></proof>
+    <proof prover="1"><result status="valid" time="0.010000" steps="785"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="t3&#39;vc.10.5" expl="loop invariant preservation" proved="true">
    <transf name="generalize_introduced" proved="true" >
     <goal name="t3&#39;vc.10.5.0" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><path name="queens_NQueensSets_VC_t3_2.v"/><result status="valid" time="12.180000"/></proof>
+    <proof prover="3"><path name="queens_NQueensSets_VC_t3_2.v"/><result status="valid" time="5.667969"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="t3&#39;vc.10.6" expl="loop invariant preservation" proved="true">
    <transf name="case" proved="true" arg1="(i = d)">
     <goal name="t3&#39;vc.10.6.0" expl="true case (loop invariant preservation)" proved="true">
-    <proof prover="9"><result status="valid" time="0.060000" steps="277"/></proof>
+    <proof prover="1"><result status="valid" time="0.060000" steps="466"/></proof>
     </goal>
     <goal name="t3&#39;vc.10.6.1" expl="false case (loop invariant preservation)" proved="true">
     <transf name="case" proved="true" arg1="(j = d)">
      <goal name="t3&#39;vc.10.6.1.0" expl="false case (true case. loop invariant preservation)" proved="true">
-     <proof prover="9"><result status="valid" time="0.020000" steps="76"/></proof>
+     <proof prover="1"><result status="valid" time="0.020000" steps="125"/></proof>
      </goal>
      <goal name="t3&#39;vc.10.6.1.1" expl="false case (loop invariant preservation)" proved="true">
      <transf name="apply" proved="true" arg1="H9">
       <goal name="t3&#39;vc.10.6.1.1.0" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.060000" steps="280"/></proof>
+      <proof prover="1"><result status="valid" time="0.060000" steps="388"/></proof>
       </goal>
       <goal name="t3&#39;vc.10.6.1.1.1" expl="apply premises" proved="true">
-      <proof prover="9"><result status="valid" time="0.020000" steps="76"/></proof>
+      <proof prover="1"><result status="valid" time="0.020000" steps="115"/></proof>
       </goal>
      </transf>
      </goal>
@@ -204,28 +199,26 @@
   </transf>
   </goal>
   <goal name="t3&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="1.880000" steps="2836"/></proof>
   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),get,set,(!),(==),subset,is_empty,singleton,disjoint,partial_solution,solution,lt_sol,sorted,d,Assoc1,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm1,Assoc,Mul_distr_l,Mul_distr_r,Comm,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,extensionality,subset_refl,subset_trans,is_empty_empty,empty_is_empty,add_def,mem_singleton,add_remove,remove_add,subset_remove,union_def,subset_union_1,subset_union_2,inter_def,subset_inter_1,subset_inter_2,subset_diff,pick_def,disjoint_inter_empty,disjoint_diff_eq,disjoint_diff_s2,filter_def,subset_filter,map_def,mem_map,cardinal_nonneg,cardinal_empty,cardinal_add,cardinal_remove,cardinal_subset,subset_eq,cardinal1,cardinal_union,cardinal_inter_disjoint,cardinal_diff,cardinal_filter,cardinal_map,min_elt_def,max_elt_def,interval_def,cardinal_interval,mk&#39;spec,choose&#39;spec,partial_solution_eq_prefix,no_duplicate,H22,H20,H19,H18,H17,H16,Ensures15,Ensures14,H15,H14,H13,H12,H11,H10,H9,LoopInvariant3,LoopInvariant1,H8,Ensures11,Ensures10,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,H7,H5,Ensures3,Ensures">
    <goal name="t3&#39;vc.11.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.100000" steps="216"/></proof>
-   <proof prover="9"><result status="valid" time="0.140000" steps="396"/></proof>
+   <proof prover="1"><result status="valid" time="3.048996" steps="16201"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="t3&#39;vc.12" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;vc.12.0" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.020000" steps="83"/></proof>
+   <proof prover="1"><result status="valid" time="0.020000" steps="121"/></proof>
    </goal>
    <goal name="t3&#39;vc.12.1" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.030000" steps="85"/></proof>
+   <proof prover="1"><result status="valid" time="0.030000" steps="122"/></proof>
    </goal>
    <goal name="t3&#39;vc.12.2" expl="loop invariant preservation" proved="true">
    <transf name="instantiate" proved="true" arg1="LoopInvariant3" arg2="t">
     <goal name="t3&#39;vc.12.2.0" expl="loop invariant preservation" proved="true">
     <transf name="instantiate" proved="true" arg1="H14" arg2="t">
      <goal name="t3&#39;vc.12.2.0.0" expl="loop invariant preservation" proved="true">
-     <proof prover="9"><result status="valid" time="3.170000" steps="17135"/></proof>
+     <proof prover="1"><result status="valid" time="0.631555" steps="7165"/></proof>
      </goal>
     </transf>
     </goal>
@@ -234,49 +227,49 @@
   </transf>
   </goal>
   <goal name="t3&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.290000" steps="1637"/></proof>
+  <proof prover="1"><result status="valid" time="0.290000" steps="2867"/></proof>
   </goal>
   <goal name="t3&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.170000" steps="667"/></proof>
+  <proof prover="1"><result status="valid" time="0.170000" steps="2858"/></proof>
   </goal>
   <goal name="t3&#39;vc.15" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="t3&#39;vc.15.0" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.000000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.000000" steps="32"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.1" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.2" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.3" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.4" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="1.452455" steps="5106"/></proof>
+   <proof prover="1"><result status="valid" time="0.604331" steps="6941"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.5" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.310000" steps="1674"/></proof>
+   <proof prover="1"><result status="valid" time="0.310000" steps="2296"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.6" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.070000" steps="469"/></proof>
+   <proof prover="1"><result status="valid" time="0.070000" steps="595"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.7" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
    </goal>
    <goal name="t3&#39;vc.15.8" expl="postcondition" proved="true">
-   <proof prover="9"><result status="valid" time="0.010000" steps="32"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="32"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="t3&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="9"><result status="valid" time="0.050000" steps="184"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="265"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="queens3&#39;vc" expl="VC for queens3" proved="true">
- <proof prover="9"><result status="valid" time="0.100000" steps="758"/></proof>
+ <proof prover="1"><result status="valid" time="0.100000" steps="410"/></proof>
  </goal>
 </theory>
 </file>

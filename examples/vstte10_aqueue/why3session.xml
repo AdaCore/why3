@@ -2,28 +2,27 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.3.3" timelimit="10" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="10" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte10_aqueue.mlw"/>
 <theory name="AmortizedQueue" proved="true">
  <goal name="queue&#39;vc" expl="VC for queue" proved="true">
- <proof prover="2"><result status="valid" time="0.000000" steps="3"/></proof>
+ <proof prover="0" timelimit="5"><result status="valid" time="0.000000" steps="8"/></proof>
  </goal>
  <goal name="empty&#39;vc" expl="VC for empty" proved="true">
- <proof prover="2" timelimit="10"><result status="valid" time="0.000000" steps="37"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="58"/></proof>
  </goal>
  <goal name="head&#39;vc" expl="VC for head" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="105"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="108"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="120"/></proof>
+ <proof prover="0"><result status="valid" time="0.020000" steps="111"/></proof>
  </goal>
  <goal name="tail&#39;vc" expl="VC for tail" proved="true">
- <proof prover="1"><result status="valid" time="0.030000" steps="178"/></proof>
+ <proof prover="0"><result status="valid" time="0.030000" steps="173"/></proof>
  </goal>
  <goal name="enqueue&#39;vc" expl="VC for enqueue" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="129"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="147"/></proof>
  </goal>
 </theory>
 </file>

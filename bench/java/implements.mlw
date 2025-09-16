@@ -1,0 +1,19 @@
+module AnInterface
+    [@java:package:fr.labri]
+    [@java:class_kind:interface]
+
+    type t
+end
+
+
+module AnImplementation
+    [@java:implements:fr.labri.AnInterface,java.lang.Comparable<AnImplementation>]
+    use AnInterface
+    use mach.java.lang.Integer
+
+    type t
+
+    let compare_to(self [@W:unused_variable:N]: t) (other [@W:unused_variable:N] : t) : integer = -1
+end
+
+

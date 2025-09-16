@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -55,9 +55,9 @@ let convert_prover_answer (pa: prover_answer) =
   | StepLimitExceeded -> "StepLimitExceeded",""
   | Unknown s         -> "Unknown",s
   | Failure s         -> "Failure",s
-  | HighFailure       -> "HighFailure",""
+  | HighFailure s     -> "HighFailure",s
 
-let convert_limit (l: Call_provers.resource_limit) =
+let convert_limit (l: Call_provers.resource_limits) =
   Record
     ["limit_time", Float l.Call_provers.limit_time;
      "limit_mem", Int l.Call_provers.limit_mem;
@@ -71,7 +71,6 @@ let convert_unix_process (ps: Unix.process_status) =
 
 let convert_model (m: Model_parser.model) =
   String (Pp.string_of
-            (* By default, we print attributes in JSON *)
             (fun fmt m -> Model_parser.print_model ~print_attrs:true fmt m) m)
 
 let convert_models (ml: Model_parser.model list) =
@@ -567,8 +566,8 @@ let parse_prover_answer a d =
   | "StepLimitExceeded" -> StepLimitExceeded
   | "Unknown"           -> Unknown d
   | "Failure"           -> Failure d
-  | "HighFailure"       -> HighFailure
-  | _                   -> HighFailure
+  | "HighFailure"       -> HighFailure d
+  | _                   -> HighFailure d
 
 let parse_unix_process j arg =
   match j with
@@ -584,7 +583,7 @@ let parse_prover_result j =
       with Not_found -> ""
     in
     try parse_prover_answer (get_string_field j "pr_answer") arg
-    with Not_found -> HighFailure
+    with Not_found -> HighFailure "unparsed prover answer (JSON)"
   in
   let pr_status_unix =
     let arg =

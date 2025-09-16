@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.14" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="mlcfg" proved="true">
+<prover id="1" name="Alt-Ergo" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="mlcfg">
 <path name=".."/><path name="while_loop.mlcfg"/>
-<theory name="Decrement_Test" proved="true">
- <goal name="test&#39;vc" expl="VC for test" proved="true">
- <transf name="split_vc" proved="true" >
+<theory name="Decrement_Test">
+ <goal name="test&#39;vc" expl="VC for test">
+ <transf name="split_vc" >
   <goal name="test&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="16488"/></proof>
-  <proof prover="1" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.020000" steps="16488"/></proof>
+  <proof prover="2"><result status="valid" time="0.008842" steps="5"/></proof>
   </goal>
-  <goal name="test&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.02" steps="20741"/></proof>
-  <proof prover="1" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+  <goal name="test&#39;vc.1" expl="postcondition">
+  <proof prover="0" obsolete="true"><result status="valid" time="0.020000" steps="20741"/></proof>
+  <proof prover="1"><result status="timeout" time="5.000000" steps="205513"/></proof>
   </goal>
   <goal name="test&#39;vc.2" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="20329"/></proof>
-  <proof prover="1" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.010000" steps="20329"/></proof>
+  <proof prover="2"><result status="valid" time="0.009156" steps="24"/></proof>
   </goal>
   <goal name="test&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.01" steps="19210"/></proof>
-  <proof prover="1" obsolete="true"><result status="highfailure" time="0.00"/></proof>
+  <proof prover="0" obsolete="true"><result status="valid" time="0.010000" steps="19210"/></proof>
+  <proof prover="2"><result status="valid" time="0.008373" steps="22"/></proof>
   </goal>
  </transf>
  </goal>

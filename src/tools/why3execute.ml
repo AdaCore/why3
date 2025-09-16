@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -12,6 +12,9 @@
 open Format
 open Why3
 open Pmodule
+
+module Main : functor () -> sig end
+ = functor () -> struct
 
 let usage_msg =
   "<file> <expr>\n\
@@ -37,6 +40,7 @@ let opt_metas = ref []
 let opt_enable_rac = ref false
 let opt_rac_prover = ref None
 let opt_rac_timelimit = ref None
+let opt_rac_memlimit = ref None
 let opt_rac_steplimit = ref None
 let opt_rac_ignore_incomplete = ref true
 
@@ -69,8 +73,10 @@ let option_list =
     "<prover> use <prover> to check assertions in RAC when term\n\
      reduction is insufficient, with optional, space-\n\
      separated time and memory limit (e.g. 'cvc4 2 1000')";
-    KLong "rac-timelimit", Hnd1 (AInt, fun i -> opt_rac_timelimit := Some i),
+    KLong "rac-timelimit", Hnd1 (AFloat, fun i -> opt_rac_timelimit := Some i),
     "<sec> set the time limit for RAC (with --rac)";
+    KLong "rac-memlimit", Hnd1 (AInt, fun i -> opt_rac_memlimit := Some i),
+    "<sec> set the memory limit for RAC (with --rac)";
     KLong "rac-steplimit", Hnd1 (AInt, fun i -> opt_rac_steplimit := Some i),
     "<steps> set the step limit for RAC (with --rac)";
     KLong "rac-fail-cannot-check", Hnd0 (fun () -> opt_rac_ignore_incomplete := false),
@@ -127,13 +133,24 @@ let do_input f =
   Option.iter Pinterp.init_real !prec;
   try
     let compute_term = Rac.Why.mk_compute_term_lit env () in
-    let why_prover = !opt_rac_prover and metas = !opt_metas in
+    let main = Whyconf.get_main config in
+    let limit_time = Whyconf.timelimit main in
+    let limit_time = Opt.fold (fun _ s -> s) limit_time !opt_rac_timelimit in
+    let limit_mem = Whyconf.memlimit main in
+    let limit_mem = Opt.fold (fun _ s -> s) limit_mem !opt_rac_memlimit in
+    let limit_steps = Opt.fold (fun _ s -> s) 0 !opt_rac_steplimit in
+    let limits = Call_provers.{ limit_time ; limit_mem ; limit_steps } in
+    let why_prover =
+      match !opt_rac_prover with
+      | None -> None
+      | Some p -> Some(p,limits)
+    in
+    let metas = !opt_metas in
     let rac = Pinterp.mk_rac ~ignore_incomplete:!opt_rac_ignore_incomplete
-        (Rac.Why.mk_check_term_lit config env ~metas ?why_prover ()) in
+        (Rac.Why.mk_check_term_lit config env ~metas ~why_prover ()) in
     let env = Pinterp.mk_empty_env env pmod in
     let ctx = Pinterp.mk_ctx env ~do_rac:!opt_enable_rac ~rac ~giant_steps:false
-        ~compute_term ?steplimit:!opt_rac_steplimit
-        ?timelimit:(Option.map float_of_int !opt_rac_timelimit) () in
+        ~compute_term ~limits () in
     let res = Pinterp.exec_global_fundef ctx [] None expr in
     printf "%a@." (Pinterp.report_eval_result expr) res;
     exit (match res with Pinterp.Normal _, _, _ -> 0 | _ -> 1);
@@ -148,7 +165,7 @@ let do_input f =
       eprintf "RAC got stuck %s after %a@." reason
         (Pp.print_option_or_default "unknown location" Loc.pp_position) l;
       exit 2
-  | Pinterp_core.Incomplete reason ->
+  | Pinterp_core.Cannot_decide (_,_,reason) ->
       eprintf "Execution terminated because %s@." reason;
       exit 2
 
@@ -159,8 +176,6 @@ let () =
     eprintf "%a@." Exn_printer.exn_printer e;
     exit 1
 
-(*
-Local Variables:
-compile-command: "unset LANG; make -C ../.. byte"
-End:
-*)
+end
+
+let () = Whyconf.register_command "execute" (module Main)

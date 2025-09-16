@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (assertion at "bench/check-ce/model_projection.mlw", line 23, characters 11-48)
 File "bench/check-ce/model_projection.mlw", line 23, characters 11-48:
 Sub-goal Assertion of goal g1'vc.
-Prover result is: Unknown (sat) (372 steps).
+Prover result is: Unknown (sat) (346 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,13 +19,13 @@ File int.mlw:
     one = 1
 File model_projection.mlw:
   Line 6:
-    to_map = fun (bOUND_VARIABLE_3982:t) ->
+    to_map = fun (bOUND_VARIABLE_393:t) ->
               fun (x:int) -> if x = 14 then 42 else 0
   Line 9:
-    get = fun (bOUND_VARIABLE_4052:t) (bOUND_VARIABLE_4062:int) -> 41
+    get = fun (bOUND_VARIABLE_4002:t) (bOUND_VARIABLE_4012:int) -> 41
   Line 13:
-    set = fun (bOUND_VARIABLE_4192:t) (bOUND_VARIABLE_4202:int)
-           (bOUND_VARIABLE_4212:int) -> epsilon x:t.
+    set = fun (bOUND_VARIABLE_4142:t) (bOUND_VARIABLE_4152:int)
+           (bOUND_VARIABLE_4162:int) -> epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
   Line 19:
     y = {d= epsilon x:t.
@@ -36,11 +36,11 @@ File model_projection.mlw:
   Line 21:
     _ = ()
     Execution of main function `g1` with env:
-      to_map = fun (bOUND_VARIABLE_3982:t) ->
+      to_map = fun (bOUND_VARIABLE_393:t) ->
                 fun (x:int) -> if x = 14 then 42 else 0
-      get = fun (bOUND_VARIABLE_4052:t) (bOUND_VARIABLE_4062:int) -> 41
-      set = fun (bOUND_VARIABLE_4192:t) (bOUND_VARIABLE_4202:int)
-             (bOUND_VARIABLE_4212:int) -> epsilon x:t.
+      get = fun (bOUND_VARIABLE_4002:t) (bOUND_VARIABLE_4012:int) -> 41
+      set = fun (bOUND_VARIABLE_4142:t) (bOUND_VARIABLE_4152:int)
+             (bOUND_VARIABLE_4162:int) -> epsilon x:t.
              to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)
       y = {d= epsilon x:t.
            to_map x = (fun (x1:int) -> if x1 = 14 then 42 else 0)}

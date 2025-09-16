@@ -1,0 +1,40 @@
+use int.Int
+use bintree.Tree
+use bintree.Occ
+use coma.Std
+
+let unTree < 'elt > (t: tree 'elt)
+  (onNode (v: 'elt) (l r: tree 'elt) { t = Node l v r })
+  (onLeaf { t = Empty })
+= any
+
+let rec remove_min (t: tree 'a) { t <> Empty }
+      (return (m: 'a) (o: tree 'a)
+        { forall x. mem x t <-> (x = m || mem x o) })
+= unTree < 'a > {t} node fail
+  [ node (x: 'a) (l r: tree 'a) ->
+    if {l=Empty}
+       (-> return {x} {r})
+       (-> remove_min {l}
+             (fun (m: 'a) (l': tree 'a) -> return {m} {Node l' x r})) ]
+
+let remove_root (t: tree 'a) (return (o: tree 'a))
+= unTree < 'a > {t}
+    (fun (_x: 'a) (l r: tree 'a) ->
+      (! if {r=Empty}
+            (-> out {l})
+            (-> remove_min {r} (fun (m: 'a) (r': tree 'a) -> out {Node l m r'})))
+      [ out (o: tree 'a) { forall x. mem x o <-> (mem x l || mem x r) }
+        -> return {o} ])
+    fail
+
+function cl (t: tree 'a) : int
+= match t with
+  | Node l _ r -> cl l + cl r
+  | Empty -> 1
+  end
+
+let rec count_leaf (&c: int) (t: tree 'a) [old_c: int = c] {}
+  (return { c = old_c + cl t })
+= unTree < 'a > {t} (fun (_x: 'a) (l r: tree 'a) ->
+    count_leaf &c {l} (-> count_leaf &c {r} return)) (-> [&c <- c + 1] return)

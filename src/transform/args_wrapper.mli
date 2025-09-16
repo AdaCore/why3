@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -114,6 +114,8 @@ val wrap_l : ('a, task list) trans_typ -> 'a -> Trans.trans_with_args_l
 val wrap   : ('a, task) trans_typ -> 'a -> Trans.trans_with_args
 
 val wrap_and_register : desc:Pp.formatted -> string -> ('a, 'b) trans_typ -> 'a -> unit
+
+val parse_and_type_list : lang:string -> as_fmla:bool -> string -> Trans.naming_table -> Term.term list
 
 val set_argument_parsing_functions:
   Env.fformat ->

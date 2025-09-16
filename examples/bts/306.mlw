@@ -1,0 +1,13 @@
+
+use int.Int
+use bool.Bool
+
+let f (x:int) (y:bool) : int 
+  ensures { result > 0 }
+=
+  let ref r = 0 in
+  if x = 42 then
+    if y = False then r <- 1 else r <- 2
+  else r <- 3;
+  r
+  

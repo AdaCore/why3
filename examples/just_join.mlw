@@ -54,7 +54,7 @@ let rec ghost function height (t: tree) : int
 predicate wf (t: tree) =
   match t with
   | E         -> true
-  | N h l x r -> h = height t && wf l && wf r
+  | N h l _x r -> h = height t && wf l && wf r
   end
 
 (** AVL are binary search trees *)

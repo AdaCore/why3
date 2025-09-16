@@ -1,0 +1,39 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+  - Abstract RAC: STUCK (failure in precondition of `rsa` at "bench/check-ce/falseCE.mlw", line 12, characters 4-7)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/falseCE.mlw", line 15, characters 11-21)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/falseCE.mlw", line 15, characters 11-21)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/falseCE.mlw", line 15, characters 11-21)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/falseCE.mlw", line 15, characters 11-21)
+File "bench/check-ce/falseCE.mlw", line 15, characters 11-21:
+Sub-goal Assertion of goal rsa'vc.
+Prover result is: Unknown (unknown) (9599 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File falseCE.mlw:
+  Line 12:
+    a = 3407
+    b = 3571
+    a = 3407
+    b = 3571
+    Execution of main function `rsa` with env:
+      a = 3407
+      b = 3571
+      zero = 0
+      one = 1
+  Line 15:
+    Property failure at assertion with:
+      a = 3407
+      b = 3571
+      c = 12166397
+

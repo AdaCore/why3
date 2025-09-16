@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -322,16 +322,17 @@ let why3_execute_one m rs =
   Sys_js.set_channel_flusher stdout (fun v -> Buffer.add_string output v);
   let {Theory.th_name = th} = m.Pmodule.mod_theory in
   let mod_name = th.Ident.id_string in
+  let limits = Call_provers.empty_limits in
   let result =
     try
-      let ctx = Pinterp.mk_ctx (Pinterp.mk_empty_env env m)
+      let ctx = Pinterp.mk_ctx ~limits (Pinterp.mk_empty_env env m)
           ~do_rac:false ~giant_steps:false () in
       let res = Pinterp.exec_global_fundef ctx [] None expr in
       Format.print_flush ();
       asprintf "@[<v>%s.main produces@,%a@,output:@,%s@]"
         mod_name (Pinterp.report_eval_result expr) res
         (Buffer.contents output)
-    with Pinterp_core.Incomplete r ->
+    with Pinterp_core.Cannot_decide (_,_,r) ->
       asprintf "%s.main cannot compute (%s)" mod_name r in
   let mod_loc = Option.value ~default:Loc.dummy_position th.Ident.id_loc in
   (mod_loc, result)

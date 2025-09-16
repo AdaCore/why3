@@ -69,7 +69,7 @@ let find_driver_file ~conf_file ?extra_conf_file (extra_dir,fn) =
   (* In Why3, driver names are stored in the configuration file(s) without the
      suffix, so we add it here; for robustness we still check if it's already
      there. *)
-  let fn = if Strings.ends_with fn ".drv" then fn else fn ^ ".drv" in
+  let fn = if Strings.has_suffix fn ~suffix:".drv" then fn else fn ^ ".drv" in
   try
     if Sys.file_exists fn then fn
     else match extra_conf_file with
@@ -147,5 +147,7 @@ let set_debug_flags_gnatprove () =
   Loc.disable_warning warn_reduction_aborted;
   Loc.disable_warning Theory.warn_axiom_abstract;
   Loc.disable_warning warn_missing_shapes;
-  Loc.disable_warning Dterm.warn_unused_variable
+  Loc.disable_warning Dterm.warn_unused_variable;
+  Loc.disable_warning Smtv2_model_parser.warn;
+  Loc.disable_warning Check_ce.warn_concrete_term
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.13.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="bst.coma"/>
+<theory name="Coma" proved="true">
+ <goal name="vc_unTree" proved="true">
+ <proof prover="1"><result status="valid" time="0.015734" steps="499"/></proof>
+ </goal>
+ <goal name="vc_remove_min" proved="true">
+ <proof prover="0"><result status="valid" time="0.041963" steps="10690"/></proof>
+ </goal>
+ <goal name="vc_remove_root" proved="true">
+ <proof prover="1"><result status="valid" time="0.023432" steps="15636"/></proof>
+ </goal>
+ <goal name="vc_count_leaf" proved="true">
+ <proof prover="0"><result status="valid" time="0.023783" steps="3650"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

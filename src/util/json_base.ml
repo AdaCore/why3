@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -75,7 +75,7 @@ and map_bindings fmt map_bindings =
 let rec print_json_single_line fmt v =
   match v with
   | Record r -> map_bindings fmt r
-  | List l -> list print_json_single_line fmt l
+  | List l -> no_formatting_list fmt l
   | String s -> string fmt s
   | Int i -> int fmt i
   | Float f -> float fmt f
@@ -83,17 +83,25 @@ let rec print_json_single_line fmt v =
   | Bool b -> bool fmt b
   | Null -> pp_print_string fmt "null"
 and map_binding fmt (key, value) =
-  fprintf fmt "%a: %a" string key print_json_single_line value
+  fprintf fmt "%a:%a" string key print_json_single_line value
 and map_bindings fmt l =
-  fprintf fmt "{ ";
+  fprintf fmt "{";
   begin match l with
   | [] -> ()
-  | [x] -> map_binding fmt x
   | x :: xs ->
-      List.iter (fun elt -> map_binding fmt elt; fprintf fmt ", ") xs;
-      map_binding fmt x
+      map_binding fmt x;
+      List.iter (fun elt -> fprintf fmt ","; map_binding fmt elt) xs
   end;
-  fprintf fmt " }"
+  fprintf fmt "}"
+and no_formatting_list fmt l =
+  fprintf fmt "[";
+  begin match l with
+  | [] -> ()
+  | x :: xs ->
+      print_json_single_line fmt x;
+      List.iter (fun elt -> fprintf fmt ","; print_json_single_line fmt elt) xs;
+  end;
+  fprintf fmt "]"
 
 (* Get json fields. Return Not_found if no fields or field missing *)
 let get_field j s =

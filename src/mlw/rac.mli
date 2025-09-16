@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -48,12 +48,12 @@ module Why : sig
   type why_prover = {
     command: string;
     driver: Driver.driver;
-    limit: Call_provers.resource_limit;
+    limits: Call_provers.resource_limits;
   }
   (** The configuration of the prover used for reducing terms in RAC *)
 
   val mk_why_prover :
-    command:string -> Driver.driver -> Call_provers.resource_limit -> why_prover
+    command:string -> Driver.driver -> Call_provers.resource_limits -> why_prover
 
   val mk_check_term :
     ?metas:(Theory.meta * Theory.meta_arg list) list ->
@@ -73,13 +73,15 @@ module Why : sig
     Whyconf.config -> Env.env ->
     ?metas:(string * string option) list ->
     ?trans:string ->
-    ?why_prover:string ->
+    why_prover:(string * Call_provers.resource_limits) option ->
     ?oracle_quant_var:oracle_quant_var ->
     unit -> check_term
-  (** [mk_rac_lit cnf env ?metas ?trans ?prover ?try_negate ()] configures the
-      term reduction of RAC. [trans] is the name of a transformation
-      ("compute_in_goal" by default). [why_prover] is a prover string with
-      optional, space-sparated time limit and memory limit.
+  (** [mk_rac_lit cnf env ?metas ?trans ?prover ?try_negate ()]
+      configures the term reduction of RAC. [trans] is the name of a
+      transformation ("compute_in_goal" by default). [why_prover] is a
+      pair of a prover string (of the command-line shape
+      "<provername>,<version>,<alternative>") and a set of resource
+      limits.
 
       If the environment variable [WHY3RACTASKDIR] is set, it is used as a
       directory to print all SMT tasks sent to the RAC prover, if

@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.4.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<file format="whyml">
 <path name=".."/><path name="lemma_functions.mlw"/>
-<theory name="LemmaFunction1" proved="true">
- <goal name="f&#39;vc" expl="VC for f" proved="true">
- <proof prover="1"><result status="valid" time="0.04" steps="8037"/></proof>
+<theory name="LemmaFunction1">
+ <goal name="f&#39;vc" expl="VC for f">
+ <proof prover="1" obsolete="true"><result status="valid" time="0.040000" steps="8037"/></proof>
  </goal>
  <goal name="g" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="12"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="12"/></proof>
  </goal>
 </theory>
 <theory name="LemmaFunction2" proved="true">
  <goal name="sum_nonneg&#39;vc" expl="VC for sum_nonneg" proved="true">
- <proof prover="2"><result status="valid" time="0.18" steps="2163"/></proof>
+ <proof prover="0"><result status="valid" time="0.312852" steps="3968"/></proof>
  </goal>
  <goal name="g1" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="18"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="24"/></proof>
  </goal>
 </theory>
 <theory name="M" proved="true">
  <goal name="lemma_length_non_neg&#39;vc" expl="VC for lemma_length_non_neg" proved="true">
- <proof prover="2"><result status="valid" time="0.01" steps="43"/></proof>
+ <proof prover="0"><result status="valid" time="0.010000" steps="49"/></proof>
  </goal>
  <goal name="toy_example&#39;vc" expl="VC for toy_example" proved="true">
- <proof prover="2"><result status="valid" time="0.00" steps="17"/></proof>
+ <proof prover="0"><result status="valid" time="0.000000" steps="18"/></proof>
  </goal>
 </theory>
 </file>

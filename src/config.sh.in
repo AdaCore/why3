@@ -33,7 +33,6 @@ let localdir  = $localdir
 let libobjdir = $libobjdir
 
 let enable_ide = \"@enable_ide@\"
-let enable_zarith = \"@enable_zarith@\"
 let enable_zip = \"@enable_zip@\"
 let enable_coq_libs = \"@enable_coq_libs@\"
 let enable_coq_fp_libs = \"@enable_coq_fp_libs@\"
@@ -52,12 +51,11 @@ fi
 
 echo "
 OCAMLBEST   = @OCAMLBEST@
-BIGINTLIB   = @BIGINTLIB@
 MPFRLIB     = @MLMPFR@
 INFERLIB    = @INFERLIB@
 STACKIFY    = @enable_stackify@
 INCLUDE     = @BIGINTINCLUDE@ -I $ocamllib
-EXTPKGS     = menhirLib @RELIB@ unix num dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
+EXTPKGS     = menhirLib @RELIB@ unix zarith dynlink @ZIPLIB@ @MLMPFR@ @WHY3LIB@ @INFERPKG@ @SEXPLIB@ @SEXPLIBPPX@
 " > $makefileconfig
 
 if [ "@enable_ocamlfind@" = "yes" ]; then

@@ -1,0 +1,10 @@
+theory A
+  use real.RealInfix
+
+  constant x:real
+  axiom a1 : 0. <. x
+  lemma a2 : 0. <=. 0. /. x
+
+  (* Previously a soundness bug here *)
+  goal g_KO: false
+end
