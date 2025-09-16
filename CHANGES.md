@@ -1,6 +1,6 @@
 :x: marks a potential source of incompatibility
 
-Version 1.8.2, September 12, 2025
+Version 1.8.2, September 16, 2025
 ---------------------------
 
 Compilation
