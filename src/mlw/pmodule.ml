@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -64,11 +64,18 @@ let overload_of_rs {rs_cty = cty} =
       if ity_closed res && res.ity_pure then FixedRes res else NoOver
   | _ -> NoOver
 
+let overload_of_oo srs =
+  match overload_of_rs (Srs.min_elt srs) with
+  | FixedRes _ as o -> o
+  | _ -> overload_of_rs (Srs.max_elt srs)
+
 let same_overload r1 r2 =
   List.length r1.rs_cty.cty_args = List.length r2.rs_cty.cty_args &&
   match overload_of_rs r1, overload_of_rs r2 with
   | SameType, SameType -> true
   | FixedRes t1, FixedRes t2 -> ity_equal t1 t2
+  | SameType, FixedRes t2 -> ity_equal r1.rs_cty.cty_result t2
+  | FixedRes t1, SameType -> ity_equal t1 r2.rs_cty.cty_result
   | _ -> false (* two NoOver's are not the same *)
 
 let ref_attr = Ident.create_attribute "mlw:reference_var"
@@ -224,7 +231,7 @@ let empty_module env n p = {
 }
 
 let close_module, restore_module =
-  let h = Hid.create 17 in
+  let h = Wid.create 17 in
   (fun uc ->
      let th = close_theory uc.muc_theory in (* catches errors *)
      let m = { mod_theory = th;
@@ -233,9 +240,9 @@ let close_module, restore_module =
                mod_known  = uc.muc_known;
                mod_local  = uc.muc_local;
                mod_used   = uc.muc_used; } in
-     Hid.add h th.th_name m;
+     Wid.set h th.th_name m;
      m),
-  (fun th -> Hid.find h th.th_name)
+  (fun th -> Wid.find h th.th_name)
 
 let open_scope uc s = match uc.muc_import with
   | ns :: _ -> { uc with
@@ -1191,6 +1198,13 @@ let clone_type_decl loc inst cl tdl decl kn =
               if not (Number.float_format_equal ff ff')
               then raise (CannotInstantiate id);
               s'
+          | Alias ity, Some ({ its_def = Alias ity'; _ } as s') ->
+              (* Apply the substitution on the def of the cloned symbol *)
+              let ity = conv_ity alg ity in
+              (* Check equality with the cloning symbol modulo type variables *)
+              let isb = its_match_args s' (List.map ity_var s.its_ts.ts_args) in
+              ity_equal_check ity (ity_full_inst isb ity');
+              s'
           | _ -> raise (CannotInstantiate id) in
         cl.ts_table <- Mts.add ts s' cl.ts_table;
         let decl' = Mid.find s'.its_ts.ts_name kn in
@@ -1473,7 +1487,7 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
 
 let impl_cl = empty_clones' Sid.empty
 
-let mod_table = Hid.create 17
+let mod_table = Wid.create 17
 
 let theory_add_clone = Theory.add_clone_internal ()
 
@@ -1503,7 +1517,7 @@ let decl_impl uc d =
   | _ -> uc
 
 let need_copy m =
-  Sid.exists (fun id -> Hid.mem mod_table id) m.mod_theory.th_used
+  Sid.exists (fun id -> Wid.mem mod_table id) m.mod_theory.th_used
 
 let pdecl_impl inst uc d =
   let uc = clone_pdecl None inst impl_cl uc d in
@@ -1564,13 +1578,13 @@ and mod_impl' e m =
 
 and mod_impl e m =
   let id = m.mod_theory.th_name in
-  try Hid.find mod_table id with
+  try Wid.find mod_table id with
   | Not_found ->
      if not (need_copy m)
      then m
      else begin
          let m = mod_impl' e m in
-         Hid.add mod_table id m;
+         Wid.set mod_table id m;
          m
        end
 
@@ -1639,8 +1653,8 @@ let mod_impl_register e m mimpl inst =
   let mimpl' = clone_export' mimpl' m inst impl_cl in
   let mimpl' = close_scope mimpl' ~import:false in
   let mimpl' = close_module mimpl' in
-  Hid.add mod_table mimpl.mod_theory.th_name mimpl';
-  Hid.add mod_table m.mod_theory.th_name mimpl'
+  Wid.set mod_table mimpl.mod_theory.th_name mimpl';
+  Wid.set mod_table m.mod_theory.th_name mimpl'
 
 (** {2 WhyML language} *)
 

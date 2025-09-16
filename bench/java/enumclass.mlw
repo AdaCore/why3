@@ -1,0 +1,23 @@
+module EnumClass
+  use mach.java.lang.Integer
+
+  type kind_of_t = Some_kind | Another_Kind | Some_other_sort
+
+  type t = {
+    kind : kind_of_t;
+    dummy_value : integer
+  }
+
+  let constructor [@java:constructor] () = {
+      kind = Some_other_sort; dummy_value = 0
+  }
+  
+  let get_kind (self : t) = self.kind
+
+  let get_integer_kind (self : t) : integer =
+    match self.kind with
+    | Some_kind -> 1
+    | Another_Kind -> 0
+    | Some_other_sort -> 2
+    end
+end

@@ -1,7 +1,7 @@
 open Why3
 open Term
 
-type reason =
+type check_kind =
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
    | VC_Index_Check
@@ -24,6 +24,7 @@ type reason =
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
    | VC_Initialization_Check
+   | VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -32,9 +33,10 @@ type reason =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -45,6 +47,8 @@ type reason =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -67,7 +71,7 @@ type reason =
    | VC_Unreachable_Branch
    | VC_Dead_Code
 
-let is_warning_reason r =
+let is_warning_kind r =
   match r with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check
@@ -91,6 +95,7 @@ let is_warning_reason r =
    | VC_Ceiling_Priority_Protocol
    | VC_Task_Termination
    | VC_Initialization_Check
+   | VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition
    | VC_Default_Initial_Condition
@@ -99,9 +104,10 @@ let is_warning_reason r =
    | VC_Postcondition
    | VC_Refined_Post
    | VC_Contract_Case
-   | VC_Disjoint_Contract_Cases
-   | VC_Complete_Contract_Cases
+   | VC_Disjoint_Cases
+   | VC_Complete_Cases
    | VC_Exceptional_Case
+   | VC_Exit_Case
    | VC_Loop_Invariant
    | VC_Loop_Invariant_Init
    | VC_Loop_Invariant_Preserv
@@ -112,6 +118,8 @@ let is_warning_reason r =
    | VC_Assert_Premise
    | VC_Assert_Step
    | VC_Raise
+   | VC_Unexpected_Program_Exit
+   | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
    | VC_Container_Aggr_Check
@@ -141,7 +149,7 @@ type subp_entity = Gnat_loc.loc
 type id = int
 type check =
   { id             : id;
-    reason         : reason;
+    check_kind     : check_kind;
     sloc           : Gnat_loc.loc;
     shape          : string;
     already_proved : bool
@@ -168,20 +176,20 @@ type limit_mode =
 let check_compare a b =
   let c = Stdlib.compare a.id b.id in
   if c <> 0 then c
-  else Stdlib.compare a.reason b.reason
+  else Stdlib.compare a.check_kind b.check_kind
 
 let check_equal a b =
-  Stdlib.(=) a.id b.id && Stdlib.(=) a.reason b.reason
+  Stdlib.(=) a.id b.id && Stdlib.(=) a.check_kind b.check_kind
 
-let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.reason)
+let check_hash e = Hashcons.combine (Hashtbl.hash e.id) (Hashtbl.hash e.check_kind)
 
-let mk_check ?shape:shape reason id sloc ap =
-  { reason = reason; id = id ; sloc = sloc ; already_proved = ap;
+let mk_check ?shape:shape check_kind id sloc ap =
+  { check_kind = check_kind; id = id ; sloc = sloc ; already_proved = ap;
     shape = match shape with None -> "" | Some s -> s }
 
 let get_loc c = c.sloc
-let get_reason c = c.reason
-let reason_from_string s =
+let get_check_kind c = c.check_kind
+let check_kind_from_string s =
    match s with
    (* VC_RTE_Kind - run-time checks *)
    | "VC_DIVISION_CHECK"            -> VC_Division_Check
@@ -207,6 +215,7 @@ let reason_from_string s =
    | "VC_CEILING_PRIORITY_PROTOCOL" -> VC_Ceiling_Priority_Protocol
    | "VC_TASK_TERMINATION"          -> VC_Task_Termination
    | "VC_INITIALIZATION_CHECK"      -> VC_Initialization_Check
+   | "VC_VALIDITY_CHECK"            -> VC_Validity_Check
    (* VC_Assert_Kind - assertions *)
    | "VC_INITIAL_CONDITION"         -> VC_Initial_Condition
    | "VC_DEFAULT_INITIAL_CONDITION" -> VC_Default_Initial_Condition
@@ -215,9 +224,10 @@ let reason_from_string s =
    | "VC_POSTCONDITION"             -> VC_Postcondition
    | "VC_REFINED_POST"              -> VC_Refined_Post
    | "VC_CONTRACT_CASE"             -> VC_Contract_Case
-   | "VC_DISJOINT_CONTRACT_CASES"   -> VC_Disjoint_Contract_Cases
-   | "VC_COMPLETE_CONTRACT_CASES"   -> VC_Complete_Contract_Cases
+   | "VC_DISJOINT_CASES"            -> VC_Disjoint_Cases
+   | "VC_COMPLETE_CASES"            -> VC_Complete_Cases
    | "VC_EXCEPTIONAL_CASE"          -> VC_Exceptional_Case
+   | "VC_EXIT_CASE"                 -> VC_Exit_Case
    | "VC_LOOP_INVARIANT"            -> VC_Loop_Invariant
    | "VC_LOOP_INVARIANT_INIT"       -> VC_Loop_Invariant_Init
    | "VC_LOOP_INVARIANT_PRESERV"    -> VC_Loop_Invariant_Preserv
@@ -228,6 +238,8 @@ let reason_from_string s =
    | "VC_ASSERT_PREMISE"            -> VC_Assert_Premise
    | "VC_ASSERT_STEP"               -> VC_Assert_Step
    | "VC_RAISE"                     -> VC_Raise
+   | "VC_UNEXPECTED_PROGRAM_EXIT"   -> VC_Unexpected_Program_Exit
+   | "VC_PROGRAM_EXIT_POST"         -> VC_Program_Exit_Post
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
@@ -250,11 +262,11 @@ let reason_from_string s =
    | "VC_UNREACHABLE_BRANCH"        -> VC_Unreachable_Branch
    | "VC_DEAD_CODE"                 -> VC_Dead_Code
    | _                              ->
-       let s = Format.sprintf "unknown VC reason: %s@." s in
-       Gnat_util.abort_with_message ~internal:true s
+       let s = Format.sprintf "unknown VC kind: %s@." s in
+       raise (Invalid_argument s)
 
-let reason_to_ada reason =
-   match reason with
+let check_kind_to_ada kind =
+   match kind with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "VC_DIVISION_CHECK"
    | VC_Index_Check               -> "VC_INDEX_CHECK"
@@ -279,6 +291,7 @@ let reason_to_ada reason =
    | VC_Ceiling_Priority_Protocol -> "VC_CEILING_PRIORITY_PROTOCOL"
    | VC_Task_Termination          -> "VC_TASK_TERMINATION"
    | VC_Initialization_Check      -> "VC_INITIALIZATION_CHECK"
+   | VC_Validity_Check            -> "VC_VALIDITY_CHECK"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "VC_INITIAL_CONDITION"
    | VC_Default_Initial_Condition -> "VC_DEFAULT_INITIAL_CONDITION"
@@ -287,9 +300,10 @@ let reason_to_ada reason =
    | VC_Postcondition             -> "VC_POSTCONDITION"
    | VC_Refined_Post              -> "VC_REFINED_POST"
    | VC_Contract_Case             -> "VC_CONTRACT_CASE"
-   | VC_Disjoint_Contract_Cases   -> "VC_DISJOINT_CONTRACT_CASES"
-   | VC_Complete_Contract_Cases   -> "VC_COMPLETE_CONTRACT_CASES"
+   | VC_Disjoint_Cases            -> "VC_DISJOINT_CASES"
+   | VC_Complete_Cases            -> "VC_COMPLETE_CASES"
    | VC_Exceptional_Case          -> "VC_EXCEPTIONAL_CASE"
+   | VC_Exit_Case                 -> "VC_EXIT_CASE"
    | VC_Loop_Invariant            -> "VC_LOOP_INVARIANT"
    | VC_Loop_Invariant_Init       -> "VC_LOOP_INVARIANT_INIT"
    | VC_Loop_Invariant_Preserv    -> "VC_LOOP_INVARIANT_PRESERV"
@@ -300,6 +314,8 @@ let reason_to_ada reason =
    | VC_Assert_Premise            -> "VC_ASSERT_PREMISE"
    | VC_Assert_Step               -> "VC_ASSERT_STEP"
    | VC_Raise                     -> "VC_RAISE"
+   | VC_Unexpected_Program_Exit   -> "VC_UNEXPECTED_PROGRAM_EXIT"
+   | VC_Program_Exit_Post         -> "VC_PROGRAM_EXIT_POST"
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
@@ -322,8 +338,8 @@ let reason_to_ada reason =
    | VC_Unreachable_Branch        -> "VC_UNREACHABLE_BRANCH"
    | VC_Dead_Code                 -> "VC_DEAD_CODE"
 
-let reason_to_string reason =
-   match reason with
+let check_kind_to_string kind =
+   match kind with
    (* VC_RTE_Kind - run-time checks *)
    | VC_Division_Check            -> "division_check"
    | VC_Index_Check               -> "index_check"
@@ -346,6 +362,7 @@ let reason_to_string reason =
    | VC_Ceiling_Priority_Protocol -> "ceiling__priority_protocol"
    | VC_Task_Termination          -> "task_termination"
    | VC_Initialization_Check      -> "initialization"
+   | VC_Validity_Check            -> "validity"
    (* VC_Assert_Kind - assertions *)
    | VC_Initial_Condition         -> "initial_condition"
    | VC_Default_Initial_Condition -> "default_initial_condition"
@@ -354,9 +371,10 @@ let reason_to_string reason =
    | VC_Postcondition             -> "postcondition"
    | VC_Refined_Post              -> "refined_post"
    | VC_Contract_Case             -> "contract_case"
-   | VC_Disjoint_Contract_Cases   -> "disjoint_contract_cases"
-   | VC_Complete_Contract_Cases   -> "complete_contract_cases"
+   | VC_Disjoint_Cases            -> "disjoint_cases"
+   | VC_Complete_Cases            -> "complete_cases"
    | VC_Exceptional_Case          -> "exceptional_case"
+   | VC_Exit_Case                 -> "exit_case"
    | VC_Loop_Invariant            -> "loop_invariant"
    | VC_Loop_Invariant_Init       -> "loop_invariant_init"
    | VC_Loop_Invariant_Preserv    -> "loop_invariant_preserv"
@@ -367,6 +385,8 @@ let reason_to_string reason =
    | VC_Assert_Premise            -> "assert_premise"
    | VC_Assert_Step               -> "assert_step"
    | VC_Raise                     -> "raise"
+   | VC_Unexpected_Program_Exit   -> "unexpected_program_exit"
+   | VC_Program_Exit_Post         -> "program_exit_post"
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
@@ -390,7 +410,7 @@ let reason_to_string reason =
    | VC_Dead_Code                 -> "dead_code"
 
 type gp_label =
-  | Gp_Check of int * reason * Gnat_loc.loc
+  | Gp_Check of int * check_kind * Gnat_loc.loc
   | Gp_Pretty_Ada of int
   | Gp_Shape of string
   | Gp_Already_Proved
@@ -398,9 +418,9 @@ type gp_label =
 
 let parse_check_string s l =
   match l with
-  | id::reason_string::sloc_rest ->
+  | id::check_kind_string::sloc_rest ->
     begin try
-      Gp_Check (int_of_string id, reason_from_string reason_string, Gnat_loc.parse_loc sloc_rest)
+      Gp_Check (int_of_string id, check_kind_from_string check_kind_string, Gnat_loc.parse_loc sloc_rest)
     with e when Debug.test_flag Debug.stack_trace -> raise e
     | Failure _ ->
        let s =
@@ -413,7 +433,7 @@ let parse_check_string s l =
         Gnat_util.abort_with_message ~internal:true s
 
 let read_label s =
-    if Strings.has_prefix "GP_" s then
+    if Strings.has_prefix ~prefix:"GP_" s then
        match Gnat_util.colon_split s with
        | "GP_Check" :: rest ->
              Some (parse_check_string s rest)
@@ -447,7 +467,7 @@ let read_label s =
 
 type my_expl =
    { mutable check_id       : int option;
-     mutable check_reason   : reason option;
+     mutable check_kind     : check_kind option;
      mutable extra_node     : int option;
      mutable check_sloc     : Gnat_loc.loc option;
      mutable shape          : string option;
@@ -459,13 +479,14 @@ type my_expl =
 
 let default_expl =
    { check_id       = None;
-     check_reason   = None;
+     check_kind     = None;
      check_sloc     = None;
      extra_node     = None;
      shape          = None;
      already_proved = false;
      inline         = None;
    }
+
 let read_vc_labels acc s =
    (* This function takes a set of labels and extracts a "node_info" from that
       set. We start with an empty record; We fill it up by iterating over all
@@ -475,8 +496,8 @@ let read_vc_labels acc s =
      (fun x ->
         let s = x.Ident.attr_string in
         match read_label s with
-        | Some Gp_Check (id, reason, sloc) ->
-            b.check_reason <- Some reason;
+        | Some Gp_Check (id, kind, sloc) ->
+            b.check_kind <- Some kind;
             b.check_id <- Some id;
             b.check_sloc <- Some sloc;
         | Some Gp_Pretty_Ada node ->
@@ -486,21 +507,22 @@ let read_vc_labels acc s =
         | Some Gp_Already_Proved ->
            b.already_proved <- true
         | Some Gp_Inlined ->
-          if b.extra_node = None then b.inline <- Some (-1)
+          if b.inline <> None then ()
+          else if b.extra_node = None then b.inline <- Some (-1)
           else b.inline <- b.extra_node
         | None ->
             ()
      ) s;
      (* We potentially need to rectify in the case of loop invariants: We need
         to check whether the VC is for initialization or preservation *)
-     if b.check_reason = Some VC_Loop_Invariant then begin
+     if b.check_kind = Some VC_Loop_Invariant then begin
         Ident.Sattr.iter (fun x ->
            let s = x.Ident.attr_string in
-           if Strings.has_prefix "expl:" s then
+           if Strings.has_prefix ~prefix:"expl:" s then
               if s = "expl:loop invariant init" then
-                 b.check_reason <- Some VC_Loop_Invariant_Init
+                 b.check_kind <- Some VC_Loop_Invariant_Init
               else
-                 b.check_reason <- Some VC_Loop_Invariant_Preserv) s
+                 b.check_kind <- Some VC_Loop_Invariant_Preserv) s
      end;
      b
 
@@ -508,11 +530,11 @@ let read_vc_labels acc s =
 let extract_check b =
      match b with
      | { check_id = Some id ;
-         check_reason = Some reason;
+         check_kind = Some check_kind;
          check_sloc = Some sloc;
          shape = shape;
          already_proved = ap; } ->
-           Some (mk_check ?shape reason id sloc ap)
+           Some (mk_check ?shape check_kind id sloc ap)
      | _ -> None
 
 (* Copied from Termcode and modified to use an accumulator. Traverse the
@@ -550,24 +572,31 @@ let to_filename fmt check =
       let file, line, col = Gnat_loc.explode x in
       Format.fprintf fmt "%s_%d_%d_" file line col;
   ) check.sloc;
-  Format.fprintf fmt "%s" (reason_to_string check.reason)
+  Format.fprintf fmt "%s" (check_kind_to_string check.check_kind)
 
 let parse_line_spec s =
    try
      let args = Re.Str.split (Re.Str.regexp_string ":") s in
-     match args with
+     let rev_args = List.rev args in
+     match rev_args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true
         ("limit-line: incorrect line specification - missing ':'")
-     | [fn;line] ->
-         let line = int_of_string line in
-         Limit_Line (Gnat_loc.mk_loc_line fn line)
-     | [fn;line;col;check] ->
-         let line = int_of_string line in
-         let col = int_of_string col in
-         let check = reason_from_string check in
-         let loc = Gnat_loc.mk_loc fn line col None in
-         Limit_Check (mk_check check 0 loc false)
+     | [_] ->
+        Gnat_util.abort_with_message ~internal:true
+        ("limit-line: incorrect line specification - missing line information")
+     | may_check::may_col::rest ->
+         try
+           let check = check_kind_from_string may_check in
+           let col = int_of_string may_col in
+           let loc = Gnat_loc.parse_loc_line_only (List.rev rest) in
+           let loc = Gnat_loc.set_col loc col in
+           (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+           Limit_Check (mk_check check 0 (List.rev loc) false)
+        with Invalid_argument _ ->
+           (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+          let loc = Gnat_loc.parse_loc_line_only args in
+          Limit_Line (List.rev loc)
      | _ ->
       Gnat_util.abort_with_message ~internal:true
       (
@@ -584,20 +613,21 @@ let parse_line_spec s =
 let parse_region_spec s =
    try
      let args = Re.Str.split (Re.Str.regexp_string ":") s in
-     match args with
+     match List.rev args with
      | [] ->
         Gnat_util.abort_with_message ~internal:true
         ("limit-region: incorrect region specification - missing ':'")
-     | [fn;l_start;l_end] ->
+     | l_end::l_start::fn::rest ->
+         let loc = Gnat_loc.parse_loc_line_only (List.rev rest) in
          let l_start = int_of_string l_start in
          let l_end = int_of_string l_end in
-         Gnat_loc.mk_region fn l_start l_end
+         (* ??? gnatwhy3 apparently stores most locs in inverse order *)
+         Gnat_loc.mk_region (List.rev loc) fn l_start l_end
      | _ ->
       Gnat_util.abort_with_message ~internal:true
       (
         "limit-region: incorrect line specification -\
-         invalid parameter number, must be \
-         3")
+         invalid parameter number")
   with
    | e when Debug.test_flag Debug.stack_trace -> raise e
    | Failure "int_of_string" ->

@@ -1,30 +1,17 @@
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because many args for exec fun)
+  - Concrete RAC: INCOMPLETE (fatal rac error: many args for exec fun)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
 - Selected model 1: INCOMPLETE
-  - Concrete RAC: INCOMPLETE (terminated because many args for exec fun)
+  - Concrete RAC: INCOMPLETE (fatal rac error: many args for exec fun)
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
 File "bench/check-ce/anonymous5.mlw", line 7, characters 12-22:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Unknown (unknown + incomplete) (447 steps).
+Prover result is: Unknown (unknown + incomplete) (398 steps).
 The following counterexample model could not be verified
-  (concrete RAC terminated because many args for exec fun, abstract RAC terminated because Postcondition of `f` cannot be evaluated):
+  (concrete RAC fatal rac error: many args for exec fun, abstract RAC terminated because Postcondition of `f` cannot be evaluated):
 File anonymous5.mlw:
   Line 6:
+    y :  = 0
     y : int = 0
-  Line 7:
-    result : int = 0
-    result : int = 0
-    y : int = 0
-  Line 8:
-    result of call at line 8, characters 2-9 : int = 0
-    result of call at line 8, characters 2-7 : int -> int = [|_ => 0|]
-    result of call at line 8, characters 2-5 :
-      int
-      ->
-      int
-      ->
-      int = [|_ => [|_ => 0|]|]
-    result : int = 0
 

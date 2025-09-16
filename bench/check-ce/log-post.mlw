@@ -1,0 +1,46 @@
+(** Examples for testing a new form of presentation of counterexamples
+
+    This file concerns the presentation of CE for simple functions
+    with no conditional, no loop, no function call
+
+    This case is for the post-condition
+
+*)
+
+use int.Int
+
+constant a : int
+
+val ref b : int
+
+let f1 (x:int) (ref y:int) : unit
+  requires { x >= 0 /\ y >= 0 /\ b >= 0}
+  ensures Q { a + b + x + y <= 42 }
+= y <- y + x;
+  assert A1 { y >= 0 };
+  b <- b + y
+
+(** Expected form of answer:
+
+Function `f1` does not conform with its specification at postcondition `Q`
+on line `...`. A counterexample given by the following logic context
+--
+a : int = ...
+--
+and the execution of `f1` in the initial global context
+--
+b : ref int = ....
+--
+the parameters
+--
+x : int = ...
+y : ref int = ....
+---
+that reaches the postcondition `Q` with the context
+---
+b : ref int = ...
+x : int = ...
+y : ref int = ...
+---
+
+*)

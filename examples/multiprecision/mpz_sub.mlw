@@ -19,7 +19,7 @@ use int.Abs
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_sub (w u v: mpz_ptr) : unit
+let partial wmpz_sub (w u v: mpz_ptr) : unit
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[u] < max_int32 /\ mpz.abs_size[v] < max_int32 }
@@ -325,7 +325,7 @@ let wmpz_sub (w u v: mpz_ptr) : unit
 use add_1.Add_1
 use sub_1.Sub_1
 
-let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
+let partial wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[u] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] < max_int32 }
@@ -410,7 +410,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
           assert { v <= value wp abs_usize };
           assert { value wp abs_usize = value_of u mpz };
           assert { value wp abs_usize >= power radix (abs_usize - 1) };
-          let ghost _b = wmpn_sub_1_in_place wp abs_usize v in
+          let (ghost _b) = wmpn_sub_1_in_place wp abs_usize v in
           assert { _b = 0 };
           assert { value wp abs_usize = value_of u mpz - v };
           value_tail wp (abs_usize - 1);
@@ -457,7 +457,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
           assert { sgn_value wp wsize = - value wp 1 = (pelts up)[0] - v};
         end else begin
           assert { v <= abs_value_of mpz u };
-          let ghost _b = wmpn_sub_1 wp up abs_usize v in
+          let (ghost _b) = wmpn_sub_1 wp up abs_usize v in
           assert { _b = 0 };
           assert { value wp abs_usize = value_of u mpz - v };
           value_tail wp (abs_usize - 1);
@@ -502,7 +502,7 @@ let wmpz_sub_ui (w u: mpz_ptr) (v: uint64) : unit
   release_writer w wp
 
 
-let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
+let partial wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
   requires { mpz.alloc[w] >= 1 /\ mpz.alloc[v] >= 1 }
   requires { mpz.readers[w] = 0 /\ mpz.readers[v] = 0 }
   requires { mpz.abs_size[v] < max_int32 }
@@ -520,13 +520,13 @@ let wmpz_ui_sub (w: mpz_ptr) (uval: uint64) (v:mpz_ptr) : unit
     let wp = wmpz_realloc w vsize in
     if vw
     then begin
-      let ghost _b = wmpn_sub_1_in_place wp vsize uval in
+      let (ghost _b) = wmpn_sub_1_in_place wp vsize uval in
       assert { _b = 0 };
     end else begin
       unchanged v mpz ompz;
       let vp = get_read_ptr v in
       assert { mpz.abs_size[v] = vsize };
-      let ghost _b = wmpn_sub_1 wp vp vsize uval in
+      let (ghost _b) = wmpn_sub_1 wp vp vsize uval in
       assert { _b = 0
                by value vp vsize >= power radix (vsize - 1)
                so vsize - 1 >= 1

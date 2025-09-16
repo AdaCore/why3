@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,6 +16,10 @@ val comment : Lexing.lexbuf -> unit
 val string : Lexing.lexbuf -> string
 
 val update_loc : Lexing.lexbuf -> string option -> int -> int -> unit
+
+val resolve_file : string -> string -> string
+(** [resolve_file orig src] resolves the file name [src], a path name
+    relative to the directory name of [orig] *)
 
 val backjump : Lexing.lexbuf -> int -> unit
 (** [backjump lexbuf n] rewinds the lexing buffer by [n] bytes, thus

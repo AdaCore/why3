@@ -11,7 +11,7 @@ Prover result is: Valid (54 steps).
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
 File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
 Sub-goal Index in array bounds of goal f1'vc.
-Prover result is: Unknown (unknown + incomplete) (243 steps).
+Prover result is: Unknown (unknown + incomplete) (161 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -23,23 +23,23 @@ File int.mlw:
     one = 1
 File array_mono.mlw:
   Line 35:
-    a = {elts= fun (x:int) -> 0; length= 0}
-    a = {elts= fun (x:int) -> 0; length= 0}
+    a = {elts= UNDEFINED; length= 0}
+    a = {elts= UNDEFINED; length= 0}
     Execution of main function `f1` with env:
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       zero = 0
       one = 1
   Line 36:
     (giant-step) execution of unimplemented function `([])`
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       i = 0
     Property failure at precondition of `([])` with:
-      a = {elts= fun (x:int) -> 0; length= 0}
+      a = {elts= UNDEFINED; length= 0}
       i = 0
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.
-Prover result is: Valid (202 steps).
+Prover result is: Valid (115 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: INCOMPLETE
@@ -50,34 +50,14 @@ Prover result is: Valid (202 steps).
   - Abstract RAC: STUCK (failure in precondition of `f2` at "bench/check-ce/array_mono.mlw", line 38, characters 6-8)
 File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
 Sub-goal Postcondition of goal f2'vc.
-Prover result is: Step limit exceeded (150014 steps).
+Prover result is: Step limit exceeded (150012 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
 File array_mono.mlw:
-  Line 9:
-    elts : array -> int -> int = [|_ => [|0 => 42; 1 => 42; _ => 0|]|]
-  Line 10:
-    length : array -> int = [|_ => 2|]
-  Line 19:
-    mixfix [<-] :
-      array
-      ->
-      int
-      ->
-      int
-      ->
-      array = fun _arg_11 _arg_2 _arg_3 ->
-               {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
-  Line 23:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
-  Line 25:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
-    old a :
-      array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
   Line 38:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
-  Line 40:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
+    a :  = {elts = [|0 => 42; 1 => 42; _ => 0|]; length = 2}
+    a : array = {elts = [|0 => 42; 1 => 42; _ => 0|]; length = 2}
   Line 41:
-    a : array = {Array.elts = [|0 => 42; 1 => 42; _ => 0|]; Array.length = 2}
+    a : array = {elts = [|0 => 42; 1 => 42; _ => 0|]; length = 2}
+    result :  = Tuple0
 

@@ -1,0 +1,112 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+File "bench/check-ce/log-asserts.mlw", line 19, characters 14-20:
+Sub-goal Assertion of goal f1'vc.
+Prover result is: Unknown (unknown) (26 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-asserts.mlw:
+  Line 14:
+    Constant b initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    b = {contents= 0}
+  Line 16:
+    x = 0
+    y = {contents= 0}
+    x = 0
+    y = {contents= 0}
+    Execution of main function `f1` with env:
+      b = {contents= 0}
+      x = 0
+      y = {contents= 0}
+      zero = 0
+      one = 1
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 0
+  Line 19:
+    Property failure at assertion with:
+      y = {contents= 0}
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 19, characters 14-20)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 21, characters 14-33)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 21, characters 14-33)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 21, characters 14-33)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/log-asserts.mlw", line 21, characters 14-33)
+File "bench/check-ce/log-asserts.mlw", line 21, characters 14-33:
+Sub-goal Assertion of goal f1'vc.
+Prover result is: Unknown (unknown) (42 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-asserts.mlw:
+  Line 12:
+    a = 0
+  Line 14:
+    b = {contents= 41}
+  Line 16:
+    x = 0
+    y = {contents= 1}
+    x = 0
+    y = {contents= 1}
+    Execution of main function `f1` with env:
+      a = 0
+      b = {contents= 41}
+      x = 0
+      y = {contents= 1}
+      zero = 0
+      one = 1
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `(+)` with args:
+      _ = 1
+      _ = 0
+  Line 20:
+    Normal execution of function `contents` with args:
+      arg = {contents= 1}
+    Normal execution of function `contents` with args:
+      arg = {contents= 41}
+    Normal execution of function `(+)` with args:
+      _ = 41
+      _ = 1
+  Line 21:
+    Property failure at assertion with:
+      b = {contents= 42}
+      x = 0
+      y = {contents= 1}
+

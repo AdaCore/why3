@@ -33,8 +33,7 @@ The following commands are available:
     and transformations on them.
 
 :why3:tool:`pp`
-    Pretty-print WhyML definitions (formatting :file:`.mlw` files
-    or printing inductive definitions to LaTeX).
+    Pretty-print WhyML definitions in various output formats.
 
 :why3:tool:`prove`
     Read a WhyML input file and call provers, on the command-line.
@@ -430,7 +429,7 @@ Options
 
 .. option:: --memlimit=<MiB>
 
-   Set the prover's memory limit.
+   Set the prover's memory limit, in megabytes
    By default, there is no limit.
 
 .. option:: --meta=<meta>[=<string>]
@@ -493,11 +492,6 @@ Options
 .. option:: --json
 
    Print output in JSON format.
-
-.. option:: --json-model-values
-
-   Print values of prover model in JSON format
-   (backwards compatibility with :option:`--json`).
 
 .. option:: --color
 
@@ -971,7 +965,8 @@ from failing proof attempts, for provers that are able to produce a
 *counter-model* of the proof task. Why3 attempts to turn this
 counter-model into values for the free variables of the original Why3
 input. Currently, this is supported for CVC4 prover version at least
-1.5, CVC5, and Z3 prover version at least 4.4.0.
+1.5, CVC5, Z3 prover version at least 4.4.0 and Alt-Ergo version at
+least 2.6.0.
 
 The generation of counterexamples is fully integrated in Why3 IDE. The
 recommended usage is to first start a prover normally, as shown in
@@ -1622,7 +1617,7 @@ should use the `why3 bench` command on the new session instead.
 
 .. option:: -m <MiB>, --memlimit=<MiB>
 
-   Specify the memory limit for the added proof attempts.
+   Specify the memory limit, in megabytes, for the added proof attempts.
 
 .. why3:tool:: doc
 .. _sec.why3doc:
@@ -1708,8 +1703,8 @@ specified using the ``--output`` option.
 
 ::
 
-    why3 pp [--output=mlw|sexp|latex|dep] [--kind=inductive] [--prefix=<prefix>] \
-      <filename> <file>[[.<Module>].<ind_type>] ...
+    why3 pp [--output=mlw|sexp|latex|dep] [--prefix=<prefix>] \
+      <filename> <file>[[.<Module>].<object>] ...
 
 .. option:: --output=<output>
 
@@ -1721,17 +1716,15 @@ specified using the ``--output`` option.
      ``Ptree``) as a S-expression (enabled only when package ``ppx_sexp_conv`` is
      available at configuration time of Why3).
 
-   - ``latex``: currently can be used to print WhyML inductive definitions
-     to LaTeX, using the ``mathpartir`` package.
+   - ``latex``: can be used to print some fragment of WhyML
+     declarations. These include algebraic type definitions,
+     direct definitions of logic symbols, and inductive definitions of
+     logic predicates. Inductive definitions are formatted under the form of
+     deduction rules, using the ``mathpartir`` package.
 
    - ``dep``: display module dependencies, under the form of a digraph
-     using the ``dot`` syntax from the `GraphViz <https://www.graphviz.org/>`_ visualisation software.
-
-.. option:: --kind=<kind>
-
-   Set the syntactic kind to be pretty printed. Currently, the only
-   supported kind are inductive types (``--kind=inductive``) when using
-   the LaTeX output (``--output=latex``).
+     using the ``dot`` syntax from the `GraphViz
+     <https://www.graphviz.org/>`_ visualisation software.
 
 .. option:: --prefix=<prefix>
 
@@ -1781,7 +1774,7 @@ Runtime assertion checking (RAC)
 The execution can be instructed using option :option:`--rac` to check the
 validity of the program annotations that are encountered during the execution.
 This includes the validation of assertions, function contracts, and loop
-invariants [#no-function-invars]_.
+invariants [#no-type-invars]_.
 
 There are two strategies to check the validity of an annotation: First, the term
 is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
@@ -1810,7 +1803,8 @@ Options
    exponent, and the number of bits of mantissa. For example, the
    standard single-precision binary representation (32 bits) is set by
    parameters -148,128,24. The default is using long double-precision
-   (128-bits) with parameters -16493,16384,113.
+   (128-bits) with parameters -16493,16384,113. Note that this feature
+   is only available when Why3 has been compiled with MPFR support.
 
 .. option:: --rac
 
@@ -1820,12 +1814,16 @@ Options
 
    Use prover *p* for the checking formulas, when term reduction is
    insufficient (which is always tried first). The prover *p* is the
-   name or shortcut of a prover, with optional, comma-separated time
-   limit and memory limit, e.g. ``cvc4,2,1000``.
+   name of a prover, with optional, comma-separated version number and
+   alternative, e.g. ``Alt-Ergo,2.6.0``.
 
 .. option:: --rac-timelimit=<sec>
 
    Time limit in seconds for RAC prover.
+
+.. option:: --rac-memlimit=<MiB>
+
+   Memory limit in megabytes for RAC prover.
 
 .. option:: --rac-steplimit=<steps>
 
@@ -1843,7 +1841,7 @@ Options
    Normally the execution continues normally when an annotation cannot be
    checked.
 
-.. [#no-function-invars] RAC for function invariants aren't supported yet.
+.. [#no-type-invars] RAC for type invariants aren't supported yet.
 
 .. why3:tool:: extract
 .. _sec.why3extract:

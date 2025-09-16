@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.0.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="verifythis_2024_challenge1.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="all_subsegments&#39;vc" expl="VC for all_subsegments" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="all_subsegments&#39;vc.0" expl="assertion" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="all_subsegments&#39;vc.0.0" expl="assertion" proved="true">
+   <proof prover="5"><result status="valid" time="0.009138" steps="22621"/></proof>
+   </goal>
+   <goal name="all_subsegments&#39;vc.0.1" expl="VC for all_subsegments" proved="true">
+   <proof prover="2"><result status="valid" time="0.350239" steps="53500"/></proof>
+   </goal>
+   <goal name="all_subsegments&#39;vc.0.2" expl="VC for all_subsegments" proved="true">
+   <proof prover="2"><result status="valid" time="0.263580" steps="45590"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.014321" steps="19175"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="smart_array_copy_0&#39;vc" expl="VC for smart_array_copy_0" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="smart_array_copy_0&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.035080" steps="2998"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.027725" steps="2333"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.004084" steps="1480"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.003150" steps="1543"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.030562" steps="4476"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.5" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.000001" steps="1604"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.6" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.040887" steps="5623"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.7" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.117253" steps="18582"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.8" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.094720" steps="17888"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.9" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.092008" steps="17971"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.015920" steps="28800"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.11" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.064754" steps="9630"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.12" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="1.004583" steps="113505"/></proof>
+  <proof prover="6"><result status="valid" time="1.934463" steps="302658"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.13" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.030119" steps="3013"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.14" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.094708" steps="14285"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.15" expl="out of loop bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.035127" steps="3404"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.034395" steps="4085"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.071451" steps="11985"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.18" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.036878" steps="3226"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.041786" steps="4543"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.20" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.035318" steps="4253"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.21" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.017658" steps="24334"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.22" expl="out of loop bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.012290" steps="22592"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.23" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.026514" steps="2324"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.24" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.040320" steps="3525"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.25" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.038962" steps="3708"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.26" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.013050" steps="20562"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.27" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.007176" steps="23335"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.040683" steps="6250"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.29" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.042774" steps="4670"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.30" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.000001" steps="1356"/></proof>
+  </goal>
+  <goal name="smart_array_copy_0&#39;vc.31" expl="out of loop bounds" proved="true">
+  <proof prover="7"><result status="valid" time="0.030035" steps="18"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="copy_chunk&#39;vc" expl="VC for copy_chunk" proved="true">
+ <proof prover="5"><result status="valid" time="0.011189" steps="39455"/></proof>
+ </goal>
+ <goal name="smart_array_copy_0b&#39;vc" expl="VC for smart_array_copy_0b" proved="true">
+ <proof prover="2"><result status="valid" time="1.443054" steps="181088"/></proof>
+ </goal>
+ <goal name="distinct_subsegments&#39;vc" expl="VC for distinct_subsegments" proved="true">
+ <proof prover="5"><result status="valid" time="0.024600" steps="82193"/></proof>
+ </goal>
+ <goal name="frame_permutation_pair&#39;vc" expl="VC for frame_permutation_pair" proved="true">
+ <proof prover="7"><result status="valid" time="0.064143" steps="282"/></proof>
+ </goal>
+ <goal name="frame_subsegment&#39;vc" expl="VC for frame_subsegment" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="frame_subsegment&#39;vc.0" expl="postcondition" proved="true">
+  <transf name="unfold" proved="true" arg1="copy_subsegment">
+   <goal name="frame_subsegment&#39;vc.0.0" expl="VC for frame_subsegment" proved="true">
+   <transf name="unfold" proved="true" arg1="copy_subsegment" arg2="in" arg3="Requires3">
+    <goal name="frame_subsegment&#39;vc.0.0.0" expl="VC for frame_subsegment" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="frame_subsegment&#39;vc.0.0.0.0" expl="VC for frame_subsegment" proved="true">
+     <transf name="unfold" proved="true" arg1="copy_to">
+      <goal name="frame_subsegment&#39;vc.0.0.0.0.0" expl="VC for frame_subsegment" proved="true">
+      <transf name="split_vc" proved="true" >
+       <goal name="frame_subsegment&#39;vc.0.0.0.0.0.0" expl="VC for frame_subsegment" proved="true">
+       <proof prover="2"><result status="valid" time="0.059336" steps="8696"/></proof>
+       </goal>
+       <goal name="frame_subsegment&#39;vc.0.0.0.0.0.1" expl="VC for frame_subsegment" proved="true">
+       <proof prover="4"><result status="valid" time="0.058582" steps="8456"/></proof>
+       </goal>
+       <goal name="frame_subsegment&#39;vc.0.0.0.0.0.2" expl="VC for frame_subsegment" proved="true">
+       <proof prover="5"><result status="valid" time="0.020011" steps="42082"/></proof>
+       </goal>
+       <goal name="frame_subsegment&#39;vc.0.0.0.0.0.3" expl="VC for frame_subsegment" proved="true">
+       <proof prover="2"><result status="valid" time="0.591413" steps="150659"/></proof>
+       </goal>
+       <goal name="frame_subsegment&#39;vc.0.0.0.0.0.4" expl="VC for frame_subsegment" proved="true">
+       <transf name="instantiate" proved="true" arg1="H2" arg2="(i - startd)">
+        <goal name="frame_subsegment&#39;vc.0.0.0.0.0.4.0" expl="VC for frame_subsegment" proved="true">
+        <proof prover="4"><result status="valid" time="0.029224" steps="5014"/></proof>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="frame_subsegment&#39;vc.0.0.0.1" expl="VC for frame_subsegment" proved="true">
+     <transf name="unfold" proved="true" arg1="frame" arg2="in" arg3="Requires1">
+      <goal name="frame_subsegment&#39;vc.0.0.0.1.0" expl="VC for frame_subsegment" proved="true">
+      <transf name="case" proved="true" arg1="(tau[sigma[j1]] &lt; tau[sigma[j2]])">
+       <goal name="frame_subsegment&#39;vc.0.0.0.1.0.0" expl="true case" proved="true">
+       <transf name="destruct" proved="true" arg1="Requires1">
+        <goal name="frame_subsegment&#39;vc.0.0.0.1.0.0.0" expl="true case" proved="true">
+        <transf name="destruct" proved="true" arg1="Requires1">
+         <goal name="frame_subsegment&#39;vc.0.0.0.1.0.0.0.0" expl="true case" proved="true">
+         <transf name="rewrite" proved="true" arg1="Requires2">
+          <goal name="frame_subsegment&#39;vc.0.0.0.1.0.0.0.0.0" expl="true case" proved="true">
+          <proof prover="7"><result status="valid" time="0.081548" steps="697"/></proof>
+          </goal>
+          <goal name="frame_subsegment&#39;vc.0.0.0.1.0.0.0.0.1" expl="rewrite premises" proved="true">
+          <proof prover="2"><result status="valid" time="0.461157" steps="100018"/></proof>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+       <goal name="frame_subsegment&#39;vc.0.0.0.1.0.1" expl="false case" proved="true">
+       <transf name="destruct" proved="true" arg1="Requires1">
+        <goal name="frame_subsegment&#39;vc.0.0.0.1.0.1.0" expl="false case" proved="true">
+        <transf name="destruct" proved="true" arg1="Requires1">
+         <goal name="frame_subsegment&#39;vc.0.0.0.1.0.1.0.0" expl="false case" proved="true">
+         <transf name="rewrite" proved="true" arg1="Requires1">
+          <goal name="frame_subsegment&#39;vc.0.0.0.1.0.1.0.0.0" expl="false case" proved="true">
+          <proof prover="7"><result status="valid" time="0.074472" steps="697"/></proof>
+          </goal>
+          <goal name="frame_subsegment&#39;vc.0.0.0.1.0.1.0.0.1" expl="rewrite premises" proved="true">
+          <proof prover="2"><result status="valid" time="0.131003" steps="25569"/></proof>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="frame_subsegment&#39;vc.0.0.0.2" expl="VC for frame_subsegment" proved="true">
+     <transf name="unfold" proved="true" arg1="frame" arg2="in" arg3="Requires">
+      <goal name="frame_subsegment&#39;vc.0.0.0.2.0" expl="VC for frame_subsegment" proved="true">
+      <transf name="destruct" proved="true" arg1="Requires">
+       <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0" expl="VC for frame_subsegment" proved="true">
+       <transf name="destruct" proved="true" arg1="Requires">
+        <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0" expl="VC for frame_subsegment" proved="true">
+        <transf name="case" proved="true" arg1="(sigma[j1] &lt; sigma[j2])">
+         <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.0" expl="true case" proved="true">
+         <transf name="rewrite" proved="true" arg1="Requires1">
+          <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.0.0" expl="true case" proved="true">
+          <proof prover="7"><result status="valid" time="0.078804" steps="619"/></proof>
+          </goal>
+          <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.0.1" expl="rewrite premises" proved="true">
+          <proof prover="2"><result status="valid" time="0.404338" steps="88182"/></proof>
+          </goal>
+         </transf>
+         </goal>
+         <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.1" expl="false case" proved="true">
+         <transf name="rewrite" proved="true" arg1="Requires">
+          <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.1.0" expl="false case" proved="true">
+          <proof prover="7"><result status="valid" time="0.072852" steps="619"/></proof>
+          </goal>
+          <goal name="frame_subsegment&#39;vc.0.0.0.2.0.0.0.1.1" expl="rewrite premises" proved="true">
+          <proof prover="2"><result status="valid" time="0.147978" steps="31602"/></proof>
+          </goal>
+         </transf>
+         </goal>
+        </transf>
+        </goal>
+       </transf>
+       </goal>
+      </transf>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="decompose_sigma&#39;vc" expl="VC for decompose_sigma" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="decompose_sigma&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.029378" steps="12"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.034003" steps="4243"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.2" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.099868" steps="17285"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.209311" steps="33706"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.037656" steps="31"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.210332" steps="36330"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.029998" steps="43"/></proof>
+  </goal>
+  <goal name="decompose_sigma&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.035823" steps="5550"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="decompose_tau_sigma&#39;vc" expl="VC for decompose_tau_sigma" proved="true">
+ <proof prover="2"><result status="valid" time="0.104311" steps="16742"/></proof>
+ </goal>
+ <goal name="all_subsegments_perm&#39;vc" expl="VC for all_subsegments_perm" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="all_subsegments_perm&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.052886" steps="10125"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.122497" steps="22331"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.054376" steps="10326"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.011615" steps="4176"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.012013" steps="20044"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.5" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="all_subsegments_perm&#39;vc.5.0" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.007511" steps="4052"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.5.1" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.045355" steps="10359"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.5.2" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.004912" steps="4062"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.5.3" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.037734" steps="7011"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.5.4" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.040910" steps="7017"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.004126" steps="5915"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.041480" steps="7102"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.8" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.032959" steps="7103"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.012331" steps="19057"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.10" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="all_subsegments_perm&#39;vc.10.0" expl="postcondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.053727" steps="10780"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.10.1" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.041498" steps="7202"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.10.2" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.003878" steps="4124"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.10.3" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.036754" steps="7207"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.10.4" expl="postcondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.041294" steps="7213"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.034083" steps="7374"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.12" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.040044" steps="111"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.107904" steps="717"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.14" expl="postcondition" proved="true">
+  <proof prover="0" timelimit="30"><result status="valid" time="0.668649" steps="88100"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.030696" steps="27"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.16" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.072966" steps="13117"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.17" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.107652" steps="711"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.18" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="all_subsegments_perm&#39;vc.18.0" expl="postcondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.015314" steps="4520"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.18.1" expl="VC for all_subsegments_perm" proved="true">
+   <proof prover="4"><result status="valid" time="0.122015" steps="23052"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.18.2" expl="VC for all_subsegments_perm" proved="true">
+   <proof prover="2"><result status="valid" time="0.267535" steps="52562"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.19" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.050822" steps="11264"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.20" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.024416" steps="64423"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.21" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.110755" steps="730"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.050659" steps="11518"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.23" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.026268" steps="65823"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.24" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="1.799332" steps="3497"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.25" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.080623" steps="15790"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.26" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.082513" steps="13377"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.27" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.090540" steps="14855"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.28" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.092505" steps="16611"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.29" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.045373" steps="7965"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.30" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.078686" steps="13401"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.31" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.080854" steps="15821"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.32" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.085743" steps="16648"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.33" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.093480" steps="16648"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.34" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.055024" steps="11808"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.35" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.582298" steps="381"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.36" expl="postcondition" proved="true">
+  <transf name="case" proved="true" arg1="(o1 = j)">
+   <goal name="all_subsegments_perm&#39;vc.36.0" expl="true case (postcondition)" proved="true">
+   <proof prover="7"><result status="valid" time="0.992453" steps="1040"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.36.1" expl="false case (postcondition)" proved="true">
+   <proof prover="7"><result status="valid" time="0.950299" steps="1009"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.37" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.000001" steps="6376"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.38" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.066292" steps="9693"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.39" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.107489" steps="724"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.40" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.049229" steps="11690"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.41" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.067337" steps="10707"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.42" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="1.387048" steps="3559"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.43" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.084166" steps="13581"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.44" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.111780" steps="17691"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.45" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.086010" steps="13579"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.46" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.103479" steps="15461"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.47" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.083378" steps="17003"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.48" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.108379" steps="17737"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.49" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.028078" steps="70682"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.50" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.114307" steps="17995"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.51" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.004009" steps="4677"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.52" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.087087" steps="16007"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.53" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.030947" steps="72030"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.54" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.031102" steps="70636"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.55" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.031717" steps="72030"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.56" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.028576" steps="70773"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.57" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.027667" steps="72164"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.58" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.029366" steps="70745"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.59" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.024897" steps="72164"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.60" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.011738" steps="4694"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.61" expl="assertion" proved="true">
+  <proof prover="7"><result status="valid" time="0.908840" steps="2867"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.62" expl="postcondition" proved="true">
+  <transf name="case" proved="true" arg1="(o1 = j)">
+   <goal name="all_subsegments_perm&#39;vc.62.0" expl="true case (postcondition)" proved="true">
+   <proof prover="7"><result status="valid" time="1.249120" steps="1636"/></proof>
+   </goal>
+   <goal name="all_subsegments_perm&#39;vc.62.1" expl="false case (postcondition)" proved="true">
+   <proof prover="7"><result status="valid" time="1.334959" steps="1624"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.63" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.058018" steps="11546"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.64" expl="assertion" proved="true">
+  <proof prover="4"><result status="valid" time="0.059426" steps="9691"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.65" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.171274" steps="1270"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.66" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.050322" steps="11647"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.67" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.029980" steps="66633"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.68" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.016443" steps="6661"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.69" expl="postcondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.180636" steps="1304"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.70" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.140967" steps="23971"/></proof>
+  </goal>
+  <goal name="all_subsegments_perm&#39;vc.71" expl="postcondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.032373" steps="69062"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="smart_array_copy_1&#39;vc" expl="VC for smart_array_copy_1" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="smart_array_copy_1&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.057140" steps="10386"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.007365" steps="4422"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.067431" steps="13078"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.3" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.023698" steps="62882"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.108121" steps="19529"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.052803" steps="11710"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.039138" steps="7986"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.7" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.003784" steps="4631"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.8" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.003985" steps="4636"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.9" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.048240" steps="11919"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.10" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.044899" steps="8957"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.129710" steps="26016"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.12" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.025353" steps="68799"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.13" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.028896" steps="73993"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.14" expl="assertion" proved="true">
+  <proof prover="2"><result status="valid" time="0.162666" steps="32344"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.15" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.061708" steps="15054"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.16" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.026551" steps="70908"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.17" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.077639" steps="15341"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.18" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.050227" steps="12287"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.19" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.048692" steps="145"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.20" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.100269" steps="20483"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.21" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.047842" steps="152"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.22" expl="loop invariant init" proved="true">
+  <proof prover="5"><result status="valid" time="0.007492" steps="4869"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.23" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.084989" steps="17029"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.24" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.027219" steps="80186"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.25" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.103165" steps="19844"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.26" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.080629" steps="17181"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.27" expl="index in array bounds" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="smart_array_copy_1&#39;vc.27.0" expl="index in array bounds" proved="true">
+   <proof prover="4"><result status="valid" time="0.095260" steps="17332"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.27.1" expl="index in array bounds" proved="true">
+   <proof prover="2"><result status="valid" time="0.069584" steps="14509"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.28" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.032105" steps="86098"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.29" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.035297" steps="90517"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.30" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.137646" steps="26203"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.31" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.472912" steps="1054750"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.32" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.137219" steps="256186"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.33" expl="loop invariant preservation" proved="true">
+  <transf name="unfold" proved="true" arg1="copy_to">
+   <goal name="smart_array_copy_1&#39;vc.33.0" expl="VC for smart_array_copy_1" proved="true">
+   <transf name="split_vc" proved="true" >
+    <goal name="smart_array_copy_1&#39;vc.33.0.0" expl="VC for smart_array_copy_1" proved="true">
+    <proof prover="5"><result status="valid" time="0.030862" steps="82502"/></proof>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.33.0.1" expl="VC for smart_array_copy_1" proved="true">
+    <proof prover="2"><result status="valid" time="0.107330" steps="22892"/></proof>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.33.0.2" expl="VC for smart_array_copy_1" proved="true">
+    <proof prover="4"><result status="valid" time="0.052457" steps="10627"/></proof>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.33.0.3" expl="VC for smart_array_copy_1" proved="true">
+    <proof prover="5"><result status="valid" time="0.041756" steps="143876"/></proof>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.33.0.4" expl="VC for smart_array_copy_1" proved="true">
+    <proof prover="2"><result status="valid" time="0.114961" steps="24749"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.34" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(i&#39;=i)">
+   <goal name="smart_array_copy_1&#39;vc.34.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="4"><result status="valid" time="0.053753" steps="11403"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.34.1" expl="false case (loop invariant preservation)" proved="true">
+   <transf name="assert" proved="true" arg1="(p[startdst + i&#39;] = p1[startdst + i&#39;] = startsrc + i&#39;)">
+    <goal name="smart_array_copy_1&#39;vc.34.1.0" expl="asserted formula" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="smart_array_copy_1&#39;vc.34.1.0.0" proved="true">
+     <proof prover="5"><result status="valid" time="0.032056" steps="88813"/></proof>
+     </goal>
+     <goal name="smart_array_copy_1&#39;vc.34.1.0.1" proved="true">
+     <transf name="apply" proved="true" arg1="LoopInvariant8">
+      <goal name="smart_array_copy_1&#39;vc.34.1.0.1.0" expl="apply premises" proved="true">
+      <proof prover="4"><result status="valid" time="0.053645" steps="10764"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.34.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="5"><result status="valid" time="0.011695" steps="30842"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.35" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(i&#39;=i)">
+   <goal name="smart_array_copy_1&#39;vc.35.0" expl="true case (loop invariant preservation)" proved="true">
+   <proof prover="5"><result status="valid" time="0.029518" steps="85682"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.35.1" expl="false case (loop invariant preservation)" proved="true">
+   <transf name="assert" proved="true" arg1="(invp[startsrc + i&#39;] = invp1[startsrc + i&#39;] = startdst + i&#39;)">
+    <goal name="smart_array_copy_1&#39;vc.35.1.0" expl="asserted formula" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="smart_array_copy_1&#39;vc.35.1.0.0" proved="true">
+     <proof prover="2"><result status="valid" time="0.103206" steps="23915"/></proof>
+     </goal>
+     <goal name="smart_array_copy_1&#39;vc.35.1.0.1" proved="true">
+     <transf name="apply" proved="true" arg1="LoopInvariant8">
+      <goal name="smart_array_copy_1&#39;vc.35.1.0.1.0" expl="apply premises" proved="true">
+      <proof prover="2"><result status="valid" time="0.077846" steps="15247"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+    <goal name="smart_array_copy_1&#39;vc.35.1.1" expl="false case (loop invariant preservation)" proved="true">
+    <proof prover="2"><result status="valid" time="0.080037" steps="15480"/></proof>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.36" expl="loop invariant preservation" proved="true">
+  <transf name="apply" proved="true" arg1="frame_subsegment" arg2="with" arg3="dst2,j,p2,invp2">
+   <goal name="smart_array_copy_1&#39;vc.36.0" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.040641" steps="9449"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.1" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.066690" steps="15501"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.2" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.056150" steps="11151"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.3" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.094070" steps="19996"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.4" expl="apply premises" proved="true">
+   <proof prover="5"><result status="valid" time="0.040424" steps="84312"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.5" expl="apply premises" proved="true">
+   <proof prover="5"><result status="valid" time="0.019479" steps="81251"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.6" expl="apply premises" proved="true">
+   <proof prover="5"><result status="valid" time="0.005043" steps="5377"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.7" expl="apply premises" proved="true">
+   <proof prover="2"><result status="valid" time="0.060508" steps="13862"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.36.8" expl="apply premises" proved="true">
+   <proof prover="4"><result status="valid" time="0.035642" steps="9433"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.37" expl="loop invariant preservation" proved="true">
+  <proof prover="4"><result status="valid" time="0.043182" steps="8724"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.38" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.055932" steps="12821"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.39" expl="loop invariant preservation" proved="true">
+  <transf name="case" proved="true" arg1="(j&#39; = j)">
+   <goal name="smart_array_copy_1&#39;vc.39.0" expl="true case (loop invariant preservation)" proved="true">
+   <transf name="unfold" proved="true" arg1="copy_subsegment">
+    <goal name="smart_array_copy_1&#39;vc.39.0.0" expl="VC for smart_array_copy_1" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="smart_array_copy_1&#39;vc.39.0.0.0" expl="VC for smart_array_copy_1" proved="true">
+     <proof prover="2"><result status="valid" time="0.067968" steps="14156"/></proof>
+     </goal>
+     <goal name="smart_array_copy_1&#39;vc.39.0.0.1" expl="VC for smart_array_copy_1" proved="true">
+     <proof prover="7"><result status="valid" time="0.105814" steps="535"/></proof>
+     </goal>
+     <goal name="smart_array_copy_1&#39;vc.39.0.0.2" expl="VC for smart_array_copy_1" proved="true">
+     <proof prover="7"><result status="valid" time="0.105380" steps="536"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.39.1" expl="false case (loop invariant preservation)" proved="true">
+   <proof prover="2"><result status="valid" time="0.097629" steps="18545"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.40" expl="out of loop bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.062395" steps="13076"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.41" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.012036" steps="6895"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.42" expl="precondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="smart_array_copy_1&#39;vc.42.0" expl="precondition" proved="true">
+   <proof prover="2"><result status="valid" time="0.059478" steps="12724"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.42.1" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.047526" steps="8899"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.42.2" expl="precondition" proved="true">
+   <proof prover="5"><result status="valid" time="0.013196" steps="68365"/></proof>
+   </goal>
+   <goal name="smart_array_copy_1&#39;vc.42.3" expl="precondition" proved="true">
+   <proof prover="7"><result status="valid" time="0.044331" steps="127"/></proof>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.43" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.011478" steps="4783"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.44" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.034036" steps="127"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.45" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.044684" steps="127"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.46" expl="precondition" proved="true">
+  <proof prover="7"><result status="valid" time="0.039450" steps="127"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.47" expl="precondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.084363" steps="15778"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.48" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.060230" steps="12157"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.49" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.010901" steps="4754"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.50" expl="out of loop bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.047155" steps="8888"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.51" expl="loop invariant init" proved="true">
+  <proof prover="7"><result status="valid" time="0.027852" steps="58"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.52" expl="loop invariant init" proved="true">
+  <proof prover="4"><result status="valid" time="0.038036" steps="7937"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.53" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.024131" steps="70130"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.54" expl="index in array bounds" proved="true">
+  <proof prover="4"><result status="valid" time="0.051147" steps="11657"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.55" expl="index in array bounds" proved="true">
+  <proof prover="5"><result status="valid" time="0.020790" steps="71849"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.56" expl="index in array bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.087349" steps="16027"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.57" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.037730" steps="132808"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.58" expl="loop invariant preservation" proved="true">
+  <proof prover="5"><result status="valid" time="0.034243" steps="84524"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.59" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.047816" steps="12144"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.60" expl="VC for smart_array_copy_1" proved="true">
+  <proof prover="4"><result status="valid" time="0.034005" steps="7923"/></proof>
+  </goal>
+  <goal name="smart_array_copy_1&#39;vc.61" expl="out of loop bounds" proved="true">
+  <proof prover="2"><result status="valid" time="0.055287" steps="13369"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -1,0 +1,54 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23)
+File "bench/check-ce/if_decision_branch.mlw", line 19, characters 13-23:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown (unknown) (24 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File if_decision_branch.mlw:
+  Line 8:
+    Constant path_selector initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {sel_path= false}
+    path_selector = {sel_path= false}
+  Line 18:
+    a = 0
+    a = 0
+    Execution of main function `f` with env:
+      path_selector = {sel_path= false}
+      a = 0
+      zero = 0
+      one = 1
+  Line 22:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 1
+    Normal execution of function `sel_path` with args:
+      arg = {sel_path= false}
+  Line 25:
+    Normal execution of function `True` with args:
+  Line 27:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 5
+    Normal execution of function `sel_path` with args:
+      arg = {sel_path= false}
+  Line 19:
+    Property failure at postcondition of `f` with:
+      result = 22
+

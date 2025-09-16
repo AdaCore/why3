@@ -1,0 +1,60 @@
+File "bench/check-ce/log-post.mlw", line 20, characters 14-20:
+Sub-goal Assertion of goal f1'vc.
+Prover result is: Valid (377 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-post.mlw", line 18, characters 14-33)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-post.mlw", line 18, characters 14-33)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/log-post.mlw", line 18, characters 14-33)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/log-post.mlw", line 18, characters 14-33)
+File "bench/check-ce/log-post.mlw", line 18, characters 14-33:
+Sub-goal Postcondition of goal f1'vc.
+Prover result is: Unknown (unknown + incomplete) (561 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File log-post.mlw:
+  Line 12:
+    a = 43
+  Line 14:
+    b = {contents= 0}
+  Line 16:
+    x = 0
+    y = {contents= 0}
+    x = 0
+    y = {contents= 0}
+    Execution of main function `f1` with env:
+      a = 43
+      b = {contents= 0}
+      x = 0
+      y = {contents= 0}
+      zero = 0
+      one = 1
+  Line 19:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 0
+  Line 21:
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `contents` with args:
+      arg = {contents= 0}
+    Normal execution of function `(+)` with args:
+      _ = 0
+      _ = 0
+  Line 18:
+    Property failure at postcondition of `f1` with:
+      b = {contents= 0}
+      x = 0
+      y = {contents= 0}
+

@@ -48,7 +48,7 @@ let opt_logging = ref false
 let opt_limit_line : Gnat_expl.limit_mode option ref = ref None
 let opt_limit_lines : string ref = ref ""
 let opt_limit_region : Gnat_loc.region option ref = ref None
-let opt_socket_name : string ref = ref ""
+let opt_socket_name : string ref = ref (match Sys.getenv_opt "GNATPROVE_SOCKET" with | Some s -> s | None -> "")
 let opt_standalone = ref false
 let opt_replay = ref false
 
@@ -157,7 +157,6 @@ let output_list_transforms () =
 
 let show_config () =
   Format.printf "enable_ide: %s@." Config.enable_ide;
-  Format.printf "enable_zarith: %s@." Config.enable_zarith;
   Format.printf "enable_zip: %s@." Config.enable_zip;
   Format.printf "enable_coq_libs: %s@." Config.enable_coq_libs;
   Format.printf "enable_coq_fp_libs: %s@." Config.enable_coq_fp_libs;
@@ -572,7 +571,7 @@ let limit_time ~prover ~warning =
   | Some p, _ when prover = p.prover_name &&
                    !opt_ce_timeout <> None ->
       float (Option.get !opt_ce_timeout)
-  | _, None -> Call_provers.empty_limit.Call_provers.limit_time
+  | _, None -> Call_provers.empty_limits.Call_provers.limit_time
   | _, Some x -> float (x)
 
 type steps_convert = { add : int; mult : int }
@@ -629,7 +628,7 @@ end
 
 let steps ~config_prover =
   if config_prover.command_steps = None then
-    Call_provers.empty_limit.Call_provers.limit_steps
+    Call_provers.empty_limits.Call_provers.limit_steps
   else
     let prover = config_prover.prover.prover_name in
     let raw_steps =
@@ -638,12 +637,12 @@ let steps ~config_prover =
       | _ -> !opt_steps
     in
     match manual_prover, raw_steps with
-    | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_steps
+    | Some _, _ | _, None -> Call_provers.empty_limits.Call_provers.limit_steps
     | _, Some c -> Steps_conversion.convert ~prover c
 
 let limit_mem () =
   match manual_prover, !opt_memlimit with
-  | Some _, _ | _, None -> Call_provers.empty_limit.Call_provers.limit_mem
+  | Some _, _ | _, None -> Call_provers.empty_limits.Call_provers.limit_mem
   | _, Some m -> m
 
 let back_convert_steps = Steps_conversion.back_convert
@@ -675,7 +674,7 @@ let parallel = !opt_parallel
 
 let unit_name =
   let suffix = ".mlw" in
-  if Strings.ends_with filename suffix then
+  if Strings.has_suffix filename ~suffix then
     String.sub filename 0 (String.length filename - String.length suffix)
   else Filename.chop_extension filename
 

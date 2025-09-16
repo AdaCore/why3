@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -80,7 +80,7 @@ let do_action ~config ~env ~session action =
       Whyconf.filter_one_prover config filter_prover
     in
     let main = Whyconf.get_main config in
-    let limit =
+    let limits =
       {
         Call_provers.limit_time = Whyconf.timelimit main;
         Call_provers.limit_steps = 0;
@@ -88,7 +88,7 @@ let do_action ~config ~env ~session action =
       }
     in
     Why3session_lib.session_iter_proof_node_id_by_filter session f (fun pn ->
-        let _ = graft_proof_attempt session pn p.Whyconf.prover ~limit in
+        let _ = graft_proof_attempt session pn p.Whyconf.prover ~limits in
         ())
 
 let run_update () =

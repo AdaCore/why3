@@ -1,0 +1,21 @@
+File "bench/check-ce/let_function_logic.mlw", line 8, characters 12-24:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Valid (12 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (fatal rac error: missing value for global `g`)
+  - Abstract RAC: INCOMPLETE (fatal rac error: missing value for global `g`)
+- Checked model 1: BAD_CE
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 14, characters 10-13)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24)
+File "bench/check-ce/let_function_logic.mlw", line 12, characters 12-24:
+Sub-goal Postcondition of goal main'vc.
+Prover result is: Unknown (unknown) (17 steps).
+The following counterexample model could not be verified
+  (both RAC fatal rac error: missing value for global `g`):
+File let_function_logic.mlw:
+  Line 11:
+    y :  = 0
+    y :  = 0
+

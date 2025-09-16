@@ -8,7 +8,7 @@ Warning, file "bench/check-ce/615.mlw", line 2, characters 9-10: unused variable
   - Abstract RAC: FAILURE (check at "bench/check-ce/615.mlw", line 3, characters 12-28)
 File "bench/check-ce/615.mlw", line 3, characters 12-28:
 Sub-goal Check of goal f'vc.
-Prover result is: Unknown (sat) (179 steps).
+Prover result is: Unknown (sat) (153 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -21,15 +21,15 @@ File int.mlw:
 File 615.mlw:
   Line 2:
     t = 0
-    x = 1
+    x = (- 1)
     t = 0
-    x = 1
+    x = (- 1)
     Execution of main function `f` with env:
       t = 0
-      x = 1
+      x = (- 1)
       zero = 0
       one = 1
   Line 3:
     Property failure at check with:
-      x = 1
+      x = (- 1)
 

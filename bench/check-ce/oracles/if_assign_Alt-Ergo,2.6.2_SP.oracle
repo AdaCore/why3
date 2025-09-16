@@ -1,0 +1,200 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 10, characters 12-23)
+  - Abstract RAC: STUCK (failure in postcondition of `(:=)` at "WHY3DATA/stdlib/ref.mlw", line 20, characters 39-44)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 10, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 10, characters 12-23)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 10, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 10, characters 12-23)
+File "bench/check-ce/if_assign.mlw", line 10, characters 12-23:
+Sub-goal Postcondition of goal f'vc.
+Prover result is: Unknown (unknown) (12 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File if_assign.mlw:
+  Line 7:
+    Constant x initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    x = {contents= 0}
+  Line 9:
+    _a = 0
+    _a = 0
+    Execution of main function `f` with env:
+      x = {contents= 0}
+      _a = 0
+      zero = 0
+      one = 1
+  Line 12:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      v = 42
+  Line 13:
+    Normal execution of function `(!)` with args:
+      r = {contents= 42}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 42}
+File if_assign.mlw:
+  Line 10:
+    Property failure at postcondition of `f` with:
+      result = 42
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 16, characters 12-23)
+File "bench/check-ce/if_assign.mlw", line 16, characters 12-23:
+Sub-goal Postcondition of goal fTest1'vc.
+Prover result is: Unknown (unknown) (17 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File if_assign.mlw:
+  Line 7:
+    Constant x initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    x = {contents= 0}
+  Line 15:
+    a = 0
+    a = 0
+    Execution of main function `fTest1` with env:
+      x = {contents= 0}
+      a = 0
+      zero = 0
+      one = 1
+  Line 18:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 0
+  Line 22:
+    Normal execution of function `(!)` with args:
+      r = {contents= 42}
+File ref.mlw:
+  Line 18:
+    Normal execution of function `contents` with args:
+      arg = {contents= 42}
+File if_assign.mlw:
+  Line 16:
+    Property failure at postcondition of `fTest1` with:
+      result = 42
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+File "bench/check-ce/if_assign.mlw", line 28, characters 31-38:
+Sub-goal Assertion of goal fTest2'vc.
+Prover result is: Unknown (unknown) (12 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File if_assign.mlw:
+  Line 7:
+    Constant x initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    x = {contents= 0}
+  Line 24:
+    a = 0
+    a = 0
+    Execution of main function `fTest2` with env:
+      x = {contents= 0}
+      a = 0
+      zero = 0
+      one = 1
+  Line 27:
+    Normal execution of function `(=)` with args:
+      x = 0
+      y = 0
+  Line 28:
+    Property failure at assertion with:
+      x = {contents= 42}
+
+File "bench/check-ce/if_assign.mlw", line 30, characters 23-30:
+Sub-goal Assertion of goal fTest2'vc.
+Prover result is: Valid (9 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/if_assign.mlw", line 28, characters 31-38)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/if_assign.mlw", line 25, characters 12-23)
+File "bench/check-ce/if_assign.mlw", line 25, characters 12-23:
+Sub-goal Postcondition of goal fTest2'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File if_assign.mlw:
+  Line 7:
+    Constant x initialization
+    (giant-step) execution of unimplemented function with args:
+    result = {contents= 0}
+    x = {contents= 0}
+  Line 24:
+    a = (- 1)
+    a = (- 1)
+    Execution of main function `fTest2` with env:
+      x = {contents= 0}
+      a = (- 1)
+      zero = 0
+      one = 1
+  Line 27:
+    Normal execution of function `(=)` with args:
+      x = (- 1)
+      y = 0
+  Line 30:
+    Normal execution of function `(:=)` with args:
+      r = {contents= 0}
+      v = 18
+  Line 25:
+    Property failure at postcondition of `fTest2` with:
+      result = 17
+

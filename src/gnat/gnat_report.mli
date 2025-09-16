@@ -28,7 +28,7 @@ open Why3
    that occured during execution of gnatwhy3.
 
      result = { "id"             : int,
-                "reason"         : string,
+                "check_kind"     : string,
                 "result"         : bool,
                 "extra_info"     : extra_info,
                 "vc_file"        : string,
@@ -37,7 +37,7 @@ open Why3
                 "cntexmp"        : cntexmp_rec
                 }
 
-   The field "id" contains the id of the VC. The field "reason" identifies the
+   The field "id" contains the id of the VC. The field "check_kind" identifies the
    kind of the VC, such as "overflow_check" etc. The field "result" tells if
    the VC has been proved or not. The field "extra_info" specifies more
    precisely the part of the VC (see below). The fields "vc_file" and
@@ -90,7 +90,7 @@ open Why3
    - "old"
    - "result"
 
-   The field "proof_attempts" basically contains a copy of the session
+   The field "check_tree" basically contains a copy of the session
    tree in JSON format. It's a tree structure whose nodes are goals,
    transformations and proof attempts:
 

@@ -29,7 +29,7 @@ module BagSpec
     ghost mutable contents: bag 'a;
   } invariant { 0 <= size }
 
-  val create (dummy: 'a) : t 'a
+  val create (_dummy: 'a) : t 'a
     ensures { result.size = 0 }
     ensures { result.contents == Bag.empty }
 

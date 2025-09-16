@@ -9,199 +9,237 @@ Require map.Occ.
 Require map.MapPermut.
 
 Axiom array : forall (a:Type), Type.
-Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (array a).
+Parameter array_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
-Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
-  a)), (0%Z <= (length self))%Z.
-
-(* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  ((elts a1) i).
-
-Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
-  Z -> a -> (array a).
-
-Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
-  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
-  v)) = (map.Map.set (elts a1) i v)).
+Axiom array'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:(Z -> a)) (a2:(Z -> a))
-  (l:Z) (u:Z): Prop := forall (i:Z), ((l <= i)%Z /\ (i < u)%Z) -> ((a1
-  i) = (a2 i)).
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
+
+Parameter mixfix_lblsmnrb:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
+
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
+Axiom mixfix_lblsmnrb'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
+
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
+
+Axiom make_spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb (make n v) i) = v)) /\
+  ((length (make n v)) = n).
 
 (* Why3 assumption *)
-Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)) (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\ (((0%Z <= l)%Z /\
-  (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\ (u <= (length a1))%Z) /\
-  (map_eq_sub (elts a1) (elts a2) l u))).
+Definition map_eq_sub {a:Type} {a_WT:WhyType a} (a1:Numbers.BinNums.Z -> a)
+    (a2:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) :
+    Prop :=
+  forall (i:Numbers.BinNums.Z), (l <= i)%Z /\ (i < u)%Z -> ((a1 i) = (a2 i)).
 
 (* Why3 assumption *)
-Definition array_eq {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)): Prop := ((length a1) = (length a2)) /\ (map_eq_sub (elts a1) (elts a2)
-  0%Z (length a1)).
+Definition array_eq_sub {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a)
+    (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) : Prop :=
+  ((length a1) = (length a2)) /\
+  ((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\
+  ((0%Z <= u)%Z /\ (u <= (length a1))%Z) /\
+  map_eq_sub (elts a1) (elts a2) l u.
 
 (* Why3 assumption *)
-Definition exchange {a:Type} {a_WT:WhyType a} (a1:(Z -> a)) (a2:(Z -> a))
-  (l:Z) (u:Z) (i:Z) (j:Z): Prop := ((l <= i)%Z /\ (i < u)%Z) /\
-  (((l <= j)%Z /\ (j < u)%Z) /\ (((a1 i) = (a2 j)) /\ (((a1 j) = (a2 i)) /\
-  forall (k:Z), ((l <= k)%Z /\ (k < u)%Z) -> ((~ (k = i)) -> ((~ (k = j)) ->
-  ((a1 k) = (a2 k))))))).
-
-Axiom exchange_set : forall {a:Type} {a_WT:WhyType a}, forall (a1:(Z -> a))
-  (l:Z) (u:Z) (i:Z) (j:Z), ((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\
-  (j < u)%Z) -> (exchange a1 (map.Map.set (map.Map.set a1 i (a1 j)) j (a1 i))
-  l u i j)).
+Definition array_eq {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a) :
+    Prop :=
+  ((length a1) = (length a2)) /\
+  map_eq_sub (elts a1) (elts a2) 0%Z (length a1).
 
 (* Why3 assumption *)
-Definition exchange1 {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
-  (i:Z) (j:Z): Prop := ((length a1) = (length a2)) /\ (exchange (elts a1)
-  (elts a2) 0%Z (length a1) i j).
+Definition exchange {a:Type} {a_WT:WhyType a} (a1:Numbers.BinNums.Z -> a)
+    (a2:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z)
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z) : Prop :=
+  ((l <= i)%Z /\ (i < u)%Z) /\
+  ((l <= j)%Z /\ (j < u)%Z) /\
+  ((a1 i) = (a2 j)) /\
+  ((a1 j) = (a2 i)) /\
+  (forall (k:Numbers.BinNums.Z), (l <= k)%Z /\ (k < u)%Z -> ~ (k = i) ->
+   ~ (k = j) -> ((a1 k) = (a2 k))).
+
+Axiom exchange_set :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:Numbers.BinNums.Z -> a) (l:Numbers.BinNums.Z)
+    (u:Numbers.BinNums.Z) (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z),
+  (l <= i)%Z /\ (i < u)%Z -> (l <= j)%Z /\ (j < u)%Z ->
+  exchange a1 (map.Map.set (map.Map.set a1 i (a1 j)) j (a1 i)) l u i j.
 
 (* Why3 assumption *)
-Definition permut {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
-  (l:Z) (u:Z): Prop := ((length a1) = (length a2)) /\ (((0%Z <= l)%Z /\
-  (l <= (length a1))%Z) /\ (((0%Z <= u)%Z /\ (u <= (length a1))%Z) /\
-  (map.MapPermut.permut (elts a1) (elts a2) l u))).
+Definition exchange1 {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a)
+    (i:Numbers.BinNums.Z) (j:Numbers.BinNums.Z) : Prop :=
+  ((length a1) = (length a2)) /\
+  exchange (elts a1) (elts a2) 0%Z (length a1) i j.
 
 (* Why3 assumption *)
-Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array a))
-  (l:Z) (u:Z): Prop := (map_eq_sub (elts a1) (elts a2) 0%Z l) /\ ((permut a1
-  a2 l u) /\ (map_eq_sub (elts a1) (elts a2) u (length a1))).
+Definition permut {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a)
+    (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) : Prop :=
+  ((length a1) = (length a2)) /\
+  ((0%Z <= l)%Z /\ (l <= (length a1))%Z) /\
+  ((0%Z <= u)%Z /\ (u <= (length a1))%Z) /\
+  map.MapPermut.permut (elts a1) (elts a2) l u.
 
 (* Why3 assumption *)
-Definition permut_all {a:Type} {a_WT:WhyType a} (a1:(array a)) (a2:(array
-  a)): Prop := ((length a1) = (length a2)) /\ (map.MapPermut.permut (elts a1)
-  (elts a2) 0%Z (length a1)).
+Definition permut_sub {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a)
+    (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z) : Prop :=
+  map_eq_sub (elts a1) (elts a2) 0%Z l /\
+  permut a1 a2 l u /\ map_eq_sub (elts a1) (elts a2) u (length a1).
+
+(* Why3 assumption *)
+Definition permut_all {a:Type} {a_WT:WhyType a} (a1:array a) (a2:array a) :
+    Prop :=
+  ((length a1) = (length a2)) /\
+  map.MapPermut.permut (elts a1) (elts a2) 0%Z (length a1).
 
 (* Why3 goal *)
-Theorem exchange_permut_sub : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (a2:(array a)) (i:Z) (j:Z) (l:Z) (u:Z), (exchange1 a1
-  a2 i j) -> (((l <= i)%Z /\ (i < u)%Z) -> (((l <= j)%Z /\ (j < u)%Z) ->
-  ((0%Z <= l)%Z -> ((u <= (length a1))%Z -> (permut_sub a1 a2 l u))))).
+Theorem exchange_permut_sub {a:Type} {a_WT:WhyType a} :
+  forall (a1:array a) (a2:array a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (l:Numbers.BinNums.Z) (u:Numbers.BinNums.Z),
+  exchange1 a1 a2 i j -> (l <= i)%Z /\ (i < u)%Z ->
+  (l <= j)%Z /\ (j < u)%Z -> (0%Z <= l)%Z -> (u <= (length a1))%Z ->
+  permut_sub a1 a2 l u.
 (* Why3 intros a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7. *)
 intros a1 a2 i j l u h1 (h2,h3) (h4,h5) h6 h7.
 destruct h1 as (h11,h12).
 destruct h12 as (ha,(hb,(hc,(hd,he)))).
 red. repeat split.
 (* eq_sub *)
-red. intros. apply he; omega.
-assumption. assumption. omega. omega. assumption.
+red. intros. apply he; auto with zarith.
+assumption. assumption. auto with zarith. auto with zarith. assumption.
 (* permut *)
 red. intro v.
 
 assert (Occ.occ v (elts a1) i (i+1) + Occ.occ v (elts a1) j (j+1)
       = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) j (j+1))%Z.
 destruct (why_decidable_eq (elts a1 i) v).
-rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (i+1-1)%Z; assumption.
-rewrite (Occ.occ_right_add v (elts a2) j). 2: omega.
+rewrite Occ.occ_right_add. 2: auto with zarith. 2: ring_simplify (i+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) j). 2: auto with zarith.
   2: ring_simplify (j+1-1)%Z; rewrite <- hc; assumption.
 ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) j). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) j). 2: auto with zarith.
 destruct (why_decidable_eq (elts a1 j) v).
-rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
-rewrite (Occ.occ_right_add v (elts a2) i). 2: omega.
+rewrite Occ.occ_right_add. 2: auto with zarith. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) i). 2: auto with zarith.
   2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
 ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) i). 2: auto with zarith.
 ring.
-rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
-rewrite (Occ.occ_right_no_add v (elts a2) i). 2: omega.
+rewrite Occ.occ_right_no_add. 2: auto with zarith. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) i). 2: auto with zarith.
   2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
 ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) i). 2: auto with zarith.
 ring.
-rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (i+1-1)%Z; assumption.
-rewrite (Occ.occ_right_no_add v (elts a2) j). 2: omega.
+rewrite Occ.occ_right_no_add. 2: auto with zarith. 2: ring_simplify (i+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) j). 2: auto with zarith.
   2: ring_simplify (j+1-1)%Z; rewrite <- hc; assumption.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) j). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) j). 2: auto with zarith.
 destruct (why_decidable_eq (elts a1 j) v).
-rewrite Occ.occ_right_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
-rewrite (Occ.occ_right_add v (elts a2) i). 2: omega.
+rewrite Occ.occ_right_add. 2: auto with zarith. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_add v (elts a2) i). 2: auto with zarith.
   2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
 ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) i). 2: auto with zarith.
 ring.
-rewrite Occ.occ_right_no_add. 2: omega. 2: ring_simplify (j+1-1)%Z; assumption.
-rewrite (Occ.occ_right_no_add v (elts a2) i). 2: omega.
+rewrite Occ.occ_right_no_add. 2: auto with zarith. 2: ring_simplify (j+1-1)%Z; assumption.
+rewrite (Occ.occ_right_no_add v (elts a2) i). 2: auto with zarith.
   2: ring_simplify (i+1-1)%Z; rewrite <- hd; assumption.
 ring_simplify (i+1-1)%Z. ring_simplify (j+1-1)%Z.
-rewrite Occ.occ_empty. 2: omega. rewrite (Occ.occ_empty v (elts a2) i). 2: omega.
+rewrite Occ.occ_empty. 2: auto with zarith. rewrite (Occ.occ_empty v (elts a2) i). 2: auto with zarith.
 ring.
 
-assert (c: (i < j \/ i = j \/ j < i)%Z) by omega. destruct c as [c|c].
+generalize (Z.lt_total i j); intros [c|c].
 (* i < j *)
 assert (Occ.occ v (elts a1) l u = Occ.occ v (elts a1) l i + Occ.occ v (elts a1) i u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) i u = Occ.occ v (elts a1) i (i+1) + Occ.occ v (elts a1) (i+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) (i+1) u = Occ.occ v (elts a1) (i+1) j + Occ.occ v (elts a1) j u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) j u = Occ.occ v (elts a1) j (j+1) + Occ.occ v (elts a1) (j+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 
 assert (Occ.occ v (elts a2) l u = Occ.occ v (elts a2) l i + Occ.occ v (elts a2) i u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) i u = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) (i+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) (i+1) u = Occ.occ v (elts a2) (i+1) j + Occ.occ v (elts a2) j u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) j u = Occ.occ v (elts a2) j (j+1) + Occ.occ v (elts a2) (j+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 
 assert (Occ.occ v (elts a1) l i = Occ.occ v (elts a2) l i).
-  apply Occ.occ_eq. intros. apply he; omega.
+  apply Occ.occ_eq. intros. apply he; auto with zarith.
 assert (Occ.occ v (elts a1) (i+1) j = Occ.occ v (elts a2) (i+1) j).
-  apply Occ.occ_eq. intros; apply he; omega.
+  apply Occ.occ_eq. intros; apply he; auto with zarith.
 assert (Occ.occ v (elts a1) (j+1) u = Occ.occ v (elts a2) (j+1) u).
-  apply Occ.occ_eq. intros; apply he; omega.
+  apply Occ.occ_eq. intros; apply he; auto with zarith.
 
-omega.
+auto with zarith.
 
 (* i = j *)
 destruct c.
 subst j.
 apply Occ.occ_eq.
 intros k hk.
-assert (c: (k=i \/ k <>i)%Z) by omega. destruct c.
+generalize (Z.eq_dec k i); intros [c|c].
 subst k. assumption.
-apply he. omega. assumption. assumption.
+apply he. auto with zarith. assumption. assumption.
 
 (* j < i *)
 assert (Occ.occ v (elts a1) l u = Occ.occ v (elts a1) l j + Occ.occ v (elts a1) j u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) j u = Occ.occ v (elts a1) j (j+1) + Occ.occ v (elts a1) (j+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) (j+1) u = Occ.occ v (elts a1) (j+1) i + Occ.occ v (elts a1) i u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a1) i u = Occ.occ v (elts a1) i (i+1) + Occ.occ v (elts a1) (i+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 
 assert (Occ.occ v (elts a2) l u = Occ.occ v (elts a2) l j + Occ.occ v (elts a2) j u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) j u = Occ.occ v (elts a2) j (j+1) + Occ.occ v (elts a2) (j+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) (j+1) u = Occ.occ v (elts a2) (j+1) i + Occ.occ v (elts a2) i u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 assert (Occ.occ v (elts a2) i u = Occ.occ v (elts a2) i (i+1) + Occ.occ v (elts a2) (i+1) u)%Z.
-  apply Occ.occ_append. omega.
+  apply Occ.occ_append. auto with zarith.
 
 assert (Occ.occ v (elts a1) l j = Occ.occ v (elts a2) l j).
-  apply Occ.occ_eq. intros. apply he; omega.
+  apply Occ.occ_eq. intros. apply he; auto with zarith.
 assert (Occ.occ v (elts a1) (j+1) i = Occ.occ v (elts a2) (j+1) i).
-  apply Occ.occ_eq. intros; apply he; omega.
+  apply Occ.occ_eq. intros; apply he; auto with zarith.
 assert (Occ.occ v (elts a1) (i+1) u = Occ.occ v (elts a2) (i+1) u).
-  apply Occ.occ_eq. intros; apply he; omega.
+  apply Occ.occ_eq. intros; apply he; auto with zarith.
 
-omega.
+auto with zarith.
 
 (* eq_sub *)
-red. intros. apply he; omega.
+red. intros. apply he; auto with zarith.
 Qed.
+

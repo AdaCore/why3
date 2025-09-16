@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -59,8 +59,8 @@ val return_prover: string -> Whyconf.config -> Whyconf.config_prover option
 
 type command =
   | Transform    of string * Trans.gentrans * string list
-  | Strat        of string * (Env.env -> Task.task -> Strategy.strat)
-  | Prove        of Whyconf.config_prover * Call_provers.resource_limit
+  | Strat        of string * Strategy.gen_strat * string list
+  | Prove        of Whyconf.config_prover * Call_provers.resource_limits
   | Strategies   of string
   | Edit         of Whyconf.prover
   | Get_ce

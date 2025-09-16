@@ -1,0 +1,51 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call4.mlw", line 8, characters 12-21)
+  - Abstract RAC: STUCK (failure in postcondition of `g` at "bench/check-ce/func_call4.mlw", line 8, characters 12-21)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/func_call4.mlw", line 11, characters 25-30)
+File "bench/check-ce/func_call4.mlw", line 11, characters 25-30:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (15 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File func_call4.mlw:
+  Line 4:
+    Constant z initialization
+    (giant-step) execution of unimplemented function with args:
+    result = 0
+    Normal execution of function `ref` with args:
+      contents = 0
+    Normal execution of function `ref'mk` with args:
+      contents = 0
+    z = {contents= 0}
+Unknown location:
+    _ = ()
+File func_call4.mlw:
+  Line 10:
+    _ = ()
+    Execution of main function `f` with env:
+      z = {contents= 0}
+      _ = ()
+      zero = 0
+      one = 1
+  Line 11:
+    Normal execution of function `Tuple0` with args:
+    (giant-step) execution of unimplemented function `g`
+      _ = ()
+    z = {contents= 2}
+    result of `g` = ()
+    Property failure at assertion with:
+      z = {contents= 2}
+

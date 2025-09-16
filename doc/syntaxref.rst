@@ -1147,6 +1147,7 @@ assertion is only making use of field access, so there is no need to
 reestablish the invariant.
 
 .. index:: private type
+.. index:: pair: keyword; private
 .. rubric:: Private types
 
 A record type can be declared ``private``, as follows:
@@ -1196,6 +1197,7 @@ If needed, we could even add invariants (e.g., the sequence ``s`` is
 sorted in a priority queue).
 
 .. index:: abstract type
+.. index:: pair: keyword; abstract
 
 When a private record type only has ghost fields, one can use
 ``abstract`` as a convenient shortcut:
@@ -1434,6 +1436,11 @@ This type is used in the standard library in the theories
 Function declarations
 ^^^^^^^^^^^^^^^^^^^^^
 
+.. index:: pair: keyword; let
+.. index:: pair: keyword; val
+.. index:: pair: keyword; function
+.. index:: pair: keyword; predicate
+
 ``let``
    Definition of a program function, with prototype, contract, and body
 
@@ -1477,12 +1484,44 @@ Function declarations
    property by induction directly in Why3, without resorting to an
    external higher-order proof assistant.
 
+.. index:: pair: keyword; ghost
+.. index:: pair: keyword; partial
+
 Program functions (defined with ``let`` or declared with ``val``) can
 additionally be marked ``ghost``, meaning that they can only be used
 in the ghost code and never translated into executable code ; or
 ``partial``, meaning that their execution can produce observable
 effects unaccounted by their specification, and thus they cannot be
 used in the ghost code.
+
+The following table summarizes the various kinds of declarations and,
+for each, indicates whether they can be used in programs, in ghost
+code, and in logic:
+
++----------------------------------+----------+------------+--------+
+| declaration                      | programs | ghost code | logic  |
++==================================+==========+============+========+
+| ``let`` (pure)                   |    ✓     |      ✓     |        |
++----------------------------------+----------+------------+--------+
+| ``let`` (with non-ghost effects) |    ✓     |            |        |
++----------------------------------+----------+------------+--------+
+| ``let partial``                  |    ✓     |            |        |
++----------------------------------+----------+------------+--------+
+| ``function``                     |          |      ✓     |    ✓   |
++----------------------------------+----------+------------+--------+
+| ``let function``                 |    ✓     |      ✓     |    ✓   |
++----------------------------------+----------+------------+--------+
+| ``let ghost/lemma``              |          |      ✓     |        |
++----------------------------------+----------+------------+--------+
+| ``let ghost function``           |          |      ✓     |    ✓   |
++----------------------------------+----------+------------+--------+
+
+The only combinations missing are that of a declaration
+
+- only in the logic, since any logic declaration can be used in ghost code;
+- in programs and in logic but not in ghost code, for the same reason.
+
+.. index:: pair: keyword; rec
 
 Recursive program functions must be defined using ``let rec``.
 

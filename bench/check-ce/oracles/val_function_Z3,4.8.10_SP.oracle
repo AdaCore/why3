@@ -7,20 +7,15 @@
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `f` cannot be evaluated)
 File "bench/check-ce/val_function.mlw", line 7, characters 12-24:
 Sub-goal Postcondition of goal main_f'vc.
-Prover result is: Unknown (sat) (203 steps).
+Prover result is: Unknown (sat) (170 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `f` cannot be evaluated):
 File val_function.mlw:
-  Line 4:
-    f : int -> int = [|2 => 42; _ => 42|]
   Line 6:
+    y :  = 2
     y : int = 2
-  Line 7:
-    result : int = 42
-    result : int = 42
   Line 9:
     result of call at line 9, characters 2-5 : int = 42
-    result : int = 42
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -31,7 +26,7 @@ File val_function.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/val_function.mlw", line 16, characters 12-24)
 File "bench/check-ce/val_function.mlw", line 16, characters 12-24:
 Sub-goal Postcondition of goal main_g'vc.
-Prover result is: Unknown (sat) (822 steps).
+Prover result is: Unknown (sat) (787 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -44,6 +44,13 @@ let pat_var ?loc id = pat ?loc (Pvar id)
 let tconst ?loc i = term ?loc (Tconst (const i))
 
 
+
+
+let break_id    = "'Break"
+let continue_id = "'Continue"
+let return_id   = "'Return"
+
+
 let expr ?(loc=Loc.dummy_position) e = { expr_desc = e; expr_loc = loc }
 
 let econst ?loc i = expr ?loc (Econst (const i))
@@ -71,6 +78,15 @@ let use ?(loc=Loc.dummy_position) ~import l =
   let qid_id_opt = (qualid l, None) in
   Duseimport(loc,import,[qid_id_opt])
 
+let global_var_decl ty id =
+  let v =
+    Eany([], Expr.RKnone, Some ty, pat Pwild, Ity.MaskVisible, empty_spec)
+  in
+  let body = expr (Eapply(expr Eref, expr v)) in
+  let attrs = [ATstr Pmodule.ref_attr] in
+  let id_x = ident ~attrs id in
+  id_x, Dlet (id_x, false, Expr.RKnone, body)
+
 let prop k ?loc id t =
   Dprop(k,ident ?loc id,t)
 
@@ -79,8 +95,9 @@ module F = struct
   type state = { modules : (ident * decl list) list ;
                  module_id : ident option;
                  decls : decl list;
-                 fun_head : (bool * pty option * ident * binder list) option;
+                 fun_head : (bool * bool * pty option * ident * binder list) option;
                  spec_pre : term list;
+                 spec_writes : term list;
                  spec_post : term list;
                }
 
@@ -93,6 +110,7 @@ module F = struct
                     decls = [];
                     fun_head = None;
                     spec_pre = [];
+                    spec_writes = [];
                     spec_post = [];
                   }
 
@@ -119,17 +137,30 @@ module F = struct
        let d = prop k ?loc id t in
        { s with decls = d :: s.decls }
 
-  let begin_let s ?(ghost=false) ?ret_type id params =
+  let add_global_var_decl s ty id =
     match s.fun_head with
     | Some _ -> invalid_use "begin_let: function declaration already in progress"
     | None ->
-       { s with fun_head = Some (ghost,ret_type,(ident id), params) }
+        let id,d = global_var_decl ty id in
+        id, { s with decls = d :: s.decls }
+
+  let begin_let s ?(ghost=false) ?(diverges=false) ?ret_type id params =
+    match s.fun_head with
+    | Some _ -> invalid_use "begin_let: function declaration already in progress"
+    | None ->
+       { s with fun_head = Some (ghost,diverges,ret_type,(ident id), params) }
 
   let add_pre s t =
     match s.fun_head with
     | None -> invalid_use "add_pre: no function declaration in progress"
     | Some _ ->
        { s with spec_pre = t :: s.spec_pre }
+
+  let add_writes s w =
+    match s.fun_head with
+    | None -> invalid_use "add_pre: no function declaration in progress"
+    | Some _ ->
+       { s with spec_writes = w @ s.spec_writes }
 
   let add_post s t =
     match s.fun_head with
@@ -140,7 +171,7 @@ module F = struct
   let add_body s e =
     match s.fun_head with
     | None -> invalid_use "add_body: no function declaration in progress"
-    | Some (ghost,ret_type,id,params) ->
+    | Some (ghost,diverges,ret_type,id,params) ->
        let pres = List.rev s.spec_pre in
        let posts =
          List.rev_map (fun t -> (Loc.dummy_position,[pat Pwild,t])) s.spec_post
@@ -154,7 +185,7 @@ module F = struct
            sp_alias = [];
            sp_variant = [];
            sp_checkrw = false;
-           sp_diverge = false;
+           sp_diverge = diverges;
            sp_partial = false;
          }
        in
@@ -201,11 +232,18 @@ module I = struct
   let add_prop k ?loc id t =
     st := F.add_prop !st k ?loc id t
 
-  let begin_let ?(ghost=false) ?ret_type id params =
-    st := F.begin_let !st ~ghost ?ret_type id params
+  let add_global_var_decl ty id =
+    let id,s = F.add_global_var_decl !st ty id in
+    st := s; id
+
+  let begin_let ?(ghost=false) ?(diverges=false) ?ret_type id params =
+    st := F.begin_let !st ~ghost ~diverges ?ret_type id params
 
   let add_pre t =
     st := F.add_pre !st t
+
+  let add_writes w =
+    st := F.add_writes !st w
 
   let add_post t =
     st := F.add_post !st t

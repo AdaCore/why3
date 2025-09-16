@@ -52,7 +52,7 @@ let lemma pow_mon (b x y:int)
                    = power b x }
   else pow_mon_strict b x y
 
-let wmpz_get_str (sp: ptr char) (ghost sz:int32)
+let partial wmpz_get_str (sp: ptr char) (ghost sz:int32)
                  (base:int32) (u: mpz_ptr) : ptr char
   requires { valid sp sz }
   requires { writable sp }
@@ -118,7 +118,7 @@ let wmpz_get_str (sp: ptr char) (ghost sz:int32)
   then begin
     value_tail up (un-1);
     let ghost um = C.get_ofs up (un - 1) in
-    let ghost sb = wmpn_limb_size_in_base_2 um in
+    let (ghost sb) = wmpn_limb_size_in_base_2 um in
     let ghost ub = 64 * (un - 1) + (Limb.to_int32 sb) in
     assert { power 2 (ub - 1) <= value up un < power 2 ub
              by value up un < power radix (un - 1) + power radix (un - 1) * um

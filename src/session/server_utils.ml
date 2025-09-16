@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -279,7 +279,7 @@ let return_prover name config =
 type command_prover =
   | Bad_Arguments of Whyconf.prover
   | Not_Prover
-  | Prover of (Whyconf.config_prover * Call_provers.resource_limit)
+  | Prover of (Whyconf.config_prover * Call_provers.resource_limits)
 
 (* Parses the Other command. If it fails to parse it, it answers None otherwise
    it returns the config of the prover together with the ressource_limit *)
@@ -295,18 +295,17 @@ let parse_prover_name config name args : command_prover =
         | [] ->
             let limit_time = Whyconf.timelimit (Whyconf.get_main config) in
             let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
-            let default_limit = Call_provers.{empty_limit with
-                                              limit_time = limit_time;
-                                              limit_mem = limit_mem} in
+            let default_limit = Call_provers.{empty_limits with
+                                              limit_time ; limit_mem} in
             Prover (prover_config, default_limit)
         | [timeout] ->
             let limit_mem = Whyconf.memlimit (Whyconf.get_main config) in
             Prover (prover_config,
-                    Call_provers.{empty_limit with
+                    Call_provers.{empty_limits with
                                   limit_time = float_of_string timeout;
-                                  limit_mem = limit_mem})
+                                  limit_mem })
         | [timeout; oom ] ->
-            Prover (prover_config, Call_provers.{empty_limit with
+            Prover (prover_config, Call_provers.{empty_limits with
                                                  limit_time = float_of_string timeout;
                                                  limit_mem = int_of_string oom})
         | _ -> Bad_Arguments prover
@@ -361,8 +360,8 @@ let split_args s =
 
 type command =
   | Transform    of string * Trans.gentrans * string list
-  | Strat        of string * (Env.env -> Task.task -> Strategy.strat)
-  | Prove        of Whyconf.config_prover * Call_provers.resource_limit
+  | Strat        of string * Strategy.gen_strat * string list
+  | Prove        of Whyconf.config_prover * Call_provers.resource_limits
   | Strategies   of string
   | Edit         of Whyconf.prover
   | Get_ce
@@ -462,7 +461,7 @@ let interp commands_table cont id s =
                 let s = List.hd (Strings.split '\n' s) in
                 let s = Strategy.lookup_strat s in
                 match id with
-                | Some (Session_itp.APn _) -> Strat(cmd, s)
+                | Some (Session_itp.APn _) -> Strat(cmd, s, args)
                 | _ -> QError ("Please select a goal or trans node in the task tree")
               with | Strategy.UnknownStrat _ ->
                match cmd, args with

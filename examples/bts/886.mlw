@@ -1,0 +1,27 @@
+
+module M_regression__produces_trans
+
+  type t
+
+  type u
+
+  use seq.Seq
+
+  function to_mut_seq'0 (self : t) : Seq.seq u
+
+  predicate produces'0 (self : t) (visited : Seq.seq u) (tl : t) =
+    to_mut_seq'0 self = Seq.(++) visited (to_mut_seq'0 tl)
+
+  constant a  : t
+
+  constant ab  : Seq.seq u
+
+  constant b  : t
+
+  constant bc  : Seq.seq u
+
+  constant c  : t
+
+  goal vc_produces_trans :
+   (produces'0 b bc c) -> (produces'0 a ab b) -> (produces'0 a (Seq.(++) ab bc) c)
+end

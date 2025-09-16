@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -201,10 +201,10 @@ let expl_type_inv  = Ident.create_attribute "expl:type invariant"
 let expl_divergent = Ident.create_attribute "expl:termination"
 
 let print_expl fmt expl =
-  Format.pp_print_string fmt (Strings.remove_prefix "expl:" expl.attr_string)
+  Format.pp_print_string fmt (Strings.remove_prefix ~prefix:"expl:" expl.attr_string)
 
 let attrs_has_expl attrs =
-  Sattr.exists (fun a -> Strings.has_prefix "expl:" a.attr_string) attrs
+  Sattr.exists (fun a -> Strings.has_prefix ~prefix:"expl:" a.attr_string) attrs
 
 let annot_attrs = Sattr.add stop_split (Sattr.singleton annot_attr)
 

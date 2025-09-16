@@ -1,0 +1,73 @@
+File bench/check-ce/array_mono.mlw:
+Goal array'vc.
+Prover result is: Valid (2 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `([])` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `([])` cannot be evaluated)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/array_mono.mlw", line 36, characters 4-8)
+File "bench/check-ce/array_mono.mlw", line 36, characters 4-8:
+Sub-goal Index in array bounds of goal f1'vc.
+Prover result is: Unknown (unknown) (4 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File array_mono.mlw:
+  Line 35:
+    a = {elts= UNDEFINED; length= 0}
+    a = {elts= UNDEFINED; length= 0}
+    Execution of main function `f1` with env:
+      a = {elts= UNDEFINED; length= 0}
+      zero = 0
+      one = 1
+  Line 36:
+    (giant-step) execution of unimplemented function `([])`
+      a = {elts= UNDEFINED; length= 0}
+      i = 0
+    Property failure at precondition of `([])` with:
+      a = {elts= UNDEFINED; length= 0}
+      i = 0
+
+File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
+Sub-goal Index in array bounds of goal f2'vc.
+Prover result is: Valid (2 steps).
+
+Warning: Error while interpreting elts: No variable in bound_vars matching qualified identifier (Qident (Isymbol a1))
+
+Warning: Error while interpreting elts: No variable in bound_vars matching qualified identifier (Qident (Isymbol a1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Precondition of `f2` cannot be evaluated)
+- Checked model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
+- Selected model 2: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Postcondition of `([]<-)` cannot be evaluated)
+File "bench/check-ce/array_mono.mlw", line 40, characters 14-26:
+Sub-goal Postcondition of goal f2'vc.
+Prover result is: Unknown (unknown) (45 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Postcondition of `([]<-)` cannot be evaluated):
+File array_mono.mlw:
+  Line 38:
+    a :  = {elts = "undefined"; length = 2}
+    a : array = {elts = "undefined"; length = 2}
+  Line 41:
+    a : array = {elts = "undefined"; length = 2}
+    result :  = Tuple0
+

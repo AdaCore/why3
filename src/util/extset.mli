@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -136,6 +136,9 @@ module type S =
 
     val fold_left : ('b -> elt -> 'b) -> 'b -> t -> 'b
     (** same as {!fold} but in the order of [List.fold_left] *)
+
+    val fold_right : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    (** same as {!fold} but in the right-to-left direction *)
 
     val fold2_inter : (elt -> 'a -> 'a) -> t -> t -> 'a -> 'a
     (** [fold2_inter f s1 s2 a] computes [(f eN ... (f e1 a) ...)],

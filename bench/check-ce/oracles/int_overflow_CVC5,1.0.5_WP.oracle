@@ -45,16 +45,17 @@ File int_overflow.mlw:
   - Abstract RAC: INCOMPLETE (terminated because Postcondition of `test2'goal1` cannot be evaluated)
 File "bench/check-ce/int_overflow.mlw", line 14, characters 27-38:
 Goal test2.
-Prover result is: Unknown (unknown + incomplete) (111909 steps).
+Prover result is: Unknown (unknown + incomplete) (98813 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `test2'goal1` cannot be evaluated):
 File int_overflow.mlw:
   Line 14:
+    x :  = 0
     x : int = 0
 
 File "bench/check-ce/int_overflow.mlw", line 19, characters 43-53:
 Goal test_overflow.
-Prover result is: Valid (3374 steps).
+Prover result is: Valid (116 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -65,7 +66,7 @@ Prover result is: Valid (3374 steps).
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 19, characters 48-62:
 Goal test_overflow.
-Prover result is: Unknown (unknown + incomplete) (110188 steps).
+Prover result is: Unknown (sat) (140 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -78,7 +79,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 24, characters 45-56:
 Goal test_overflow2.
-Prover result is: Unknown (unknown + incomplete) (110232 steps).
+Prover result is: Unknown (sat) (141 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -91,7 +92,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 24, characters 51-65:
 Goal test_overflow2.
-Prover result is: Unknown (unknown + incomplete) (110198 steps).
+Prover result is: Unknown (sat) (140 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -104,7 +105,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 31, characters 33-49)
 File "bench/check-ce/int_overflow.mlw", line 31, characters 33-49:
 Goal test_overflow_int16.
-Prover result is: Unknown (unknown + incomplete) (110591 steps).
+Prover result is: Unknown (sat) (205 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -143,7 +144,7 @@ File int_overflow.mlw:
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 36, characters 54-67:
 Goal test_overflow_int16_alt.
-Prover result is: Unknown (unknown + incomplete) (110262 steps).
+Prover result is: Unknown (sat) (141 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -156,7 +157,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 36, characters 64-76:
 Goal test_overflow_int16_alt.
-Prover result is: Unknown (unknown + incomplete) (110203 steps).
+Prover result is: Unknown (sat) (140 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -169,7 +170,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 42, characters 29-45)
 File "bench/check-ce/int_overflow.mlw", line 42, characters 29-45:
 Goal test_overflow_int16_bis.
-Prover result is: Unknown (unknown + incomplete) (110428 steps).
+Prover result is: Unknown (sat) (254 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -208,7 +209,7 @@ File int_overflow.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 49, characters 33-49)
 File "bench/check-ce/int_overflow.mlw", line 49, characters 33-49:
 Goal test_overflow_int32.
-Prover result is: Unknown (unknown + incomplete) (110591 steps).
+Prover result is: Unknown (sat) (205 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -247,7 +248,7 @@ File int_overflow.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/int_overflow.mlw", line 54, characters 48-64)
 File "bench/check-ce/int_overflow.mlw", line 54, characters 48-64:
 Goal test_overflow_int32_bis.
-Prover result is: Unknown (unknown + incomplete) (110428 steps).
+Prover result is: Unknown (sat) (254 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -279,7 +280,7 @@ File int_overflow.mlw:
 
 File "bench/check-ce/int_overflow.mlw", line 59, characters 88-108:
 Goal test_overflow_int32_bis_inline.
-Prover result is: Valid (3421 steps).
+Prover result is: Valid (163 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -290,7 +291,7 @@ Prover result is: Valid (3421 steps).
   - Abstract RAC: FAILURE (postcondition at unknown location)
 File "bench/check-ce/int_overflow.mlw", line 59, characters 103-122:
 Goal test_overflow_int32_bis_inline.
-Prover result is: Unknown (unknown + incomplete) (110331 steps).
+Prover result is: Unknown (sat) (178 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

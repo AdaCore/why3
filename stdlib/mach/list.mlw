@@ -1,0 +1,51 @@
+
+(** {1 extra list functions dedicated to OCaml extraction} *)
+
+module OCaml
+
+use list.List
+use list.Length
+use int.Int
+use mach.int.Int63
+
+
+let length_defensive (l: list 'a) : int63
+  requires { Length.length l <= int63'maxInt }
+  ensures { result = Length.length l }
+= let rec aux (n:int63) (l:list 'a) : int63
+    requires { n + Length.length l <= int63'maxInt }
+    variant { l }
+    ensures { result = n + Length.length l }
+  = match l with
+    | Nil -> n
+    | Cons _ rem -> aux (n+1) rem
+    end
+  in
+  aux 0 l
+
+(** return the length of a list as an machine integer.  in principle
+    this function is not realizable, but with the "Peano" implicit
+    assumption one can admit that nobody can ever built a list with
+    more than 2^63 elements
+
+    See also library `mach.peano`
+*)
+
+use mach.peano.Peano
+
+let rec length_peano (l: list 'a) : Peano.t
+  variant { l }
+  ensures { result = Length.length l }
+= match l with
+  | Nil -> Peano.zero
+  | Cons _ rem -> Peano.succ (length_peano rem)
+  end
+
+use mach.peano.Int63
+
+let partial length (l: list 'a) : int63
+  ensures { result = Length.length l }
+= to_int63 (length_peano l)
+
+
+end

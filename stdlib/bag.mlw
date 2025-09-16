@@ -25,6 +25,8 @@ module Bag
 
   axiom bag_extensionality: forall a b: bag 'a. a == b -> a = b
 
+  meta extensionality predicate (==)
+
   (** basic constructors of bags *)
 
   function empty_bag: bag 'a

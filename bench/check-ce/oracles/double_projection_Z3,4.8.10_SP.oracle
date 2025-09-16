@@ -2,29 +2,10 @@
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for c`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for c`)
-- Selected model 1: INCOMPLETE
+- Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for c`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for c`)
 File "bench/check-ce/double_projection.mlw", line 19, characters 15-22:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Unknown (sat) (205 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Cannot prove termination for c`):
-File double_projection.mlw:
-  Line 8:
-    d :
-      t
-      ->
-      int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 0; _ => 0|]
-  Line 12:
-    c :
-      t
-      ->
-      int = [|epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1 => 1; _ => 1|]
-  Line 17:
-    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
-  Line 19:
-    x : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
-  Line 21:
-    _t : t = epsilon x. (Test.d x) = 0 /\ (Test.c x) = 1
+Prover result is: Unknown (sat) (179 steps).
 

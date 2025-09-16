@@ -19,6 +19,7 @@ updateoracle=false
 removeoutfile=true
 debug=false
 files=""
+petiot=1
 failed=""
 
 function usage() {
@@ -42,6 +43,9 @@ Options:
   --suffix <s>
     The suffix <s> is appended on the Why3 executable name, e.g. '.opt'.
     Default: $SUFFIX
+
+  --debug
+    Prints the why3 command used
 EOF
 }
 
@@ -66,13 +70,25 @@ while test $# != 0; do
       SUFFIX="$2"
       shift 2
       ;;
+    --debug)
+      debug=true
+      shift 1
+      ;;
     "-"*)
       echo "unknown option: $1"
       usage
       exit 2
       ;;
+    "petiot")
+        files="$files "
+        petiot=2
+        shift 1
+        ;;
     *)
-      files="$files $1"
+	files="$files $1"
+	if test "$petiot" = 1; then
+            petiot=0
+        fi
       shift 1
   esac
 done
@@ -86,6 +102,7 @@ readonly SUFFIX
 readonly removeoutfile
 readonly updateoracle
 readonly files
+readonly petiot
 
 # Path to the why3 binary
 WHY3_BIN="$SCRIPT_DIR"/../bin/why3"$SUFFIX"
@@ -171,8 +188,8 @@ run () {
   # (note that stack trace may be more detailed with bytecode)
   record_time
   cmd="$WHY3_BIN prove -a split_vc -P $prover \
-      --stepslimit=$steps --timelimit=10 \
-      --rac-steplimit=$steps --rac-timelimit=10 \
+      --stepslimit=$steps --timelimit=5 \
+      --rac-steplimit=$racsteps --rac-timelimit=2 \
       --check-ce --rac-prover=$1 --ce-log-verbosity=5 \
       --library=$2 ${file_path}.mlw \
       --debug=check_ce:categorization${debug_vc_sp}"
@@ -217,6 +234,7 @@ for file in $files; do
     altergosteps=10000
     altergostepsrac=$altergosteps
     skipae=no
+    skipcvc4=no
     cvc4steps=150000
     cvc4stepsrac=$cvc4steps
     cvc5steps=150000
@@ -226,38 +244,89 @@ for file in $files; do
     case "$filebase" in
       "640_no_loc_failure")
           z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "657")
           z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "668_projection")
           z3steps=500000
+          z3stepsrac=$z3steps
+          ;;
+      "703_reduce_term")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          z3steps=500000
+          z3stepsrac=$z3steps
+          ;;
+      "algebraic_types_mono")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "algebraic_types_poly")
+          skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "anonymous3")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "anonymous5")
+          z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "array_records_poly")
           skipae=yes
+          skipcvc4=yes
           ;;
       "array_records_mono")
           z3stepsrac=100
+          z3stepsrac=$z3steps
+          skipae=yes
           ;;
       "array_mono")
+          skipae=yes
           z3steps=100000
+          z3stepsrac=$z3steps
           ;;
       "bv32")
-          z3steps=2500000
+          z3steps=500000
+          z3stepsrac=$z3steps
           ;;
       "bv32_mono")
           z3steps=100000
+          z3stepsrac=$z3steps
           ;;
       "bv32_toBig")
           z3steps=100000
+          z3stepsrac=$z3steps
+          ;;
+      "call-val-function")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "falseCE")
+          skipae=yes
+          altergosteps=7500
+          altergostepsrac=$altergosteps
+          ;;
+      "float_div")
+          skipae=yes
           ;;
       "floats")
+          skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           cvc5stepsrac=10000
           z3steps=100000
           z3stepsrac=10000
           ;;
       "int_overflow")
+          skipae=yes
           z3steps=400000
+          z3stepsrac=$z3steps
           ;;
       "jlamp0_mono")
           skipae=yes
@@ -265,24 +334,53 @@ for file in $files; do
       "jlamp0_poly")
           skipae=yes
           ;;
+      "let_function_logic")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
+      "lists")
+          skipae=yes
+          altergosteps=1000
+          altergostepsrac=$altergosteps
+          ;;
       "loop_inv_int_mono")
           skipae=yes
           ;;
       "loop_inv_real")
           z3steps=1000000
+          z3stepsrac=$z3steps
+          ;;
+      "map_of_algebraic")
+          z3steps=50000
+          z3stepsrac=$z3steps
           ;;
       "maps_mono")
-          altergosteps=100
+          altergosteps=1000
           altergostepsrac=$altergosteps
+          cvc5steps=5000
+          cvc5stepsrac=$cvc5steps
           ;;
       "maps_poly")
-          cvc5steps=300000
+          cvc5steps=15000
+          cvc5stepsrac=$cvc5steps
           ;;
       "strings")
           z3steps=3000
+          z3stepsrac=$z3steps
+          ;;
+      "test_result_ce_value2")
+          skipae=yes
+          ;;
+      "test_result_ce_value2")
+          skipae=yes
           ;;
       "threshold")
           z3steps=500000
+          z3stepsrac=$z3steps
+          ;;
+      "val_function")
+          altergosteps=1000
+          altergostepsrac=$altergosteps
           ;;
       "while_mono")
           skipae=yes
@@ -291,13 +389,17 @@ for file in $files; do
           ;;
     esac
     if [ "$skipae" = "yes" ] ; then
-          echo "Skipping unreproducible run of Alt-Ergo 2.5.2 on $filedir/$filebase.mlw";
+          echo "Skipping unreproducible run of Alt-Ergo 2.6.2 on $filedir/$filebase.mlw";
     else
-      run Alt-Ergo,2.5.2 $filedir $filebase true  $altergosteps $altergostepsrac
-      run Alt-Ergo,2.5.2 $filedir $filebase false  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.2 $filedir $filebase true  $altergosteps $altergostepsrac
+      run Alt-Ergo,2.6.2 $filedir $filebase false  $altergosteps $altergostepsrac
     fi
-    run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
-    run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    if [ "$skipcvc4" = "yes" ] ; then
+          echo "Skipping unreproducible run of CVC4 1.8 on $filedir/$filebase.mlw";
+    else
+        run CVC4,1.8       $filedir $filebase true  $cvc4steps $cvc4stepsrac
+        run CVC4,1.8       $filedir $filebase false $cvc4steps $cvc4stepsrac
+    fi
     run CVC5,1.0.5     $filedir $filebase true  $cvc5steps $cvc5stepsrac
     run CVC5,1.0.5     $filedir $filebase false $cvc5steps $cvc5stepsrac
     run Z3,4.8.10      $filedir $filebase true  $z3steps $z3stepsrac
@@ -305,13 +407,13 @@ for file in $files; do
   # fi
 done
 
-# Check the reproduction of the experiments by Petiot (2018).
 if $updateoracle; then
   updatearg="--updateoracle"
 else
   updatearg=""
 fi
 
+# Check the reproduction of the experiments by Petiot (2018).
 # $1 = prover
 # $2 = stepslimit
 petiot () {
@@ -322,10 +424,12 @@ bench/check-ce/petiot2018/experiments.sh \
 if [ $? = 1 ]; then failed="${failed}Petiot experiments with $1.\n"; fi
 }
 
-petiot Alt-Ergo,2.5.2  10000
-petiot Z3,4.8.10  500000
-petiot CVC4,1.8 10000
-petiot CVC5,1.0.5 10000
+if test "$petiot" -gt 0; then
+    petiot Alt-Ergo,2.6.2  10000
+    petiot Z3,4.8.10  500000
+    petiot CVC4,1.8 10000
+    petiot CVC5,1.0.5 10000
+fi
 
 end=$(date +%s)
 

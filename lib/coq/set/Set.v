@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,6 +16,7 @@ Require BuiltIn.
 Require HighOrd.
 Require map.Map.
 Require map.Const.
+Require map.MapExt.
 
 Require Import ClassicalEpsilon.
 
@@ -43,30 +44,7 @@ Definition mem {a:Type} {a_WT:WhyType a} (x:a) (s:a -> Init.Datatypes.bool) :
 
 Hint Unfold mem : core.
 
-(* Why3 assumption *)
-Definition infix_eqeq {a:Type} {a_WT:WhyType a} (s1:a -> Init.Datatypes.bool)
-    (s2:a -> Init.Datatypes.bool) : Prop :=
-  forall (x:a), mem x s1 <-> mem x s2.
-
-Notation "x == y" := (infix_eqeq x y) (at level 70, no associativity).
-
-(* Why3 goal *)
-Lemma extensionality {a:Type} {a_WT:WhyType a} :
-  forall (s1:a -> Init.Datatypes.bool) (s2:a -> Init.Datatypes.bool),
-  infix_eqeq s1 s2 -> (s1 = s2).
-Proof.
-intros s1 s2 h1.
-apply predicate_extensionality.
-intros x.
-generalize (h1 x).
-unfold mem.
-intros [h2 h3].
-destruct (s1 x).
-now rewrite h2.
-destruct (s2 x).
-now apply h3.
-easy.
-Qed.
+Notation "x == y" := (MapExt.infix_eqeq x y) (at level 70, no associativity).
 
 (* Why3 assumption *)
 Definition subset {a:Type} {a_WT:WhyType a} (s1:a -> Init.Datatypes.bool)
@@ -137,7 +115,7 @@ Lemma add_remove {a:Type} {a_WT:WhyType a} :
    = s).
 Proof.
 intros x s h1.
-apply extensionality; intro y.
+apply MapExt.extensionality; intro y.
 unfold mem, Map.set. unfold mem in h1.
 destruct (why_decidable_eq x y) as [->|H] ; intuition.
 Qed.
@@ -149,7 +127,7 @@ Lemma remove_add {a:Type} {a_WT:WhyType a} :
    = (map.Map.set s x Init.Datatypes.false)).
 Proof.
 intros x s.
-apply extensionality; intro y.
+apply MapExt.extensionality; intro y.
 unfold mem, Map.set.
 destruct (why_decidable_eq x y) as [->|H] ; intuition.
 Qed.
@@ -349,18 +327,13 @@ intros s1 s2.
 unfold disjoint, diff.
 unfold mem.
 intuition.
-apply (extensionality _ s1). unfold infix_eqeq.
-unfold mem.
-intuition.
-destruct (H x); intuition.
-rewrite Bool.andb_true_iff in H0. intuition.
-rewrite Bool.andb_true_iff in H0. intuition.
-rewrite Bool.andb_true_iff.
-intuition.
-destruct (H x); intuition.
-rewrite <- H.
-rewrite Bool.andb_true_iff.
-destruct (s2 x); intuition.
+- apply (MapExt.extensionality _ s1). unfold MapExt.infix_eqeq.
+  intro x.
+  generalize (H x); clear H; intro H.
+  destruct (s1 x); destruct (s2 x); intuition.
+- rewrite <- H.
+  rewrite Bool.andb_true_iff.
+  destruct (s2 x); intuition.
 Qed.
 
 (* Why3 goal *)

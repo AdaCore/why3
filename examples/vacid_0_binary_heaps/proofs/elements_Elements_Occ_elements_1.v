@@ -11,7 +11,8 @@ Axiom bag : forall (a:Type), Type.
 Parameter bag_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (bag a).
 Existing Instance bag_WhyType.
 
-Parameter nb_occ: forall {a:Type} {a_WT:WhyType a}, a -> (bag a) -> Z.
+Parameter nb_occ:
+  forall {a:Type} {a_WT:WhyType a}, a -> bag a -> Numbers.BinNums.Z.
 
 Axiom occ_non_negative :
   forall {a:Type} {a_WT:WhyType a},
@@ -22,12 +23,12 @@ Definition mem {a:Type} {a_WT:WhyType a} (x:a) (b:bag a) : Prop :=
   (0%Z < (nb_occ x b))%Z.
 
 (* Why3 assumption *)
-Definition eq_bag {a:Type} {a_WT:WhyType a} (a1:bag a) (b:bag a) : Prop :=
+Definition infix_eqeq {a:Type} {a_WT:WhyType a} (a1:bag a) (b:bag a) : Prop :=
   forall (x:a), ((nb_occ x a1) = (nb_occ x b)).
 
 Axiom bag_extensionality :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:bag a) (b:bag a), (eq_bag a1 b) -> (a1 = b).
+  forall (a1:bag a) (b:bag a), infix_eqeq a1 b -> (a1 = b).
 
 Parameter empty_bag: forall {a:Type} {a_WT:WhyType a}, bag a.
 
@@ -45,8 +46,8 @@ Parameter singleton: forall {a:Type} {a_WT:WhyType a}, a -> bag a.
 Axiom occ_singleton :
   forall {a:Type} {a_WT:WhyType a},
   forall (x:a) (y:a),
-  ((x = y) /\ ((nb_occ y (singleton x)) = 1%Z)) \/
-  (~ (x = y) /\ ((nb_occ y (singleton x)) = 0%Z)).
+  (x = y) /\ ((nb_occ y (singleton x)) = 1%Z) \/
+  ~ (x = y) /\ ((nb_occ y (singleton x)) = 0%Z).
 
 Axiom occ_singleton_eq :
   forall {a:Type} {a_WT:WhyType a},
@@ -56,8 +57,7 @@ Axiom occ_singleton_neq :
   forall {a:Type} {a_WT:WhyType a},
   forall (x:a) (y:a), ~ (x = y) -> ((nb_occ y (singleton x)) = 0%Z).
 
-Parameter union:
-  forall {a:Type} {a_WT:WhyType a}, (bag a) -> (bag a) -> bag a.
+Parameter union: forall {a:Type} {a_WT:WhyType a}, bag a -> bag a -> bag a.
 
 Axiom occ_union :
   forall {a:Type} {a_WT:WhyType a},
@@ -101,7 +101,7 @@ Axiom occ_add_neq :
   forall (b:bag a) (x:a) (y:a), ~ (x = y) ->
   ((nb_occ y (add x b)) = (nb_occ y b)).
 
-Parameter card: forall {a:Type} {a_WT:WhyType a}, (bag a) -> Z.
+Parameter card: forall {a:Type} {a_WT:WhyType a}, bag a -> Numbers.BinNums.Z.
 
 Axiom Card_nonneg :
   forall {a:Type} {a_WT:WhyType a}, forall (x:bag a), (0%Z <= (card x))%Z.
@@ -125,8 +125,7 @@ Axiom Card_add :
   forall {a:Type} {a_WT:WhyType a},
   forall (x:a) (b:bag a), ((card (add x b)) = (1%Z + (card b))%Z).
 
-Parameter diff:
-  forall {a:Type} {a_WT:WhyType a}, (bag a) -> (bag a) -> bag a.
+Parameter diff: forall {a:Type} {a_WT:WhyType a}, bag a -> bag a -> bag a.
 
 Axiom Diff_occ :
   forall {a:Type} {a_WT:WhyType a},
@@ -153,55 +152,75 @@ Axiom Diff_comm :
 
 Axiom Add_diff :
   forall {a:Type} {a_WT:WhyType a},
-  forall (b:bag a) (x:a), (mem x b) -> ((add x (diff b (singleton x))) = b).
+  forall (b:bag a) (x:a), mem x b -> ((add x (diff b (singleton x))) = b).
 
-Parameter choose: forall {a:Type} {a_WT:WhyType a}, (bag a) -> a.
+Parameter inter: forall {a:Type} {a_WT:WhyType a}, bag a -> bag a -> bag a.
+
+Axiom inter1 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (x:a) (a1:bag a) (b:bag a),
+  ((nb_occ x (inter a1 b)) =
+   (ZArith.BinInt.Z.min (nb_occ x a1) (nb_occ x b))).
+
+Parameter choose: forall {a:Type} {a_WT:WhyType a}, bag a -> a.
 
 Axiom choose_mem :
   forall {a:Type} {a_WT:WhyType a},
   forall (b:bag a), ~ ((empty_bag : bag a) = b) -> mem (choose b) b.
 
 (* Why3 assumption *)
-Definition array (a:Type) := Z -> a.
+Definition array (a:Type) := Numbers.BinNums.Z -> a.
 
 Parameter elements:
-  forall {a:Type} {a_WT:WhyType a}, (Z -> a) -> Z -> Z -> bag a.
+  forall {a:Type} {a_WT:WhyType a}, (Numbers.BinNums.Z -> a) ->
+  Numbers.BinNums.Z -> Numbers.BinNums.Z -> bag a.
 
 Axiom Elements_empty :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z), (j <= i)%Z ->
-  ((elements a1 i j) = (empty_bag : bag a)).
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z),
+  (j <= i)%Z -> ((elements a1 i j) = (empty_bag : bag a)).
 
 Axiom Elements_add :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z), (i < j)%Z ->
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z),
+  (i < j)%Z ->
   ((elements a1 i j) = (add (a1 (j - 1%Z)%Z) (elements a1 i (j - 1%Z)%Z))).
 
 Axiom Elements_singleton :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z), (j = (i + 1%Z)%Z) ->
-  ((elements a1 i j) = (singleton (a1 i))).
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z),
+  (j = (i + 1%Z)%Z) -> ((elements a1 i j) = (singleton (a1 i))).
 
 Axiom Elements_union :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z) (k:Z), ((i <= j)%Z /\ (j <= k)%Z) ->
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (k:Numbers.BinNums.Z),
+  (i <= j)%Z /\ (j <= k)%Z ->
   ((elements a1 i k) = (union (elements a1 i j) (elements a1 j k))).
 
 Axiom Elements_add1 :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z), (i < j)%Z ->
-  ((elements a1 i j) = (add (a1 i) (elements a1 (i + 1%Z)%Z j))).
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z),
+  (i < j)%Z -> ((elements a1 i j) = (add (a1 i) (elements a1 (i + 1%Z)%Z j))).
 
 Axiom Elements_remove_last :
   forall {a:Type} {a_WT:WhyType a},
-  forall (a1:Z -> a) (i:Z) (j:Z), (i < (j - 1%Z)%Z)%Z ->
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z),
+  (i < (j - 1%Z)%Z)%Z ->
   ((elements a1 i (j - 1%Z)%Z) =
    (diff (elements a1 i j) (singleton (a1 (j - 1%Z)%Z)))).
 
 (* Why3 goal *)
 Theorem Occ_elements {a:Type} {a_WT:WhyType a} :
-  forall (a1:Z -> a) (i:Z) (j:Z) (n:Z), ((i <= j)%Z /\ (j < n)%Z) ->
-  (0%Z < (nb_occ (a1 j) (elements a1 i n)))%Z.
+  forall (a1:Numbers.BinNums.Z -> a) (i:Numbers.BinNums.Z)
+    (j:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  (i <= j)%Z /\ (j < n)%Z -> (0%Z < (nb_occ (a1 j) (elements a1 i n)))%Z.
+(* Why3 intros a1 i j n (h1,h2). *)
 Proof.
 intros a1 i j n (h1,h2).
 rewrite (Elements_union _ _ j); auto with zarith.
@@ -210,6 +229,6 @@ rewrite (Elements_add1 _ j n); auto with zarith.
 rewrite occ_add_eq with (y := a1 j); auto.
 generalize (occ_non_negative (elements a1 i j) (a1 j)).
 generalize (occ_non_negative (elements a1 (j+1)n) (a1 j)).
-omega.
+auto with zarith.
 Qed.
 

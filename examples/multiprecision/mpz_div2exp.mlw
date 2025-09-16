@@ -44,7 +44,7 @@ let lemma div_minus (x y:int)
   ensures  { div (-x) y = - div x y }
 = ()
 
-let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
+let partial wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
   requires { mpz.alloc[r] >= 1 /\ mpz.alloc[u] >= 1 }
   requires { mpz.readers[r] = 0 /\ mpz.readers[u] = 0 }
   requires { mpz.abs_size[u] + div cnt 64 + 1 <= max_int32 }
@@ -86,7 +86,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
       let ghost oup = pure { up } in
       if c <> 0 then begin
         label Shift in
-        let ghost _m = wmpn_rshift rp up rn c in
+        let (ghost _m) = wmpn_rshift rp up rn c in
         assert { _m + radix * value rp rn
                  = value oup rn * power 2 (64 - c) };
         assert { radix * value oup rn
@@ -191,7 +191,7 @@ let wmpz_tdiv_q_2exp (r u:mpz_ptr) (cnt:limb) : unit
       let ghost oup = pure { up } in
       if c <> 0 then begin
         label Shift in
-        let ghost _m = OL.wmpn_rshift rp up rn c in
+        let (ghost _m) = OL.wmpn_rshift rp up rn c in
         assert { _m + radix * value rp rn
                  = value oup rn * power 2 (64 - c) };
         assert { radix * value oup rn

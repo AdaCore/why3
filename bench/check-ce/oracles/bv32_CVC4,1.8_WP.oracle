@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32.mlw", line 9, characters 14-29)
 File "bench/check-ce/bv32.mlw", line 9, characters 14-29:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Unknown (unknown + incomplete) (13303 steps).
+Prover result is: Unknown (unknown + incomplete) (1069 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -39,10 +39,12 @@ File bv32.mlw:
       r = {contents= (132:t)}
 
 <check_ce:categorization>Categorizations of models:
-- Checked model 0: BAD_CE
+- Selected model 0: BAD_CE
   - Concrete RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
   - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32.mlw", line 13, characters 5-26)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (150036 steps).
+Prover result is: Step limit exceeded (150030 steps).
+Sorry, we don't have a good counterexample for you :(
+
 

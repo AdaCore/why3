@@ -7,7 +7,7 @@
   - Abstract RAC: STUCK (failure in precondition of `dummy_update` at "bench/check-ce/bv32.mlw", line 7, characters 6-18)
 File "bench/check-ce/bv32.mlw", line 9, characters 14-29:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Step limit exceeded (2500039 steps).
+Prover result is: Step limit exceeded (500036 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -39,29 +39,19 @@ File bv32.mlw:
       r = {contents= (132:t)}
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: INCOMPLETE
+- Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
-- Checked model 1: INCOMPLETE
+- Selected model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
   - Abstract RAC: INCOMPLETE (terminated because Precondition of `dummy_update_with_int` cannot be evaluated)
 File "bench/check-ce/bv32.mlw", line 15, characters 14-28:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (2500043 steps).
+Prover result is: Step limit exceeded (500040 steps).
 The following counterexample model could not be verified
   (both RAC terminated because Precondition of `dummy_update_with_int` cannot be evaluated):
-File bv.mlw:
-  Line 695:
-    of_int : int -> t = [|_ => #x00000000|]
 File bv32.mlw:
   Line 13:
-    r : t = #x00000022
-  Line 15:
-    r : t = #x00000084
-    r : t = #x00000084
-  Line 16:
-    r : t = #x00000042
-  Line 17:
-    r : t = #x00000084
-    result of call at line 17, characters 9-16 : t = #x00000084
+    r :  = {contents = 0}
+    r :  = {contents = 0}
 

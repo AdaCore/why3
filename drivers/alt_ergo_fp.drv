@@ -48,15 +48,15 @@ theory real.MinMax
 end
 
 theory real.PowerInt
-  syntax function power "(%1 **. %2)"
+  syntax function power "(ae.pow %1 %2)"
 end
 
 theory real.PowerReal
-  syntax function pow "(%1 **. %2)"
+  syntax function pow "(ae.pow %1 %2)"
 end
 
 theory real.Square
-  syntax function sqrt "sqrt_real(%1)"
+  syntax function sqrt "ae.sqrt_real(%1)"
 end
 
 theory ieee_float.GenericFloat
@@ -71,12 +71,14 @@ theory ieee_float.RoundingMode
   syntax function RTN "Down"
   syntax function RTP "Up"
   syntax function RTZ "ToZero"
+
+  syntax predicate to_nearest "(or (= %1 RNE) (= %1 RNA))"
 end
 
 theory ieee_float.Float32
-  syntax function round "float32(%1,%2)"
+  syntax function round "ae.float32(%1,%2)"
 end
 
 theory ieee_float.Float64
-  syntax function round "float64(%1,%2)"
+  syntax function round "ae.float64(%1,%2)"
 end

@@ -12,7 +12,7 @@ use mach.int.UInt64GMP
 use mpz.Z
 use mpz.Zutil
 
-let wmpz_set_ui (dst: mpz_ptr) (src: uint64): unit
+let partial wmpz_set_ui (dst: mpz_ptr) (src: uint64): unit
   requires { mpz.alloc[dst] >= 1 }
   requires { mpz.readers[dst] = 0 }
   ensures  { value_of dst mpz = src }
@@ -32,7 +32,7 @@ let abs_cast (x: int64): uint64
   ensures { result = abs x }
 = if x >= 0 then of_int64 x else of_int64 (- (x + 1)) + 1
 
-let wmpz_set_si (dst: mpz_ptr) (src: int64): unit
+let partial wmpz_set_si (dst: mpz_ptr) (src: int64): unit
   requires { mpz.alloc[dst] >= 1 }
   requires { mpz.readers[dst] = 0 }
   ensures  { value_of dst mpz = src }

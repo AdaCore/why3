@@ -33,7 +33,7 @@ COPY --chown=guest:guest . /home/guest/why3
 WORKDIR /home/guest/why3
 
 RUN ./autogen.sh && \
-    ./configure --enable-ide --enable-zarith --enable-zip && \
+    ./configure --enable-ide --enable-zip && \
     make
 
 USER root

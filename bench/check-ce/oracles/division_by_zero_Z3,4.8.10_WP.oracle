@@ -1,0 +1,33 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/division_by_zero.mlw", line 2, characters 22-28)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/division_by_zero.mlw", line 2, characters 22-28)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/division_by_zero.mlw", line 2, characters 22-28)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/division_by_zero.mlw", line 2, characters 22-28)
+File "bench/check-ce/division_by_zero.mlw", line 2, characters 22-28:
+Sub-goal Check division by zero of goal f'vc.
+Prover result is: Unknown (sat) (81 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File int.mlw:
+  Line 13:
+    Constant zero initialization
+    zero = 0
+  Line 14:
+    Constant one initialization
+    one = 1
+File division_by_zero.mlw:
+  Line 2:
+    x = 0
+    x = 0
+    Execution of main function `f` with env:
+      x = 0
+      zero = 0
+      one = 1
+    Normal execution of function `(/)` with args:
+      x = 1000
+      y = 0
+    Property failure at precondition of `(/)` with:
+      y = 0
+

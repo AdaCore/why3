@@ -54,6 +54,7 @@ theory bv.BV_Gen
 (* Conversions from/to integers *)
 
   remove prop two_power_size_val
+  remove prop two_power_size_minus_one_val
   remove prop max_int_val
 
   remove prop to_uint_extensionality
@@ -194,6 +195,26 @@ end
 theory bv.BVConverter_128_256
   syntax function toBig "((_ zero_extend 128) %1)"
   syntax function toSmall "((_ extract 127 0) %1)"
+end
+
+theory bv.BVConverter_64_256
+  syntax function toBig "((_ zero_extend 192) %1)"
+  syntax function toSmall "((_ extract 63 0) %1)"
+end
+
+theory bv.BVConverter_32_256
+  syntax function toBig "((_ zero_extend 224) %1)"
+  syntax function toSmall "((_ extract 31 0) %1)"
+end
+
+theory bv.BVConverter_16_256
+  syntax function toBig "((_ zero_extend 240) %1)"
+  syntax function toSmall "((_ extract 15 0) %1)"
+end
+
+theory bv.BVConverter_8_256
+  syntax function toBig "((_ zero_extend 248) %1)"
+  syntax function toSmall "((_ extract 7 0) %1)"
 end
 
 theory bv.BVConverter_64_128

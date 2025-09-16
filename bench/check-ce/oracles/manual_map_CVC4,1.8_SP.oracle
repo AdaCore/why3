@@ -7,7 +7,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/manual_map.mlw", line 5, characters 14-36)
 File "bench/check-ce/manual_map.mlw", line 5, characters 14-36:
 Sub-goal Postcondition of goal test_map'vc.
-Prover result is: Unknown (sat) (210 steps).
+Prover result is: Unknown (sat) (184 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -19,15 +19,15 @@ File int.mlw:
     one = 1
 File manual_map.mlw:
   Line 4:
-    x = fun (x:int) -> if x = 1 then 3 else 0
-    x = fun (x:int) -> if x = 1 then 3 else 0
+    x = fun (x1:int) -> if x1 = 1 then 3 else 0
+    x = fun (x1:int) -> if x1 = 1 then 3 else 0
     Execution of main function `test_map` with env:
-      x = fun (x:int) -> if x = 1 then 3 else 0
+      x = fun (x1:int) -> if x1 = 1 then 3 else 0
       zero = 0
       one = 1
   Line 7:
     Normal execution of function `set` with args:
-      f = fun (x:int) -> if x = 1 then 3 else 0
+      f = fun (x1:int) -> if x1 = 1 then 3 else 0
       x = 0
       v = 3
   Line 5:

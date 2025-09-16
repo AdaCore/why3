@@ -19,7 +19,7 @@ Prover result is: Valid (52 steps).
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_mono.mlw", line 21, characters 14-25)
 File "bench/check-ce/ref_mono.mlw", line 21, characters 14-25:
 Sub-goal Postcondition of goal test_post'vc.
-Prover result is: Unknown (unknown + incomplete) (923 steps).
+Prover result is: Unknown (sat) (301 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -31,44 +31,44 @@ File int.mlw:
     one = 1
 File ref_mono.mlw:
   Line 20:
-    x = 0
-    y = {contents= (- 1)}
-    x = 0
-    y = {contents= (- 1)}
+    x = 1
+    y = {contents= 0}
+    x = 1
+    y = {contents= 0}
     Execution of main function `test_post` with env:
-      x = 0
-      y = {contents= (- 1)}
+      x = 1
+      y = {contents= 0}
       zero = 0
       one = 1
   Line 23:
     Normal execution of function `(!)` with args:
-      r = {contents= (- 1)}
+      r = {contents= 0}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 1)}
+      arg = {contents= 0}
   Line 23:
     Normal execution of function `(-)` with args:
-      x = 0
+      x = 1
       y = 1
 File int.mlw:
   Line 23:
     Normal execution of function `(-_)` with args:
       _ = 1
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = 1
       _ = (-1)
 File ref_mono.mlw:
   Line 23:
     Normal execution of function `(+)` with args:
-      _ = (-1)
-      _ = (- 1)
+      _ = 0
+      _ = 0
     Normal execution of function `(:=)` with args:
-      r = {contents= (- 1)}
-      v = (-2)
+      r = {contents= 0}
+      v = 0
   Line 21:
     Property failure at postcondition of `test_post` with:
-      x = 0
-      y = {contents= (- 1)}
+      x = 1
+      y = {contents= 0}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -79,7 +79,7 @@ File ref_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_mono.mlw", line 27, characters 14-29)
 File "bench/check-ce/ref_mono.mlw", line 27, characters 14-29:
 Sub-goal Postcondition of goal test_post2'vc.
-Prover result is: Unknown (unknown + incomplete) (978 steps).
+Prover result is: Unknown (sat) (343 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -92,20 +92,20 @@ File int.mlw:
 File ref_mono.mlw:
   Line 25:
     x = 43
-    y = {contents= 0}
+    y = {contents= (- 42)}
     x = 43
-    y = {contents= 0}
+    y = {contents= (- 42)}
     Execution of main function `test_post2` with env:
       x = 43
-      y = {contents= 0}
+      y = {contents= (- 42)}
       zero = 0
       one = 1
   Line 29:
     Normal execution of function `(!)` with args:
-      r = {contents= 0}
+      r = {contents= (- 42)}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents= (- 42)}
   Line 29:
     Normal execution of function `(-)` with args:
       x = 43
@@ -121,15 +121,15 @@ File ref_mono.mlw:
   Line 29:
     Normal execution of function `(+)` with args:
       _ = 42
-      _ = 0
+      _ = (- 42)
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 42
+      r = {contents= (- 42)}
+      v = 0
   Line 27:
     Property failure at postcondition of `test_post2` with:
       x = 43
-      y = {contents= 42}
       y = {contents= 0}
+      y = {contents= (- 42)}
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -140,7 +140,7 @@ File ref_mono.mlw:
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/ref_mono.mlw", line 38, characters 12-36)
 File "bench/check-ce/ref_mono.mlw", line 38, characters 12-36:
 Sub-goal Postcondition of goal incr'vc.
-Prover result is: Unknown (unknown + incomplete) (1126 steps).
+Prover result is: Unknown (sat) (431 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -154,11 +154,11 @@ File ref_mono.mlw:
   Line 35:
     y = {contents= (- 1)}
   Line 37:
-    x23 = {contents= 0}
-    x23 = {contents= 0}
+    x23 = {contents= (- 2)}
+    x23 = {contents= (- 2)}
     Execution of main function `incr` with env:
       y = {contents= (- 1)}
-      x23 = {contents= 0}
+      x23 = {contents= (- 2)}
       zero = 0
       one = 1
   Line 40:
@@ -176,34 +176,34 @@ File ref_mono.mlw:
       v = 0
   Line 41:
     Normal execution of function `(!)` with args:
-      r = {contents= 0}
+      r = {contents= (- 2)}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      arg = {contents= (- 2)}
   Line 41:
     Normal execution of function `(+)` with args:
-      _ = 0
+      _ = (- 2)
       _ = 1
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 1
+      r = {contents= (- 2)}
+      v = (-1)
   Line 42:
     Normal execution of function `(!)` with args:
-      r = {contents= 1}
+      r = {contents= (-1)}
   Line 9:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      arg = {contents= (-1)}
   Line 42:
     Normal execution of function `(+)` with args:
-      _ = 1
+      _ = (-1)
       _ = 1
     Normal execution of function `(:=)` with args:
-      r = {contents= 1}
-      v = 2
+      r = {contents= (-1)}
+      v = 0
   Line 38:
     Property failure at postcondition of `incr` with:
-      x23 = {contents= 2}
       x23 = {contents= 0}
+      x23 = {contents= (- 2)}
       y = {contents= (- 1)}
 
 <check_ce:categorization>Categorizations of models:
@@ -215,13 +215,13 @@ File ref_mono.mlw:
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_mono.mlw", line 51, characters 14-36)
 File "bench/check-ce/ref_mono.mlw", line 51, characters 14-36:
 Sub-goal Loop invariant init of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (845 steps).
+Prover result is: Unknown (sat) (235 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
 File "bench/check-ce/ref_mono.mlw", line 52, characters 12-14:
 Sub-goal Loop variant decrease of goal test_loop'vc.
-Prover result is: Valid (1112 steps).
+Prover result is: Valid (505 steps).
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -232,7 +232,7 @@ Prover result is: Valid (1112 steps).
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_mono.mlw", line 51, characters 14-36)
 File "bench/check-ce/ref_mono.mlw", line 51, characters 14-36:
 Sub-goal Loop invariant preservation of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (1111 steps).
+Prover result is: Unknown (sat) (490 steps).
 Sorry, we don't have a good counterexample for you :(
 
 
@@ -245,7 +245,7 @@ Sorry, we don't have a good counterexample for you :(
   - Abstract RAC: FAILURE (loop invariant init at "bench/check-ce/ref_mono.mlw", line 51, characters 14-36)
 File "bench/check-ce/ref_mono.mlw", line 45, characters 12-23:
 Sub-goal Postcondition of goal test_loop'vc.
-Prover result is: Unknown (unknown + incomplete) (1028 steps).
+Prover result is: Unknown (sat) (400 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

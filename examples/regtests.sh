@@ -80,7 +80,7 @@ run_dir () {
     shapes="$shapes $1/*/why3shapes.gz"
 }
 
-echo "=== Programs already ported === MUST REPLAY AND ALL GOALS PROVED ==="
+echo "=== Examples and Case Studies === MUST REPLAY AND ALL GOALS PROVED ==="
 echo ""
 run_dir . ""
 run_dir micro-c ""
@@ -94,9 +94,11 @@ run_dir verifythis_2016_matrix_multiplication "-L verifythis_2016_matrix_multipl
 run_dir WP_revisited ""
 run_dir prover "-L prover --warn-off=unused_variable"
 run_dir multiprecision "-L multiprecision"
+run_dir c_cursor "-L c_cursor"
+run_dir numeric ""
 echo ""
 
-echo "Score on ported programs : $success/$total"
+echo "Score on Examples and Case Studies: $success/$total"
 echo ""
 
 echo "=== Standard Library ==="

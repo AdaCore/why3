@@ -1,0 +1,48 @@
+(** Examples for testing a new form of presentation of counterexamples
+
+    This file concerns the presentation of CE for simple functions
+    with no conditional, no loop, no function call
+
+    This case is for several assertions
+
+*)
+
+use int.Int
+
+constant a : int
+
+val ref b : int
+
+let f1 (x:int) (ref y:int) : unit
+  requires { x >= 0 /\ y >= 0 /\ b >= 0}
+= y <- y + x;
+  assert A1 { y >= 1 };
+  b <- b + y;
+  assert A2 { a + b + x + y <= 42 }
+
+(** Expected form of answer:
+
+Function `f1` does not conform with this its specification at assertion `A2`
+on line `...`. A counterexample is given by the following logic context
+--
+a : int = ...
+--
+and the execution of `f1` in the initial global context
+--
+b : ref int = ....
+--
+the parameters
+--
+x : int = ...
+y : ref int = ....
+---
+that reaches the assertion `A2` with the context
+---
+b : ref int = ...
+x : int = ...
+y : ref int = ...
+---
+
+Note: for being a good CE, that CE must validating the previous assertions,
+      namely A1, so x=y=0 is not a good CE
+*)

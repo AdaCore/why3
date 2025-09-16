@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -280,7 +280,7 @@ let make_command =
   let cmd_regexp = Re.Str.regexp "%\\(.\\)" in
   fun exec com ->
     let replace s = match Re.Str.matched_group 1 s with
-      | "e" -> exec
+      | "e" -> Filename.quote exec
       | c -> "%"^c
     in
     Re.Str.global_substitute cmd_regexp replace com
@@ -676,8 +676,8 @@ let list_binaries () =
 
 let query_prover_version path version_switch version_regexp =
   let out = Filename.temp_file "out" "" in
-  let cmd = sprintf "%s %s" path version_switch in
-  let c = sprintf "(%s) > %s 2>&1" cmd out in
+  let cmd = sprintf "%s %s" (Filename.quote path) version_switch in
+  let c = sprintf "(%s) > %s 2>&1" cmd (Filename.quote out) in
   Debug.dprintf debug "Run: %s@." c;
   try
     let ret = Sys.command c in
@@ -728,9 +728,9 @@ let locate_exe =
   Hstr.fold (fun p fullpath acc ->
       let lp = String.length p in
       if lp >= ln &&
-         Strings.has_prefix name p &&
+         Strings.has_prefix ~prefix:name p &&
          (lp = ln ||
-            (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix "exe" p || has_suffix "bat" p)) ||
+            (p.[ln] = '.' && lp = ln + 4 && Strings.(has_suffix ~suffix:"exe" p || has_suffix ~suffix:"bat" p)) ||
             (p.[ln] = '-' && lp >= ln + 2 && '0' <= p.[ln + 1] && p.[ln + 1] <= '9')) then
         fullpath :: acc
       else acc) (Lazy.force binaries) []

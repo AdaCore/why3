@@ -2,8 +2,8 @@ use int.Int
 
 constant c : int
 
-axiom test:
+lemma test:
      forall x:int.
-     (let y = (not x = 42) in true)
-     
+     (let _y = (not x = 42) in true)
+
 goal foo: c <= 41

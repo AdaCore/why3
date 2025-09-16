@@ -1,3 +1,13 @@
+(********************************************************************)
+(*                                                                  *)
+(*  The Why3 Verification Platform   /   The Why3 Development Team  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
+(*                                                                  *)
+(*  This software is distributed under the terms of the GNU Lesser  *)
+(*  General Public License version 2.1, with the special exception  *)
+(*  on linking described in file LICENSE.                           *)
+(*                                                                  *)
+(********************************************************************)
 
 (**
 
@@ -24,7 +34,10 @@ val infer_loop_invs :
    the module known map of that function.
 
   The set [attrs] is checked for the presence of the [[\@bddinfer]]
-   attribute. Without it, the empty list is immediately returned.
+  attribute. Without it, the empty list is immediately returned.  If
+  that [[\@bddinfer]] attribute is followed by a colon and a number,
+  like [[\@bddinfer:1]], that number is taken as the verbosity level
+  (see below).
 
   The environment [env] is needed to access the builtin functions such
    as the integer operators.
@@ -40,20 +53,22 @@ val infer_loop_invs :
    invariant generated.
 
   The inference does not support the full WhyML language. If any
-   unsupported feature is met, this function will just return the
-   empty list. The reason should be queried using function
-   [report_on_last_call] below.
+  unsupported feature is met, this function will just return the empty
+  list. The reason should be inspected using [register_hook] function
+  below, that should be called before.
 
  *)
 
 val verbose_level : int ref
 (** Controls informative messages that will be printed in standard
-   output during execution of [infer_loop_invs]. default is 0: no
-   messages, 1 and 2 while not print anything as well.  3 will print the
-   WhyML expression on which inference of invariants is attempted,
-   together with the translated Why1 code. level 4 corresponds the
-   more debugging messages that should be used only during
-   development. *)
+    output during execution of [infer_loop_invs]. default is 0: no
+    messages, 1 prints inferred invariants and domains for loops.  2
+    also prints inferred states before any statement annotated with an
+    attribute starting with "bddinfer:".  3 will print the WhyML
+    expressions on which inference of invariants is attempted,
+    together with the translated "Why1" code. level 4 corresponds the
+    more debugging messages that should be used only during
+    development. *)
 
 type domains = Abstract.domain Term.Mvs.t
 

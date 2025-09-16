@@ -225,7 +225,7 @@ module D = struct
   let mk_exn id pty mask = Dexn (id, pty, mask)
   let mk_meta ident args = Dmeta (ident, args)
   let mk_cloneexport qid substs = Dcloneexport (get_pos (), qid, substs)
-  let mk_useexport qid = Duseexport qid
+  let mk_useexport ?loc qid = Duseexport (get_pos ?loc (), qid)
   let mk_cloneimport ?loc export qid opt_id substs =
     Dcloneimport (get_pos ?loc (), export, qid, opt_id, substs)
   let mk_useimport ?loc export renames =

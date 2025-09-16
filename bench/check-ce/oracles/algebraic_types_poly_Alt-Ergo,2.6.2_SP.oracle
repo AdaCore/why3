@@ -1,0 +1,87 @@
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A4))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A4)))))
+with lsymbol match_list
+Warning: Error while checking function definition type l: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol list) (Sint))
+                                  (Var (Qannotident (Isymbol (Sprover @a8)) (Smultiple (Isymbol list) (Sint))))) with lsymbol l
+
+Warning: Error while checking function definition type index_list: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a4)) (Sint))))
+with lsymbol index_list
+Warning: Error while checking function definition type Cons_proj_2: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A8)))
+  (Var (Qannotident (Isymbol (Sprover @a2)) (Smultiple (Isymbol list) (Ssimple (Isymbol A8))))))
+with lsymbol Cons_proj_2
+Warning: Error while checking function definition type Cons_proj_1: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A7))
+  (Var (Qannotident (Isymbol (Sprover @a3)) (Ssimple (Isymbol A7)))))
+with lsymbol Cons_proj_1
+Warning: Error while checking function definition type Cons: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A2)))
+  (Var (Qannotident (Isymbol (Sprover @a6)) (Smultiple (Isymbol list) (Ssimple (Isymbol A2))))))
+with lsymbol Cons
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_poly.mlw", line 7, characters 30-42:
+Goal g.
+Prover result is: Unknown (unknown) (5 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+File "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22:
+Sub-goal Postcondition of goal proj_test'vc.
+Prover result is: Valid (4 steps).
+
+Warning: Error while checking function definition type match_list: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A4))
+  (Var (Qannotident (Isymbol (Sprover @a7)) (Ssimple (Isymbol A4)))))
+with lsymbol match_list
+Warning: Error while checking function definition type length: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a3)) (Sint))))
+with lsymbol list.Length.length
+Warning: Error while checking function definition type l: Type mismatch when interpreting (Function ()
+                                  (Smultiple (Isymbol list) (Ssimple (Isymbol int_type)))
+                                  (Var (Qannotident (Isymbol (Sprover @a11)) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type)))))) with lsymbol l1
+
+Warning: Error while checking function definition type index_list: Function arity mismatch when interpreting
+(Function () (Sint) (Var (Qannotident (Isymbol (Sprover @a6)) (Sint))))
+with lsymbol index_list
+Warning: Error while checking function definition type Cons_proj_2: Function arity mismatch when interpreting
+(Function ()
+  (Smultiple (Isymbol list) (Ssimple (Isymbol A8)))
+  (Var (Qannotident (Isymbol (Sprover @a4)) (Smultiple (Isymbol list) (Ssimple (Isymbol A8))))))
+with lsymbol Cons_proj_2
+Warning: Error while checking function definition type Cons_proj_1: Function arity mismatch when interpreting
+(Function ()
+  (Ssimple (Isymbol A7))
+  (Var (Qannotident (Isymbol (Sprover @a5)) (Ssimple (Isymbol A7)))))
+with lsymbol Cons_proj_1
+Warning: Error while checking function definition type Cons: Type mismatch when interpreting (Function ((_arg_0 (Ssimple (Isymbol int_type)))
+                                  (_arg_1 (Smultiple (Isymbol list) (Ssimple (Isymbol int_type)))))
+                                  (Smultiple (Isymbol list) (Ssimple (Isymbol int_type)))
+                                  (Var (Qannotident (Isymbol (Sprover @a11)) (Smultiple (Isymbol list) (Ssimple (Isymbol int_type)))))) with lsymbol Cons
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/algebraic_types_poly.mlw", line 30, characters 12-22:
+Sub-goal Postcondition of goal proj_test'vc.
+Prover result is: Unknown (unknown) (5 steps).
+Sorry, we don't have a good counterexample for you :(
+
+

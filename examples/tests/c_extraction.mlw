@@ -1,0 +1,36 @@
+
+module R
+
+  use mach.int.Int32
+  type r = { x : int32; y : int32 }
+  let swap (a : r) : r = { x = a.y ; y = a.x }
+
+end
+
+module Rmut
+
+  use mach.int.Int32
+  type rm = { mutable x : int32; mutable y : int32 }
+  let swap (a : rm) : unit =
+     let tmp = a.y in a.y <- a.x; a.x <- tmp
+
+end
+
+module S
+
+  use mach.int.UInt32
+  use mach.c.String
+
+  let hello () : string = "hello"
+
+  let hello_len () : uint32 = length "hello"
+
+end
+
+module Glob
+
+  use mach.int.Int32
+  let g : int32 = 42
+  let main () : int32 = return g
+
+end

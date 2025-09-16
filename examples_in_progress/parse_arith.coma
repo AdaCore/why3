@@ -1,0 +1,78 @@
+use seq.Seq
+use int.Int
+use coma.Std
+
+type char
+type word = seq char
+
+constant space: char
+constant times: char
+constant plus: char
+constant lpar: char
+constant rpar: char
+constant c_0: char
+constant c_1: char
+constant c_2: char
+constant c_3: char
+constant c_4: char
+constant c_5: char
+constant c_6: char
+constant c_7: char
+constant c_8: char
+constant c_9: char
+
+let caseNum (c: char)
+  (case0 { c = c_0 })
+  (case1 { c = c_1 })
+  (case2 { c = c_2 })
+  (case3 { c = c_3 })
+  (case4 { c = c_4 })
+  (case5 { c = c_5 })
+  (case6 { c = c_6 })
+  (case7 { c = c_7 })
+  (case8 { c = c_8 })
+  (case9 { c = c_9 })
+  (no    { c <> c_0 /\ c <> c_1 /\ c <> c_2 /\
+           c <> c_3 /\ c <> c_4 /\ c <> c_5 /\
+           c <> c_6 /\ c <> c_7 /\ c <> c_8 /\
+           c <> c_9 })
+= any
+
+let atoi (c: char) (ok (i:int)) (err) =
+  caseNum {c}
+    (ok {0}) (ok {1}) (ok {2}) (ok {3}) (ok {4})
+    (ok {5}) (ok {6}) (ok {7}) (ok {8}) (ok {9})
+    (err)
+
+let unSpace (c: char) (space) (else) = if {c = space} space else
+
+let rec next (w: word) (i: int) {..} (k (c: char) {c <> space})
+= unSpace {w[i]}
+    (-> {0 <= i < length w} (! next {w} {i+1} k))
+    (-> k {w[i]})
+
+let rec lit (w: word) (i v: int) (k (kv: int) (c: char) {c <> space})
+= atoi {w[i]}
+       (fun (i: int) -> lit {w} {i} {10 * v + i} k)
+       (-> unSpace {w[i]}
+            (-> next {w} {i + 1} (k {v}))
+            (-> k {v} {w[i]}))
+
+let rec atom (w: word) (i: int) {..} (k (kv: int) (c: char))
+= next {w} {i} . fun (c: char) ->
+    if {c = lpar}
+       (-> sum {w} {i+1} .
+             fun (kv: int) (c: char) -> if {c <> rpar}
+                                           fail
+                                           (-> next {w} {i+1} (k {kv})))
+       (-> atoi {c} (fun (n:int) -> lit {w} {i+1} {n} k) fail)
+
+with term (w: word) (i: int) (k (kv: int) (c: char)) =
+  atom {w} {i} . fun (kv: int) (c: char) ->
+    if { c = times }
+       (-> term {w} {kv} (fun (v': int) (c: char) -> k {v*v'} c))
+       (-> k {kv} {c})
+
+with sum (w: word) (i: int) (k (kv: int) (c: char)) = any
+
+let count (w: word) {} (ret (r: int) {}) = any

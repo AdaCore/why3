@@ -2,54 +2,10 @@
 - Checked model 0: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for to_map`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for to_map`)
-- Selected model 1: INCOMPLETE
+- Checked model 1: INCOMPLETE
   - Concrete RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for to_map`)
   - Abstract RAC: INCOMPLETE (terminated with uncaught exception `Cannot prove termination for to_map`)
 File "bench/check-ce/model_projection.mlw", line 23, characters 11-48:
 Sub-goal Assertion of goal g1'vc.
-Prover result is: Unknown (sat) (402 steps).
-The following counterexample model could not be verified
-  (both RAC terminated with uncaught exception `Cannot prove termination for to_map`):
-File model_projection.mlw:
-  Line 6:
-    to_map :
-      t
-      ->
-      int
-      ->
-      int = [|{Top.to_map => [|14 => 42; _ => 42|]} => [|14 => 42; _ => 42|];
-            _ => [|14 => 42; _ => 42|]|]
-  Line 9:
-    get :
-      t
-      ->
-      int
-      ->
-      int = fun x!07 x!13 ->
-             if x!07 = {Top.to_map => [|14 => 42; _ => 42|]} /\ x!13 = 13
-             then 41 else 41
-  Line 13:
-    set :
-      t
-      ->
-      int
-      ->
-      int
-      ->
-      t = fun x!06 x!12 x!21 ->
-           if x!06 = {Top.to_map => [|14 => 42; _ => 42|]} /\ x!12 = 1 /\
-              x!21 = 2
-           then {Top.to_map => [|14 => 42; _ => 42|]}
-           else {Top.to_map => [|14 => 42; _ => 42|]}
-  Line 19:
-    y : t = {Top.to_map => [|14 => 42; _ => 42|]}
-  Line 22:
-    result of call at line 22, characters 9-20 :
-      t = {Top.to_map => [|14 => 42; _ => 42|]}
-    result of call at line 22, characters 13-16 :
-      t = {Top.to_map => [|14 => 42; _ => 42|]}
-    y : s = {d = {Top.to_map => [|14 => 42; _ => 42|]}}
-    y : t = {Top.to_map => [|14 => 42; _ => 42|]}
-  Line 23:
-    y : t = {Top.to_map => [|14 => 42; _ => 42|]}
+Prover result is: Unknown (sat) (369 steps).
 

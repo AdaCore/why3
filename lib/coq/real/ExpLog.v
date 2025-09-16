@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -38,6 +38,50 @@ Lemma Exp_sum :
 exact exp_plus.
 Qed.
 
+Require Import Lra.
+
+(* Why3 goal *)
+Lemma exp_increasing :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R), (x <= y)%R ->
+  ((Reals.Rtrigo_def.exp x) <= (Reals.Rtrigo_def.exp y))%R.
+Proof.
+intros x y h1.
+assert (x = y \/ x < y)%R.
+lra.
+destruct H.
+subst x.
+auto with real.
+generalize (exp_increasing x y).
+lra.
+Qed.
+
+Require Import Reals.Rpower.
+
+(* Why3 goal *)
+Lemma exp_positive :
+  forall (x:Reals.Rdefinitions.R), (0%R < (Reals.Rtrigo_def.exp x))%R.
+Proof.
+intros x.
+apply exp_pos.
+Qed.
+
+(* Why3 goal *)
+Lemma exp_inv :
+  forall (x:Reals.Rdefinitions.R),
+  ((Reals.Rtrigo_def.exp (-x)%R) = (/ (Reals.Rtrigo_def.exp x))%R).
+Proof.
+intros x.
+apply exp_Ropp.
+Qed.
+
+(* Why3 goal *)
+Lemma exp_sum_opposite :
+  forall (x:Reals.Rdefinitions.R),
+  (2%R <= ((Reals.Rtrigo_def.exp x) + (Reals.Rtrigo_def.exp (-x)%R))%R)%R.
+Proof.
+intros x.
+Admitted.
+
 (* Why3 comment *)
 (* log is replaced with (Reals.Rpower.ln x) by the coq driver *)
 
@@ -54,6 +98,21 @@ Lemma Log_mul :
    ((Reals.Rpower.ln x) + (Reals.Rpower.ln y))%R).
 intros x y (Hx,Hy).
 now apply ln_mult.
+Qed.
+
+(* Why3 goal *)
+Lemma log_increasing :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (x <= y)%R -> ((Reals.Rpower.ln x) <= (Reals.Rpower.ln y))%R.
+Proof.
+intros x y (h1,h2).
+assert (x = y \/ x < y)%R.
+lra.
+destruct H.
+subst x.
+auto with real.
+generalize (ln_increasing x y).
+lra.
 Qed.
 
 (* Why3 goal *)
@@ -77,4 +136,18 @@ Definition log2 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
 (* Why3 assumption *)
 Definition log10 (x:Reals.Rdefinitions.R) : Reals.Rdefinitions.R :=
   ((Reals.Rpower.ln x) / (Reals.Rpower.ln 10%R))%R.
+
+(* Why3 goal *)
+Lemma log2_increasing :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (x <= y)%R -> ((log2 x) <= (log2 y))%R.
+Proof.
+Admitted.
+
+(* Why3 goal *)
+Lemma log10_increasing :
+  forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
+  (0%R < x)%R /\ (x <= y)%R -> ((log10 x) <= (log10 y))%R.
+Proof.
+Admitted.
 

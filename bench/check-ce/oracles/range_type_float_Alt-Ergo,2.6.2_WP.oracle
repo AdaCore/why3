@@ -1,0 +1,25 @@
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+- Selected model 1: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/range_type_float.mlw", line 10, characters 12-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/range_type_float.mlw", line 10, characters 12-26)
+- Checked model 2: NC
+  - Concrete RAC: FAILURE (assertion at "bench/check-ce/range_type_float.mlw", line 10, characters 12-26)
+  - Abstract RAC: FAILURE (assertion at "bench/check-ce/range_type_float.mlw", line 10, characters 12-26)
+File "bench/check-ce/range_type_float.mlw", line 10, characters 12-26:
+Sub-goal Assertion of goal f'vc.
+Prover result is: Unknown (unknown) (3 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File range_type_float.mlw:
+  Line 8:
+    x = epsilon x:t. t'real x = 10.0
+    x = epsilon x:t. t'real x = 10.0
+    Execution of main function `f` with env:
+      x = epsilon x:t. t'real x = 10.0
+  Line 10:
+    Property failure at assertion with:
+      x = epsilon x:t. t'real x = 10.0
+

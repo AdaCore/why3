@@ -62,7 +62,7 @@ predicate encoding (s1 s2: string) =
 lemma decode_unique: forall s1 s2 s3.
   encoding s1 s2 /\ encoding s3 s2 -> s1 = s3
 
-let encode (s: string) : string
+let partial encode (s: string) : string
   ensures { encoding s result }
 = let ref i = 0 in
   let r = StringBuffer.create (length s) in
@@ -82,7 +82,7 @@ let encode (s: string) : string
   done;
   StringBuffer.contents r
 
-let decode (s: string) : string
+let partial decode (s: string) : string
   requires { valid_hex s }
   ensures  { encoding result s }
 = let ref i = 0 in
@@ -101,7 +101,7 @@ let decode (s: string) : string
   done;
   StringBuffer.contents r
 
-let decode_encode (s: string) : unit
+let partial decode_encode (s: string) : unit
 = let s1 = encode s in
   let s2 = decode s1 in
   assert { s = s2 }

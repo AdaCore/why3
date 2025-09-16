@@ -1,0 +1,21 @@
+module EuclidDiv
+
+use int.Int
+use bv.Pow2int
+use bv.BV32
+
+goal g: 1+1 = 42  (* intentionally wrong *)
+
+end
+
+
+module BVand
+
+use bv.Pow2int
+use bv.BV32
+
+
+goal g: bw_and (13:t) (27:t) = (42:t)  (* intentionally wrong *)
+
+
+end

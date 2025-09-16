@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -131,6 +131,9 @@ let print_commands fmt =
        (fun fmt e -> Format.fprintf fmt "  %s   @[<hov>%s@]"
          (Strings.pad_right ' ' e.cmd_name maxl) e.cmd_desc)) cmds
 
+module Main : functor () -> sig end
+ = functor () -> struct
+
 let anon_file x = raise (Getopt.GetoptFailure (Printf.sprintf "unexpected argument: %s" x))
 
 let usage_msg = "<command>\nExecute the given subcommand.\n"
@@ -158,3 +161,7 @@ let () =
   with e when not (Debug.test_flag Debug.stack_trace) ->
     Format.eprintf "@.%a@." Exn_printer.exn_printer e;
     exit 1
+
+end
+
+let () = Whyconf.register_command "show" (module Main)

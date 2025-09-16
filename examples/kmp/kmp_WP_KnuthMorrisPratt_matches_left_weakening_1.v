@@ -8,96 +8,130 @@ Require map.Map.
 
 (* Why3 assumption *)
 Inductive ref (a:Type) :=
-  | mk_ref : a -> ref a.
+  | ref'mk : a -> ref a.
 Axiom ref_WhyType : forall (a:Type) {a_WT:WhyType a}, WhyType (ref a).
 Existing Instance ref_WhyType.
-Implicit Arguments mk_ref [[a]].
+Arguments ref'mk {a}.
 
 (* Why3 assumption *)
-Definition contents {a:Type} {a_WT:WhyType a} (v:(ref a)): a :=
+Definition contents {a:Type} {a_WT:WhyType a} (v:ref a) : a :=
   match v with
-  | (mk_ref x) => x
+  | ref'mk x => x
   end.
 
 Axiom array : forall (a:Type), Type.
-Parameter array_WhyType : forall (a:Type) {a_WT:WhyType a},
-  WhyType (array a).
+Parameter array_WhyType :
+  forall (a:Type) {a_WT:WhyType a}, WhyType (array a).
 Existing Instance array_WhyType.
 
-Parameter elts: forall {a:Type} {a_WT:WhyType a}, (array a) -> (Z -> a).
+Parameter elts:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a.
 
-Parameter length: forall {a:Type} {a_WT:WhyType a}, (array a) -> Z.
+Parameter length:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z.
 
-Axiom array'invariant : forall {a:Type} {a_WT:WhyType a}, forall (self:(array
-  a)), (0%Z <= (length self))%Z.
+Axiom array'invariant :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (self:array a), (0%Z <= (length self))%Z.
 
 (* Why3 assumption *)
-Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:(array a)) (i:Z): a :=
-  ((elts a1) i).
+Definition mixfix_lbrb {a:Type} {a_WT:WhyType a} (a1:array a)
+    (i:Numbers.BinNums.Z) : a :=
+  elts a1 i.
 
-Parameter mixfix_lblsmnrb: forall {a:Type} {a_WT:WhyType a}, (array a) ->
-  Z -> a -> (array a).
+Parameter mixfix_lblsmnrb:
+  forall {a:Type} {a_WT:WhyType a}, array a -> Numbers.BinNums.Z -> a ->
+  array a.
 
-Axiom mixfix_lblsmnrb_spec : forall {a:Type} {a_WT:WhyType a},
-  forall (a1:(array a)) (i:Z) (v:a), ((length (mixfix_lblsmnrb a1 i
-  v)) = (length a1)) /\ ((elts (mixfix_lblsmnrb a1 i
-  v)) = (map.Map.set (elts a1) i v)).
+Axiom mixfix_lblsmnrb'spec'0 :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((length (mixfix_lblsmnrb a1 i v)) = (length a1)).
+
+Axiom mixfix_lblsmnrb'spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (a1:array a) (i:Numbers.BinNums.Z) (v:a),
+  ((elts (mixfix_lblsmnrb a1 i v)) = (map.Map.set (elts a1) i v)).
+
+Parameter make:
+  forall {a:Type} {a_WT:WhyType a}, Numbers.BinNums.Z -> a -> array a.
+
+Axiom make_spec :
+  forall {a:Type} {a_WT:WhyType a},
+  forall (n:Numbers.BinNums.Z) (v:a), (0%Z <= n)%Z ->
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb (make n v) i) = v)) /\
+  ((length (make n v)) = n).
 
 Axiom char : Type.
 Parameter char_WhyType : WhyType char.
 Existing Instance char_WhyType.
 
 (* Why3 assumption *)
-Definition matches (a1:(array char)) (i1:Z) (a2:(array char)) (i2:Z)
-  (n:Z): Prop := ((0%Z <= i1)%Z /\ (i1 <= ((length a1) - n)%Z)%Z) /\
-  (((0%Z <= i2)%Z /\ (i2 <= ((length a2) - n)%Z)%Z) /\ forall (i:Z),
-  ((0%Z <= i)%Z /\ (i < n)%Z) -> ((mixfix_lbrb a1
-  (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z))).
+Definition matches (a1:array char) (i1:Numbers.BinNums.Z) (a2:array char)
+    (i2:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) : Prop :=
+  ((0%Z <= i1)%Z /\ (i1 <= ((length a1) - n)%Z)%Z) /\
+  ((0%Z <= i2)%Z /\ (i2 <= ((length a2) - n)%Z)%Z) /\
+  (forall (i:Numbers.BinNums.Z), (0%Z <= i)%Z /\ (i < n)%Z ->
+   ((mixfix_lbrb a1 (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z))).
 
-Axiom matches_empty : forall (a1:(array char)) (a2:(array char)) (i1:Z)
-  (i2:Z), ((0%Z <= i1)%Z /\ (i1 <= (length a1))%Z) -> (((0%Z <= i2)%Z /\
-  (i2 <= (length a2))%Z) -> (matches a1 i1 a2 i2 0%Z)).
+Axiom matches_empty :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z),
+  (0%Z <= i1)%Z /\ (i1 <= (length a1))%Z ->
+  (0%Z <= i2)%Z /\ (i2 <= (length a2))%Z -> matches a1 i1 a2 i2 0%Z.
 
-Axiom matches_right_extension : forall (a1:(array char)) (a2:(array char))
-  (i1:Z) (i2:Z) (n:Z), (matches a1 i1 a2 i2 n) ->
-  ((i1 <= (((length a1) - n)%Z - 1%Z)%Z)%Z ->
-  ((i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z -> (((mixfix_lbrb a1
-  (i1 + n)%Z) = (mixfix_lbrb a2 (i2 + n)%Z)) -> (matches a1 i1 a2 i2
-  (n + 1%Z)%Z)))).
+Axiom matches_right_extension :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  matches a1 i1 a2 i2 n -> (i1 <= (((length a1) - n)%Z - 1%Z)%Z)%Z ->
+  (i2 <= (((length a2) - n)%Z - 1%Z)%Z)%Z ->
+  ((mixfix_lbrb a1 (i1 + n)%Z) = (mixfix_lbrb a2 (i2 + n)%Z)) ->
+  matches a1 i1 a2 i2 (n + 1%Z)%Z.
 
-Axiom matches_contradiction_at_first : forall (a1:(array char)) (a2:(array
-  char)) (i1:Z) (i2:Z) (n:Z), (0%Z < n)%Z -> ((~ ((mixfix_lbrb a1
-  i1) = (mixfix_lbrb a2 i2))) -> ~ (matches a1 i1 a2 i2 n)).
+Axiom matches_contradiction_at_first :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  (0%Z < n)%Z -> ~ ((mixfix_lbrb a1 i1) = (mixfix_lbrb a2 i2)) ->
+  ~ matches a1 i1 a2 i2 n.
 
-Axiom matches_contradiction_at_i : forall (a1:(array char)) (a2:(array char))
-  (i1:Z) (i2:Z) (i:Z) (n:Z), (0%Z < n)%Z -> (((0%Z <= i)%Z /\ (i < n)%Z) ->
-  ((~ ((mixfix_lbrb a1 (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z))) ->
-  ~ (matches a1 i1 a2 i2 n))).
+Axiom matches_contradiction_at_i :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z) (i:Numbers.BinNums.Z) (n:Numbers.BinNums.Z),
+  (0%Z < n)%Z -> (0%Z <= i)%Z /\ (i < n)%Z ->
+  ~ ((mixfix_lbrb a1 (i1 + i)%Z) = (mixfix_lbrb a2 (i2 + i)%Z)) ->
+  ~ matches a1 i1 a2 i2 n.
 
-Axiom matches_right_weakening : forall (a1:(array char)) (a2:(array char))
-  (i1:Z) (i2:Z) (n:Z) (n':Z), (matches a1 i1 a2 i2 n) -> ((n' < n)%Z ->
-  (matches a1 i1 a2 i2 n')).
+Axiom matches_right_weakening :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) (n':Numbers.BinNums.Z),
+  matches a1 i1 a2 i2 n -> (n' < n)%Z -> matches a1 i1 a2 i2 n'.
+
+
+Require Import Lia.
 
 
 (* Why3 goal *)
-Theorem matches_left_weakening : forall (a1:(array char)) (a2:(array char))
-  (i1:Z) (i2:Z) (n:Z) (n':Z), (matches a1 (i1 - (n - n')%Z)%Z a2
-  (i2 - (n - n')%Z)%Z n) -> ((n' < n)%Z -> (matches a1 i1 a2 i2 n')).
+Theorem matches_left_weakening :
+  forall (a1:array char) (a2:array char) (i1:Numbers.BinNums.Z)
+    (i2:Numbers.BinNums.Z) (n:Numbers.BinNums.Z) (n':Numbers.BinNums.Z),
+  matches a1 (i1 - (n - n')%Z)%Z a2 (i2 - (n - n')%Z)%Z n -> (n' < n)%Z ->
+  matches a1 i1 a2 i2 n'.
 (* Why3 intros a1 a2 i1 i2 n n' h1 h2. *)
 (* YOU MAY EDIT THE PROOF BELOW *)
 intros a1 a2 i1 i2 n n' Hmatch Hn.
 destruct Hmatch. destruct H0.
 red.
 split.
- omega.
+ lia.
 split.
- omega.
+ lia.
 intros i Hi.
 replace (i1 + i)%Z with (i1 - (n - n') + (i + (n - n')))%Z.
 replace (i2 + i)%Z with (i2 - (n - n') + (i + (n - n')))%Z.
 apply H1.
-omega.
- omega.
- omega.
+lia.
+ lia.
+ lia.
 Qed.
 

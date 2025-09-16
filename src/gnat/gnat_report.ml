@@ -90,12 +90,12 @@ let get_cntexmp_models =
               let t =
                 Ident.Sattr.fold Term.t_attr_add ctx.Pinterp_core.attrs t in
               let check = match Gnat_expl.search_labels t with
-                | Some Gnat_expl.{check={id; reason; sloc}} ->
+                | Some Gnat_expl.{check={id; check_kind; sloc}} ->
                     let file, line, col =
                       Gnat_loc.explode (Gnat_loc.orig_loc sloc) in
                     Record [
                       "id", Int id;
-                      "vc_kind", String (Gnat_expl.reason_to_ada reason);
+                      "vc_kind", String (Gnat_expl.check_kind_to_ada check_kind);
                       "sloc", Record [
                         "file", String file;
                         "line", Int line;
@@ -165,7 +165,7 @@ let get_msg (check, m) =
   Record (
     List.concat [
       [ "id", Int check.Gnat_expl.id ;
-        "reason", String (Gnat_expl.reason_to_ada check.Gnat_expl.reason) ;
+        "check_kind", String (Gnat_expl.check_kind_to_ada check.Gnat_expl.check_kind) ;
         "result", Bool m.result ;
         "check_tree", m.check_tree ;
         "extra_info", get_extra_info m.extra_info
@@ -202,7 +202,7 @@ let get_entity () =
 (* The main function, where we build the final Record to be printed using
 Why3.Json_base.print_json function. *)
 let print_messages () =
-  print_json Format.std_formatter (
+  print_json_single_line Format.std_formatter (
     Record (
       List.concat [
         [get_results (); get_timings (); get_entity ()];

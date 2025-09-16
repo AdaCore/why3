@@ -2,12 +2,12 @@
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
-- Checked model 1: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/668_projection.mlw", line 13, characters 14-50)
 File "bench/check-ce/668_projection.mlw", line 13, characters 14-50:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (500020 steps).
+Prover result is: Unknown (sat) (151 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
@@ -34,15 +34,15 @@ File 668_projection.mlw:
       result = epsilon x:t. t'int x = 3
 
 <check_ce:categorization>Categorizations of models:
-- Selected model 0: BAD_CE
+- Checked model 0: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
-- Checked model 1: BAD_CE
+- Selected model 1: BAD_CE
   - Concrete RAC: NORMAL
   - Abstract RAC: NORMAL
 File "bench/check-ce/668_projection.mlw", line 16, characters 14-26:
 Sub-goal Postcondition of goal g'vc.
-Prover result is: Step limit exceeded (500016 steps).
+Prover result is: Unknown (sat) (119 steps).
 Sorry, we don't have a good counterexample for you :(
 
 

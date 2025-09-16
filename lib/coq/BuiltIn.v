@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,7 +11,7 @@
 
 Require Export ZArith.
 Require Export Rbase.
-
+Require Import String.
 Require Import ClassicalEpsilon.
 
 Class WhyType T := {
@@ -40,6 +40,14 @@ destruct (total_order_T x y) as [[H|H]|H] ;
   try (left ; exact H) ; right.
 now apply Rlt_not_eq.
 now apply Rgt_not_eq.
+Qed.
+
+Global Instance string_WhyType : WhyType string.
+Proof.
+split.
+exact EmptyString.
+intros x y.
+apply string_dec.
 Qed.
 
 Global Instance tuple_WhyType : forall T {T' : WhyType T} U {U' : WhyType U}, WhyType (T * U).

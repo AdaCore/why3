@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -156,6 +156,17 @@ and string_skip_spaces buf = parse
           pos_lnum = line;
           pos_bol = pos.pos_cnum - chars;
       }
+
+  let warn_inexistent_file =
+    Loc.register_warning "inexistent_file" "Warn about inexistent file in source location"
+
+  let resolve_file orig_file file =
+    try
+      Sysutil.resolve_from_paths [Filename.dirname orig_file] file
+    with
+    | e ->
+       Loc.warning warn_inexistent_file "inexistent file in source location: %a" Exn_printer.exn_printer e;
+       file
 
   let backjump lexbuf chars =
     if chars < 0 || chars > lexbuf.lex_curr_pos - lexbuf.lex_start_pos then

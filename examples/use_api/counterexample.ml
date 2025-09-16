@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -80,6 +80,11 @@ let main : Whyconf.main = Whyconf.get_main config
 (* all the provers detected, from the config file *)
 let provers : Whyconf.config_prover Whyconf.Mprover.t =
   Whyconf.get_provers config
+(* default resource limits *)
+let limits =
+  Call_provers.{empty_limits with
+                limit_time = Whyconf.timelimit main;
+                limit_mem = Whyconf.memlimit main }
 
 (* BEGIN{ce_get_cvc4ce} *)
 (* One alternative for CVC4 with counterexamples in the config file *)
@@ -110,20 +115,20 @@ let cvc4_driver : Driver.driver =
 let result1 : Call_provers.prover_result =
   Call_provers.wait_on_call
     (Driver.prove_task
-       ~limit:Call_provers.empty_limit
+       ~limits
        ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
     cvc4_driver task2)
 
 (* BEGIN{ce_callprover} *)
-(* prints CVC4 answer *)
-let () = printf "@[On task 1, CVC4,1.7 answers %a@."
+(* Prints CVC4 answer. *)
+let () = printf "@[On task2, CVC4,1.7 answers %a@."
     (Call_provers.print_prover_result ?json:None) result1
 
-let () = printf "Model is %t@."
+let () = printf "@[A candidate counterexample obtained from the prover is@\n%t@]@."
     (fun fmt ->
-       match Check_ce.select_model_last_non_empty
-                result1.Call_provers.pr_models with
+       match Check_ce.last_nonempty_model (Task.task_known task2)
+               result1.Call_provers.pr_models with
        | Some m -> Json_base.print_json fmt (Model_parser.json_model m)
        | None -> fprintf fmt "unavailable")
 (* END{ce_callprover} *)
@@ -163,7 +168,7 @@ let task =
 
 let {Call_provers.pr_models= models} =
   Call_provers.wait_on_call
-    (Driver.prove_task ~limit:Call_provers.empty_limit
+    (Driver.prove_task ~limits
        ~config:main
        ~command:(Whyconf.get_complete_command cvc4 ~with_steps:false)
        cvc4_driver task)
@@ -172,24 +177,26 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
+  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
-      (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
-  let model, clsf = Option.get_exn (Failure "No good model found")
-      (Check_ce.select_model ~check_ce:true rac env pm models) in
+      (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+  let results = Check_ce.models_from_rac ~limits rac env pm models in
+  let model, clsf = Opt.get_exn (Failure "No good model found")
+       (Check_ce.best_rac_result results) in
   printf "%a@." (Check_ce.print_model_classification env
-                   ~check_ce:true ?verb_lvl:None ?json:None) (model, clsf)
+                   ?verb_lvl:None ~json:false) (model, clsf)
 (* END{check_ce} *)
 
 let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
+  let why_prover = Some ("Alt-Ergo,2.5.4",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
-    (Rac.Why.mk_check_term_lit config env ~why_prover:"alt-ergo" ()) in
-  let rac_results = Check_ce.get_rac_results ~only_giant_step:true
+    (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
+  let rac_results = Check_ce.models_from_giant_step ~limits
     rac env pm models in
-  let strategy = Check_ce.best_non_empty_giant_step_rac_result in
-  let _,res = Option.get_exn (Failure "No good model found")
-    (Check_ce.select_model_from_giant_step_rac_results ~strategy rac_results) in
+  let _,res = Opt.get_exn (Failure "No good model found")
+    (Check_ce.best_giant_step_result rac_results) in
   printf "%a@." (Check_ce.print_rac_result ?verb_lvl:None) res
 (* END{check_ce_giant_step} *)

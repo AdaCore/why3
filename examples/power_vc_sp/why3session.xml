@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.1.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="power_vc_sp.mlw"/>
 <theory name="FastExponentiation" proved="true">
  <goal name="fast_exp&#39;vc" expl="VC for fast_exp" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="fast_exp&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="4"/></proof>
   </goal>
   <goal name="fast_exp&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="31"/></proof>
   </goal>
   <goal name="fast_exp&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="6"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="9"/></proof>
   </goal>
   <goal name="fast_exp&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.000000" steps="4"/></proof>
+  <proof prover="2"><result status="valid" time="0.000000" steps="4"/></proof>
   </goal>
   <goal name="fast_exp&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.100000" steps="89"/></proof>
+  <proof prover="3"><result status="valid" time="0.032622" steps="989"/></proof>
   </goal>
  </transf>
  </goal>
@@ -44,10 +45,10 @@
   <proof prover="1"><result status="valid" time="0.020000" steps="4585"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.560000" steps="100"/></proof>
+  <proof prover="3"><result status="valid" time="0.170467" steps="5604"/></proof>
   </goal>
   <goal name="fast_exp_imperative&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="1"><result status="valid" time="0.000000" steps="10"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.000000" steps="96"/></proof>
   </goal>
  </transf>
  </goal>

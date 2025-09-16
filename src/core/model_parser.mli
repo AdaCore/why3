@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2023 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -38,6 +38,9 @@ type model_element_kind =
   | Other
 
 val print_model_kind : Format.formatter -> model_element_kind -> unit
+val compute_kind : Ident.Sattr.t -> Loc.position option -> Ident.Sattr.t -> model_element_kind
+(* Computes the kidn of an element given the attributes of the VC, the loc of the element
+   and its attributes *)
 
 (** {3 Model element concrete value} *)
 
@@ -123,7 +126,7 @@ and concrete_syntax_funlit =
 and concrete_syntax_fun = { args : string list; body : concrete_syntax_term; }
 
 (** Concrete term *)
-and concrete_syntax_term =
+and concrete_syntax_term = private
   | Var of string
   (** Variable of the given name *)
   | Const of concrete_syntax_constant
@@ -155,12 +158,31 @@ and concrete_syntax_term =
 
 val print_concrete_term : Format.formatter -> concrete_syntax_term -> unit
 
+
 (** Helper functions to create concrete terms *)
 
-val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term
+val concrete_const : concrete_syntax_constant -> concrete_syntax_term
+val concrete_var : string -> concrete_syntax_term
+val concrete_apply : string -> concrete_syntax_term list -> concrete_syntax_term
+val concrete_if : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_let : string -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_record : (string * concrete_syntax_term) list -> concrete_syntax_term
+val concrete_proj : string -> concrete_syntax_term -> concrete_syntax_term
+val concrete_epsilon : string -> concrete_syntax_term -> concrete_syntax_term
+val concrete_function_literal : concrete_syntax_funlit_elts list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_function : string list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_quant : concrete_syntax_quant -> string list -> concrete_syntax_term -> concrete_syntax_term
+val concrete_binop: concrete_syntax_binop -> concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_not: concrete_syntax_term -> concrete_syntax_term
+
+val concrete_undefined : concrete_syntax_term
+val is_concrete_undefined : concrete_syntax_term -> bool
+
+val concrete_string_from_vs : Term.vsymbol -> string
+(*val concrete_var_from_vs : Term.vsymbol -> concrete_syntax_term*)
 val concrete_const_bool : bool -> concrete_syntax_term
 val concrete_apply_from_ls : Term.lsymbol -> concrete_syntax_term list -> concrete_syntax_term
-val concrete_apply_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
+val concrete_equ : concrete_syntax_term -> concrete_syntax_term -> concrete_syntax_term
 val subst_concrete_term :
   concrete_syntax_term Wstdlib.Mstr.t -> concrete_syntax_term -> concrete_syntax_term
 val t_and_l_concrete : concrete_syntax_term list -> concrete_syntax_term
@@ -240,7 +262,6 @@ val json_model : model -> Json_base.json
     The format is documented in [share/ce-models.json]. *)
 
 val print_model :
-  ?filter_similar:bool ->
   print_attrs:bool ->
   Format.formatter ->
   model ->
@@ -250,14 +271,6 @@ val print_model :
     @param print_attrs when set to true, each element is printed together with the
     attrs associated to it.
 *)
-
-val print_model_human :
-  ?filter_similar:bool ->
-  Format.formatter ->
-  model ->
-  print_attrs:bool ->
-  unit
-(** Same as print_model but is intended to be human readable.*)
 
 (** {2 Interleaving source code and model} *)
 

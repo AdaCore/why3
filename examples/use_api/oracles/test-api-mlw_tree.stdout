@@ -28,8 +28,30 @@ module M4
   
   let f (a : Array.array int)
     requires { Int.( >= ) (a.Array.length) 1 }
+    writes { a }
     ensures { (Array.( [] ) a 0) = 42 }
   = Array.( []<- ) a 0 42
+end
+module Mglob
+  use int.Int
+  
+  let ref x = any int
+  
+  let f (_ : ())
+    writes { x [@mlw:reference_var] }
+  = (x [@mlw:reference_var]) <- (Int.( + ) x [@mlw:reference_var] 1)
+end
+
+module Mscope
+  use int.Int
+  
+  scope S
+    function f (x: int) : int = x
+    end
+  
+  import S
+  
+  goal g: Int.( = ) (2.f) 2
 end
 module M5
   use int.Int
@@ -50,3 +72,6 @@ module M6
   = Array.( []<- ) a 0 42
 end
 On task 1, alt-ergo answers Valid (<hidden>s, <hidden> steps)
+On task 2, alt-ergo answers Valid (<hidden>s, <hidden> steps)
+On task 3, alt-ergo answers Valid (<hidden>s, <hidden> steps)
+On task 4, alt-ergo answers Valid (<hidden>s, <hidden> steps)
