@@ -3,6 +3,9 @@
 Version 1.8.2, September 12, 2025
 ---------------------------
 
+Compilation
+  * compatibility with OCaml 5.4 (MR !1228)
+
 Provers
   * fix soundness bug with floats in Alt-Ergo 2.6.x (issue #905)
 
