@@ -45,7 +45,7 @@ Lemma size_pos : (0%Z < size)%Z.
   rewrite size_int_S; lia.
 Qed.
 
-Require Import Bool.Bvector.
+From Coq Require Import Bvector.
 
 (* Why3 goal *)
 Definition t : Type.
