@@ -383,7 +383,7 @@ module USingleLemmas
   use real.Abs
   use USingle
 
-  let ghost uadd_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma uadd_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -445,7 +445,7 @@ module USingleLemmas
         y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let ghost usub_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma usub_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -468,7 +468,7 @@ module USingleLemmas
 
   use HelperLemmas
 
-  let ghost umul_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma umul_single_error_propagation (x_f y_f r : usingle) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -501,7 +501,7 @@ module USingleLemmas
 
   use real.ExpLog
 
-  let ghost log_single_error_propagation (logx_f x_f : usingle)
+  let lemma log_single_error_propagation (logx_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -524,7 +524,7 @@ module USingleLemmas
     <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost log2_single_error_propagation (log2x_f x_f : usingle)
+  let lemma log2_single_error_propagation (log2x_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -547,7 +547,7 @@ module USingleLemmas
     <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost log10_single_error_propagation (log10x_f x_f : usingle)
+  let lemma log10_single_error_propagation (log10x_f x_f : usingle)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -570,7 +570,7 @@ module USingleLemmas
     <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost exp_single_error_propagation (expx_f x_f : usingle)
+  let lemma exp_single_error_propagation (expx_f x_f : usingle)
         (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -606,7 +606,7 @@ module USingleLemmas
 
   use real.Trigonometry
 
-  let ghost sin_single_error_propagation (sinx_f x_f : usingle)
+  let lemma sin_single_error_propagation (sinx_f x_f : usingle)
         (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -626,7 +626,7 @@ module USingleLemmas
   <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let ghost cos_single_error_propagation (cosx_f x_f : usingle)
+  let lemma cos_single_error_propagation (cosx_f x_f : usingle)
         (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -652,7 +652,7 @@ module USingleLemmas
 
   function real_fun (f:int -> usingle) : int -> real = fun i -> to_real (f i)
 
-  let ghost sum_single_error_propagation (x : usingle)
+  let lemma sum_single_error_propagation (x : usingle)
                 (f : int -> usingle) (f_exact f_factor f_factor' : int -> real) (n:int)
                 (sum_rel sum_abs f_rel f_abs : real)
     requires {
@@ -683,7 +683,7 @@ module USingleLemmas
   }
 
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
-  let ghost udiv_exact_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs : real)
+  let lemma udiv_exact_single_error_propagation (x_f y_f r: usingle) (x x_factor x_rel x_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -738,7 +738,7 @@ module UDoubleLemmas
   use real.Abs
   use UDouble
 
-  let ghost uadd_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma uadd_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -800,7 +800,7 @@ module UDoubleLemmas
         y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
   }
 
-  let ghost usub_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma usub_double_error_propagation (x_f y_f r : udouble) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -823,7 +823,7 @@ module UDoubleLemmas
 
   use HelperLemmas
 
-  let ghost umul_double_error_propagation (x_f y_f r : udouble)
+  let lemma umul_double_error_propagation (x_f y_f r : udouble)
      (x x_factor x_rel x_abs : real) (y y_factor y_rel y_abs : real) : unit
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
@@ -857,7 +857,7 @@ module UDoubleLemmas
 
   use real.ExpLog
 
-  let ghost log_double_error_propagation (logx_f x_f : udouble)
+  let lemma log_double_error_propagation (logx_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -880,7 +880,7 @@ module UDoubleLemmas
     <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost log2_double_error_propagation (log2x_f x_f : udouble)
+  let lemma log2_double_error_propagation (log2x_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -903,7 +903,7 @@ module UDoubleLemmas
     <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost log2_double_error_propagation_simple (log2x_f x_f : udouble)
+  let lemma log2_double_error_propagation_simple (log2x_f x_f : udouble)
         (x_exact log_rel x_rel : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_exact }
     requires {
@@ -920,7 +920,7 @@ module UDoubleLemmas
   =
   log2_double_error_propagation log2x_f x_f x_exact x_exact log_rel 0.0 x_rel 0.0
 
-  let ghost log10_double_error_propagation (log10x_f x_f : udouble)
+  let lemma log10_double_error_propagation (log10x_f x_f : udouble)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -943,7 +943,7 @@ module UDoubleLemmas
     <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let ghost exp_double_error_propagation (expx_f x_f : udouble)
+  let lemma exp_double_error_propagation (expx_f x_f : udouble)
         (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -979,7 +979,7 @@ module UDoubleLemmas
 
   use real.Trigonometry
 
-  let ghost sin_double_error_propagation (sinx_f x_f : udouble)
+  let lemma sin_double_error_propagation (sinx_f x_f : udouble)
         (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -999,7 +999,7 @@ module UDoubleLemmas
   <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let ghost cos_double_error_propagation (cosx_f x_f : udouble)
+  let lemma cos_double_error_propagation (cosx_f x_f : udouble)
         (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -1025,7 +1025,7 @@ module UDoubleLemmas
 
   function real_fun (f:int -> udouble) : int -> real = fun i -> to_real (f i)
 
-  let ghost sum_double_error_propagation (x : udouble)
+  let lemma sum_double_error_propagation (x : udouble)
                 (f : int -> udouble) (f_exact f_factor f_factor' : int -> real) (n:int)
                 (sum_rel sum_abs f_rel f_abs : real)
     requires {
@@ -1056,7 +1056,7 @@ module UDoubleLemmas
   }
 
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
-  let ghost udiv_exact_double_error_propagation (x_f y_f r: udouble) (x x_factor x_rel x_abs : real)
+  let lemma udiv_exact_double_error_propagation (x_f y_f r: udouble) (x x_factor x_rel x_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
