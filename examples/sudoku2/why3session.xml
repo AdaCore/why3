@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.2.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="sudoku2.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="row&#39;vc" expl="VC for row" proved="true">
+ <proof prover="1"><result status="valid" time="0.019411" steps="1295"/></proof>
+ </goal>
+ <goal name="col&#39;vc" expl="VC for col" proved="true">
+ <proof prover="1"><result status="valid" time="0.013461" steps="1295"/></proof>
+ </goal>
+ <goal name="grp&#39;vc" expl="VC for grp" proved="true">
+ <proof prover="1"><result status="valid" time="0.007027" steps="1738"/></proof>
+ </goal>
+ <goal name="filled_upto_lemma" proved="true">
+ <proof prover="1"><result status="valid" time="0.021984" steps="33105"/></proof>
+ </goal>
+ <goal name="check_&#39;vc" expl="VC for check_" proved="true">
+ <proof prover="0"><result status="valid" time="0.514000" steps="41806"/></proof>
+ </goal>
+ <goal name="solve&#39;vc" expl="VC for solve" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="solve&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.018119" steps="35635"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.022392" steps="36836"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.2" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.008950" steps="3443"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.3" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.005870" steps="3389"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.013127" steps="18351"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.044337" steps="113565"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.008791" steps="3473"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.007041" steps="3478"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.8" expl="exceptional postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.006116" steps="3501"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.9" expl="loop invariant init" proved="true">
+  <proof prover="1"><result status="valid" time="0.008159" steps="3568"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.054149" steps="95339"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.054917" steps="146499"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.035004" steps="70280"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.13" expl="variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.009067" steps="3656"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.105122" steps="214912"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.014697" steps="20495"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.16" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.026986" steps="54981"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.047079" steps="81687"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.011265" steps="3619"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.19" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.019705" steps="56784"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.20" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.093593" steps="191268"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.21" expl="exceptional postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.455491" steps="60445"/></proof>
+  </goal>
+  <goal name="solve&#39;vc.22" expl="exceptional postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.010102" steps="3501"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="solve_main&#39;vc" expl="VC for solve_main" proved="true">
+ <proof prover="1"><result status="valid" time="0.019470" steps="29316"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>
