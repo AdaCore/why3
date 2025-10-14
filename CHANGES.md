@@ -1,5 +1,32 @@
 :x: marks a potential source of incompatibility
 
+Version 1.8.2, September 16, 2025
+---------------------------
+
+Compilation
+  * compatibility with OCaml 5.4 (MR !1228)
+
+Provers
+  * fix soundness bug with floats in Alt-Ergo 2.6.x (issue #905)
+
+Sessions
+  * fix issue with file identifiers in sessions (MR !1231)
+
+Extraction
+  * restore compatibility of OCaml extraction with js_of_ocaml
+
+Version 1.8.1, June 4, 2025
+---------------------------
+
+Core
+  * fix cloning of injective records
+
+Miscellaneous
+  * fix compilation error with GCC 15
+
+Plugins
+  * resurrect the BDD-infer loop invariant generation plug-in
+
 Version 1.8.0, December 11, 2024
 --------------------------------
 
@@ -15,8 +42,9 @@ Standard library
 
 Core
   * records and range types now have some predefined symbol `foo'eq`
-    and some axiom `foo'inj` to express injectivity. See manual
-    Section "The WhyML Language Reference/Record Types".
+    and some axiom `foo'inj` to express injectivity; see Section
+    "The WhyML Language Reference/Record Types" of the manual
+    (contribution by Loïc Correnson)
 
 Transformations
   * new transformation `extensionality` to help with equality proofs
@@ -44,15 +72,18 @@ Tools
   * `why3 pp`: dropped option `--kind` :x:
 
 Extraction
-  * added support for Java, see Manual, Section "Executing WhyML Programs"
+  * added support for Java; see Section "Executing WhyML Programs" of the manual
+    (contribution by Gérald Point)
   * improved extraction to C: floating-point numbers, global variables
 
 API
-  * changed how resource limits are specified :x
-  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x
+  * changed how resource limits are specified :x:
+  * renamed type `effect` to `effekt` for compatibility with OCaml 5.3 :x:
 
 Miscellaneous
   * dependency on OCaml library `num` was replaced by `zarith`
+  * added support for native Windows compilation through Opam 2.2
+    (contribution by Basile Deslosges)
 
 Version 1.7.2, April 18, 2024
 -----------------------------
