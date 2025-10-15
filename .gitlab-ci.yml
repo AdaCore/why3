@@ -138,9 +138,7 @@ trywhy3-extra:
   image: "debian:bullseye-slim"
   script:
     - misc/ci-trywhy3.sh
-  only:
-    variables:
-      - $NEW_TRYWHY3_EXTRA
+  when: manual
   artifacts:
     paths:
       - trywhy3

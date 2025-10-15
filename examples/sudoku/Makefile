@@ -57,7 +57,7 @@ JSMAIN=jsmain
 JSOCAMLC=ocamlfind ocamlc -package js_of_ocaml -package js_of_ocaml-ppx -package js_of_ocaml-lwt
 
 $(JSMAIN).js: $(JSMAIN).byte
-	js_of_ocaml +nat.js $(JSMAIN).byte
+	js_of_ocaml +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $(JSMAIN).byte
 
 $(JSMAIN).byte: $(CMO) $(JSMAIN).cmo
 	$(JSOCAMLC) $(INCLUDE) zarith.cma -o $@ -linkpkg $^
