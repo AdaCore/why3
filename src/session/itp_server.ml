@@ -493,20 +493,16 @@ let relativize_loc =
 
 let get_locations (task: Task.task) =
   let list = ref [] in
-  let goal_loc = ref None in
+  let goal_locs = ref [] in
   let color_loc ~color ~loc =
     let loc = relativize_loc loc in
     list := (loc, color) :: !list
   in
-  let get_goal_loc ~loc pr_loc =
+  let get_goal_loc ~locs pr_loc =
     (* We get the task loc in priority. If it is not there, we take the pr
        ident loc. No loc can happen in completely ghost function. *)
-    let loc = Option.fold ~some:(fun x -> Some x) ~none:pr_loc loc in
-    match loc with
-    | Some loc ->
-        let loc = relativize_loc loc in
-        goal_loc := Some loc
-    | _ -> () in
+    let locs = if locs = [] then Option.to_list pr_loc else locs in
+    goal_locs := List.map relativize_loc locs in
   let rec color_locs ~color formula =
     List.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_locs;
     Term.t_iter (fun subf -> color_locs ~color subf) formula in
@@ -549,7 +545,7 @@ let get_locations (task: Task.task) =
                 Theory.Decl { Decl.d_node = Decl.Dprop (k, pr, f) }}} ->
       begin match k with
       | Decl.Pgoal  ->
-          get_goal_loc ~loc:(Term.t_loc f) pr.Decl.pr_name.Ident.id_loc;
+          get_goal_loc ~locs:f.Term.t_locs pr.Decl.pr_name.Ident.id_loc;
           color_t_locs ~premise:false f
       | Decl.Paxiom -> color_t_locs ~premise:true  f
       | _ -> assert false
@@ -558,7 +554,7 @@ let get_locations (task: Task.task) =
     | Some { Task.task_prev = prev } -> scan prev
     | _ -> () in
   scan task;
-  !goal_loc, !list
+  !goal_locs, !list
 
 let get_modified_node n =
   match n with
@@ -942,7 +938,7 @@ end
     let lang = lang d.cont.controller_session (APn id) in
     (* This function also send source locations associated to the task *)
     let goal_loc, loc_color_list =
-      if loc then get_locations task else (None, []) in
+      if loc then get_locations task else ([], []) in
     let task_text =
       let pr = tables.Trans.printer in
       let apr = tables.Trans.aprinter in
@@ -960,17 +956,14 @@ end
     | Goal_loc
     | Color_loc of Itp_communication.color
 
-  let create_ce_tab ~print_attrs s model any list_loc goal_loc =
+  let create_ce_tab ~print_attrs s model any list_loc goal_locs =
     let f = get_encapsulating_file s any in
     let file_format = Session_itp.file_format f in
     let filename = Session_itp.system_path s f in
     let source_code = Sysutil.file_contents filename in
     (* Convert the color location and location of the goal at the same time *)
     let list_loc = List.map (fun (x, y) -> x, Color_loc y) list_loc in
-    let list_loc =
-      match goal_loc with
-      | Some goal_loc -> (goal_loc, Goal_loc) :: list_loc
-      | None          -> list_loc in
+    let list_loc = List.map (fun loc -> (loc, Goal_loc)) goal_locs @ list_loc in
     let (source_result, list_loc) =
       Model_parser.interleave_with_source ~print_attrs ?start_comment:None ?end_comment:None
         model ~rel_filename:filename
@@ -997,24 +990,24 @@ end
       match any with
       | APn _id ->
         let s = "Goal is detached and cannot be printed" in
-        P.notify (Task (nid, s, [], None, ""))
+        P.notify (Task (nid, s, [], [], ""))
       | ATh t ->
           let th_id   = theory_name t in
           let th_name = th_id.Ident.id_string in
-          let th_loc  = th_id.Ident.id_loc in
+          let th_loc  = Option.to_list th_id.Ident.id_loc in
           P.notify (Task (nid, "Detached theory " ^ th_name, [], th_loc, ""))
       | APa pid ->
           let pa = get_proof_attempt_node  d.cont.controller_session pid in
           let name = Pp.string_of Whyconf.print_prover pa.prover in
           let prover_text = "Detached prover\n====================> Prover: " ^ name ^ "\n" in
-          P.notify (Task (nid, prover_text, [], None, ""))
+          P.notify (Task (nid, prover_text, [], [], ""))
       | AFile f ->
-          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), [], None, ""))
+          P.notify (Task (nid, "Detached file " ^ (Sysutil.basename (file_path f)), [], [], ""))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           P.notify (Task (nid, "Detached transformation\n====================> Transformation: " ^
-                          String.concat " " (name :: args) ^ "\n", [], None, ""))
+                          String.concat " " (name :: args) ^ "\n", [], [], ""))
     else
       let lang = lang d.cont.controller_session any in
       match any with
@@ -1024,8 +1017,7 @@ end
       | ATh t ->
           let th_id   = theory_name t in
           let th_name = th_id.Ident.id_string in
-          let th_loc  = th_id.Ident.id_loc in
-          let th_loc = Option.map relativize_loc th_loc in
+          let th_loc  = th_id.Ident.id_loc |> Option.map relativize_loc |> Option.to_list in
           P.notify (Task (nid, "Theory " ^ th_name, [], th_loc, lang))
       | APa pid ->
           let print_attrs = Debug.test_flag debug_attrs in
@@ -1075,15 +1067,15 @@ match pa.proof_state with
             let fp = Session_itp.system_path d.cont.controller_session f in
             Loc.user_position fp 1 0 1 0 in
           let file_loc = relativize_loc file_loc in
-          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], Some file_loc, lang))
+          P.notify (Task (nid, "File " ^ (Sysutil.basename (file_path f)), [], [file_loc], lang))
       | ATn tid ->
           let name = get_transf_name d.cont.controller_session tid in
           let args = get_transf_args d.cont.controller_session tid in
           let parid = get_trans_parent d.cont.controller_session tid in
-          let s, list_loc, goal_loc = task_of_id d parid show_full_context show_uses_clones_metas loc in
+          let s, list_loc, goal_locs = task_of_id d parid show_full_context show_uses_clones_metas loc in
           P.notify (Task (nid, s ^ "\n====================> Transformation: " ^
                           String.concat " " (name :: args) ^ "\n",
-                          list_loc, goal_loc, lang))
+                          list_loc, goal_locs, lang))
 
   (* -------------------- *)
 

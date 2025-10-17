@@ -313,8 +313,12 @@ let convert_loc_color (loc,color: Loc.position * color) : Json_base.json =
   let color = convert_color color in
   Record ["loc", loc; "color", color]
 
-let convert_list_loc (l: (Loc.position * color) list) : json =
+let convert_list_loc_color (l: (Loc.position * color) list) : json =
   let list_of_loc = List.map convert_loc_color l in
+  List list_of_loc
+
+let convert_list_loc (l: Loc.position list) : json =
+  let list_of_loc = List.map convert_loc l in
   List list_of_loc
 
 exception Notcolor
@@ -351,9 +355,14 @@ let parse_loc_color (j: json): Loc.position * color =
   with
     Not_found -> raise Notposition
 
-let parse_list_loc (j: json): (Loc.position * color) list =
+let parse_list_loc_color (j: json): (Loc.position * color) list =
   match j with
   | List l -> List.map parse_loc_color l
+  | _ -> raise Notposition
+
+let parse_list_loc (j: json): Loc.position list =
+  match j with
+  | List l -> List.map parse_loc l
   | _ -> raise Notposition
 
 (* Option is represented by a list *)
@@ -404,8 +413,8 @@ let convert_notification (n: notification): json =
       ["notification", String "Task";
        "node_ID", Int nid;
        "task", String s;
-       "loc_list", convert_list_loc list_loc;
-       "goal_loc", convert_option_loc goal_loc;
+       "loc_list", convert_list_loc_color list_loc;
+       "goal_loc", convert_list_loc goal_loc;
        "lang", String lang]
   | File_contents (f, s, f_format, read_only) ->
       ["notification", String "File_contents";
@@ -416,7 +425,7 @@ let convert_notification (n: notification): json =
   | Source_and_ce (s, list_loc, goal_loc, f_format) ->
       ["notification", String "Source_and_ce";
        "content", String s;
-       "loc_list", convert_list_loc list_loc;
+       "loc_list", convert_list_loc_color list_loc;
        "goal_loc", convert_option_loc goal_loc;
        "file_format", String f_format]
   | Ident_notif_loc loc ->
@@ -797,7 +806,7 @@ let parse_notification constr j =
     let l = get_field j "loc_list" in
     let gl = get_field j "goal_loc" in
     let lang = get_string_field j "lang" in
-    Task (nid, s, parse_list_loc l, parse_opt_loc gl, lang)
+    Task (nid, s, parse_list_loc_color l, parse_list_loc gl, lang)
 
   | "Next_Unproven_Node_Id" ->
     let nid1 = get_int_field j "node_ID1" in
@@ -816,7 +825,7 @@ let parse_notification constr j =
     let l = get_field j "loc_list" in
     let gl = get_field j "goal_loc" in
     let f_format = get_string_field j "file_format" in
-    Source_and_ce(s, parse_list_loc l, parse_opt_loc gl, f_format)
+    Source_and_ce(s, parse_list_loc_color l, parse_opt_loc gl, f_format)
 
   | "Ident_notif_loc" ->
       let loc = parse_loc (get_field j "ident_loc") in
