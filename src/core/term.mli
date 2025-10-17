@@ -319,6 +319,9 @@ val t_attr_copy : term -> term -> term
 (** [t_attr_copy src dst] returns the term [dst] with attributes and
    locations augmented with those of term [src] *)
 
+val t_locs_append : Loc.position list -> term -> term
+(** Append locations to the end of the [t_locs] field *)
+
 (** Constructors with propositional simplification *)
 
 val t_let_close_simp : vsymbol -> term -> term -> term

@@ -662,6 +662,9 @@ let t_loc t = match t.t_locs with
   | [] -> None
   | loc :: _ -> Some loc
 
+let t_locs_append locs t =
+  if locs = [] then t else { t with t_locs = t.t_locs @ locs }
+
 (* unsafe map *)
 
 let bound_map fn (u,b,e) = (u, bnd_map fn b, fn e)
