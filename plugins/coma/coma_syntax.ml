@@ -133,7 +133,7 @@ module PP = struct
 
   let rec pp_expr fmt = function
     | Eany           -> fprintf fmt "any"
-    | Esym i         -> fprintf fmt "%a"             pp_hs i
+    | Esym (i, _)    -> fprintf fmt "%a"             pp_hs i
     | Ebox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
     | Ewox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
     | Eset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
@@ -147,7 +147,7 @@ module PP = struct
     | At t        -> fprintf fmt "%a"   pp_ty  t
     | Av v        -> fprintf fmt "%a"   pp_term v
     | Ar r        -> fprintf fmt "%a"   (pp_var true) r
-    | Ac (Esym i) -> fprintf fmt "%a"   pp_hs i
+    | Ac (Esym (i, _)) -> fprintf fmt "%a" pp_hs i
     | Ac e        -> fprintf fmt "(%a)" pp_expr e
 
   and pp_def direct fmt (h, w, pl, e) =

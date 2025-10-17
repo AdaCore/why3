@@ -322,7 +322,7 @@ type param =
   | Pc of hsymbol * vsymbol list * param list
 
 type expr =
-  | Esym of hsymbol
+  | Esym of hsymbol * Loc.position
   | Eapp of expr * argument
   | Elam of param list * expr
   | Edef of expr * bool * defn list
@@ -344,7 +344,7 @@ and defn = hsymbol * vsymbol list * param list * expr
 (* VC formulas *)
 
 type formula =
-  | Fsym of hsymbol
+  | Fsym of hsymbol * Loc.position
   | Fagt of formula * ty
   | Fagv of formula * term
   | Fagr of formula * vsymbol
@@ -450,7 +450,7 @@ let print_formula fmt e =
     | Pr vs -> Format.pp_print_char fmt '&'; Format.pp_print_string fmt vs.vs_name.id_string
     | Pc (hs,_,_) -> Format.pp_print_string fmt hs.hs_name.id_string in
   let rec pp fmt = function
-    | Fsym h -> Format.pp_print_string fmt h.hs_name.id_string
+    | Fsym (h, _) -> Format.pp_print_string fmt h.hs_name.id_string
     | Flam (pl,_,f) -> Format.fprintf fmt "@[<hov 2>(lambda %a .@ %a)@]"
         (Pp.print_list Pp.space pp_p) pl pp f
     | Fcut (s,true,f) -> Format.fprintf fmt "@[<hov 2>{ %a }@ %a@]"
@@ -553,7 +553,7 @@ let close vl hl {wp;sp} =
   w_forall vl @@ w_and_l {wp; sp = Mhs.set_diff sp sh} wl
 
 let rec f_eval c o bl = match o with
-  | Fsym h -> c_call_hs c h true bl
+  | Fsym (h, loc) -> c_call_hs c h true bl
   | Flam (pl, mm, f) ->
       let c,vl,hl,bl = consume mm c pl bl in
       close vl hl (f_eval c f bl)
@@ -577,7 +577,7 @@ and f_handler c o go bl =
   f_pass (if go then c else c_neutralize c Shs.empty) o bl
 
 let rec fill_mm lh = function
-  | Fsym h as f ->
+  | Fsym (h, _) as f ->
       (try incr (Mhs.find h lh) with Not_found -> ()); f
   | Flam (pl, mm, f) ->
       let mm = Shs.inter mm (lh_of_pl pl) in
@@ -656,7 +656,7 @@ let dl_split flat pl dl =
   let [@warning "-8"] head (Pc (h,_,_),_) = h in
   let iter fn (_,g) =
     let rec inspect sh st = function
-      | Fsym h ->
+      | Fsym (h, _) ->
           (* h may be external or dummy, therefore
              we inspect every term on the stack *)
           let pop ({contents = {csh; cg}} as r) =
@@ -707,9 +707,9 @@ let rec vc tt hc o al =
   match o with
   | Eapp (e,a) ->
       vc tt hc e (a::al)
-  | Esym h ->
+  | Esym (h, loc) ->
       let (wr,pl) = Mhs.find h hc in
-      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym h) wr in
+      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym (h, loc)) wr in
       let w = if tt then TT f else TB (f, Fneu (f, Shs.empty)) in
       apply w Mvs.empty pl al
   | Elam (pl,e) ->
@@ -822,7 +822,7 @@ let rec fill_wr hc lh lr wm o al =
   match o with
   | Eapp (e,a) ->
       fill_wr hc lh lr wm e (a::al)
-  | Esym h ->
+  | Esym (h, _) ->
       let lc,(_,pl) = try true, Mhs.find h lh
         with Not_found -> false, Mhs.find h hc in
       if lc && not (Mhs.mem h !wm) then

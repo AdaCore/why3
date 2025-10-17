@@ -35,7 +35,7 @@ type param =
   | Pc of hsymbol * vsymbol list * param list
 
 type expr =
-  | Esym of hsymbol
+  | Esym of hsymbol * Loc.position
   | Eapp of expr * argument
   | Elam of param list * expr
   | Edef of expr * bool * defn list

@@ -210,7 +210,7 @@ let dl_split flat dl =
   let iter fn (_,_,_,d) =
     (* we assume no collisions *)
     let rec inspect = function
-      | Esym h -> fn h
+      | Esym (h, _) -> fn h
       | Edef (e,_,dl) ->
           let check (_,_,_,d) = inspect d
           in List.iter check dl; inspect e
@@ -275,7 +275,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
           Loc.errorm ~loc:(qloc q) "[coma typing] \
             unbound handler `%a'" Typing.print_qualid q
       in
-      Esym h, pl
+      Esym (h, qloc q), pl
   | PEapp (pe, a) ->
       let e, te = type_expr muc ctx pe in
       (match te, a with
