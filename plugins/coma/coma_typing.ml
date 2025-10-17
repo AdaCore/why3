@@ -254,6 +254,24 @@ let rec subs_param (mty, mvs as acc) = function
 
 let curr_prog = ref ""
 
+let expected_param_kind = function
+  | Pv _ -> "{TERM}"
+  | Pc _ -> "expression"
+  | Pt _ -> "<TYPE>"
+  | Pr _ -> "&REF"
+
+let pp_actual_arg_kind ty_of_pty h = function
+  | PAv _ -> Format.pp_print_string h "term"
+  | PAc _ -> Format.pp_print_string h "expression"
+  | PAt ty -> Format.fprintf h "type %a" PP.pp_ty (ty_of_pty ty)
+  | PAr id -> Format.fprintf h "reference &%s" id.id_str
+
+let arg_loc ~default = function
+  | PAv t -> t.term_loc
+  | PAc e -> e.pexpr_loc
+  | PAt _ -> default
+  | PAr id -> id.id_loc
+
 let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
   | PEany -> Eany, []
@@ -293,7 +311,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
                    PP.pp_ty ty
              | None ->
                  Loc.errorm ~loc:t.term_loc "[coma typing] \
-                   type error in application (todo better message)" in
+                   type error in application: could not type argument" in
            Eapp (e, Av tt), tes
        | Pr rs :: tes, PAr id ->
            let s = match Mstr.find id.id_str ctx.vars with
@@ -321,57 +339,12 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
              the expression `%a' is already fully applied" PP.pp_expr e
 
         (* error message *)
-       | Pv _ :: _, PAr id ->
-           Loc.errorm ~loc "[coma typing] \
+       | expected :: _, actual ->
+           Loc.errorm ~loc:(arg_loc ~default:loc actual) "[coma typing] \
              type error with the application \
-             (expected term, got reference `&%s')" id.id_str
-       | Pv _ :: _, PAt pty ->
-           let ty = Typing.ty_of_pty tuc pty in
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected term, got type `%a')" PP.pp_ty ty
-       | Pv _ :: _, PAc c ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected term, got expression `%a')" PPp.pp_expr c
-       | Pr _ :: _, PAv _ ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected reference, got term)"
-       | Pr _ :: _, PAt pty ->
-           let ty = Typing.ty_of_pty tuc pty in
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected reference, got type `%a')" PP.pp_ty ty
-       | Pr _ :: _, PAc c ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected reference, got expression `%a')" PPp.pp_expr c
-       | Pc _ :: _, PAv _ ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected expression, got term)"
-       | Pc _ :: _, PAr id ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected expression, got reference `&%s')" id.id_str
-       | Pc _ :: _, PAt pty ->
-           let ty = Typing.ty_of_pty tuc pty in
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected expression, got type `%a')" PP.pp_ty ty
-       | Pt _ :: _, PAv _ ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected type, got term)"
-       | Pt _ :: _, PAr id ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected type, got reference `&%s')" id.id_str
-       | Pt _ :: _, PAc c ->
-           Loc.errorm ~loc "[coma typing] \
-             type error with the application \
-             (expected type, got expression `%a')" PPp.pp_expr c
+             (expected %s, got %a)"
+             (expected_param_kind expected)
+             (pp_actual_arg_kind (Typing.ty_of_pty tuc)) actual
        end
   | PElet (e, l) ->
       let ctx0 = ctx in
