@@ -267,7 +267,7 @@ let rec reify_term renv t rt =
            | Ttrue | Tfalse -> t
            | _ -> t (* FIXME some cases missing *)
          in
-         t_attr_set ?loc:t.t_loc Sattr.empty t
+         t_attr_set ~locs:t.t_locs Sattr.empty t
        in
        let t = rm t in
        (* remove attributes to identify terms modulo attributes *)

@@ -16,7 +16,7 @@ let attrset = Sattr.of_list [Term.asym_split]
 
 let rec fmla_simpl f =
   let f = if Sattr.disjoint f.t_attrs attrset then f else
-    t_attr_set ?loc:f.t_loc (Sattr.diff f.t_attrs attrset) f in
+    t_attr_set ~locs:f.t_locs (Sattr.diff f.t_attrs attrset) f in
   TermTF.t_map_simp t_fmla_simpl fmla_simpl f
 
 and t_fmla_simpl t = TermTF.t_map t_fmla_simpl fmla_simpl t

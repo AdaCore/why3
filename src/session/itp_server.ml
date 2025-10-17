@@ -508,7 +508,7 @@ let get_locations (task: Task.task) =
         goal_loc := Some loc
     | _ -> () in
   let rec color_locs ~color formula =
-    Option.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_loc;
+    List.iter (fun loc -> color_loc ~color ~loc) formula.Term.t_locs;
     Term.t_iter (fun subf -> color_locs ~color subf) formula in
   let rec color_t_locs ~premise f =
     match f.Term.t_node with
@@ -524,7 +524,7 @@ let get_locations (task: Task.task) =
     | Term.Tquant (Term.Tforall,fq) when not premise ->
       let _,_,f1 = Term.t_open_quant fq in
       color_t_locs ~premise f1
-    | Term.Tnot f1 when premise && f.Term.t_loc = None ->
+    | Term.Tnot f1 when premise && f.Term.t_locs = [] ->
       color_locs ~color:Neg_premise_color f1
     | _ when premise ->
       color_locs ~color:Premise_color f
@@ -549,7 +549,7 @@ let get_locations (task: Task.task) =
                 Theory.Decl { Decl.d_node = Decl.Dprop (k, pr, f) }}} ->
       begin match k with
       | Decl.Pgoal  ->
-          get_goal_loc ~loc:f.Term.t_loc pr.Decl.pr_name.Ident.id_loc;
+          get_goal_loc ~loc:(Term.t_loc f) pr.Decl.pr_name.Ident.id_loc;
           color_t_locs ~premise:false f
       | Decl.Paxiom -> color_t_locs ~premise:true  f
       | _ -> assert false

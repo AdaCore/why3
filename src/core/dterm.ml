@@ -593,9 +593,9 @@ let check_exists_implies loc f = match f.t_node with
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
-let t_attr_set loc attrs t =
-  if loc = None && Sattr.is_empty attrs
-  then t else t_attr_set ?loc attrs t
+let t_attr_set locs attrs t =
+  if locs = [] && Sattr.is_empty attrs
+  then t else t_attr_set ~locs attrs t
 
 let rec strip uloc attrs dt = match dt.dt_node with
   | DTcast (dt,_) -> strip uloc attrs dt
@@ -609,7 +609,7 @@ let rec term ~strict ~keep_loc uloc env prop dt =
   let tloc = if uloc <> None then uloc else tloc in
   let t = Loc.try7 ?loc:dt.dt_loc
     try_term strict keep_loc tloc uloc env prop dt.dt_dty dt.dt_node in
-  let t = t_attr_set tloc attrs t in
+  let t = t_attr_set (Option.to_list tloc) attrs t in
   match t.t_ty with
   | Some _ when prop -> t_attr_copy t
       (Loc.try2 ?loc:dt.dt_loc t_equ t t_bool_true)
@@ -696,13 +696,13 @@ and try_term strict keep_loc tloc uloc env prop dty node =
       t_iff (get env true df1) (get env true df2)
   | DTbinop (DTby,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
-      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_locs Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_locs Sattr.empty (t_or_asym t2 tt) in
       t_implies t2 (get env true df1)
   | DTbinop (DTso,df1,df2) ->
       let t2 = get env true df2 in
-      let tt = t_attr_set t2.t_loc Sattr.empty t_true in
-      let t2 = t_attr_set t2.t_loc Sattr.empty (t_or_asym t2 tt) in
+      let tt = t_attr_set t2.t_locs Sattr.empty t_true in
+      let t2 = t_attr_set t2.t_locs Sattr.empty (t_or_asym t2 tt) in
       t_and (get env true df1) t2
   | DTnot df ->
       t_not (get env true df)

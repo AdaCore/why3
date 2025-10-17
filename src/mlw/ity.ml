@@ -617,9 +617,9 @@ let fields_of_invariant ftv flds invl =
   let check_invariant acc p =
     let ivs = t_freevars Mvs.empty p in
     let itv = t_ty_freevars Stv.empty p in
-    if not (Mvs.set_submap ivs fvs) then Loc.error ?loc:p.t_loc
+    if not (Mvs.set_submap ivs fvs) then Loc.error ?loc:(t_loc p)
       (Decl.UnboundVar (fst (Mvs.choose (Mvs.set_diff ivs fvs))));
-    if not (Stv.subset itv ftv) then Loc.error ?loc:p.t_loc
+    if not (Stv.subset itv ftv) then Loc.error ?loc:(t_loc p)
       (Ty.UnboundTypeVar (Stv.choose (Stv.diff itv ftv)));
     Mvs.set_union acc ivs in
   let fvs = List.fold_left check_invariant Mvs.empty invl in
@@ -1343,12 +1343,12 @@ let check_tvs reads raises result pre post xpost =
   let tvs = Sxs.fold add_xs raises tvs in
   let check_tvs () t =
     let ttv = t_ty_freevars Stv.empty t in
-    if not (Stv.subset ttv tvs) then Loc.error ?loc:t.t_loc
+    if not (Stv.subset ttv tvs) then Loc.error ?loc:(t_loc t)
       (UnboundTypeVar (Stv.choose (Stv.diff ttv tvs))) in
   spec_t_fold check_tvs () pre post xpost
 
 let check_pre pre = List.iter (fun p -> if p.t_ty <> None
-  then Loc.error ?loc:p.t_loc (Term.FmlaExpected p)) pre
+  then Loc.error ?loc:(t_loc p) (Term.FmlaExpected p)) pre
 
 let check_post exn ity post =
   let ty = ty_of_ity ity in

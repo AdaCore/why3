@@ -156,7 +156,7 @@ let rec print_term info fmt t =
   if check_for_counterexample t then
     begin match t.t_node with
     | Tapp (ls,_) ->
-      info.info_model <- add_model_element (ls,t.t_loc,t.t_attrs) info.info_model
+      info.info_model <- add_model_element (ls,t_loc t,t.t_attrs) info.info_model
     | _ -> assert false (* cannot happen because check_for_counterexample is true *)
     end;
 
@@ -197,7 +197,7 @@ let rec print_term info fmt t =
                           model_trace_for_postcondition ~attrs:ls.ls_name.id_attrs info.info_vc_term
                        *)
                     in
-                    let _t_check_pos = t_attr_set ~loc attrs t in
+                    let _t_check_pos = t_attr_set ~locs:[loc] attrs t in
 		      (* TODO: temporarily disable collecting variables inside the term triggering VC *)
 		      (*info.info_model <- add_model_element t_check_pos info.info_model;*)
 		      ()
@@ -254,7 +254,7 @@ and print_fmla info fmt f =
   if check_for_counterexample f then
     begin match f.t_node with
     | Tapp (ls,_) ->
-      info.info_model <- add_model_element (ls,f.t_loc,f.t_attrs) info.info_model
+      info.info_model <- add_model_element (ls,t_loc f,f.t_attrs) info.info_model
     | _ -> assert false (* cannot happen because check_for_counterexample is true *)
     end;
   check_enter_vc_term f info.info_in_goal info.info_vc_term;
@@ -501,7 +501,7 @@ let print_task args ?old:_ fmt task =
   let g,_ = Task.task_separate_goal task in
   let vc_loc =
     Theory.(match g.td_node with
-        | Decl { d_node = Dprop (_,_,t) } -> t.t_loc
+        | Decl { d_node = Dprop (_,_,t) } -> t_loc t
         | _ -> None)
   in
   let vc_attrs = (Task.task_goal_fmla task).t_attrs in
