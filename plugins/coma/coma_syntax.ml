@@ -29,7 +29,7 @@ type pexpr = {
 }
 
 and pexpr_desc =
-  | PEsym of qualid (* x *)
+  | PEsym of qualid * Loc.position option (* x *)
   | PEapp of pexpr * pargument (* e <ty>... t... | e... *)
   | PElam of pparam list * pexpr (* fun pl -> e *)
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
@@ -214,7 +214,7 @@ module PPp = struct
 
   let rec pp_expr fmt e = match e.pexpr_desc with
     | PEany           -> fprintf fmt "any"
-    | PEsym q         -> fprintf fmt "%a"             Typing.print_qualid q
+    | PEsym (q, _)    -> fprintf fmt "%a"             Typing.print_qualid q
     | PEbox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
     | PEwox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l

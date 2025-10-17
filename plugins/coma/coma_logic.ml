@@ -322,7 +322,7 @@ type param =
   | Pc of hsymbol * vsymbol list * param list
 
 type expr =
-  | Esym of hsymbol * Loc.position
+  | Esym of hsymbol * Loc.position list
   | Eapp of expr * argument
   | Elam of param list * expr
   | Edef of expr * bool * defn list
@@ -344,7 +344,7 @@ and defn = hsymbol * vsymbol list * param list * expr
 (* VC formulas *)
 
 type formula =
-  | Fsym of hsymbol * Loc.position
+  | Fsym of hsymbol * Loc.position list
   | Fagt of formula * ty
   | Fagv of formula * term
   | Fagr of formula * vsymbol
@@ -553,7 +553,7 @@ let close vl hl {wp;sp} =
   w_forall vl @@ w_and_l {wp; sp = Mhs.set_diff sp sh} wl
 
 let rec f_eval c ls o bl = match o with
-  | Fsym (h, loc) -> c_call_hs c h true bl (loc :: ls)
+  | Fsym (h, locs) -> c_call_hs c h true bl (locs @ ls)
   | Flam (pl, mm, f) ->
       let c,vl,hl,bl = consume mm c pl bl ls in
       close vl hl (f_eval c ls f bl)
@@ -707,9 +707,9 @@ let rec vc tt hc o al =
   match o with
   | Eapp (e,a) ->
       vc tt hc e (a::al)
-  | Esym (h, loc) ->
+  | Esym (h, locs) ->
       let (wr,pl) = Mhs.find h hc in
-      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym (h, loc)) wr in
+      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym (h, locs)) wr in
       let w = if tt then TT f else TB (f, Fneu (f, Shs.empty)) in
       apply w Mvs.empty pl al
   | Elam (pl,e) ->

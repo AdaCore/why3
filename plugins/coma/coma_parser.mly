@@ -122,8 +122,8 @@ coma_expr2:
   { mk_pexpr d $loc }
 
 coma_desc2:
-| x=lqword
-  { PEsym x }
+| x=lqword loc=POSITION?
+  { PEsym (x, loc) }
 | ANY
   { PEany }
 | LEFTPAR c=coma_closure(coma_prog) RIGHTPAR
@@ -155,7 +155,7 @@ coma_arg:
 | LEFTPAR e=coma_prog RIGHTPAR
   { PAc e }
 | li=lqword
-  { let d = mk_pexpr (PEsym li) $loc in
+  { let d = mk_pexpr (PEsym (li, None)) $loc in
     PAc d }
 | LEFTPAR c=coma_closure(coma_prog) RIGHTPAR
   { PAc c }
