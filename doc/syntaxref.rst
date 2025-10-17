@@ -76,7 +76,7 @@ a prime (:token:`qident`, used exclusively for type variables):
 .. productionlist::
     alpha: "a" - "z" | "A" - "Z"
     suffix: (`alpha` | "'"* ("0" - "9" | "_"))* "'"*
-    lident_nq: ("a" - "z" | "_") `suffix`
+    lident_nq: ("a" - "z" | "_") `suffix` ; except just "_"
     uident_nq: ("A" - "Z") `suffix`
     ident_nq: `lident_nq` | `uident_nq`
     qident: "'" ("a" - "z") `suffix`
