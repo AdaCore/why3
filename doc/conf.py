@@ -117,7 +117,7 @@ htmlhelp_basename = 'Why3doc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-    # 'papersize': 'letterpaper',
+    'papersize': 'a4paper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #
@@ -125,7 +125,7 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': '\DeclareUnicodeCharacter{1EC5}{\^e}',
 
     # Latex figure (float) alignment
     #
