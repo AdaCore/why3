@@ -586,10 +586,10 @@ let check_used_var t vs =
         Loc.warning warn_unused_variable ?loc:vs.vs_name.id_loc "unused variable %s" s
     end
 
-let check_exists_implies f = match f.t_node with
-  | Tbinop (Timplies,{ t_node = Tbinop (Tor,f,{ t_node = Ttrue }) },_)
-    when Sattr.mem Term.asym_split f.t_attrs -> ()
-  | Tbinop (Timplies,_,_) -> Loc.warning warn_exists_implies ?loc:f.t_loc
+let check_exists_implies loc f = match f.t_node with
+  | Tbinop (Timplies,{ t_node = Tbinop (Tor,g,{ t_node = Ttrue }) },_)
+    when Sattr.mem Term.asym_split g.t_attrs -> ()
+  | Tbinop (Timplies,_,_) -> Loc.warning warn_exists_implies ?loc
       "form \"exists x. P -> Q\" is likely an error (use \"not P \\/ Q\" if not)"
   | _ -> ()
 
@@ -608,7 +608,7 @@ let rec term ~strict ~keep_loc uloc env prop dt =
   let tloc = if keep_loc then dt.dt_loc else None in
   let tloc = if uloc <> None then uloc else tloc in
   let t = Loc.try7 ?loc:dt.dt_loc
-    try_term strict keep_loc uloc env prop dt.dt_dty dt.dt_node in
+    try_term strict keep_loc tloc uloc env prop dt.dt_dty dt.dt_node in
   let t = t_attr_set tloc attrs t in
   match t.t_ty with
   | Some _ when prop -> t_attr_copy t
@@ -617,7 +617,7 @@ let rec term ~strict ~keep_loc uloc env prop dt =
       (t_if t t_bool_true t_bool_false)
   | _ -> t
 
-and try_term strict keep_loc uloc env prop dty node =
+and try_term strict keep_loc tloc uloc env prop dty node =
   let get env prop dt = term ~strict ~keep_loc uloc env prop dt in
   match node with
   | DTvar (n,_) ->
@@ -677,7 +677,7 @@ and try_term strict keep_loc uloc env prop dty node =
         | DTforall ->
             t_forall_close vl trl f
         | DTexists ->
-            check_exists_implies f;
+            check_exists_implies tloc f;
             t_exists_close vl trl f
         | DTlambda ->
             t_lambda vl trl f
