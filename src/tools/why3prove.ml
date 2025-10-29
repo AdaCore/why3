@@ -277,7 +277,7 @@ let print_th_namespace fmt th =
 let really_do_task (task: task) =
   let t = task_goal_fmla task in
   let aux (f,l,e) =
-    match t.Term.t_loc with
+    match Term.t_loc t with
     | None -> false
     | Some loc ->
         let goal_f, goal_l, _, _, _ = Loc.get loc in
@@ -441,7 +441,7 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
             (fun m -> Some (m, Not_checked))
         in
           printf "%a@." (print_result !opt_json)
-            (fname, t.Term.t_loc, goal_name, expls, res, ce);
+            (fname, Term.t_loc t, goal_name, expls, res, ce);
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

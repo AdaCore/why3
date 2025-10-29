@@ -119,7 +119,7 @@ let print_rac_result_state fmt = function
       fprintf fmt "FAILURE (%a at %a)"
         Vc.print_expl ctx.attr
         (Pp.print_option_or_default "unknown location" Loc.pp_position)
-        (match ctx.loc with Some _ as loc -> loc | _ -> t.Term.t_loc)
+        (match ctx.loc with Some _ as loc -> loc | _ -> Term.t_loc t)
   | Res_stuck reason -> fprintf fmt "STUCK (%s)" reason
   | Res_incomplete reason -> fprintf fmt "INCOMPLETE (%s)" reason
 
@@ -138,7 +138,7 @@ let is_vc_term ~vc_term_loc ~vc_term_attrs ctx t =
          the goal, so we search for the location of the VC term within the term
          [t] where the contradiction has been detected. *)
       let rec has_vc_term_loc t =
-        Option.equal Loc.equal (Some vc_term_loc) t.t_loc || match t.t_node with
+        Option.equal Loc.equal (Some vc_term_loc) (t_loc t) || match t.t_node with
         | Tbinop (Term.Timplies, _, t) -> has_vc_term_loc t
         | Tquant (_, tq) -> let _,_,t = t_open_quant tq in has_vc_term_loc t
         | Tlet (_, tb) -> let _,t = t_open_bound tb in has_vc_term_loc t
@@ -370,7 +370,7 @@ let rec find_in_list f = function
     | res -> res
 
 let rec find_in_term loc t =
-  Option.equal Loc.equal (Some loc) t.t_loc || t_any (find_in_term loc) t
+  Option.equal Loc.equal (Some loc) (t_loc t) || t_any (find_in_term loc) t
 
 (* let find_lemma_goal th loc =
  *   let open Theory in

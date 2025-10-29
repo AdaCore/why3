@@ -188,11 +188,11 @@ let rec param_spec (pre,name) o a pl e =
         let mke d i = { pexpr_desc = d; pexpr_loc = i.id_loc } in
         let apply d = function
           | PPt u -> mke (PEapp (d, PAt (PTtyvar u))) u
-          | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym (Qident g)) g))) g
+          | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym (Qident g, None)) g))) g
           | PPv (v,_) -> mke (PEapp (d, PAv (mkt (Tident (Qident v)) v))) v
           | PPr (r,_) -> mke (PEapp (d, PAr r)) r
           | PPa _ | PPl _ | PPo | PPb -> d in
-        let d = List.fold_left apply (mke (PEsym (Qident h)) h) ql in
+        let d = List.fold_left apply (mke (PEsym (Qident h, None)) h) ql in
         let post = false, name ^ "'" ^ h.id_str in
         let ql,d = Loc.try4 ~loc:h.id_loc param_spec post o a ql d in
         let d = { pdefn_name = h; pdefn_writes = wr;
@@ -211,7 +211,7 @@ let dl_split flat dl =
   let iter fn (_,_,_,d) =
     (* we assume no collisions *)
     let rec inspect = function
-      | Esym h -> fn h
+      | Esym (h, _) -> fn h
       | Edef (e,_,dl) ->
           let check (_,_,_,d) = inspect d
           in List.iter check dl; inspect e
@@ -283,7 +283,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
         (fun acc (t,b) -> Ecut (type_fmla tuc ctx t, b, acc))
         e (List.rev l) in
       ll, []
-  | PEsym q ->
+  | PEsym (q, loc) ->
       let h, _, pl =
         try let nm = match q with
               | Qdot _ -> raise Not_found
@@ -296,7 +296,7 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
           Loc.errorm ~loc:(qloc q) "[coma typing] \
             unbound handler `%a'" Typing.print_qualid q
       in
-      Esym h, pl
+      Esym (h, Option.to_list loc @ [qloc q]), pl
   | PEapp (pe, a) ->
       let e, te = type_expr muc ctx pe in
       begin match te, a with

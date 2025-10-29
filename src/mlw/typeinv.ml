@@ -656,11 +656,11 @@ let rec inject kn uf pins caps pos f = match f.t_node with
       let check _ (_,c) = assert (cap_valid uf c) in
       Mls.iter check p.p_vars;
       let rec relocate g =
-        t_attr_set ?loc:f.t_loc g.t_attrs
+        t_attr_set ~locs:f.t_locs g.t_attrs
           (TermTF.t_map (fun t -> t) relocate g) in
       let inv_attr_copy g =
         t_attr_copy f
-          (if f.t_loc = None then g else relocate g) in
+          (if f.t_locs = [] then g else relocate g) in
       let inv = List.map inv_attr_copy p.p_inv in
       t_and_asym_l inv, uf
   | Tapp (ls,[t]) when not pos && ls_equal ls ls_valid ->

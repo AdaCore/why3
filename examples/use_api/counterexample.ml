@@ -51,10 +51,10 @@ let fmla2 : Term.term =
   Term.t_implies atom_A (Term.t_and atom_A atom_B)
 (* We add a location and attribute to indicate the start of a goal *)
 let fmla2 : Term.term =
-  let loc = Loc.user_position "myfile.my_ext" 42 28 42 91  in
+  let locs = [Loc.user_position "myfile.my_ext" 42 28 42 91] in
   let attrs = Ident.Sattr.singleton Ity.annot_attr in
   (* Note that this remove any existing attribute/locations on fmla2 *)
-  Term.t_attr_set ~loc attrs fmla2
+  Term.t_attr_set ~locs attrs fmla2
 (* END{ce_adaptgoals} *)
 
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2

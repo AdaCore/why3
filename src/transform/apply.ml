@@ -248,7 +248,7 @@ let apply pr withed_terms : Task.task Trans.tlist = Trans.store (fun task ->
         Debug.dprintf debug_matching "Printing new_goals to introduce:\n%a@."
           (Pp.print_list Pp.newline Pretty.print_term) new_goals;
         let create_goal h =
-          let pr = create_prsymbol (gen_ident ?loc:g.t_loc "G") in
+          let pr = create_prsymbol (gen_ident ?loc:(t_loc g) "G") in
           Task.add_decl task (create_goal ~expl:apply_subgoals pr h)
         in
         List.map create_goal new_goals

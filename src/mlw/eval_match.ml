@@ -193,7 +193,7 @@ let rec eval_match ~keep_trace kn stop env t =
     | Tcase (t1, bl1) ->
         let t1 = eval env t1 in
         let fn env t2 _cs _tl =
-          eval env (Loc.try2 ?loc:t.t_loc flat_case t2 bl1) in
+          eval env (Loc.try2 ?loc:(t_loc t) flat_case t2 bl1) in
         begin try dive_to_constructor ~keep_trace fn env t1
         with Exit -> branch_map eval env t1 bl1 end
     | Tquant (q, qf) ->

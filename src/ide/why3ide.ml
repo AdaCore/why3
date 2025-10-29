@@ -1353,7 +1353,11 @@ let color_loc ?(ce = false) ~color loc =
 let apply_loc_on_source (l : (Loc.position * color) list) loc_goal =
   Debug.dprintf debug "apply_loc_on_source@.";
   erase_loc_all_view ();
-  scroll_to_loc ~force_tab_switch:false loc_goal;
+  (* When a goal has associated locations in multiple files, open them all.
+    Do [List.rev] so that if two locations are in the same file,
+    we scroll to the first one in the list. *)
+  loc_goal |> List.rev |> List.iter (fun loc_goal ->
+    scroll_to_loc ~force_tab_switch:false (Some loc_goal));
   List.iter (fun (loc, color) -> color_loc ~color loc) l
 
 (* Erase the colors and apply the colors given by l (which come from the task)
@@ -3052,7 +3056,7 @@ let treat_notification n =
         (* erase_loc_all_view (); this would make warnings disappear *)
         (* Still scroll to the ident (for example for modules) *)
         (* Format.eprintf "before scroll_to_loc, loc = %a@." (Pp.print_option Loc.pp_position) goal_loc; *)
-        scroll_to_loc ~force_tab_switch:true goal_loc
+        scroll_to_loc ~force_tab_switch:true (Lists.hd_opt goal_loc);
       end;
       (* Scroll to the end of task text without any animation. We cannot use the
          scroll_to methods, as they eventually call

@@ -30,7 +30,7 @@ type pexpr = {
 }
 
 and pexpr_desc =
-  | PEsym of Ptree.qualid
+  | PEsym of Ptree.qualid * Loc.position option
   | PEapp of pexpr * pargument
   | PElam of pparam list * pexpr
   | PEdef of pexpr * bool * pdefn list
