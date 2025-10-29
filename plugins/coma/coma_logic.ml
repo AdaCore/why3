@@ -976,11 +976,21 @@ let vc_spec (_,hc,c) h =
   (id_pre, List.rev ul, call true ul bl) :: List.rev_map (fun (id,ul,bl) ->
        id, List.rev ul, t_neg (call false ul bl)) outs
 
+let print_some_loc fmt = function
+  | None -> ()
+  | Some loc -> Format.fprintf fmt "File %a: " Loc.pp_position loc
+
 let () = Exn_printer.register (fun fmt -> function
-  | BadUndef h -> Format.fprintf fmt
+  | BadUndef h ->
+    print_some_loc fmt h.hs_name.id_loc;
+    Format.fprintf fmt
       "Handler `%s' is used in an illegal position" h.hs_name.id_string
-  | CollisionHs h -> Format.fprintf fmt
+  | CollisionHs h ->
+    print_some_loc fmt h.hs_name.id_loc;
+    Format.fprintf fmt
       "Handler `%s' is introduced twice in an expression" h.hs_name.id_string
-  | CollisionRs r -> Format.fprintf fmt
+  | CollisionRs r ->
+    print_some_loc fmt r.vs_name.id_loc;
+    Format.fprintf fmt
       "Reference `%s' is introduced twice in an expression" r.vs_name.id_string
   | exn -> raise exn)
