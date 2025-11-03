@@ -10,7 +10,7 @@ and maps, etc.) and basic programming data structures (arrays, queues,
 hash tables, etc.). A user can write WhyML programs directly and get
 correct-by-construction OCaml programs through an automated extraction
 mechanism. WhyML is also used as an intermediate language for the
-verification of C, Java, or Ada programs.
+verification of C, Java, Rust, and Ada programs.
 
 Why3 is a complete reimplementation of the former Why
 platform :cite:`filliatre07cav`. Among the new features are:
@@ -39,19 +39,26 @@ See the file :file:`INSTALL.md` for quick installation instructions, and
 Contact
 ~~~~~~~
 
-There is a public mailing list for users’ discussions:
+There is a Zulip discussion forum for users' discussion:
+https://why3.zulipchat.com/
+together with a public mailing list:
 https://groupes.renater.fr/sympa/info/why3-club.
 
-Report any bug to the Why3 Bug Tracking System:
-https://gitlab.inria.fr/why3/why3/issues.
+Report any bug to the Why3 Bug Tracking System (if you have an account there):
+https://gitlab.inria.fr/why3/why3/issues
+or to the Zulip forum.
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
 
 We gratefully thank the people who contributed to Why3, directly or
-indirectly: Stefan Berghofer, Sylvie Boldo, Martin Clochard, Simon
-Cruanes, Sylvain Dailler, Xavier Denis, Clément Fumex, Léon Gondelman, David Hauzar,
-Daisuke Ishii, Jacques-Henri Jourdan, Johannes Kanig, Mikhail Mandrykin, David Mentré, Benjamin
-Monate, Kim Nguyen, Thi-Minh-Tuyen Nguyen, Mário Pereira, Raphaël
-Rieu-Helft, Simāo Melo de Sousa, Asma Tafat, Piotr Trojanek, Makarius
+indirectly: Lucas Baudin, Benedikt Becker, Cláudio Belo Lourenço,
+Stefan Berghofer, Sylvie Boldo, Paul Bonnot, Martin Clochard,
+Guillaume Cluzel, Simon Cruanes, Sylvain Dailler, Xavier Denis, Yacine
+El Haddad, Clément Fumex, Quentin Garchery, Léon Gondelman, David
+Hauzar, Daisuke Ishii, Benjamin Jorge, Jacques-Henri Jourdan, Johannes
+Kanig, Mikhail Mandrykin, Matteo Manighetti, David Mentré, Benjamin
+Monate, Solène Moreau, Kim Nguyễn, Thi-Minh-Tuyen Nguyen, Paul
+Patault, Mário Pereira, Gérald Point, Raphaël Rieu-Helft, Gabriel
+Scherer, Simão Melo de Sousa, Asma Tafat, Piotr Trojanek, Makarius
 Wenzel.

@@ -1738,13 +1738,14 @@ by symbols with the exact same definition.
 Module interface
 ^^^^^^^^^^^^^^^^
 
-Module interface allows to only use an high level view, the interface, of a
-module during the proof and the actual implementation during the extraction. It
-is based on the cloning mechanism for checking the correspondence between the
-implementation and the interface.
+Module interfaces make it possible to use only a high-level view of a
+module, the interface, during verification. This relies on the cloning
+mechanism to check the correspondence between the implementation and
+the interface. The actual implementation is still used during the
+extraction.
 
-For example the interface can model the datastructure with a simple finite set,
-and the inmplementation use an ordered list:
+Below is the example of a data structure implemented using an ordered
+list. The interface models it as a finite set:
 
 .. code-block:: whyml
 
@@ -1828,9 +1829,10 @@ and the inmplementation use an ordered list:
 
     end
 
-During the proof of the function `main`, only the specifiction defined in `Set``
-are present. So, for example, the generated goals are not polluted with the
-invariants of `ListSet`. However, during extraction the code of `ListSet` is
+During the verification of the function ``main``, only the
+specification defined in ``Set`` is present. As a consequence, the
+generated verification conditions are not polluted with the invariants
+of ``ListSet``. However, during extraction, the code of ``ListSet`` is
 used.
 
 .. index:: standard library
@@ -1867,47 +1869,48 @@ native OCaml’s types and operations when Why3 code is extracted to OCaml
 Library ``int``: mathematical integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``int`` library contains several modules whose dependencies are
+The `int <https://www.why3.org/stdlib/int.html>`__ library
+contains several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.int`.
 
 .. graphviz:: generated/library-int.dot
    :caption: Module dependencies in library ``int``.
    :name: fig.lib.int
 
-The main module is ``Int`` which provides basic operations like addition
+The main module is `int.Int <https://www.why3.org/stdlib/int.html#Int_>`__,
+which provides basic operations like addition
 and multiplication, and comparisons.
 
 The division of modulo operations are defined in other modules. They
-indeed come into two flavors: the module ``EuclideanDivision`` proposes
+indeed come into two flavors: the module
+`int.EuclideanDivision <https://www.why3.org/stdlib/int.html#EuclideanDivision_>`__ provides
 a version where the result of the modulo is always non-negative, whereas
-the module ``ComputerDivision`` provides a version which matches the
+the module
+`int.ComputerDivision <https://www.why3.org/stdlib/int.html#ComputerDivision_>`__ provides a version that matches the
 standard definition available in programming languages like C, Java or
-OCaml. Note that these modules do not provide any divsion or modulo
+OCaml. Note that these modules do not provide any division or modulo
 operations to be used in programs. For those, you must use the module
-``mach.int.Int`` instead, which provides these operations, including
-proper pre-conditions, and with the usual infix syntax ``x / y`` and ``x
+`mach.int.Int <https://www.why3.org/stdlib/mach.int.html#Int_>`__
+instead, which provides these operations, including
+proper preconditions, and with the usual infix syntax ``x / y`` and ``x
 % y``.
-
-The detailed documentation of the library is available on-line at
-https://www.why3.org/stdlib/int.html.
 
 
 Library ``array``: array data structure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``array`` library contains several modules whose dependencies are
+The `array <https://www.why3.org/stdlib/array.html>`__ library contains
+several modules whose dependencies are
 displayed on Figure :numref:`fig.lib.array`.
 
 .. graphviz:: generated/library-array.dot
    :caption: Module dependencies in library ``array``.
    :name: fig.lib.array
 
-The main module is ``Array``, providing the operations for accessing and
+The main module is `array.Array <https://www.why3.org/stdlib/array.html#Array_>`__,
+which provides the operations for accessing and
 updating an array element, with respective syntax ``a[i]`` and ``a[i] <-
-e``, and proper pre-conditions for the indexes. The length of an array is
+e``, and proper preconditions for the indexes. The length of an array is
 denoted as ``a.length``. A fresh array can be created using ``make l v``
 where ``l`` is the desired length and ``v`` is the initial value of each
 cell.
-
-The detailed documentation of the library is available on-line at
-https://www.why3.org/stdlib/array.html.
