@@ -1,15 +1,14 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
 #  on linking described in file LICENSE.                           #
-#                                                                  #
 ####################################################################
 
-AC_INIT([Why3], [1.8.0+git])
+AC_INIT([Why3], [1.8.2])
 
 # verbosemake
 
@@ -205,7 +204,7 @@ AC_MSG_CHECKING([ocaml os type])
 OCAML_OS_TYPE=$($OCAMLC -config-var os_type)
 AC_MSG_RESULT([$OCAML_OS_TYPE])
 
-AC_PROG_CC([ $($OCAMLC -config-var c_compiler) gcc cl.exe clang ])
+AC_PROG_CC([ "$($OCAMLC -config-var c_compiler)" gcc cl.exe clang ])
 AC_PROG_MKDIR_P
 AC_PROG_INSTALL
 
@@ -386,15 +385,15 @@ fi
 
 # ppx
 if test "$enable_ocamlfind" = yes; then
-  AC_MSG_CHECKING([for compiler-libs using ocamlfind])
-  COMPILERLIBS=$($OCAMLFIND query compiler-libs 2> /dev/null | tr -d '\r')
-  if test -n "$COMPILERLIBS"; then
+  AC_MSG_CHECKING([for ppxlib using ocamlfind])
+  PPXLIB=$($OCAMLFIND query ppxlib 2> /dev/null | tr -d '\r')
+  if test -n "$PPXLIB"; then
     AC_MSG_RESULT([yes])
     enable_ppx=yes
   else
     AC_MSG_RESULT([no])
     enable_ppx=no
-    reason_ppx=" (compiler-libs not found)"
+    reason_ppx=" (ppxlib not found)"
   fi
 else
   enable_ppx=no
@@ -727,11 +726,7 @@ elif test "$found_ocamlgraph" = no; then
 fi
 
 if test "$enable_hypothesis_selection" != no; then
-   META_OCAMLGRAPH="ocamlgraph"
    enable_hypothesis_selection=yes
-else
-   META_OCAMLGRAPH=
-   OCAMLGRAPHLIB=
 fi
 
 if test "$enable_stackify" = no; then
@@ -743,11 +738,23 @@ elif test "$found_ocamlgraph" = no; then
    enable_stackify=no
    reason_stackify=" (ocamlgraph not found)"
    AC_MSG_WARN([cannot find library ocamlgraph, stackify disabled.])
+else
+   AX_VERSION_GE([$OCAMLVERSION], 4.12, [], [
+      if test "$enable_stackify" = yes; then
+         AC_MSG_ERROR([cannot enable stackify without ocaml >= 4.12.])
+      fi
+      enable_stackify=no
+      reason_stackify=" (ocaml < 4.12)"
+      AC_MSG_WARN([ocaml is < 4.12, stackify disabled.])
+   ])
 fi
 
 if test "$enable_stackify" != no; then
-   META_OCAMLGRAPH="ocamlgraph"
    enable_stackify=yes
+fi
+
+if test "$enable_hypothesis_selection" != no -o "$enable_stackify" != no; then
+   META_OCAMLGRAPH="ocamlgraph"
 else
    META_OCAMLGRAPH=
    OCAMLGRAPHLIB=

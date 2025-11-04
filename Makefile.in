@@ -1,12 +1,11 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
 #  on linking described in file LICENSE.                           #
-#                                                                  #
 ####################################################################
 
 .DELETE_ON_ERROR:
@@ -420,7 +419,7 @@ clean::
 ifeq (@enable_ppx@,yes)
 src/util/ppx_debug_optim$(EXE): src/util/debug_optim.ml
 	$(SHOW) 'Linking $@'
-	$(HIDE) $(OCAMLFIND) opt -package compiler-libs.common -linkpkg src/util/debug_optim.ml -o $@
+	$(HIDE) $(OCAMLFIND) opt -package ppxlib -linkpkg src/util/debug_optim.ml -o $@
 
 ifeq (@OCAML_OS_TYPE@,Win32)
 # Relative calls to executable on Windows cannot use / as path separator

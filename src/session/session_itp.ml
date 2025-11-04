@@ -1,12 +1,11 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
 (********************************************************************)
 
 open Wstdlib
@@ -35,7 +34,7 @@ let print_proofAttemptID fmt id =
 type theory = {
   theory_name                   : Ident.ident;
   mutable theory_goals          : proofNodeID list;
-  theory_parent_name            : fileID;
+  mutable theory_parent_name    : fileID;
   mutable theory_is_detached    : bool;
 }
 
@@ -828,6 +827,9 @@ let update_theory_node notification s th =
         Loc.errorm "[Fatal] Session_itp.update_theory_node: parent missing@."
     end
 
+let warn_missing_parent =
+  Loc.register_warning "warn_missing_parent" "Warn for missing parents node in session"
+
 let rec update_goal_node notification s id =
   let tr_list = get_transformations s id in
   let pa_list = get_proof_attempts s id in
@@ -852,8 +854,8 @@ let rec update_goal_node notification s id =
       | Trans trans_id -> update_trans_node notification s trans_id
       | Theory th -> update_theory_node notification s th
       | exception Not_found when not (Debug.test_flag Debug.stack_trace) ->
-                  Loc.warning (Loc.register_warning "warn_missing_parent" "Warn for missing parents node in session")
-                  "Session_itp.update_goal_node: parent missing@.";
+                  Loc.warning warn_missing_parent
+                    "Session_itp.update_goal_node: parent missing@.";
                   Printexc.print_backtrace stderr;
                   assert false
     end
@@ -1208,6 +1210,7 @@ let load_file session old_provers f =
       let def_fmt =
         Env.get_format (Format.asprintf "%a" Sysutil.print_file_path path) in
       string_attribute_def "format" f def_fmt in
+    Debug.dprintf debug "[Session_itp.load_file] fid=%d, path=%a@." fid Sysutil.print_file_path path;
     let mf = { file_id = fid;
                file_path = path;
                file_format = fmt;
@@ -1522,7 +1525,11 @@ let save_detached_theory parent_name old_s detached_theory s =
   let goalsID =
     save_detached_goals old_s detached_theory.theory_goals s (Theory detached_theory)
   in
-  assert (detached_theory.theory_parent_name = parent_name);
+  (* parent name must be updated since it refers to the file id from
+     old session, which can be different, in particular after
+     resizing hashtable `session_files`.  See MR
+     https://gitlab.inria.fr/why3/why3/-/merge_requests/1231 *)
+  detached_theory.theory_parent_name <- parent_name;
   detached_theory.theory_goals <- goalsID;
   detached_theory.theory_is_detached <- true;
   detached_theory
@@ -1771,7 +1778,6 @@ let make_theory_section ?merge ~detached (s:session) parent_name (th:Theory.theo
 let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
     (theories:Theory.theory list) format : file =
   (* let fn = Sysutil.relativize_filename s.session_dir fn in *)
-  Debug.dprintf debug "[Session_itp.add_file_section] fn = %a@." Sysutil.print_file_path fn;
 (*
   if Hfile.mem s.session_files fn then
     begin
@@ -1782,6 +1788,7 @@ let add_file_section (s:session) (fn:Sysutil.file_path) ~file_is_detached
   else
 *)
   let fid = gen_fileID s in
+  Debug.dprintf debug "[Session_itp.add_file_section] fid= %d, fn = %a@." fid Sysutil.print_file_path fn;
     let f = { file_id = fid;
               file_path = fn;
               file_format = format;
@@ -1834,23 +1841,26 @@ let merge_file_section ~ignore_shapes ~old_ses ~old_theories ~file_is_detached ~
   update_file_node (fun _ -> ()) s f
 
 let read_file env ?format fn =
-  let theories, format = Env.read_file Env.base_language env ?format fn in
-  let ltheories =
-    Mstr.fold
-      (fun name th acc ->
-        (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
-        let th_name =
-          Ident.id_register (Ident.id_derive name th.Theory.th_name) in
-         match th.Theory.th_name.Ident.id_loc with
-           | Some l -> (l,th_name,th)::acc
-           | None   -> (Loc.dummy_position,th_name,th)::acc)
-      theories []
-  in
-  let th =  List.sort
-      (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
-      ltheories
-  in
-  (List.map (fun (_,_,a) -> a) th), format
+  match Env.read_file Env.base_language env ?format fn with
+  | exception Sys_error msg -> (* File not found and other problems opening the file *)
+    raise (Loc.Located (Loc.user_position fn 0 0 0 0, Loc.Message msg))
+  | theories, format ->
+    let ltheories =
+      Mstr.fold
+        (fun name th acc ->
+          (* Hack : with WP [name] and [th.Theory.th_name.Ident.id_string] *)
+          let th_name =
+            Ident.id_register (Ident.id_derive name th.Theory.th_name) in
+          match th.Theory.th_name.Ident.id_loc with
+            | Some l -> (l,th_name,th)::acc
+            | None   -> (Loc.dummy_position,th_name,th)::acc)
+        theories []
+    in
+    let th =  List.sort
+        (fun (l1,_,_) (l2,_,_) -> Loc.compare l1 l2)
+        ltheories
+    in
+    (List.map (fun (_,_,a) -> a) th), format
 
 let merge_file_gen ~ignore_shapes ~reparse_file_fun env (ses : session) (old_ses : session) file =
   let old_theories = file_theories file in

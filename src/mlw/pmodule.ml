@@ -1,12 +1,11 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2024 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
 (*  on linking described in file LICENSE.                           *)
-(*                                                                  *)
 (********************************************************************)
 
 open Wstdlib
@@ -1158,6 +1157,7 @@ let save_special_ls cl d d' =
       cl.ls_table <- Mls.add ls ls' cl.ls_table;
   | Dtype _, Dtype _ -> ()
   | Dprop _, Dprop _ -> ()
+  | Ddata _, Ddata _ -> ()
   | _ -> assert false
 
 let clone_type_decl loc inst cl tdl decl kn =
@@ -1370,9 +1370,8 @@ let clone_pdecl loc inst cl uc d = match d.pd_node with
       let ndl, vcl = clone_type_decl loc inst cl tdl d uc.muc_known in
       let uc = List.fold_left add_vc uc vcl in
       let dl = if ndl <> [] then create_type_decl ndl else [] in
-      begin match tdl, dl with
-      | [{itd_its = {its_def = (Range _|Float _)}}], [d'] ->
-          List.iter2 (save_special_ls cl) d.pd_pure d'.pd_pure
+      begin match dl with
+      | [d'] -> List.iter2 (save_special_ls cl) d.pd_pure d'.pd_pure
       | _ -> () end;
       let add uc d = add_pdecl ~warn:false ~vc:false uc d in
       List.fold_left add uc dl
