@@ -1658,35 +1658,66 @@ let register_module, restore_module_id, restore_module =
      let m = restore_module th in
      Wid.find table m.mod_theory.th_name)
 
-let create_module env ?path n = {
-  muc_intf = create_module env ?path n;
-  muc_impl = create_module env ?path n;
-}
+let create_module env ?path n =
+  let muc = create_module env ?path n in {
+    muc_intf = muc;
+    muc_impl = muc;
+  }
 
 let close_module { muc_intf; muc_impl; } =
-  let intf = close_module muc_intf in
-  let inst = inst_of_clones intf Mpr.empty Decl.Paxiom impl_cl in
-  register_module inst intf (close_module muc_impl)
+  if muc_intf == muc_impl then
+    let m = close_module muc_intf in
+    let inst = inst_of_clones m Mpr.empty Decl.Paxiom impl_cl in
+    assert (compare { inst with mi_df = Decl.Plemma } (empty_mod_inst m) = 0);
+    register_module inst m m
+  else
+    let intf = close_module muc_intf in
+    let inst = inst_of_clones intf Mpr.empty Decl.Paxiom impl_cl in
+    register_module inst intf (close_module muc_impl)
 
-let open_scope uc s = {
-  muc_intf = open_scope uc.muc_intf s;
-  muc_impl = open_scope uc.muc_impl s;
-}
+let open_scope uc s =
+  if uc.muc_intf == uc.muc_impl then
+    let muc = open_scope uc.muc_intf s in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else {
+    muc_intf = open_scope uc.muc_intf s;
+    muc_impl = open_scope uc.muc_impl s;
+  }
 
-let close_scope uc ~import = {
-  muc_intf = close_scope uc.muc_intf ~import;
-  muc_impl = close_scope uc.muc_impl ~import;
-}
+let close_scope uc ~import =
+  if uc.muc_intf == uc.muc_impl then
+    let muc = close_scope uc.muc_intf ~import in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else {
+    muc_intf = close_scope uc.muc_intf ~import;
+    muc_impl = close_scope uc.muc_impl ~import;
+  }
 
-let import_scope uc path = {
-  muc_intf = import_scope uc.muc_intf path;
-  muc_impl = import_scope uc.muc_impl path;
-}
+let import_scope uc path =
+  if uc.muc_intf == uc.muc_impl then
+    let muc = import_scope uc.muc_intf path in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else {
+    muc_intf = import_scope uc.muc_intf path;
+    muc_impl = import_scope uc.muc_impl path;
+  }
 
-let use_export uc m = {
-  muc_intf = use_export uc.muc_intf m.mod_intf;
-  muc_impl = use_export uc.muc_impl m.mod_impl;
-}
+let use_export uc m =
+  if uc.muc_intf == uc.muc_impl && m.mod_intf == m.mod_impl then
+    let muc = use_export uc.muc_intf m.mod_intf in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else {
+    muc_intf = use_export uc.muc_intf m.mod_intf;
+    muc_impl = use_export uc.muc_impl m.mod_impl;
+  }
 
 let add_inst_in_clones cl mi =
   cl.cl_local <- Sid.union cl.cl_local mi.mi_mod.mod_local;
@@ -1711,23 +1742,40 @@ let clone_export' ?loc uc m mi mi_impl cl_impl =
   }
 
 let clone_export ?loc uc m mi =
-  let mi_impl = transpose_inst impl_cl impl_cl m.mod_impl mi in
-  clone_export' ?loc uc m mi mi_impl (cl_init m.mod_impl mi_impl)
+  if uc.muc_intf == uc.muc_impl && m.mod_intf == m.mod_impl then
+    let cl = cl_init m.mod_intf mi in
+    let muc = clone_export ?loc uc.muc_intf m.mod_intf mi cl in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else
+    let mi_impl = transpose_inst impl_cl impl_cl m.mod_impl mi in
+    clone_export' ?loc uc m mi mi_impl (cl_init m.mod_impl mi_impl)
 
 let add_meta uc m margs =
   let muc_intf = add_meta uc.muc_intf m margs in
-  let muc_impl =
-    try add_meta uc.muc_impl m (List.map (clone_meta_arg impl_cl) margs) with
-    | Not_found -> uc.muc_impl in
-  { muc_intf; muc_impl }
+  if uc.muc_intf == uc.muc_impl then
+    { muc_intf; muc_impl = muc_intf }
+  else
+    let muc_impl =
+      try add_meta uc.muc_impl m (List.map (clone_meta_arg impl_cl) margs) with
+      | Not_found -> uc.muc_impl in
+    { muc_intf; muc_impl }
 
 let add_pdecl ?warn ~vc uc d =
-  impl_cl.cl_local <- Sid.union impl_cl.cl_local d.pd_news;
-  let intf = add_pdecl ?warn ~vc uc.muc_intf d in
-  {
-    muc_intf = intf;
-    muc_impl = pdecl_impl (empty_mod_inst dummy_module) uc.muc_impl d;
-  }
+  if uc.muc_intf == uc.muc_impl then
+    let muc = add_pdecl ?warn ~vc uc.muc_intf d in {
+      muc_intf = muc;
+      muc_impl = muc;
+    }
+  else begin
+    impl_cl.cl_local <- Sid.union impl_cl.cl_local d.pd_news;
+    let intf = add_pdecl ?warn ~vc uc.muc_intf d in
+    {
+      muc_intf = intf;
+      muc_impl = pdecl_impl (empty_mod_inst dummy_module) uc.muc_impl d;
+    }
+  end
 
 exception InvalidUnit
 exception SymbolNotFound of string
