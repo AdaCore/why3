@@ -18,8 +18,6 @@ type symbol = No_symbol | Symbol of string
 type symbol_set = symbol list
 type string_sets_set = symbol list
 
-type why_node_set = unit
-
 (* Why.Sinfo *)
 
 type odomain =
@@ -1355,10 +1353,6 @@ module From_json = struct
     | `List [`String filename; `Int line] ->
       Source_ptr {filename; line}
     | json -> unexpected_json "source_ptr" json
-
-  let why_node_set_from_json : why_node_set from_json = function
-    | `String "<Why_Node_Set>" -> ()
-    | json -> unexpected_json "why_node_set" json
 
   let symbol_from_json : symbol from_json = function
     | `String "" -> No_symbol
