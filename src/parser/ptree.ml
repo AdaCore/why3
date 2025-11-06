@@ -458,7 +458,7 @@ let mlw_file_of_sexp _ = assert false  [@@warning "-32"]
    when ppx_sexp_conv is not installed *)
 
 type mlw_file =
-  | Modules of (ident * decl list) list
+  | Modules of (ident * qualid option * decl list) list
   (** a list of modules containing lists of declarations *)
   | Decls of decl list
   (** a list of declarations outside any module *)

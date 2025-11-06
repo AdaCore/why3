@@ -357,8 +357,8 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       match path, mlw_file with
       | [name], Decls decls -> name, decls
       | [module_name; name], Modules modules ->
-          let aux (id, _) = String.compare id.id_str module_name = 0 in
-          name, snd (List.find aux modules)
+          let aux (id, _, _) = String.compare id.id_str module_name = 0 in
+          name, let (_, _, decls) = List.find aux modules in decls
       | _ -> raise Not_found
     in
     let aux acc d = match d with
@@ -623,7 +623,8 @@ let deps_decl fmt filename modname d =
   | Dimport _ -> ()
   | Dscope _ -> ())
 
-let deps_module fmt filename modname dl =
+let deps_module fmt filename modname intf dl =
+  Option.iter (fun q -> deps_use fmt filename modname q) intf;
   List.iter (deps_decl fmt filename modname) dl
 
 let deps_file fmt header filename f =
@@ -635,9 +636,9 @@ let deps_file fmt header filename f =
   begin
     Ptree.(match f with
   | Modules ml ->
-     List.iter (fun (n,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) dl) ml
+     List.iter (fun (n,i,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) i dl) ml
     (* a list of modules containing lists of declarations *)
-  | Decls dl -> deps_module fmt filename (filename ^ ".Top") dl)
+  | Decls dl -> deps_module fmt filename (filename ^ ".Top") None dl)
   end;
   if header then fprintf fmt "}@."
 

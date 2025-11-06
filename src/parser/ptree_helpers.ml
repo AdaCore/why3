@@ -91,8 +91,8 @@ let prop k ?loc id t =
 
 module F = struct
 
-  type state = { modules : (ident * decl list) list ;
-                 module_id : ident option;
+  type state = { modules : (ident * qualid option * decl list) list ;
+                 module_id : (ident * qualid option) option;
                  decls : decl list;
                  fun_head : (bool * bool * pty option * ident * binder list) option;
                  spec_pre : term list;
@@ -113,14 +113,14 @@ module F = struct
                     spec_post = [];
                   }
 
-  let begin_module s ?loc name =
+  let begin_module s ?loc ?intf name =
     match s.fun_head,s.module_id,s.decls with
     | Some _,_,_ -> invalid_use "begin_module: function declaration already in progress"
     | None,Some _,_ -> invalid_use "begin_module: module declaration already in progress"
     | None,None,(_::_) -> invalid_use "begin_module: top level declarations already in progress"
     | None,None,[] ->
        let id = ident ?loc name in
-       { s with module_id = Some id }
+       { s with module_id = Some (id, intf) }
 
   let use s ?loc ~import l =
     match s.fun_head with
@@ -202,9 +202,9 @@ module F = struct
     match s.fun_head,s.module_id with
     | (Some _),_ -> invalid_use "end_module: function declaration in progress"
     | None,None -> invalid_use "end_module: no module declaration in progress"
-    | None,(Some id) ->
+    | None,(Some (id, intf)) ->
        { s with
-         modules = (id, List.rev s.decls) :: s.modules;
+         modules = (id, intf, List.rev s.decls) :: s.modules;
          module_id = None;
          decls = [] }
 
@@ -222,8 +222,8 @@ module I = struct
 
   let st = ref (F.create ())
 
-  let begin_module ?loc s =
-    st := F.begin_module !st ?loc s
+  let begin_module ?loc ?intf s =
+    st := F.begin_module !st ?loc ?intf s
 
   let use ?loc ~import l =
     st := F.use !st ?loc ~import l

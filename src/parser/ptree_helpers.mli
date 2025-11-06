@@ -89,7 +89,7 @@ module F : sig
 
   val create : unit -> state
 
-  val begin_module : state -> ?loc:position -> string -> state
+  val begin_module : state -> ?loc:position -> ?intf:qualid -> string -> state
 
   val use : state -> ?loc:Loc.position -> import:bool -> string list -> state
   (** see [use_import] above *)
@@ -119,7 +119,7 @@ end
     thread-safe *)
 module I : sig
 
-  val begin_module : ?loc:position -> string -> unit
+  val begin_module : ?loc:position -> ?intf:qualid -> string -> unit
   (** see [begin_module] above *)
 
   val use : ?loc:Loc.position -> import:bool -> string list -> unit

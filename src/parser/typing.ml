@@ -1743,13 +1743,23 @@ let rec add_decl muc env file d =
       muc
 
 
-let type_module file env loc path (id,dl) =
+let type_module file env loc path (id,intf,dl) =
+  let id =
+    if intf = None then id else { id with id_str = id.id_str ^ "'impl" } in
   let muc = create_module env ~path (create_user_id id) in
   let add_decl_env_file muc d = add_decl muc env file d in
   let muc = List.fold_left add_decl_env_file muc dl in
-  let m = Loc.try1 ~loc close_module muc in
-  let file = Mstr.add (Pmodule.mod_name m).id_string m file in
-  file
+  match intf with
+  | None ->
+      let m = Loc.try1 ~loc close_module muc in
+      let file = Mstr.add (Pmodule.mod_name m).id_string m file in
+      file
+  | Some qid ->
+      let mintf = Loc.try3 ~loc find_module env file qid in
+      let m, mimpl = Loc.try2 ~loc close_module_with_intf muc mintf in
+      let file = Mstr.add (Pmodule.mod_name m).id_string m file in
+      let file = Mstr.add (Pmodule.mod_name mimpl).id_string mimpl file in
+      file
 
 let type_mlw_file env path filename mlw_file =
   if Debug.test_flag Glob.flag then Glob.clear filename;
@@ -1757,9 +1767,11 @@ let type_mlw_file env path filename mlw_file =
   let loc = Loc.user_position filename 1 0 1 0 in
   let file =
     match mlw_file with
-    | Ptree.Decls decls -> type_module file env loc path ({id_str=""; id_ats=[]; id_loc=loc},decls)
+    | Ptree.Decls decls ->
+        type_module file env loc path ({id_str=""; id_ats=[]; id_loc=loc},None,decls)
     | Ptree.Modules m_or_t ->
-        let type_module_env_loc_path file (id,dl) = type_module file env loc path (id,dl) in
+        let type_module_env_loc_path file (id,intf,dl) =
+          type_module file env loc path (id,intf,dl) in
         List.fold_left type_module_env_loc_path file m_or_t
   in
   file
