@@ -4,49 +4,50 @@
    From
      Developing Verified Programs with Dafny.
      K. Rustan M. Leino. Tutorial notes, ICSE 2013.
+     (cf, https://leino.science/papers/krml233.pdf)
 
    For a similar data structure, see vstte12_ring_buffer.mlw
 *)
 
 use int.Int
-use seq.Seq as S
+use seq.Seq
 use array.Array
+use array.ToSeq
 
 type t 'a = {
   mutable data: array 'a;
   mutable m: int;
   mutable n: int;
-  ghost mutable contents: S.seq 'a; (* = data[m..n[ *)
+  ghost mutable contents: Seq.seq 'a; (* = data[m..n[ *)
 }
 invariant { 0 < length data }
 invariant { 0 <= m <= n <= length data }
-invariant { S.length contents = n - m }
-invariant { forall i. 0 <= i < m - n -> S.get contents i = data[m + i] }
-by { data = Array.make 1 (any 'a); m = 0; n = 0; contents = S.empty }
+invariant { Seq.length contents = n - m }
+invariant { contents == data[m..n] } (* coercion `to_seq` is inserted here *)
+by { data = Array.make 1 (any 'a); m = 0; n = 0; contents = Seq.empty }
 
 let create (x: 'a) : t 'a
-  ensures { S.(result.contents == empty) }
+  ensures { Seq.(result.contents == empty) }
 =
   { data = Array.make 10 x;
     m = 0; n = 0;
-    contents = S.empty; }
+    contents = Seq.empty; }
 
-let dequeue (q: t 'a) : (_r: 'a)
-  requires { S.length q.contents > 0 }
+let dequeue (q: t 'a) : (r: 'a)
+  requires { Seq.length q.contents > 0 }
   writes   { q.m, q.contents }
-  ensures  { S.(q.contents == (old q.contents)[1..]) }
+  ensures  { Seq.(old q.contents == cons r q.contents) }
 =
   let r = q.data[q.m] in
   q.m <- q.m + 1;
-  ghost S.(q.contents <- q.contents[1..]);
+  ghost Seq.(q.contents <- q.contents[1..]);
   r
 
 let enqueue (q: t 'a) (x: 'a) : unit
   requires { q.n < length q.data }
   writes   { q.data.elts, q.n, q.contents }
-  ensures  { S.(q.contents == snoc (old q.contents) x) }
+  ensures  { Seq.(q.contents == snoc (old q.contents) x) }
 =
   q.data[q.n] <- x;
   q.n <- q.n + 1;
-  ghost S.(q.contents <- S.snoc q.contents x)
-
+  ghost Seq.(q.contents <- Seq.snoc q.contents x)
