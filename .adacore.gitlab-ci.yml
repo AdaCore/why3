@@ -53,7 +53,7 @@ submodule:
   stage: build
   interruptible: true
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: ($CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_REF_PROTECTED == "true")
       when: always
     - when: never
   services:
