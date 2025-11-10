@@ -2,6 +2,11 @@ from e3.auth.gitlab import gen_gitlab_token
 import gitlab
 import os
 
+# This script assumes that another project (hardcoded here as
+# "eng/spark/spark2014") has a submodule pointing to our project. The purpose
+# of this script is to create a merge request in that other project, that
+# updates the submodule information to the current commit SHA.
+
 base_url = os.environ["CI_SERVER_URL"]
 project_name = "eng/spark/spark2014"
 target_commit = os.environ["CI_COMMIT_SHORT_SHA"]
