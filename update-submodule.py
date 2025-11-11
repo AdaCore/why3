@@ -22,14 +22,14 @@ def main():
     gl = gitlab.Gitlab(base_url, private_token=gen_gitlab_token()["token"])
     project = gl.projects.get(project_name)
     mr_branch = f"automated-submodule-update-{target_commit}"
-    project.branches.create({"branch": mr_branch, "ref": target_branch.name})
+    project.branches.create({"branch": mr_branch, "ref": target_branch})
     project.update_submodule(
         "why3", mr_branch, target_commit_long, commit_message=commit_message
     )
     mr = project.mergerequests.create(
         {
             "source_branch": mr_branch,
-            "target_branch": target_branch.name,
+            "target_branch": target_branch,
             "title": mr_title,
             "description": mr_body,
         }
