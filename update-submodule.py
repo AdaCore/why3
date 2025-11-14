@@ -32,9 +32,11 @@ def main():
             "target_branch": target_branch,
             "title": mr_title,
             "description": mr_body,
+            "labels": ["skip-ci"]
         }
     )
     print(f"Merge request created: {mr.web_url}")
+    mr.approve()
 
 
 if __name__ == "__main__":
