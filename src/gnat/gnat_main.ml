@@ -258,7 +258,8 @@ let report_messages c check =
                   with Not_found -> default
               else { Gnat_expl.pretty_node = None; inlined = None }
       in
-      Gnat_report.Not_Proved (extra_info, models, manual_info) in
+      let answer_status = C.Save_VCs.unproved_prover_answer s check in
+      Gnat_report.Not_Proved (extra_info, models, manual_info, answer_status) in
   Gnat_report.register check (C.Save_VCs.check_to_json s check) result
 
 (* Escaping all debug printings *)

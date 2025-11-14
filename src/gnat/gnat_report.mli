@@ -27,14 +27,15 @@ open Why3
    The "warnings" field is optional. If present, it contains a list of warnings
    that occured during execution of gnatwhy3.
 
-     result = { "id"             : int,
-                "check_kind"     : string,
-                "result"         : bool,
-                "extra_info"     : extra_info,
-                "vc_file"        : string,
-                "editor_cmd"     : string,
-                "check_tree"     : list goal,
-                "cntexmp"        : cntexmp_rec
+     result = { "id"               : int,
+                "check_kind"       : string,
+                "result"           : bool,
+                "extra_info"       : extra_info,
+                "vc_file"          : string,
+                "editor_cmd"       : string,
+                "check_tree"       : list goal,
+                "cntexmp"          : cntexmp_rec,
+                "unproved_status"  : unproved_status
                 }
 
    The field "id" contains the id of the VC. The field "check_kind" identifies the
@@ -105,6 +106,19 @@ open Why3
              steps : integer,
              result : string }
 
+  The "unproved_status" field contains a summary of the reasons why
+  the goal could not be proved. It is a record with the following fields:
+      unproved_status = { "status" : string,
+                          "time"   : bool,
+                          "steps"  : bool,
+                          "memory" : bool}
+  The "status" field contains one of the following strings:
+    - "gave_up"  : the prover gave up
+    - "limit"    : the prover reached some resource limit
+    - "unknown"  : the prover status is unknown (e.g., no proof attempt
+                   was made, or the goal was proved)
+  The "time", "steps" and "memory" fields are booleans indicating whether
+  the corresponding resource limit was reached.
    *)
 
 type prover_stat =
@@ -125,8 +139,9 @@ type result_info =
       (Model_parser.model * Check_ce.rac_result option) list *
                                  (* counterexample models and their
                                     giant-step RAC result *)
-      (string * string) option   (* for manual provers, pair of
+      (string * string) option *  (* for manual provers, pair of
                                     (vc_file, editor_cmd) *)
+      Gnat_expl.unproved_status
 
 val register : Gnat_expl.check -> Json_base.json -> result_info -> unit
 (* [register check check_tree info] registers a proof result,

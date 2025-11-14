@@ -648,3 +648,44 @@ module HCheck = Hashtbl.Make (struct
 
    let hash = check_hash
 end)
+
+type unproved_status =
+  | Unknown
+  | Gave_up
+  | Limit of { timeout : bool ; step : bool ; memory : bool }
+
+let compress ans =
+  match ans with
+  | Call_provers.Valid
+  | Call_provers.Invalid
+  | Call_provers.Unknown _
+  | Call_provers.Failure _
+  | Call_provers.HighFailure _ -> Gave_up
+  | Call_provers.Timeout ->
+      Limit { timeout = true ; step = false ; memory = false }
+  | Call_provers.OutOfMemory ->
+      Limit { timeout = false ; step = false ; memory = true }
+  | Call_provers.StepLimitExceeded ->
+      Limit { timeout = false ; step = true ; memory = false }
+
+let merge_all_needed s1 s2 =
+    match s1, s2 with
+    Unknown, _ -> s2
+  | _, Unknown -> s1
+  | Gave_up, _ -> Gave_up
+  | _, Gave_up -> Gave_up
+  | Limit l1, Limit l2 ->
+      Limit { timeout = l1.timeout || l2.timeout ;
+              step = l1.step || l2.step ;
+              memory = l1.memory || l2.memory }
+
+let merge_one_needed s1 s2 =
+  match s1, s2 with
+    Unknown, _ -> s2
+  | _, Unknown -> s1
+  | Gave_up, _ -> s2
+  | _, Gave_up -> s1
+  | Limit l1, Limit l2 ->
+      Limit { timeout = l1.timeout || l2.timeout ;
+              step = l1.step || l2.step ;
+              memory = l1.memory || l2.memory }
