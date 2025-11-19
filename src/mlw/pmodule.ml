@@ -1637,7 +1637,86 @@ let clone_export' ?loc uc m inst cl =
 let clone_export ?loc uc m inst =
   clone_export' ?loc uc m inst (cl_init m inst)
 
-let close_module_with_intf muc mintf inst =
+exception InvalidUnit
+exception SymbolNotFound of string
+
+let intf_mod_inst muc intf =
+  let rec aux_units ns_muc ns_tuc inst ul =
+    let add_type inst its =
+      try
+        let its' = ns_find_its ns_muc [its.ts_name.id_string] in
+        { inst with mi_ts = Mts.add its its' inst.mi_ts }
+      with Not_found -> raise (SymbolNotFound its.ts_name.id_string) in
+
+    let add_logic inst ls =
+      try
+        let ls' = ns_find_ls ns_tuc [ls.ls_name.id_string] in
+        { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
+      with Not_found -> raise (SymbolNotFound ls.ls_name.id_string) in
+
+    let add_exn inst xs =
+      try
+        let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
+        { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
+      with Not_found -> raise (SymbolNotFound xs.xs_name.id_string) in
+
+    let add_routine inst rs =
+      try
+        let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
+        { inst with mi_rs = Mrs.add rs rs' inst.mi_rs }
+      with Not_found ->
+        if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
+        then inst (* do not raise for let lemma induced by lemmas *)
+        else raise (SymbolNotFound rs.rs_name.id_string) in
+
+    let aux_pure inst = function
+      | { d_node = Dtype tys } -> add_type inst tys
+      | { d_node = Dparam ls } -> add_logic inst ls
+      | { d_node = Dprop _ } -> inst
+      | { d_node = Dlogic lds } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst lds
+      | { d_node = Dind (_, ids) } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst ids
+      | { d_node = Ddata _ } -> assert false (* does not appear as PDpure *) in
+
+    let aux_unit inst = function
+      | Udecl { pd_node = PDtype its_defn; _ } ->
+         List.fold_left (fun i d  -> add_type i d.itd_its.its_ts) inst its_defn
+      | Udecl { pd_node = PDexn xs; _ } -> add_exn inst xs
+      | Udecl { pd_node = PDpure; pd_pure; _ } ->
+         List.fold_left aux_pure inst pd_pure
+      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise InvalidUnit
+      | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
+      | Uscope (s, ul) ->
+         let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
+         let ns_tuc =
+           try Theory.ns_find_ns ns_tuc [s] with
+           | Not_found -> Theory.empty_ns in
+         aux_units ns_muc ns_tuc inst ul
+      | Uclone _ -> inst (* Nothing to do on clone ? *) in
+    List.fold_left aux_unit inst ul in
+
+  (* Are these the good namespaces ? *)
+  let ns_muc = List.hd muc.muc_export in
+  let ns_tuc = List.hd muc.muc_theory.uc_export in
+  aux_units ns_muc ns_tuc (empty_mod_inst intf) intf.mod_units
+
+let close_module_with_intf muc mintf =
+  let inst = intf_mod_inst muc mintf in
+  let muc =
+    open_scope muc (mintf.mod_theory.th_name.id_string^"'impl_of") in
+  let muc = clone_export muc mintf inst in
+  let muc = close_scope ~import:false muc in
+  let id_str =
+    Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
+  let id = { muc.muc_theory.uc_name with pre_name = id_str } in
+  let m' = create_module muc.muc_env ~path:muc.muc_theory.uc_path id in
+  let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in
+  let m' = clone_export m' mintf inst_axiom in
+  let m' = close_module m' in
+  let inst = intf_mod_inst muc m' in
+  let mintf = m' in
   let mimpl = close_module muc in
   let mimpl' = mod_impl'' muc.muc_env mimpl in
   let inst = {
@@ -1659,7 +1738,7 @@ let close_module_with_intf muc mintf inst =
   let mimpl' = close_module mimpl' in
   Wid.set mod_table mimpl.mod_theory.th_name mimpl';
   Wid.set mod_table mintf.mod_theory.th_name mimpl';
-  mimpl
+  mintf, mimpl
 
 (** {2 WhyML language} *)
 
@@ -1742,4 +1821,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+  | InvalidUnit -> Format.fprintf fmt "Unsupported unit in interface"
+  | SymbolNotFound s -> Format.fprintf fmt
+      "Symbol %s not found in implementation" s
   | _ -> raise e)

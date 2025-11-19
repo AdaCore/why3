@@ -1819,71 +1819,6 @@ let open_module ?intf ({id_str = nm; id_loc = loc} as id) =
        slice.muc_intf <- Some mintf
   end
 
-exception InvalidUnit
-exception SymbolNotFound of string
-
-let intf_mod_inst muc intf =
-  let rec aux_units ns_muc ns_tuc inst ul =
-    let add_type inst its =
-      try
-        let its' = ns_find_its ns_muc [its.ts_name.id_string] in
-        { inst with mi_ts = Mts.add its its' inst.mi_ts }
-      with Not_found -> raise (SymbolNotFound its.ts_name.id_string) in
-
-    let add_logic inst ls =
-      try
-        let ls' = ns_find_ls ns_tuc [ls.ls_name.id_string] in
-        { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
-      with Not_found -> raise (SymbolNotFound ls.ls_name.id_string) in
-
-    let add_exn inst xs =
-      try
-        let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
-        { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
-      with Not_found -> raise (SymbolNotFound xs.xs_name.id_string) in
-
-    let add_routine inst rs =
-      try
-        let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
-        { inst with mi_rs = Mrs.add rs rs' inst.mi_rs }
-      with Not_found ->
-        if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
-        then inst (* do not raise for let lemma induced by lemmas *)
-        else raise (SymbolNotFound rs.rs_name.id_string) in
-
-    let aux_pure inst = function
-      | { d_node = Dtype tys } -> add_type inst tys
-      | { d_node = Dparam ls } -> add_logic inst ls
-      | { d_node = Dprop _ } -> inst
-      | { d_node = Dlogic lds } ->
-          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst lds
-      | { d_node = Dind (_, ids) } ->
-          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst ids
-      | { d_node = Ddata _ } -> assert false (* does not appear as PDpure *) in
-
-    let aux_unit inst = function
-      | Udecl { pd_node = PDtype its_defn; _ } ->
-         List.fold_left (fun i d  -> add_type i d.itd_its.its_ts) inst its_defn
-      | Udecl { pd_node = PDexn xs; _ } -> add_exn inst xs
-      | Udecl { pd_node = PDpure; pd_pure; _ } ->
-         List.fold_left aux_pure inst pd_pure
-      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
-      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise InvalidUnit
-      | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
-      | Uscope (s, ul) ->
-         let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
-         let ns_tuc =
-           try Theory.ns_find_ns ns_tuc [s] with
-           | Not_found -> Theory.empty_ns in
-         aux_units ns_muc ns_tuc inst ul
-      | Uclone _ -> inst (* Nothing to do on clone ? *) in
-    List.fold_left aux_unit inst ul in
-
-  (* Are these the good namespaces ? *)
-  let ns_muc = List.hd muc.muc_export in
-  let ns_tuc = List.hd muc.muc_theory.uc_export in
-  aux_units ns_muc ns_tuc (empty_mod_inst intf) intf.mod_units
-
 let close_module loc =
   assert (not (Stack.is_empty state) && (Stack.top state).muc <> None);
   let slice = Stack.top state in
@@ -1896,29 +1831,12 @@ let close_module loc =
        slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file
     | Some mintf ->
        let muc = Option.get slice.muc in
-       let inst =
-         try intf_mod_inst muc mintf with
-         | InvalidUnit -> Loc.errorm ~loc "Unsupported unit in interface"
-         | SymbolNotFound s ->
-            Loc.errorm ~loc "Symbol %s not found in implementation" s in
-       let muc =
-         open_scope muc (mintf.mod_theory.th_name.id_string^"'impl_of") in
-       let muc = clone_export muc mintf inst in
-       let muc = close_scope ~import:false muc in
-       let id_str =
-         Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
-       let id = { muc.muc_theory.uc_name with pre_name = id_str } in
-       let m' = create_module slice.env ~path:slice.path id in
-       let inst_axiom = { (empty_mod_inst mintf) with mi_df = Paxiom } in
-       let m' = clone_export m' mintf inst_axiom in
-       let m' = close_module m' in
-       let inst = intf_mod_inst muc m' in
-       let m = Loc.try3 ~loc close_module_with_intf muc m' inst in
+       let m, mimpl = Loc.try2 ~loc close_module_with_intf muc mintf in
        (* Not sure about this *)
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m'.mod_theory.th_name;
-       slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file;
-       slice.file <- Mstr.add id_str m' slice.file
+         Glob.def ~kind:"theory" m.mod_theory.th_name;
+       slice.file <- Mstr.add mimpl.mod_theory.th_name.id_string mimpl slice.file;
+       slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file
   end;
   slice.muc <- None;
   slice.muc_intf <- None
