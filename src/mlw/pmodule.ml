@@ -1640,7 +1640,6 @@ let clone_export ?loc uc m inst =
 let close_module_with_intf muc mintf inst =
   let mimpl = close_module muc in
   let mimpl' = mod_impl'' muc.muc_env mimpl in
-  let mimpl' = open_scope mimpl' "some'scope" in
   let inst = {
       mi_mod = inst.mi_mod;
       mi_ty = Mts.map (clone_ity impl_cl) inst.mi_ty;
@@ -1654,6 +1653,7 @@ let close_module_with_intf muc mintf inst =
       mi_df = inst.mi_df
     } in
   impl_cl.cl_local <- Sid.union impl_cl.cl_local mintf.mod_local;
+  let mimpl' = open_scope mimpl' "some'scope" in
   let mimpl' = clone_export' mimpl' mintf inst impl_cl in
   let mimpl' = close_scope mimpl' ~import:false in
   let mimpl' = close_module mimpl' in
