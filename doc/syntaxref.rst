@@ -809,7 +809,7 @@ statement and of type ``int`` ; ``e1`` and ``e2`` are program
 expressions of type ``int``, and ``e3`` is an expression of type
 ``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
 is not mutable. The execution of such a loop amounts to first evaluate
-``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
+``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 > n2`` then
 the loop is not executed at all, otherwise it is executed iteratively
 for ``v`` taking all the values between ``n1`` and ``n2`` included.
 
