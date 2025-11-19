@@ -1821,30 +1821,28 @@ let open_module ?intf ({id_str = nm; id_loc = loc} as id) =
        slice.muc_intf <- Some mintf
   end
 
-exception Invalid_unit
-exception Symbol_not_found of Ident.ident
+exception InvalidUnit
+exception SymbolNotFound of string
 
 let intf_mod_inst muc intf =
-
   let rec aux_units ns_muc ns_tuc inst ul =
-
     let add_type inst its =
       try
         let its' = ns_find_its ns_muc [its.ts_name.id_string] in
         { inst with mi_ts = Mts.add its its' inst.mi_ts }
-      with Not_found -> raise (Symbol_not_found its.ts_name) in
+      with Not_found -> raise (SymbolNotFound its.ts_name.id_string) in
 
     let add_logic inst ls =
       try
         let ls' = ns_find_ls ns_tuc [ls.ls_name.id_string] in
         { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
-      with Not_found -> raise (Symbol_not_found ls.ls_name) in
+      with Not_found -> raise (SymbolNotFound ls.ls_name.id_string) in
 
     let add_exn inst xs =
       try
         let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
         { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
-      with Not_found -> raise (Symbol_not_found xs.xs_name) in
+      with Not_found -> raise (SymbolNotFound xs.xs_name.id_string) in
 
     let add_routine inst rs =
       try
@@ -1853,7 +1851,7 @@ let intf_mod_inst muc intf =
       with Not_found ->
         if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
         then inst (* do not raise for let lemma induced by lemmas *)
-        else raise (Symbol_not_found rs.rs_name) in
+        else raise (SymbolNotFound rs.rs_name.id_string) in
 
     let aux_pure inst = function
       | { d_node = Dtype tys } -> add_type inst tys
@@ -1872,7 +1870,7 @@ let intf_mod_inst muc intf =
       | Udecl { pd_node = PDpure; pd_pure; _ } ->
          List.fold_left aux_pure inst pd_pure
       | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
-      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise Invalid_unit
+      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise InvalidUnit
       | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
       | Uscope (s, ul) ->
          let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
@@ -1881,7 +1879,6 @@ let intf_mod_inst muc intf =
            | Not_found -> Theory.empty_ns in
          aux_units ns_muc ns_tuc inst ul
       | Uclone _ -> inst (* Nothing to do on clone ? *) in
-
     List.fold_left aux_unit inst ul in
 
   (* Are these the good namespaces ? *)
@@ -1903,10 +1900,9 @@ let close_module loc =
        let muc = Option.get slice.muc in
        let inst =
          try intf_mod_inst muc mintf with
-         | Invalid_unit -> Loc.errorm ~loc "Unsupported unit in interface"
-         | Symbol_not_found id ->
-            Loc.errorm ~loc "Symbol %s not found in implementation"
-              id.id_string in
+         | InvalidUnit -> Loc.errorm ~loc "Unsupported unit in interface"
+         | SymbolNotFound s ->
+            Loc.errorm ~loc "Symbol %s not found in implementation" s in
        let muc =
          open_scope muc (mintf.mod_theory.th_name.id_string^"'impl_of") in
        let muc = clone_export muc mintf inst in
