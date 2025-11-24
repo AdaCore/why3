@@ -109,7 +109,8 @@ let rec ghost u_sum_accuracy (a:int -> u) (n:int)
     abs (to_real (u_sum a n) -. sum (f_to_real a) 0 n)
     <=. from_int (n-1) *. eps *. sum (f_abs_to_real a) 0 n }
 =
-if n <= 1 then (* base case, trivial *) return ();
+if n <= 0 then (* base case, trivial *) return ();
+if n = 1 then begin assert { u_sum a n = a 0 };  return () end;
 (* induction *)
 u_sum_accuracy a (n-1); (* recursive call to obtain induction hypothesis *)
 let exact_sum = sum (f_to_real a) 0 (n-1) in (* sum in real numbers *)
@@ -402,6 +403,7 @@ module SLSE
   predicate g_hypothesis (rho:u) (a_max:real) =
    sqr (2.0 *. a_max +. abs (to_real rho)) *. (0.5 +. a_eps) +. 1.5 *. eta <=. exp_max_value
 
+  use ufloat.HelperLemmas as HelperLemmas
   use ufloat.UFloatLemmas as UFloatLemmas
 
   let ghost g_accuracy (x y rho : u) (a_max : real)
@@ -458,7 +460,9 @@ module SLSE
     begin ensures { d' <=. sqr (2.0 *. a_max +. abs (to_real rho)) }
       sqr_ge a' (2.0 *. a_max +. abs (to_real rho))
     end;
-    assert { (0.5 +. a_eps) *. d' <=. (0.5 +. a_eps) *. sqr (2.0 *. a_max +. abs (to_real rho)) };
+    begin ensures { (0.5 +. a_eps) *. d' <=. (0.5 +. a_eps) *. sqr (2.0 *. a_max +. abs (to_real rho)) }
+      HelperLemmas.mul_order_compat (0.5 +. a_eps) d' (sqr (2.0 *. a_max +. abs (to_real rho)))
+    end;
     assert { abs (to_real u_d)
              <=. abs d +. a_eps *. d' +. 1.5 *. eta
              <=. (0.5 +. a_eps) *. d' +. 1.5 *. eta

@@ -186,6 +186,12 @@ module HelperLemmas
   use real.RealInfix
   use real.Abs
 
+  let ghost mul_order_compat (x y z:real)
+    requires { x >=. 0.0 }
+    requires { y <=. z }
+    ensures { x *. y <=. x *. z }
+    = ()
+
   let ghost div_order_compat (x y z:real)
     requires { x <=. y }
     requires { 0. <. z }
