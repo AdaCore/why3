@@ -517,11 +517,14 @@ function g_max_error (rho:u) (a_max:real) : real =
     +. (exp (a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) +. 1.5 *. eta) -. 1.0)
       *. (1.0 +. exp_error)
 
+predicate float_format_hypothesis (a_eps exp_max_value eta : real) =
+ 2.0 *. a_eps *. exp_max_value +. 1.5 *. eta <=. 0x1p-6
+
 use RealHelpers as RealHelpers
 
  let ghost gg_bounds (rho:u) (a_max:real)
    requires { g_hypothesis rho a_max }
-   requires { 2.0 *. a_eps *. exp_max_value +. 1.5 *. eta <=. 0x1p-6 }
+   requires { float_format_hypothesis a_eps exp_max_value  eta }
    ensures { 0.0 <=. g_max_error rho a_max <=. 0x9p-4 }
  = begin ensures { 0.0 <=. g_max_error rho a_max }
      sqr_non_neg (2.0 *. a_max +. abs(to_real rho));
@@ -568,6 +571,7 @@ let ghost slse_accuracy (a:int -> u) (n:int) (rho:u) (a_max:real)
   requires { from_int (n-1) *. eps <=. 0x1p-2 }
   requires { forall i. 0 <= i < n -> abs (to_real (a i)) <=. a_max }
   requires { g_hypothesis rho a_max }
+  requires { float_format_hypothesis a_eps exp_max_value  eta }
   requires { slse_hypothesis rho a_max n }
   ensures {
     let gg = g_max_error rho a_max in
@@ -612,10 +616,32 @@ let ghost slse_accuracy (a:int -> u) (n:int) (rho:u) (a_max:real)
           end;
           begin ensures { exp ((a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j)))
                           +. abs (to_real rho))) +. (1.5 *. eta)) -. 1.0 >=. 0.0 }
+            assert { a_eps >=. 0.0 };
+            ExpLog.exp_increasing 0.0 ((a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j)))
+                          +. abs (to_real rho))) +. (1.5 *. eta))
           end;
-          begin ensures { (exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
-               +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) <=. (exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
-               +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) }
+          begin ensures { 
+              (exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
+                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) 
+             <=. (exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
+                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) 
+            }
+            HelperLemmas.mul_order_compat a_eps (sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
+                 +. (1.5 *. eta)) (sqr (2.0 *. a_max +. abs (to_real rho))
+                 +. (1.5 *. eta)); 
+            ExpLog.exp_increasing (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
+                 +. (1.5 *. eta)) (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
+                 +. (1.5 *. eta));
+            assert { exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
+                 +. (1.5 *. eta))  
+             <=.  exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
+                 +. (1.5 *. eta))
+                 };
+            HelperLemmas.mul_order_compat (1.0 +. exp_error) 
+              (exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
+                 +. (1.5 *. eta)) -. 1.0)
+              (exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
+                 +. (1.5 *. eta)) -. 1.0)      
           end
         end
       in
