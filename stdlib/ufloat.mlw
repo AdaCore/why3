@@ -513,13 +513,30 @@ module UFloatLemmas
     }
   =
   assert {
-    to_real x_f *. to_real y_f -. abs (to_real x_f *. to_real y_f) *. eps -. eta
-    <=. to_real (x_f **. y_f)
-    <=. to_real x_f *. to_real y_f +. abs (to_real x_f *. to_real y_f) *. eps +. eta
+    abs(to_real (x_f **. y_f) -. to_real x_f *. to_real y_f ) <=.
+      abs (to_real x_f *. to_real y_f) *. eps +. eta
   };
-    assert { abs (x *. y) <=. x_factor *. y_factor by
-       abs x *. abs y <=. x_factor *. abs y = abs y *. x_factor <=. y_factor *. x_factor };
-  mult_err_combine (to_real x_f) x x_factor x_rel x_abs (to_real y_f) y y_factor y_rel y_abs
+  begin ensures { abs (x *. y) <=. x_factor *. y_factor }
+    assert {
+       abs x *. abs y <=. x_factor *. abs y = abs y *. x_factor <=. y_factor *. x_factor }
+  end;
+  mult_err_combine (to_real x_f) x x_factor x_rel x_abs (to_real y_f) y y_factor y_rel y_abs;
+  assert {
+    abs(to_real r -. x *. y)
+    <=. abs(to_real r -. to_real x_f *. to_real y_f) +.
+        abs(to_real x_f *. to_real y_f -. x *. y)
+    <=. abs (to_real x_f *. to_real y_f) *. eps +. eta +.
+        (((((x_rel +. y_rel) +. (x_rel *. y_rel)) *. (x_factor *. y_factor))
+           +. ((y_abs +. (y_abs *. x_rel)) *. x_factor))
+          +. ((x_abs +. (x_abs *. y_rel)) *. y_factor))
+         +. (x_abs *. y_abs)
+    <=. ((1.0 +. x_rel) *. x_factor +. x_abs) *. ((1.0 +. y_rel) *. y_factor +. y_abs) *. eps +. eta +.
+        (((((x_rel +. y_rel) +. (x_rel *. y_rel)) *. (x_factor *. y_factor))
+           +. ((y_abs +. (y_abs *. x_rel)) *. x_factor))
+          +. ((x_abs +. (x_abs *. y_rel)) *. y_factor))
+         +. (x_abs *. y_abs)
+  }
+
 
   use real.ExpLog
 
