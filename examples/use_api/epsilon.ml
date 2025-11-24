@@ -51,7 +51,7 @@ let mod_M =
     let goal_term = tapp ~loc gt_int  [tapp add_int [eps;one]; zero] in
     Dprop(Decl.Pgoal, ident ~loc "g", goal_term)
   in
-  (ident ~loc "M",[use_int_Int ; g])
+  (ident ~loc "M",None,[use_int_Int ; g])
 
 
 let mlw_file = Modules [mod_M]
