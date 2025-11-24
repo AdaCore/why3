@@ -423,7 +423,7 @@ module SLSE
   begin ensures {
      abs (to_real u_a -. a) <=. 2. *. eps *. a'
   }
-    UFloatLemmas.usub_double_error_propagation (uadd x rho) y u_a
+    UFloatLemmas.usub_error_propagation (uadd x rho) y u_a
       (to_real x +. to_real rho) (abs (to_real x +. to_real rho))
       eps 0.0 (to_real y) (abs (to_real y)) 0.0 0.0;
   end;
@@ -434,7 +434,7 @@ module SLSE
   begin ensures {
     abs (to_real u_b -. b) <=. 2.0 *. a_eps *. b' +. eta
   }
-    UFloatLemmas.umul_double_error_propagation u_a u_a u_b
+    UFloatLemmas.umul_error_propagation u_a u_a u_b
       a a' (2. *. eps) 0.0 a a' (2. *. eps) 0.0
   end;
   let c = b /. 2.0 in
@@ -444,7 +444,7 @@ module SLSE
   begin ensures {
     abs (to_real u_c -. c) <=. a_eps *. c' +. 1.5 *. eta
   }
-    UFloatLemmas.udiv_exact_double_error_propagation u_b utwo u_c b b' (2.0 *. a_eps) eta
+    UFloatLemmas.udiv_exact_error_propagation u_b utwo u_c b b' (2.0 *. a_eps) eta
   end;
   let d = -. c in
   let u_d = uminus u_c in
@@ -458,10 +458,11 @@ module SLSE
     begin ensures { d' <=. sqr (2.0 *. a_max +. abs (to_real rho)) }
       sqr_ge a' (2.0 *. a_max +. abs (to_real rho))
     end;
+    assert { (0.5 +. a_eps) *. d' <=. (0.5 +. a_eps) *. sqr (2.0 *. a_max +. abs (to_real rho)) };
     assert { abs (to_real u_d)
              <=. abs d +. a_eps *. d' +. 1.5 *. eta
              <=. (0.5 +. a_eps) *. d' +. 1.5 *. eta
-             <=.  (0.5 +. a_eps) *. sqr (2.0 *. a_max +. abs (to_real rho)) +. 1.5 *. eta
+             <=. (0.5 +. a_eps) *. sqr (2.0 *. a_max +. abs (to_real rho)) +. 1.5 *. eta
              <=. exp_max_value
              };
     ()
@@ -473,7 +474,7 @@ module SLSE
   begin ensures {
     abs (to_real u_e -. e) <=. error *. e
   }
-   UFloatLemmas.exp_double_error_propagation u_e u_d d d' exp_error 0.0 a_eps (1.5 *. eta);
+   UFloatLemmas.exp_error_propagation u_e u_d d d' exp_error 0.0 a_eps (1.5 *. eta);
   end;
   assert { u_g x y rho = u_e };
   assert { g x y rho = e }
@@ -635,7 +636,7 @@ let ghost slse_accuracy (a:int -> u) (n:int) (rho:u) (a_max:real)
                     by slse_hypothesis rho a_max n }
         end
       end;
-      UFloatLemmas.log2_double_error_propagation_simple
+      UFloatLemmas.log2_error_propagation_simple
         (u_log2 (u_sum (u_gi a rho i) n))
         (u_sum (u_gi a rho i) n)
         (sum (gi a rho i) 0 n)

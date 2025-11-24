@@ -387,7 +387,7 @@ module UFloatLemmas
   use real.Abs
   use UFloat
 
-  let lemma uadd_double_error_propagation (x_f y_f r : u) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma uadd_error_propagation (x_f y_f r : u) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -459,49 +459,8 @@ module UFloatLemmas
        }
       end
   end
-(*
-  assert {
-    0. <=. x_rel /\ 0. <=. y_rel ->
-    delta <=.
-      (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
-      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
-    by
-      (delta <=. x_factor *. x_rel +. x_abs +. x_factor
-      so
-        x_factor +. x_abs <=. eps *. (y_factor +. y_abs) ->
-        delta <=. (eps +. x_rel) *. y_factor
-        +. (eps +. y_rel) *. x_factor
-        +. (y_rel +. eps) *. x_abs +. (x_rel +. eps) *. y_abs
-      by
-        delta <=. eps *. (y_factor +. y_abs) *. x_rel
-              +. (eps *. (y_factor +. y_abs)))
-      /\
-      (delta <=. y_factor *. y_rel +. y_abs +. y_factor
-      so
-      abs y_factor +. y_abs <=. eps *. (x_factor +. x_abs) ->
-      delta <=. (eps +. y_rel) *. x_factor
-        +. (eps +. x_rel) *. y_factor
-        +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
-      by
-        delta <=. eps *. (x_factor +. x_abs) *. y_rel
-              +. (eps *. (x_factor +. x_abs)))
-      /\
-      (
-       (eps *. (x_factor +. x_abs) <. abs y_factor +. y_abs /\
-       eps *. (y_factor +. y_abs) <. abs x_factor +. x_abs) ->
-       (delta <=.
-       (eps +. y_rel) *. x_factor +. (eps +. x_rel) *. y_factor
-      +. (x_rel +. eps) *. y_abs +. (y_rel +. eps) *. x_abs
-      by
-        abs (to_real x_f +. to_real y_f) <=.
-        abs (to_real x_f -. x) +. x_factor +. (abs (to_real y_f -. y) +. y_factor)
-      so
-        x_factor *. x_rel <=. (y_factor +. y_abs) /. eps *. x_rel /\
-        y_factor *. y_rel <=. (x_factor +. x_abs) /. eps *. y_rel))
-  }
-*)
 
-  let lemma usub_double_error_propagation (x_f y_f r : u) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
+  let lemma usub_error_propagation (x_f y_f r : u) (x x_factor x_rel x_abs y y_factor y_rel y_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -520,11 +479,11 @@ module UFloatLemmas
       <=. (x_rel +. y_rel +. eps) *. (x_factor +. y_factor)
           +. ((1. +. eps +. y_rel) *. x_abs +. (1. +. eps +. x_rel) *. y_abs)
     }
-  = uadd_double_error_propagation x_f (--. y_f) r x x_factor x_rel x_abs (-. y) y_factor y_rel y_abs
+  = uadd_error_propagation x_f (--. y_f) r x x_factor x_rel x_abs (-. y) y_factor y_rel y_abs
 
   use HelperLemmas
 
-  let lemma umul_double_error_propagation (x_f y_f r : u)
+  let lemma umul_error_propagation (x_f y_f r : u)
      (x x_factor x_rel x_abs : real) (y y_factor y_rel y_abs : real) : unit
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
@@ -558,7 +517,7 @@ module UFloatLemmas
 
   use real.ExpLog
 
-  let lemma log_double_error_propagation (logx_f x_f : u)
+  let lemma log_error_propagation (logx_f x_f : u)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -581,7 +540,7 @@ module UFloatLemmas
     <=. (abs (log (x_exact)) -. log (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_double_error_propagation (log2x_f x_f : u)
+  let lemma log2_error_propagation (log2x_f x_f : u)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -604,7 +563,7 @@ module UFloatLemmas
     <=. (abs (log2 (x_exact)) -. log2 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma log2_double_error_propagation_simple (log2x_f x_f : u)
+  let lemma log2_error_propagation_simple (log2x_f x_f : u)
         (x_exact log_rel x_rel : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_exact }
     requires {
@@ -619,9 +578,9 @@ module UFloatLemmas
         <=. log_rel *. abs (log2 x_exact) -. log2 (1. -. x_rel) *. (1. +. log_rel)
     }
   =
-  log2_double_error_propagation log2x_f x_f x_exact x_exact log_rel 0.0 x_rel 0.0
+  log2_error_propagation log2x_f x_f x_exact x_exact log_rel 0.0 x_rel 0.0
 
-  let lemma log10_double_error_propagation (log10x_f x_f : u)
+  let lemma log10_error_propagation (log10x_f x_f : u)
         (x_exact x_factor log_rel log_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -644,7 +603,7 @@ module UFloatLemmas
     <=. (abs (log10 (x_exact)) -. log10 (1.0 -. (((x_rel *. x_factor) +. x_abs) /. x_exact))) *. log_rel
   }
 
-  let lemma exp_double_error_propagation (expx_f x_f : u)
+  let lemma exp_error_propagation (expx_f x_f : u)
         (x_exact x_factor exp_rel exp_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -680,7 +639,7 @@ module UFloatLemmas
 
   use real.Trigonometry
 
-  let lemma sin_double_error_propagation (sinx_f x_f : u)
+  let lemma sin_error_propagation (sinx_f x_f : u)
         (x_exact x_factor sin_rel sin_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -700,7 +659,7 @@ module UFloatLemmas
   <=. (abs (sin x_exact) +. (x_rel *. x_factor +. x_abs)) *. sin_rel
   }
 
-  let lemma cos_double_error_propagation (cosx_f x_f : u)
+  let lemma cos_error_propagation (cosx_f x_f : u)
         (x_exact x_factor cos_rel cos_abs x_rel x_abs : real)
     requires { abs (to_real x_f -. x_exact) <=. x_rel *. x_factor +. x_abs }
     requires {
@@ -726,7 +685,7 @@ module UFloatLemmas
 
   function real_fun (f:int -> u) : int -> real = fun i -> to_real (f i)
 
-  let lemma sum_double_error_propagation (x : u)
+  let lemma sum_error_propagation (x : u)
                 (f : int -> u) (f_exact f_factor f_factor' : int -> real) (n:int)
                 (sum_rel sum_abs f_rel f_abs : real)
     requires {
@@ -757,7 +716,7 @@ module UFloatLemmas
   }
 
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
-  let lemma udiv_exact_double_error_propagation (x_f y_f r: u) (x x_factor x_rel x_abs : real)
+  let lemma udiv_exact_error_propagation (x_f y_f r: u) (x x_factor x_rel x_abs : real)
     requires {
       abs (to_real x_f -. x) <=. x_rel *. x_factor +. x_abs
     }
@@ -803,6 +762,8 @@ module UFloatLemmas
     div_order_compat2 (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f);
   in ()
 end
+
+
 
 (** {2 Single propagation lemmas} *)
 
