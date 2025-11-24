@@ -521,25 +521,37 @@ use RealHelpers as RealHelpers
 
  let ghost gg_bounds (rho:u) (a_max:real)
    requires { g_hypothesis rho a_max }
+   requires { 2.0 *. a_eps *. exp_max_value +. 1.5 *. eta <=. 0x1p-6 }
    ensures { 0.0 <=. g_max_error rho a_max <=. 0x9p-4 }
  = begin ensures { 0.0 <=. g_max_error rho a_max }
      sqr_non_neg (2.0 *. a_max +. abs(to_real rho));
    end;
    begin ensures { g_max_error rho a_max <=. 0x9p-4 }
-    assert { a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) <=. 2.0 *. a_eps *. exp_max_value };
+    begin ensures { a_eps *. sqr (2.0 *. a_max +. abs(to_real rho))
+                      <=. 2.0 *. a_eps *. exp_max_value }
+      assert { sqr (2.0 *. a_max +. abs (to_real rho)) *. (0.5 +. a_eps)
+                 <=. exp_max_value }; (* from g_hypothesis *)
+      assert { sqr (2.0 *. a_max +. abs (to_real rho)) <=. 2.0 *. exp_max_value };
+      HelperLemmas.mul_order_compat a_eps
+        (sqr (2.0 *. a_max +. abs (to_real rho))) (2.0 *. exp_max_value)
+    end;
     begin ensures { exp (a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) +. 1.5 *. eta) <=.
             exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) }
       exp_increasing (a_eps *. sqr (2.0 *. a_max +. abs(to_real rho))) (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta)
     end;
-    assert { a_eps <=. 0x6p-54 };
-    assert { 2.0 *. a_eps *. exp_max_value +. 1.5 *. eta <=. 0x1p-41 };
-    begin ensures { exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0 <=. 0x1p-40 }
+    begin ensures { g_max_error rho a_max <=. exp_error +.
+      (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0 ) *. (1.0 +. exp_error) }
+      HelperLemmas.mul_order_compat (1.0 +. exp_error)
+        (exp (a_eps *. sqr (2.0 *. a_max +. abs(to_real rho)) +. 1.5 *. eta) -. 1.0)
+        (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0)
+    end;
+    begin ensures { g_max_error rho a_max <=. 0.5 +.
+      2.0 *. (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0 ) }
+    end;
+    begin ensures { exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0 <=. 0x1p-5 }
       (* invoke a lemma on reals *)
       RealHelpers.exp_bound_1 (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta)
-    end;
-    assert { (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0) *. (1.0 +. exp_error) <=. 0x1p-39 };
-    assert { exp_error +. (exp (2.0 *. a_eps *. exp_max_value +. 1.5 *. eta) -. 1.0) *. (1.0 +. exp_error)
-            <=. 0.5 +. 0x1p-39 <=. 0x9p-4 }
+    end
    end
 
 
