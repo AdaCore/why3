@@ -58,6 +58,9 @@
  <goal name="div_order_compat2&#39;vc" expl="VC for div_order_compat2" proved="true">
  <proof prover="1"><result status="valid" time="0.025204" steps="4783"/></proof>
  </goal>
+ <goal name="div_abs&#39;vc" expl="VC for div_abs" proved="true">
+ <proof prover="5"><result status="valid" time="0.051467" steps="7850"/></proof>
+ </goal>
  <goal name="mult_err&#39;vc" expl="VC for mult_err" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="mult_err&#39;vc.0" expl="assertion" proved="true">
@@ -302,7 +305,7 @@
  </transf>
  </goal>
 </theory>
-<theory name="UFloatLemmas">
+<theory name="UFloatLemmas" proved="true">
  <goal name="uadd_error_propagation&#39;vc" expl="VC for uadd_error_propagation" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="uadd_error_propagation&#39;vc.0" expl="assertion" proved="true">
@@ -594,59 +597,57 @@
   </goal>
  </transf>
  </goal>
- <goal name="udiv_exact_error_propagation&#39;vc" expl="VC for udiv_exact_error_propagation">
- <transf name="split_vc" >
+ <goal name="udiv_exact_error_propagation&#39;vc" expl="VC for udiv_exact_error_propagation" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="udiv_exact_error_propagation&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.065497" steps="8975"/></proof>
+  <proof prover="8"><result status="valid" time="0.050202" steps="163"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.041292" steps="8464"/></proof>
+  <proof prover="5"><result status="valid" time="0.044728" steps="8464"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.071516" steps="200"/></proof>
+  <proof prover="1"><result status="valid" time="0.080285" steps="18343"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.062677" steps="8517"/></proof>
+  <proof prover="6"><result status="valid" time="0.014802" steps="9871"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="4.597056" steps="131900"/></proof>
+  <proof prover="8"><result status="valid" time="3.987717" steps="131900"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.049911" steps="9477"/></proof>
+  <proof prover="5"><result status="valid" time="0.038351" steps="9477"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.044728" steps="8583"/></proof>
+  <proof prover="5"><result status="valid" time="0.043769" steps="8583"/></proof>
   </goal>
-  <goal name="udiv_exact_error_propagation&#39;vc.7" expl="assertion">
+  <goal name="udiv_exact_error_propagation&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.046529" steps="182"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.8" expl="assertion" proved="true">
-  <proof prover="1"><result status="timeout" time="5.000000" steps="391461"/></proof>
-  <proof prover="5"><result status="timeout" time="5.000000"/></proof>
-  <proof prover="6"><result status="outofmemory" time="4.263305"/></proof>
-  <proof prover="8"><result status="timeout" time="5.000000" steps="68458"/></proof>
   <transf name="split_vc" proved="true" >
    <goal name="udiv_exact_error_propagation&#39;vc.8.0" expl="assertion" proved="true">
-   <proof prover="8"><result status="valid" time="0.231151" steps="2023"/></proof>
+   <proof prover="8"><result status="valid" time="0.056196" steps="392"/></proof>
    </goal>
    <goal name="udiv_exact_error_propagation&#39;vc.8.1" expl="VC for udiv_exact_error_propagation" proved="true">
-   <proof prover="8"><result status="valid" time="4.564533" steps="84245"/></proof>
+   <proof prover="8"><result status="valid" time="4.407109" steps="108902"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.069609" steps="10387"/></proof>
+  <proof prover="5"><result status="valid" time="0.038784" steps="10272"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.086019" steps="18583"/></proof>
+  <proof prover="5"><result status="valid" time="0.042616" steps="8782"/></proof>
   </goal>
-  <goal name="udiv_exact_error_propagation&#39;vc.11" expl="postcondition">
-  <proof prover="1"><result status="timeout" time="5.000000" steps="382262"/></proof>
-  <proof prover="5"><result status="timeout" time="5.000000"/></proof>
-  <proof prover="6"><result status="outofmemory" time="5.325968"/></proof>
-  <proof prover="8"><result status="timeout" time="5.000000" steps="113643"/></proof>
+  <goal name="udiv_exact_error_propagation&#39;vc.11" expl="assertion" proved="true">
+  <proof prover="5" timelimit="120"><undone/></proof>
+  <proof prover="8" timelimit="120"><result status="valid" time="27.031945" steps="948128"/></proof>
   </goal>
   <goal name="udiv_exact_error_propagation&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.056341" steps="352"/></proof>
+  <proof prover="8"><result status="valid" time="1.072693" steps="60854"/></proof>
+  </goal>
+  <goal name="udiv_exact_error_propagation&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="8"><result status="valid" time="0.053736" steps="352"/></proof>
   </goal>
  </transf>
  </goal>

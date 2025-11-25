@@ -204,6 +204,14 @@ module HelperLemmas
     ensures { y /. z <=. x /. z }
     = ()
 
+  let ghost div_abs (x y:real)
+    requires { y <> 0.0 }
+    ensures { x /. y <=. abs x /. abs y }
+    = if x >=. 0. then
+        if y >=. 0. then () else ()
+      else
+        if y >=. 0. then () else while false do variant { 0 } done
+
   let ghost mult_err (x x_exact x_factor x_rel x_abs y:real)
     requires { 0. <=. x_rel }
     requires { 0. <=. x_abs }
@@ -738,6 +746,7 @@ module UFloatLemmas
     sum_rel *. (sum f_factor 0 n +. ((f_rel *. sum f_factor 0 n) +. (f_abs *. from_int n)))
   }
 
+
   (* We don't have an error on y_f because in practice we won't have an exact division with an approximate divisor *)
   let lemma udiv_exact_error_propagation (x_f y_f r: u) (x x_factor x_rel x_abs : real)
     requires {
@@ -762,7 +771,8 @@ module UFloatLemmas
     }
     =
     div_order_compat (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
-    div_order_compat (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f) in
+    div_order_compat (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f)
+  in
   let lemma y_f_neg ()
     requires { to_real y_f <. 0. }
     ensures {
@@ -771,10 +781,7 @@ module UFloatLemmas
     }
     =
     div_order_compat2 (to_real x_f) (x +. x_rel *. x_factor +. x_abs) (to_real y_f);
-    (* TODO: Prove this somehow *)
-    assert {
-      forall x y. x /. y <=. abs x /. abs y
-    };
+    HelperLemmas.div_abs (-. x_rel *. x_factor -. x_abs) (to_real y_f);
     assert {
       (x -. x_rel *. x_factor -. x_abs) /. to_real y_f
       <=. x /. (to_real y_f) +. ((x_rel *. x_factor) +. x_abs) /. abs (to_real y_f)
@@ -783,9 +790,12 @@ module UFloatLemmas
         <=. (x_rel *. x_factor +. x_abs) /. abs (to_real y_f)
     };
     div_order_compat2 (x -. x_rel *. x_factor -. x_abs) (to_real x_f) (to_real y_f);
-  in ()
-end
+    assert { -. x_rel *. (x_factor /. abs (to_real y_f))
+         -. (x_abs /. abs (to_real y_f)) -. eta <=. to_real r -. (x /. to_real y_f) };
+  in
+  ()
 
+end
 
 
 (** {2 Single propagation lemmas} *)
