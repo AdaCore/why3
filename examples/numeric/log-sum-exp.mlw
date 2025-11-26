@@ -686,6 +686,7 @@ let ghost slse_accuracy (a:int -> u) (n:int) (rho:u) (a_max:real)
         ggg
   in
   (* another invocation of generalized accuracy for summations *)
+  assert { log2 (1.0 -. ggg) <=. 0.0 };
   u_sum_accuracy_combine log2_error (-. log2 (1.0 -. ggg) *. (1.0 +. log2_error))
     (h a n rho) (u_h a n rho) n
 
