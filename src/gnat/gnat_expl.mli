@@ -165,3 +165,22 @@ val search_labels: Why3.Term.term -> vc_info option
 
 val parse_line_spec : string -> limit_mode
 val parse_region_spec : string -> Gnat_loc.region
+
+type unproved_status =
+  | Unknown
+  | Gave_up
+  | Limit of { timeout : bool ; step : bool ; memory : bool }
+(* The unproved status of a goal contains information about the reason
+   why the goal could not be proved. Note that "unknown" means the
+   status is unknown, not that the prover answered unknown.*)
+
+val compress : Call_provers.prover_answer -> unproved_status
+(* Convert a prover answer into an unproved status *)
+
+val merge_all_needed : unproved_status -> unproved_status -> unproved_status
+(* Merge two statuses into one, assuming all proofs are needed
+  for the check to prove. *)
+
+val merge_one_needed : unproved_status -> unproved_status -> unproved_status
+(* Merge two statuses into one, assuming only one proof is needed
+   for the check to prove. *)

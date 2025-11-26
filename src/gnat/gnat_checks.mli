@@ -167,6 +167,10 @@ module Save_VCs : sig
    (* get the file name for a given goal *)
 
    val check_to_json : Session_itp.session -> Gnat_expl.check -> Json_base.json
+
+   val unproved_prover_answer :
+      Session_itp.session -> Gnat_expl.check -> Gnat_expl.unproved_status
+   (* get the unproved status for a given goal *)
 end
 
 val all_split_leaf_goals : unit -> unit
