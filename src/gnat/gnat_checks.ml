@@ -896,7 +896,7 @@ module Save_VCs = struct
     Sysutil.write_file vc_fn "";
     vc_fn
 
-  let unproved_prover_answer session check =
+  let unproved_prover_answer session goalopt check =
     let check_rec = Gnat_expl.HCheck.find explmap check in
     let status = ref Gnat_expl.Unknown in
     let proof_attempt_status pa =
@@ -916,17 +916,22 @@ module Save_VCs = struct
         Gnat_expl.merge_one_needed acc (proof_attempt_status pa))
         Gnat_expl.Unknown proof_attempts
     and goal_status g =
-      let proof_attempts = Session_itp.get_proof_attempts session g in
-      let transformations = Session_itp.get_transformations session g in
-      let pa_status = proof_attempt_list_status proof_attempts in
-      let tf_status = transformation_list_status transformations in
-      Gnat_expl.merge_one_needed pa_status tf_status
+      if Session_itp.pn_proved session g then Gnat_expl.Unknown
+      else
+        let proof_attempts = Session_itp.get_proof_attempts session g in
+        let transformations = Session_itp.get_transformations session g in
+        let pa_status = proof_attempt_list_status proof_attempts in
+        let tf_status = transformation_list_status transformations in
+        Gnat_expl.merge_one_needed pa_status tf_status
     in
-    GoalSet.iter (fun g ->
-      let g_status = goal_status g in
-      status := Gnat_expl.merge_all_needed !status g_status)
-      check_rec.toplevel;
-    !status
+    match goalopt with
+    | Some g -> goal_status g
+    | None ->
+        GoalSet.iter (fun g ->
+          let g_status = goal_status g in
+          status := Gnat_expl.merge_all_needed !status g_status)
+          check_rec.toplevel;
+        !status
 
   (* Group of functions to build a json object for a session tree.
      More precisely a session forest, because we start with a list of
