@@ -172,10 +172,16 @@
     "Symbol %s cannot be user-defined. User-defined symbol cannot use ' \
       before a letter. You can only use ' followed by _ or a number."
 
+  let rec has_name t = match t.term_desc with
+    | Tattr (ATstr s, t) -> Ident.is_hyp_name_attr s || has_name t
+    | _ -> false
+
   let name_term id_opt def t =
-    let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
-    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
-    { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
+    if has_name t then t
+    else
+      let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
+      let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+      { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
 
   let re_pat pat d = { pat with pat_desc = d }
 
