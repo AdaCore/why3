@@ -55,7 +55,8 @@ type check_kind =
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
-   | VC_UC_Alignment
+   | VC_UC_Align_Overlay
+   | VC_UC_Align_UC
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -126,7 +127,8 @@ let is_warning_kind r =
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
-   | VC_UC_Alignment
+   | VC_UC_Align_Overlay
+   | VC_UC_Align_UC
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -246,7 +248,8 @@ let check_kind_from_string s =
    | "VC_RECLAMATION_CHECK"         -> VC_Reclamation_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
-   | "VC_UC_ALIGNMENT"              -> VC_UC_Alignment
+   | "VC_UC_ALIGN_OVERLAY"          -> VC_UC_Align_Overlay
+   | "VC_UC_ALIGN_UC"               -> VC_UC_Align_UC
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -322,7 +325,8 @@ let check_kind_to_ada kind =
    | VC_Reclamation_Check         -> "VC_RECLAMATION_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
-   | VC_UC_Alignment              -> "VC_UC_ALIGNMENT"
+   | VC_UC_Align_Overlay          -> "VC_UC_ALIGN_OVERLAY"
+   | VC_UC_Align_UC               -> "VC_UC_ALIGN_UC"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -393,7 +397,8 @@ let check_kind_to_string kind =
    | VC_Reclamation_Check         -> "reclamation_check"
    | VC_UC_No_Holes               -> "uc_no_holes"
    | VC_UC_Same_Size              -> "uc_same_size"
-   | VC_UC_Alignment              -> "alignment_check"
+   | VC_UC_Align_Overlay          -> "address_alignment_check"
+   | VC_UC_Align_UC               -> "alignment_check"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
