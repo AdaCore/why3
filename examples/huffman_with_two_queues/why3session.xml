@@ -2,8 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -21,7 +21,7 @@
  <goal name="huffman_coding&#39;vc" expl="VC for huffman_coding" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="huffman_coding&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.008219" steps="7614"/></proof>
+  <proof prover="0"><result status="valid" time="0.009824" steps="7614"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="5"><result status="valid" time="0.036346" steps="45"/></proof>
@@ -30,37 +30,37 @@
   <proof prover="2"><result status="valid" time="0.033466" steps="6470"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.026214" steps="62369"/></proof>
+  <proof prover="0"><result status="valid" time="0.033064" steps="65641"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.011394" steps="8080"/></proof>
+  <proof prover="0"><result status="valid" time="0.008925" steps="8080"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.5" expl="loop invariant init" proved="true">
   <proof prover="4"><result status="valid" time="0.060000" steps="11130"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.012071" steps="8203"/></proof>
+  <proof prover="0"><result status="valid" time="0.011328" steps="8203"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.007964" steps="8599"/></proof>
+  <proof prover="0"><result status="valid" time="0.008070" steps="8599"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.8" expl="loop variant decrease" proved="true">
   <proof prover="4"><result status="valid" time="0.130000" steps="20679"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.9" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.018179" steps="56977"/></proof>
+  <proof prover="0"><result status="valid" time="0.024895" steps="59272"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.10" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.061199" steps="8885"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.019802" steps="57357"/></proof>
+  <proof prover="0"><result status="valid" time="0.025167" steps="59670"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.12" expl="loop invariant preservation" proved="true">
   <proof prover="5"><result status="valid" time="0.037403" steps="111"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="2.052872" steps="158091"/></proof>
+  <proof prover="2"><result status="valid" time="2.818031" steps="158091"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.033147" steps="7421"/></proof>
@@ -93,14 +93,14 @@
     <goal name="huffman_coding&#39;vc.21.0.1" expl="asserted formula" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="huffman_coding&#39;vc.21.0.1.0" expl="asserted formula" proved="true">
-     <proof prover="3"><result status="valid" time="0.020497" steps="58945"/></proof>
+     <proof prover="0"><result status="valid" time="0.022032" steps="61497"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
    <goal name="huffman_coding&#39;vc.21.1" expl="loop invariant preservation" proved="true">
-   <proof prover="5"><result status="valid" time="0.267229" steps="1410"/></proof>
+   <proof prover="5"><result status="valid" time="0.267229" steps="1431"/></proof>
    </goal>
   </transf>
   </goal>
@@ -111,13 +111,13 @@
   <proof prover="2"><result status="valid" time="0.040373" steps="7307"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="1.481814" steps="195519"/></proof>
+  <proof prover="4"><result status="valid" time="2.415287" steps="195519"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.25" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.060000" steps="11634"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.26" expl="loop variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.058774" steps="222"/></proof>
+  <proof prover="5"><result status="valid" time="0.058774" steps="216"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.27" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.100000" steps="14107"/></proof>
@@ -129,13 +129,13 @@
   <proof prover="5"><result status="valid" time="0.041348" steps="71"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.30" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.035875" steps="107"/></proof>
+  <proof prover="5"><result status="valid" time="0.035875" steps="112"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.31" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="2.581180" steps="171590"/></proof>
+  <proof prover="2"><result status="valid" time="3.308180" steps="171590"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.32" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="3.452759" steps="209927"/></proof>
+  <proof prover="4"><result status="valid" time="4.823511" steps="209927"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.33" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.208484" steps="35181"/></proof>
@@ -150,7 +150,7 @@
   <proof prover="4"><result status="valid" time="0.140000" steps="22674"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.37" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.018795" steps="59813"/></proof>
+  <proof prover="0"><result status="valid" time="0.027004" steps="62227"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.38" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
@@ -164,23 +164,23 @@
   </transf>
   </goal>
   <goal name="huffman_coding&#39;vc.39" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.046848" steps="83"/></proof>
+  <proof prover="5"><result status="valid" time="0.046848" steps="84"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.40" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="huffman_coding&#39;vc.40.0" expl="loop invariant preservation" proved="true">
-   <proof prover="5"><result status="valid" time="0.933871" steps="5080"/></proof>
+   <proof prover="5"><result status="valid" time="1.822037" steps="5006"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="huffman_coding&#39;vc.41" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.283055" steps="43988"/></proof>
+  <proof prover="2"><result status="valid" time="0.423223" steps="43988"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.42" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.609313" steps="3033"/></proof>
+  <proof prover="5"><result status="valid" time="0.951830" steps="3025"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.43" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="2.880000" steps="288167"/></proof>
+  <proof prover="4"><result status="valid" time="3.368155" steps="288167"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.44" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.020720" steps="30"/></proof>
@@ -204,18 +204,18 @@
   <goal name="huffman_coding&#39;vc.49" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="huffman_coding&#39;vc.49.0" expl="loop invariant preservation" proved="true">
-   <proof prover="5"><result status="valid" time="0.330446" steps="1620"/></proof>
+   <proof prover="5"><result status="valid" time="0.480347" steps="1647"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="huffman_coding&#39;vc.50" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.241078" steps="37715"/></proof>
+  <proof prover="2"><result status="valid" time="0.421844" steps="37715"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.51" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="1.205617" steps="5544"/></proof>
+  <proof prover="5"><result status="valid" time="2.861660" steps="7245"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.52" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="1.450000" steps="167683"/></proof>
+  <proof prover="4"><result status="valid" time="2.043633" steps="167683"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.53" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.055058" steps="8340"/></proof>
@@ -224,7 +224,7 @@
   <proof prover="5"><result status="valid" time="0.023591" steps="47"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.55" expl="loop variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.102540" steps="657"/></proof>
+  <proof prover="5"><result status="valid" time="0.102540" steps="706"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.56" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.090000" steps="14405"/></proof>
@@ -232,7 +232,7 @@
   <goal name="huffman_coding&#39;vc.57" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="huffman_coding&#39;vc.57.0" expl="loop invariant preservation" proved="true">
-   <proof prover="5"><result status="valid" time="0.043471" steps="185"/></proof>
+   <proof prover="5"><result status="valid" time="0.043471" steps="186"/></proof>
    </goal>
   </transf>
   </goal>
@@ -242,18 +242,18 @@
   <goal name="huffman_coding&#39;vc.59" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="huffman_coding&#39;vc.59.0" expl="loop invariant preservation" proved="true">
-   <proof prover="5"><result status="valid" time="0.496927" steps="2663"/></proof>
+   <proof prover="5"><result status="valid" time="0.730462" steps="2691"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="huffman_coding&#39;vc.60" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.272869" steps="43936"/></proof>
+  <proof prover="2"><result status="valid" time="0.417938" steps="43936"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.61" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.567787" steps="3115"/></proof>
+  <proof prover="5"><result status="valid" time="0.896774" steps="3116"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.62" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.585150" steps="3129"/></proof>
+  <proof prover="5"><result status="valid" time="1.186951" steps="4551"/></proof>
   </goal>
   <goal name="huffman_coding&#39;vc.63" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.140000" steps="20970"/></proof>
