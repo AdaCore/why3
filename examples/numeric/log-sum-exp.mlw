@@ -309,7 +309,7 @@ function u_lse [@inline:trivial] (a: int -> u) (size:int) : u
 let ghost lse_accuracy (a:int -> u) (n:int) (a_max:real)
   requires { 1 <= n }
   requires { from_int (n-1) *. eps <=. 0x1p-2 }
-  requires { forall i. 0 <= i < n -> abs (to_real (a i)) <=. a_max }
+  requires { forall i. 0 <= i < n -> -. exp_max_value <=. to_real (a i) <=. a_max }
   requires { a_max <=. exp_max_value }
   requires { exp a_max *. (1.0 +. exp_error) *.
                from_int n *. (1.0 +. eps *. from_int (n-1))
@@ -620,28 +620,28 @@ let ghost slse_accuracy (a:int -> u) (n:int) (rho:u) (a_max:real)
             ExpLog.exp_increasing 0.0 ((a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j)))
                           +. abs (to_real rho))) +. (1.5 *. eta))
           end;
-          begin ensures { 
+          begin ensures {
               (exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
-                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) 
+                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error)
              <=. (exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
-                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error) 
+                 +. (1.5 *. eta)) -. 1.0) *. (1.0 +. exp_error)
             }
             HelperLemmas.mul_order_compat a_eps (sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
                  +. (1.5 *. eta)) (sqr (2.0 *. a_max +. abs (to_real rho))
-                 +. (1.5 *. eta)); 
+                 +. (1.5 *. eta));
             ExpLog.exp_increasing (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
                  +. (1.5 *. eta)) (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
                  +. (1.5 *. eta));
             assert { exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
-                 +. (1.5 *. eta))  
+                 +. (1.5 *. eta))
              <=.  exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
                  +. (1.5 *. eta))
                  };
-            HelperLemmas.mul_order_compat (1.0 +. exp_error) 
+            HelperLemmas.mul_order_compat (1.0 +. exp_error)
               (exp (a_eps *. sqr ((abs (to_real (a @ i)) +. abs (to_real (a @ j))) +. abs (to_real rho))
                  +. (1.5 *. eta)) -. 1.0)
               (exp (a_eps *. sqr (2.0 *. a_max +. abs (to_real rho))
-                 +. (1.5 *. eta)) -. 1.0)      
+                 +. (1.5 *. eta)) -. 1.0)
           end
         end
       in
