@@ -68,14 +68,14 @@ module Typing = struct
     | _ -> e
 
   let add_decl muc env file d =
-    let vc = muc.muc_theory.uc_path = [] && Debug.test_noflag debug_type_only in
+    let vc = muc.muc_intf.muc_theory.uc_path = [] && Debug.test_noflag debug_type_only in
     match d with
     | Ptree.Dlet (id, gh, kind, e) ->
         let e = update_any kind e in
         let ld = (Unsafe.create_user_prog_id id, gh, kind, Unsafe.dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
         let ld =
-          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc.muc_intf ld else ld
         in
         add_pdecl ~vc muc (Pdecl.create_let_decl ld)
     | Ptree.Drec fdl ->
@@ -84,7 +84,7 @@ module Typing = struct
         let _, rd = Unsafe.drec_defn muc Dexpr.denv_empty fdl in
         let rd = Dexpr.rec_defn ~keep_loc:true rd in
         let rd =
-          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc.muc_intf rd else rd
         in
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
     | _ -> Unsafe.add_decl muc env file d
@@ -98,7 +98,7 @@ module Typing = struct
     let add_decl_env_file muc d = add_decl muc env file d in
     let muc = List.fold_left add_decl_env_file muc dl in
     let m = Loc.try1 ~loc Pmodule.close_module muc in
-    let file = Mstr.add m.mod_theory.th_name.id_string m file in
+    let file = Mstr.add (Pmodule.mod_name m).id_string m file in
     file
 
   let type_mlw_file env path filename mlw_file =

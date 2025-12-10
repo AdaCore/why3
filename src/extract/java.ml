@@ -83,7 +83,7 @@ let camelcase_string (s : string) : string =
     (List.hd subs)
     (List.tl subs)
 
-let get_module_package_name (m : Pmodule.pmodule) =
+let get_module_package_name (m : Pmodule.pmodule0) =
   let m_name = m.mod_theory.th_name in
   search_attribute_prefix m_name.id_attrs java_package_prefix
 
@@ -661,7 +661,7 @@ module JavaCompilerInfo = struct
   exception UnknownException of string
 
   type class_record = {
-    m : Pmodule.pmodule;
+    m : Pmodule.pmodule0;
     kind : class_kind;
     package_name : string option;
     class_name : Ident.ident;
@@ -713,7 +713,7 @@ module JavaCompilerInfo = struct
       | Some s -> Loc.errorm ?loc:clsname.id_loc
                     "invalid class_kind attribute '%s'" s
 
-  let init_compiler_info (m : Pmodule.pmodule) : unit =
+  let init_compiler_info (m : Pmodule.pmodule0) : unit =
     let clsname = m.mod_theory.th_name in
     compinfo.current_class <-
       Some {
@@ -760,14 +760,14 @@ module JavaCompilerInfo = struct
   let is_current_class (cls : class_record) : bool =
     Ident.id_equal cls.class_name (get_current_class ()).class_name
 
-  let import_module (m : Pmodule.pmodule) =
+  let import_module (m : Pmodule.pmodule0) =
     let m_name = m.mod_theory.th_name in
     debug "import module #%d: %s@\n"
       (Sid.cardinal compinfo.imported_modules)
       m_name.id_string;
     compinfo.imported_modules <- Sid.add m_name  compinfo.imported_modules
 
-  let is_imported_module (m : Pmodule.pmodule) : bool =
+  let is_imported_module (m : Pmodule.pmodule0) : bool =
     Sid.exists (fun id -> Ident.id_equal id m.mod_theory.th_name)
       compinfo.imported_modules
 
@@ -2509,7 +2509,7 @@ module ExtractJava = struct
       | Some p -> fprintf fmt "@[package %s;@]@\n@\n" p;
     in
     let print_deps fmt deps =
-      let print_module_dep fmt (pm : Pmodule.pmodule) =
+      let print_module_dep fmt (pm : Pmodule.pmodule0) =
         import_module pm;
         let pm_name = pm.mod_theory.th_name in
         match get_module_package_name pm with

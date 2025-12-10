@@ -14,7 +14,7 @@
 
 (* Entry points *)
 
-%start <Pmodule.pmodule Wstdlib.Mstr.t> mlw_file
+%start <Pmodule.mlw_file> mlw_file
 %start <Ptree.mlw_file> mlw_file_parsing_only
 %start <Ptree.term> term_eof
 %start <Ptree.expr> expr_eof

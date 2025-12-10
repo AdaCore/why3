@@ -772,9 +772,10 @@ The first step to build an environment as already illustrated in
    :end-before: END{buildenv}
 
 To write our programs, we need to import some other modules from the
-standard library integers and references. The only subtleties is to get logic
-functions from the logical part of the modules
-``mod_theory.Theory.th_export`` and the program functions from ``mod_export``.
+standard library integers and references. The only subtlety is to get logic
+functions from the logical part of the modules using
+``(Pmodule.mod_theory m).Theory.th_export`` and the program functions using
+``Pmodule.mod_export_intf``.
 
 .. literalinclude:: ../examples/use_api/mlw_expr.ml
    :language: ocaml

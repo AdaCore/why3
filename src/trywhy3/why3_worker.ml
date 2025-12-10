@@ -339,6 +339,7 @@ let why3_execute_one m rs =
 let why3_execute modules =
   let mods =
     Wstdlib.Mstr.fold (fun _ m acc ->
+        let m = m.Pmodule.mod_intf in
         match Pmodule.ns_find_rs m.Pmodule.mod_export ["main"] with
         | rs -> why3_execute_one m rs :: acc
         | exception Not_found -> acc)

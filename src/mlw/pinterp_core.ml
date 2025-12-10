@@ -707,7 +707,7 @@ let fold_premises f (premises: premises) init =
 
 type env = {
   why_env  : Env.env;
-  pmodule  : Pmodule.pmodule;
+  pmodule  : Pmodule.pmodule0;
   funenv   : (cexp * rec_defn list option) Mrs.t;
   tvenv    : Ty.ty Mtv.t;
   vsenv    : value Mvs.t;
@@ -1072,7 +1072,7 @@ let oldify_varl env varl =
 (** [variant_term env loc olds news] creates a term representing the validity of
     variants [news] at location [loc], where [olds] are the oldified variants. *)
 let variant_term env olds news =
-  let {Pmodule.mod_theory= {Theory.th_export= ns}} =
+  let {Pmodule.mod_intf= {Pmodule.mod_theory= {Theory.th_export= ns}}} =
     Pmodule.read_module env.why_env ["int"] "Int" in
   let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
   let ls_int_lt = Theory.ns_find_ls ns [Ident.op_infix "<"] in
@@ -1224,7 +1224,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       vsenv, t_lambda [vs_arg] [] t
   | Varray arr ->
       let open Pmodule in
-      let {mod_theory= {Theory.th_export= ns}} =
+      let {mod_intf= {mod_theory= {Theory.th_export= ns}}} =
         read_module env.why_env ["array"] "Array" in
       let ts_array = Theory.ns_find_ts ns ["array"] in
       if Debug.test_flag debug_array_as_update_chains_not_epsilon then
@@ -1282,7 +1282,7 @@ let compute_term_dummy : compute_term = fun _ t -> t
 
 let is_array_its env its =
   let pm = Pmodule.read_module env ["array"] "Array" in
-  let array_its = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+  let array_its = Pmodule.ns_find_its pm.Pmodule.mod_intf.Pmodule.mod_export ["array"] in
   its_equal its array_its
 
 (* TODO Remove argument [env] after replacing Varray by model substitution *)

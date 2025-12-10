@@ -380,7 +380,7 @@ let my_tasks : Task.task list =
     Wstdlib.Mstr.fold
       (fun _ m acc ->
        List.rev_append
-         (Task.split_theory m.Pmodule.mod_theory None None) acc)
+         (Task.split_theory (Pmodule.mod_theory m) None None) acc)
       mods []
   in List.rev mods
 

@@ -557,11 +557,11 @@ open Dexpr
 
 let ty_of_pty tuc = ty_of_pty (get_namespace tuc)
 
-let get_namespace muc = List.hd muc.Pmodule.muc_import
-let get_namespace_export muc = List.hd muc.Pmodule.muc_export
+let get_namespace muc = List.hd muc.Pmodule.muc_intf.muc_import
+let get_namespace_export muc = List.hd muc.Pmodule.muc_intf.muc_export
 
 let dterm muc =
-  let uc = muc.muc_theory in
+  let uc = muc.muc_intf.muc_theory in
   dterm (Theory.get_namespace uc) uc.uc_known uc.uc_crcmap
 
 let find_xsymbol     muc q = find_xsymbol_ns     (get_namespace muc) q
@@ -633,7 +633,7 @@ let parse_record muc fll =
   let its = match rs.rs_cty.cty_args with
     | [{pv_ity = {ity_node = (Ityreg {reg_its = s} | Ityapp (s,_,_))}}] -> s
     | _ -> raise (BadRecordField (ls_of_rs rs)) in
-  let itd = find_its_defn muc.muc_known its in
+  let itd = find_its_defn muc.muc_intf.muc_known its in
   let check v s = match s.rs_field with
     | Some u -> pv_equal v u
     | _ -> raise (BadRecordUnnamed (ls_of_rs rs, its.its_ts)) in
@@ -811,7 +811,7 @@ let dwrites muc wl lvm =
   let dwrites t = type_term muc lvm old t in
   List.map dwrites wl
 
-let find_variant_ls muc q = match find_lsymbol muc.muc_theory q with
+let find_variant_ls muc q = match find_lsymbol muc.muc_intf.muc_theory q with
   | { ls_args = [u;v]; ls_value = None } as ls when ty_equal u v -> ls
   | s -> Loc.errorm ~loc:(qloc q) "Not an order relation: %a" Pretty.print_ls s
 
@@ -889,7 +889,7 @@ let rec eff_dterm muc denv {term_desc = desc; term_loc = loc} =
   in
   let qualid_app loc q el =
     let e = try DEsym (find_prog_symbol muc q) with
-      | _ -> DEls_pure (find_lsymbol muc.muc_theory q, false) in
+      | _ -> DEls_pure (find_lsymbol muc.muc_intf.muc_theory q, false) in
     expr_app loc e el
   in
   let qualid_app loc q el = match q with
@@ -942,7 +942,7 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
       DEapp (Dexpr.dexpr ~loc e1, e2)) e el
   in
   let lsym_or_lemma q pure =
-    try DEls_pure (find_lsymbol muc.muc_theory q, pure) with ex ->
+    try DEls_pure (find_lsymbol muc.muc_intf.muc_theory q, pure) with ex ->
     try DEsym (find_prog_symbol muc (tick_lemma q)) with _ -> raise ex
   in
   let qualid_app loc q el =
@@ -1025,11 +1025,11 @@ let rec dexpr muc denv {expr_desc = desc; expr_loc = loc} =
             apply loc de1 op1 (dexpr muc denv e23) in
       chain "q1 " "q2 " loc (dexpr muc denv e1) op1 e23
   | Ptree.Econst (Constant.ConstInt _ as c) ->
-      let dty = if Mts.is_empty muc.muc_theory.uc_ranges
+      let dty = if Mts.is_empty muc.muc_intf.muc_theory.uc_ranges
                 then dity_int else dity_fresh () in
       DEconst(c, dty)
   | Ptree.Econst (Constant.ConstReal _ as c) ->
-      let dty = if Mts.is_empty muc.muc_theory.uc_floats
+      let dty = if Mts.is_empty muc.muc_intf.muc_theory.uc_floats
                 then dity_real else dity_fresh () in
       DEconst(c, dty)
   | Ptree.Econst (Constant.ConstStr _ as c) ->
@@ -1471,13 +1471,13 @@ let add_types muc tdl =
   let add muc d = add_pdecl ~vc:true muc d in
   let muc = List.fold_left add muc (create_type_decl tdl) in
   let add muc fid =
-    let ls = find_fsymbol muc.muc_theory (Qident fid) in
+    let ls = find_fsymbol muc.muc_intf.muc_theory (Qident fid) in
     add_meta muc Theory.meta_record [MAls ls]
   in
   List.fold_left add muc !meta_records
 
 
-let tyl_of_params {muc_theory = tuc} pl =
+let tyl_of_params {muc_intf = {muc_theory = tuc}} pl =
   let ty_of_param (loc,_,gh,ty) =
     if gh then Loc.errorm ~loc
       "ghost parameters are not allowed in pure declarations";
@@ -1498,7 +1498,7 @@ let add_logics muc dl =
   let create_symbol mkk d =
     let id = create_user_id d.ld_ident in
     let pl = tyl_of_params muc d.ld_params in
-    let ty = Option.map (ty_of_pty muc.muc_theory) d.ld_type in
+    let ty = Option.map (ty_of_pty muc.muc_intf.muc_theory) d.ld_type in
     let ls = create_lsymbol id pl ty in
     Hstr.add lsymbols d.ld_ident.id_str ls;
     Loc.try2 ~loc:d.ld_loc add_decl mkk (create_param_decl ls) in
@@ -1587,10 +1587,11 @@ let find_module env file q =
         (try Mstr.find nm file with Not_found -> read_module env [] nm)
     | Qdot (p, {id_str = nm}) -> read_module env (string_list_of_qualid p) nm in
   if Debug.test_flag Glob.flag then
-    Glob.use ~kind:"theory" (qloc_last q) m.mod_theory.th_name;
+    Glob.use ~kind:"theory" (qloc_last q) (Pmodule.mod_name m);
   m
 
-let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
+let type_inst ({muc_intf= {muc_theory = tuc}} as muc) m s =
+  let t = Pmodule.mod_theory m in
   let add_inst s = function
     | CStsym (p,[],PTtyapp (q,[])) ->
         let ts1 = find_tysymbol_ns t.th_export p in
@@ -1631,7 +1632,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
         { s with mi_ls = Loc.try4 ~loc:(qloc p) Mls.add_new
             (ClashSymbol ls1.ls_name.id_string) ls1 ls2 s.mi_ls }
     | CSvsym (p,q) ->
-        let rs1 = find_prog_symbol_ns m.mod_export p in
+        let rs1 = find_prog_symbol_ns (Pmodule.mod_export_intf m) p in
         let rs2 = find_prog_symbol muc q in
         begin match rs1, rs2 with
         | RS rs1, RS rs2 ->
@@ -1650,7 +1651,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
             assert false (* should never happen *)
         end
     | CSxsym (p,q) ->
-        let xs1 = find_xsymbol_ns m.mod_export p in
+        let xs1 = find_xsymbol_ns (Pmodule.mod_export_intf m) p in
         let xs2 = find_xsymbol muc q in
         { s with mi_xs = Loc.try4 ~loc:(qloc p) Mxs.add_new
             (ClashSymbol xs1.xs_name.id_string) xs1 xs2 s.mi_xs }
@@ -1673,7 +1674,7 @@ let type_inst ({muc_theory = tuc} as muc) ({mod_theory = t} as m) s =
   List.fold_left add_inst (empty_mod_inst m) s
 
 let rec add_decl muc env file d =
-  let vc = muc.muc_theory.uc_path = [] &&
+  let vc = muc.muc_intf.muc_theory.uc_path = [] &&
     Debug.test_noflag debug_type_only in
   match d with
   | Ptree.Dtype dl ->
@@ -1685,7 +1686,7 @@ let rec add_decl muc env file d =
   | Ptree.Dprop (k,s,f) ->
       add_prop muc k s f
   | Ptree.Dmeta (id,al) ->
-      let tuc = muc.muc_theory in
+      let tuc = muc.muc_intf.muc_theory in
       let convert = function
         | Ptree.Mty (PTtyapp (q,[]))
                        -> MAts (find_tysymbol tuc q)
@@ -1714,7 +1715,7 @@ let rec add_decl muc env file d =
       use_export muc (Loc.try3 ~loc find_module env file use)
   | Ptree.Dcloneexport (loc, use, inst) ->
       let m = Loc.try3 ~loc find_module env file use in
-      warn_clone_not_abstract (qloc use) m.mod_theory;
+      warn_clone_not_abstract (qloc use) (Pmodule.mod_theory m);
       clone_export ~loc muc m (type_inst muc m inst)
   | Ptree.Duseimport (loc,import,uses) ->
       let add_import muc (m, q) =
@@ -1728,7 +1729,7 @@ let rec add_decl muc env file d =
       let import = import || as_opt = None in
       let muc = open_scope muc (use_as qid as_opt).id_str in
       let m = Loc.try3 ~loc find_module env file qid in
-      warn_clone_not_abstract (qloc qid) m.mod_theory;
+      warn_clone_not_abstract (qloc qid) (Pmodule.mod_theory m);
       let muc = clone_export ~loc muc m (type_inst muc m inst) in
       let muc = close_scope muc ~import in
       muc
@@ -1747,7 +1748,7 @@ let type_module file env loc path (id,dl) =
   let add_decl_env_file muc d = add_decl muc env file d in
   let muc = List.fold_left add_decl_env_file muc dl in
   let m = Loc.try1 ~loc close_module muc in
-  let file = Mstr.add m.mod_theory.th_name.id_string m file in
+  let file = Mstr.add (Pmodule.mod_name m).id_string m file in
   file
 
 let type_mlw_file env path filename mlw_file =
@@ -1777,7 +1778,7 @@ end
 type slice = {
   env              : Env.env;
   path             : Env.pathname;
-  mutable file     : pmodule Mstr.t;
+  mutable file     : Pmodule.mlw_file;
   mutable muc      : pmodule_uc option;
   mutable muc_intf : pmodule option
 }
@@ -1827,16 +1828,15 @@ let close_module loc =
     | None ->
        let m = Loc.try1 ~loc close_module (Option.get slice.muc) in
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m.mod_theory.th_name;
-       slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file
+         Glob.def ~kind:"theory" (Pmodule.mod_name m);
+       slice.file <- Mstr.add (Pmodule.mod_name m).id_string m slice.file
     | Some mintf ->
        let muc = Option.get slice.muc in
        let m, mimpl = Loc.try2 ~loc close_module_with_intf muc mintf in
-       (* Not sure about this *)
        if Debug.test_flag Glob.flag then
-         Glob.def ~kind:"theory" m.mod_theory.th_name;
-       slice.file <- Mstr.add mimpl.mod_theory.th_name.id_string mimpl slice.file;
-       slice.file <- Mstr.add m.mod_theory.th_name.id_string m slice.file
+         Glob.def ~kind:"theory" (Pmodule.mod_name m);
+       slice.file <- Mstr.add (Pmodule.mod_name mimpl).id_string mimpl slice.file;
+       slice.file <- Mstr.add (Pmodule.mod_name m).id_string m slice.file
   end;
   slice.muc <- None;
   slice.muc_intf <- None

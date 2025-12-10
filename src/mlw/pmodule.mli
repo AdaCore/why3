@@ -58,7 +58,7 @@ exception IncompatibleNotation of string
 
 (** {2 Module} *)
 
-type pmodule = private {
+type pmodule0 = private {
   mod_theory : theory;        (* pure theory *)
   mod_units  : mod_unit list; (* module declarations *)
   mod_export : namespace;     (* exported namespace *)
@@ -69,13 +69,13 @@ type pmodule = private {
 
 and mod_unit =
   | Udecl  of pdecl
-  | Uuse   of pmodule
+  | Uuse   of pmodule0
   | Uclone of mod_inst
   | Umeta  of meta * meta_arg list
   | Uscope of string * mod_unit list
 
 and mod_inst = {
-  mi_mod : pmodule;
+  mi_mod : pmodule0;
   mi_ty  : ity Mts.t;
   mi_ts  : itysymbol Mts.t;
   mi_ls  : lsymbol Mls.t;
@@ -87,11 +87,42 @@ and mod_inst = {
   mi_df  : prop_kind;
 }
 
+type pmodule = private {
+  mod_inst : mod_inst;
+  mod_intf : pmodule0;
+  mod_impl : pmodule0;
+}
+(** A pmodule [m] consists of two old-style pmodule0. Its interface
+    [m.mod_intf] is the "logical" version of the module, to be used in most
+    place. It is a copy of [I] in the case of a [module A : I] module. Its
+    implementation [m.mod_impl] is the "execution" version of the module, to be
+    used during extraction or execution. It corresponds to the body of [A] in
+    the [module A : I] case. [m.mod_inst] maps the symbols from the interface
+    to the corresponding ones in the implementation. *)
+
+val mod_name : pmodule -> ident
+(** returns the name of the given pmodule, that is the name of is interface. *)
+
+val mod_theory : pmodule -> theory
+(** returns the pmodule's theory, that is, the theory of its interface. *)
+
+val mod_export_intf : pmodule -> namespace
+(** returns the mod_export field from the interface of this pmodule *)
+
+val mod_export_impl : pmodule -> namespace
+(** returns the mod_export field from the implementation of this pmodule *)
+
+val mod_known_intf : pmodule -> known_map
+(** returns the mod_known field from the interface of this pmodule *)
+
+val mod_known_impl : pmodule -> known_map
+(** returns the mod_known field from the implementation of this pmodule *)
+
 val empty_mod_inst: pmodule -> mod_inst
 
 (** {2 Module under construction} *)
 
-type pmodule_uc = private {
+type pmodule_uc0 = private {
   muc_theory : theory_uc;
   muc_units  : mod_unit list;
   muc_import : namespace list;
@@ -100,6 +131,11 @@ type pmodule_uc = private {
   muc_local  : Sid.t;
   muc_used   : Sid.t;
   muc_env    : Env.env;
+}
+
+type pmodule_uc = private {
+  muc_intf : pmodule_uc0;
+  muc_impl : pmodule_uc0;
 }
 
 val create_module : Env.env -> ?path:string list -> preid -> pmodule_uc
@@ -141,8 +177,6 @@ val add_meta : pmodule_uc -> meta -> meta_arg list -> pmodule_uc
 val add_pdecl : ?warn:bool -> vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
 (** [add_pdecl ~vc m d] adds declaration [d] in module [m].
     If [vc] is [true], VC is computed and added to [m]. *)
-
-val mod_impl : Env.env -> pmodule -> pmodule
 
 val close_module_with_intf : pmodule_uc -> pmodule -> pmodule * pmodule
 
