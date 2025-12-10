@@ -14,8 +14,8 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require int.Int.
 Require list.List.
-Require list.Nth.
 Require option.Option.
+Require list.Nth.
 Require list.HdTl.
 
 Require Import Lia.
