@@ -144,7 +144,7 @@ val add_pdecl : ?warn:bool -> vc:bool -> pmodule_uc -> pdecl -> pmodule_uc
 
 val mod_impl : Env.env -> pmodule -> pmodule
 
-val mod_impl_register : Env.env -> pmodule -> pmodule -> mod_inst -> unit
+val close_module_with_intf : pmodule_uc -> pmodule -> pmodule * pmodule
 
 (** {2 Builtin symbols} *)
 

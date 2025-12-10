@@ -1525,12 +1525,11 @@ let pdecl_impl inst uc d =
      List.fold_left decl_impl uc d.pd_pure
   | _ -> uc
 
-let rec mi_impl e mi =
+let transpose_inst cl1 cl2 mdest mi =
   let aux fold add empty findk findv m =
-    fold (fun k v m -> add (findk impl_cl k) (findv impl_cl v) m) m empty in
-  let mi_mod = mod_impl e mi.mi_mod in
+    fold (fun k v m -> try add (findk cl1 k) (findv cl2 v) m with Not_found -> m) m empty in
   {
-    mi_mod = mi_mod;
+    mi_mod = mdest;
     mi_ty = aux Mts.fold Mts.add Mts.empty cl_find_ts clone_ity mi.mi_ty;
     mi_ts = aux Mts.fold Mts.add Mts.empty cl_find_ts cl_find_its mi.mi_ts;
     mi_ls = aux Mls.fold Mls.add Mls.empty cl_find_ls cl_find_ls mi.mi_ls;
@@ -1543,17 +1542,23 @@ let rec mi_impl e mi =
     mi_df = mi.mi_df;
   }
 
+let clone_meta_arg cl = function
+  | MAty ty -> MAty (clone_ty cl ty)
+  | MAts ts -> MAts (cl_find_ts cl ts)
+  | MAls ls -> MAls (cl_find_ls cl ls)
+  | MApr pr -> MApr (cl_find_pr cl pr)
+  | a -> a
+
+let rec mi_impl e mi =
+  let mi_mod = mod_impl e mi.mi_mod in
+  transpose_inst impl_cl impl_cl mi_mod mi
+
 and unit_impl e inst uc = function
   | Udecl d -> pdecl_impl inst uc d
   | Uuse m -> use_export uc (mod_impl e m)
 
   | Umeta (m, al) ->
-     begin try add_meta uc m (List.map (function
-       | MAty ty -> MAty (clone_ty impl_cl ty)
-       | MAts ts -> MAts (cl_find_ts impl_cl ts)
-       | MAls ls -> MAls (cl_find_ls impl_cl ls)
-       | MApr pr -> MApr (cl_find_pr impl_cl pr)
-       | a -> a) al)
+     begin try add_meta uc m (List.map (clone_meta_arg impl_cl) al)
      with Not_found -> uc end
 
   | Uscope (n, ul) ->
@@ -1587,6 +1592,21 @@ and mod_impl e m =
          m
        end
 
+let inst_of_clones m pk df cl =
+  let local id _ = Sid.mem id m.mod_local in
+  {
+    mi_mod = m;
+    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
+    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
+    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
+    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
+    mi_pk  = pk;
+    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
+    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
+    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
+    mi_df  = df
+  }
+
 let clone_export' ?loc uc m inst cl =
   let rec add_unit uc u = match u with
     | Udecl d -> clone_pdecl loc inst cl uc d
@@ -1604,56 +1624,107 @@ let clone_export' ?loc uc m inst cl =
           mi_df = mi.mi_df}
         with Not_found -> uc end
     | Umeta (m,al) ->
-        begin try add_meta uc m (List.map (function
-          | MAty ty -> MAty (clone_ty cl ty)
-          | MAts ts -> MAts (cl_find_ts cl ts)
-          | MAls ls -> MAls (cl_find_ls cl ls)
-          | MApr pr -> MApr (cl_find_pr cl pr)
-          | a -> a) al)
+        begin try add_meta uc m (List.map (clone_meta_arg cl) al)
         with Not_found -> uc end
     | Uscope (n,ul) ->
         let uc = open_scope uc n in
         let uc = List.fold_left add_unit uc ul in
         close_scope ~import:false uc in
   let uc = List.fold_left add_unit uc m.mod_units in
-  let local id _ = Sid.mem id m.mod_local in
-  let mi = {
-    mi_mod = m;
-    mi_ty  = Mts.filter (fun k -> local k.ts_name) cl.ty_table;
-    mi_ts  = Mts.filter (fun k -> local k.ts_name) cl.ts_table;
-    mi_ls  = Mls.filter (fun k -> local k.ls_name) cl.ls_table;
-    mi_pr  = Mpr.filter (fun k -> local k.pr_name) cl.pr_table;
-    mi_pk  = inst.mi_pk;
-    mi_pv  = Mvs.filter (fun k -> local k.vs_name) cl.pv_table;
-    mi_rs  = Mrs.filter (fun k -> local k.rs_name) cl.rs_table;
-    mi_xs  = Mxs.filter (fun k -> local k.xs_name) cl.xs_table;
-    mi_df  = inst.mi_df} in
+  let mi = inst_of_clones m inst.mi_pk inst.mi_df cl in
   add_clone uc mi
 
 let clone_export ?loc uc m inst =
   clone_export' ?loc uc m inst (cl_init m inst)
 
-let mod_impl_register e m mimpl inst =
-  let mimpl' = mod_impl'' e mimpl in
-  let mimpl' = open_scope mimpl' "some'scope" in
-  let inst = {
-      mi_mod = inst.mi_mod;
-      mi_ty = Mts.map (clone_ity impl_cl) inst.mi_ty;
-      mi_ts = Mts.map (cl_find_its impl_cl) inst.mi_ts;
-      mi_ls = Mls.map (cl_find_ls impl_cl) inst.mi_ls;
-      mi_pr = Mpr.map (cl_find_pr impl_cl) inst.mi_pr;
-      mi_pk = inst.mi_pk;
-      mi_pv = Mvs.map (cl_find_pv impl_cl) inst.mi_pv;
-      mi_rs = Mrs.map (cl_find_rs impl_cl) inst.mi_rs;
-      mi_xs = Mxs.map (cl_find_xs impl_cl) inst.mi_xs;
-      mi_df = inst.mi_df
-    } in
-  impl_cl.cl_local <- Sid.union impl_cl.cl_local m.mod_local;
-  let mimpl' = clone_export' mimpl' m inst impl_cl in
-  let mimpl' = close_scope mimpl' ~import:false in
-  let mimpl' = close_module mimpl' in
+let copy_module e ?(path=[]) id m =
+  let muc = create_module e ~path id in
+  let inst_axiom = { (empty_mod_inst m) with mi_df = Paxiom } in
+  let muc = clone_export muc m inst_axiom in
+  close_module muc
+
+exception InvalidUnit
+exception SymbolNotFound of string
+
+let intf_mod_inst muc intf =
+  let rec aux_units ns_muc ns_tuc inst ul =
+    let add_type inst its =
+      try
+        let its' = ns_find_its ns_muc [its.ts_name.id_string] in
+        { inst with mi_ts = Mts.add its its' inst.mi_ts }
+      with Not_found -> raise (SymbolNotFound its.ts_name.id_string) in
+
+    let add_logic inst ls =
+      try
+        let ls' = ns_find_ls ns_tuc [ls.ls_name.id_string] in
+        { inst with mi_ls = Mls.add ls ls' inst.mi_ls }
+      with Not_found -> raise (SymbolNotFound ls.ls_name.id_string) in
+
+    let add_exn inst xs =
+      try
+        let xs' = ns_find_xs ns_muc [xs.xs_name.id_string] in
+        { inst with mi_xs = Mxs.add xs xs' inst.mi_xs }
+      with Not_found -> raise (SymbolNotFound xs.xs_name.id_string) in
+
+    let add_routine inst rs =
+      try
+        let rs' = ns_find_rs ns_muc [rs.rs_name.id_string] in
+        { inst with mi_rs = Mrs.add rs rs' inst.mi_rs }
+      with Not_found ->
+        if Strings.has_suffix ~suffix:"'lemma" rs.rs_name.id_string
+        then inst (* do not raise for let lemma induced by lemmas *)
+        else raise (SymbolNotFound rs.rs_name.id_string) in
+
+    let aux_pure inst = function
+      | { d_node = Dtype tys } -> add_type inst tys
+      | { d_node = Dparam ls } -> add_logic inst ls
+      | { d_node = Dprop _ } -> inst
+      | { d_node = Dlogic lds } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst lds
+      | { d_node = Dind (_, ids) } ->
+          List.fold_left (fun inst (ls, _) -> add_logic inst ls) inst ids
+      | { d_node = Ddata _ } -> assert false (* does not appear as PDpure *) in
+
+    let aux_unit inst = function
+      | Udecl { pd_node = PDtype its_defn; _ } ->
+         List.fold_left (fun i d  -> add_type i d.itd_its.its_ts) inst its_defn
+      | Udecl { pd_node = PDexn xs; _ } -> add_exn inst xs
+      | Udecl { pd_node = PDpure; pd_pure; _ } ->
+         List.fold_left aux_pure inst pd_pure
+      | Udecl { pd_node = PDlet (LDsym (rs, _)); _ } -> add_routine inst rs
+      | Udecl { pd_node = PDlet (LDvar _ | LDrec _); _ } -> raise InvalidUnit
+      | Uuse _ | Uscope (_, [Uuse _]) | Umeta _-> inst (* Nothing to do on use or meta ? *)
+      | Uscope (s, ul) ->
+         let ns_muc = try ns_find_ns ns_muc [s] with Not_found -> empty_ns in
+         let ns_tuc =
+           try Theory.ns_find_ns ns_tuc [s] with
+           | Not_found -> Theory.empty_ns in
+         aux_units ns_muc ns_tuc inst ul
+      | Uclone _ -> inst (* Nothing to do on clone ? *) in
+    List.fold_left aux_unit inst ul in
+
+  (* Are these the good namespaces ? *)
+  let ns_muc = List.hd muc.muc_export in
+  let ns_tuc = List.hd muc.muc_theory.uc_export in
+  aux_units ns_muc ns_tuc (empty_mod_inst intf) intf.mod_units
+
+let close_module_with_intf muc intf =
+  let id_str =
+    Strings.remove_suffix ~suffix:"'impl" muc.muc_theory.uc_name.pre_name in
+  let id = { muc.muc_theory.uc_name with pre_name = id_str } in
+  let intf = copy_module muc.muc_env ~path:muc.muc_theory.uc_path id intf in
+  let mimpl = close_module muc in
+  let muc = mod_impl'' muc.muc_env mimpl in
+  let mimpl' =
+    let inst = intf_mod_inst muc intf in
+    let muc = open_scope muc (intf.mod_theory.th_name.id_string^"'impl_of") in
+    impl_cl.cl_local <- Sid.union impl_cl.cl_local inst.mi_mod.mod_local;
+    let muc = clone_export' muc intf inst impl_cl in
+    let muc = close_scope ~import:false muc in
+    close_module muc in
   Wid.set mod_table mimpl.mod_theory.th_name mimpl';
-  Wid.set mod_table m.mod_theory.th_name mimpl'
+  Wid.set mod_table intf.mod_theory.th_name mimpl';
+  intf, mimpl'
 
 (** {2 WhyML language} *)
 
@@ -1736,4 +1807,7 @@ let () = Exn_printer.register (fun fmt e -> match e with
       "Incombatible type signatures for notation '%a'" Ident.print_decoded nm
   | ModuleNotFound (sl,s) -> Format.fprintf fmt
       "Module %s not found in library %a" s print_path sl
+  | InvalidUnit -> Format.fprintf fmt "Unsupported unit in interface"
+  | SymbolNotFound s -> Format.fprintf fmt
+      "Symbol %s not found in implementation" s
   | _ -> raise e)
