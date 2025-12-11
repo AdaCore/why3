@@ -125,12 +125,11 @@ nightly-bench-long:
   stage: build
   variables:
     COMPILER: bench
+  when: manual
   script:
     - misc/ci-local.sh nightly-bench-long
   image: "$BENCH_IMAGE"
   dependencies: []
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "trigger"  # only run manually
   tags:
     - large
 
