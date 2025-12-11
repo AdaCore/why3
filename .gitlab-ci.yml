@@ -35,9 +35,9 @@ bench-image:
     - docker build --force-rm -t "$BENCH_IMAGE" - < misc/Dockerfile.bench
     - docker push "$BENCH_IMAGE"
     - docker rmi "$BENCH_IMAGE"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-      when: never
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+#      when: never
     - changes:
         - misc/Dockerfile.bench
   tags:
