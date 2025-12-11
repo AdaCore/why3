@@ -36,7 +36,8 @@ bench-image:
     - docker push "$BENCH_IMAGE"
     - docker rmi "$BENCH_IMAGE"
   rules:
-    - if: '$CI_COMMIT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
     - changes:
         - misc/Dockerfile.bench
   tags:

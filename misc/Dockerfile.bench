@@ -78,7 +78,8 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.
     ./configure --bindir=/usr/local/bin && \
     make && \
     make install && \
-    rm -r E.tgz E-2.6
+    cd .. && \
+    rm -rf E.tgz E-2.6
 
 
 ## list installed provers
