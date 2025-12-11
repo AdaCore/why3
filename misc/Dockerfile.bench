@@ -1,0 +1,140 @@
+
+FROM debian:trixie-slim
+
+USER root
+
+# install dependencies
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -yq && \
+    apt-get upgrade -yq --with-new-pkgs --auto-remove && \
+    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git libgmp-dev opam pkg-config unzip wget zlib1g-dev libgcc-s1 libstdc++6 adduser && \
+    apt-get install -yq spass && \
+    apt-get clean
+
+# install provers
+## CVC5 1.0.5
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
+    chmod a+x /usr/local/bin/cvc5-1.0.5 && \
+    cvc5-1.0.5 --version
+## CVC5 1.1.2
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-static.zip && \
+    unzip cvc5-Linux-static.zip && \
+    mv cvc5-Linux-static/bin/cvc5 /usr/local/bin/cvc5-1.1.2 && \
+    rm -r cvc5-Linux-static && \
+    cvc5-1.1.2 --version
+## CVC5 1.2.1
+RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.2.1/cvc5-Linux-x86_64-static.zip && \
+    unzip cvc5-Linux-x86_64-static.zip && \
+    mv cvc5-Linux-x86_64-static/bin/cvc5 /usr/local/bin/cvc5-1.2.1 && \
+    ls -l /usr/local/bin && \
+    rm -r cvc5-Linux-x86_64-static && \
+    cvc5-1.2.1 --version
+## CVC4 1.8
+RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
+    chmod a+x /usr/local/bin/cvc4-1.8
+## CVC4 1.7
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.7-x86_64-linux-opt -O /usr/local/bin/cvc4-1.7 && \
+    chmod a+x /usr/local/bin/cvc4-1.7
+## CVC4 1.6
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.6-x86_64-linux-opt -O /usr/local/bin/cvc4-1.6 && \
+    chmod a+x /usr/local/bin/cvc4-1.6
+## CVC4 1.5
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.5-x86_64-linux-opt -O /usr/local/bin/cvc4-1.5 && \
+    chmod a+x /usr/local/bin/cvc4-1.5
+## CVC4 1.4
+RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.4-x86_64-linux-opt -O /usr/local/bin/cvc4-1.4 && \
+    chmod a+x /usr/local/bin/cvc4-1.4
+## Z3 4.6.0
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.6.0-x64-debian-8.10.zip && \
+    unzip z3-4.6.0-x64-debian-8.10.zip && \
+    mv z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0 && \
+    rm -r z3-4.6.0-x64-debian-8.10.zip z3-4.6.0-x64-debian-8.10
+## Z3 4.8.10
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-ubuntu-18.04.zip && \
+    unzip z3-4.8.10-x64-ubuntu-18.04.zip && \
+    mv z3-4.8.10-x64-ubuntu-18.04/bin/z3 /usr/local/bin/z3-4.8.10 && \
+    rm -r z3-4.8.10-x64-ubuntu-18.04.zip z3-4.8.10-x64-ubuntu-18.04
+## Z3 4.11.2
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.11.2/z3-4.11.2-x64-glibc-2.31.zip && \
+        unzip z3-4.11.2-x64-glibc-2.31.zip && \
+    mv z3-4.11.2-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.11.2 && \
+    rm -r z3-4.11.2-x64-glibc-2.31.zip z3-4.11.2-x64-glibc-2.31
+## Z3 4.12.6
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.6/z3-4.12.6-x64-glibc-2.31.zip && \
+    unzip z3-4.12.6-x64-glibc-2.31.zip && \
+    mv z3-4.12.6-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.12.6 && \
+    rm -r z3-4.12.6-x64-glibc-2.31.zip z3-4.12.6-x64-glibc-2.31
+## Z3 4.13.2
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4.13.2-x64-glibc-2.35.zip && \
+    unzip z3-4.13.2-x64-glibc-2.35.zip && \
+    mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
+    ls -l /usr/local/bin && \
+    rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
+## Z3 4.14.1
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.14.1/z3-4.14.1-x64-glibc-2.35.zip && \
+    unzip z3-4.14.1-x64-glibc-2.35.zip && \
+    mv z3-4.14.1-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.14.1 && \
+    ls -l /usr/local/bin && \
+    rm -r z3-4.14.1-x64-glibc-2.35.zip z3-4.14.1-x64-glibc-2.35
+
+## E prover 2.6
+RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz && \
+    tar -xzf E.tgz && \
+    mv E E-2.6 && \
+    cd E-2.6 && \
+    ./configure --bindir=/usr/local/bin && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf E.tgz E-2.6 && \
+    mv /usr/local/bin/eprover /usr/local/bin/eprover-2.6
+
+## E prover 3.2.5
+RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.2/E.tgz && \
+    tar -xzf E.tgz && \
+    mv E E-3.2.5 && \
+    cd E-3.2.5 && \
+    ./configure --bindir=/usr/local/bin && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf E.tgz E-3.2.5 && \
+    mv /usr/local/bin/eprover /usr/local/bin/eprover-3.2.5
+
+
+
+## list installed provers
+RUN ls -l /usr/local/bin
+
+# create user
+RUN adduser --disabled-password --gecos '' why3
+USER why3
+ENV HOME=/home/why3
+WORKDIR /home/why3
+
+# install opam
+RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
+    opam switch create bench  ocaml-base-compiler.4.09.1 && \
+    opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
+    opam install -y --switch=bench alt-ergo.2.0.0 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.0.0 && \
+    opam install -y --switch=bench alt-ergo.2.1.0 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.1.0 && \
+    opam install -y --switch=bench alt-ergo.2.2.0 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.2.0 && \
+    opam install -y --switch=bench alt-ergo.2.3.3 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.3.3 && \
+    opam install -y --switch=bench alt-ergo.2.4.3 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.4.3 && \
+    opam install -y --switch=bench alt-ergo.2.5.4 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.5.4 && \
+    opam install -y --switch=bench alt-ergo.2.6.2 && \
+    cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.6.2 && \
+    opam install -y --switch=bench menhir zarith camlzip conf-autoconf re zenon.0.8.5 coq.8.16.1 coq-flocq coq-interval && \
+    opam clean -a -c -r -s --logs
+
+USER root
+RUN cp /home/why3/alt-ergo* /usr/local/bin/
+RUN ls -l /usr/local/bin
+
+USER why3

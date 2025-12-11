@@ -3,11 +3,12 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml" proved="true">
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml">
 <path name=".."/><path name="binomial.mlw"/>
-<theory name="Top" proved="true">
+<theory name="Top">
  <goal name="infix /&#39;vc" expl="VC for infix /" proved="true">
  <proof prover="0"><result status="valid" time="0.010000" steps="6"/></proof>
  </goal>
@@ -32,7 +33,7 @@
   <proof prover="0"><result status="valid" time="0.010000" steps="3235"/></proof>
   </goal>
   <goal name="prop2&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="2" timelimit="1"><result status="valid" time="0.290359" steps="804"/></proof>
+  <proof prover="1" timelimit="1"><result status="valid" time="0.090000" steps="6092"/></proof>
   </goal>
  </transf>
  </goal>
@@ -65,44 +66,32 @@
  </transf>
  </goal>
  <goal name="prop3&#39;vc" expl="VC for prop3" proved="true">
- <proof prover="2"><result status="valid" time="1.137569" steps="775"/></proof>
+ <proof prover="1"><result status="valid" time="0.386239" steps="7600"/></proof>
  </goal>
- <goal name="compute2&#39;vc" expl="VC for compute2" proved="true">
- <transf name="split_vc" proved="true" >
+ <goal name="compute2&#39;vc" expl="VC for compute2">
+ <transf name="split_vc" >
   <goal name="compute2&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.003845" steps="386"/></proof>
+  <proof prover="2"><result status="valid" time="0.005027" steps="390"/></proof>
   </goal>
   <goal name="compute2&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="1"><result status="valid" time="0.010107" steps="4340"/></proof>
+  <proof prover="1"><result status="valid" time="0.034277" steps="92"/></proof>
   </goal>
   <goal name="compute2&#39;vc.2" expl="check division by zero" proved="true">
-  <proof prover="1"><result status="valid" time="0.004943" steps="645"/></proof>
+  <proof prover="3"><result status="valid" time="0.041673" steps="1179"/></proof>
   </goal>
   <goal name="compute2&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.009044" steps="8145"/></proof>
+  <proof prover="3"><result status="valid" time="0.037688" steps="5063"/></proof>
   </goal>
   <goal name="compute2&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="1"><result status="valid" time="0.011875" steps="8373"/></proof>
+  <proof prover="2"><result status="valid" time="0.010956" steps="7979"/></proof>
   </goal>
-  <goal name="compute2&#39;vc.5" expl="loop invariant preservation" proved="true">
-  <transf name="subst" proved="true" arg1="r1">
-   <goal name="compute2&#39;vc.5.0" expl="loop invariant preservation" proved="true">
-   <transf name="replace" proved="true" arg1="(((n - k) + (i + 1)) - 1)" arg2="((n-k)+i)">
-    <goal name="compute2&#39;vc.5.0.0" expl="loop invariant preservation" proved="true">
-    <proof prover="1"><result status="valid" time="0.876154" steps="22040247"/></proof>
-    </goal>
-    <goal name="compute2&#39;vc.5.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="1"><result status="valid" time="0.004940" steps="881"/></proof>
-    </goal>
-   </transf>
-   </goal>
-  </transf>
+  <goal name="compute2&#39;vc.5" expl="loop invariant preservation">
   </goal>
   <goal name="compute2&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010070" steps="4921"/></proof>
+  <proof prover="3"><result status="valid" time="0.040478" steps="5758"/></proof>
   </goal>
   <goal name="compute2&#39;vc.7" expl="VC for compute2" proved="true">
-  <proof prover="1"><result status="valid" time="0.013786" steps="6387"/></proof>
+  <proof prover="3"><result status="valid" time="0.027254" steps="2315"/></proof>
   </goal>
  </transf>
  </goal>

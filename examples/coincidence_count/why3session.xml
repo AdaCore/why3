@@ -2,15 +2,15 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="6" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="coincidence_count.mlw"/>
 <theory name="CoincidenceCount" proved="true">
  <goal name="drop_left" proved="true">
- <proof prover="6"><result status="valid" time="0.058022" steps="243"/></proof>
+ <proof prover="0"><result status="valid" time="0.058022" steps="243"/></proof>
  </goal>
  <goal name="not_mem_inter_r" proved="true">
  <proof prover="5"><result status="valid" time="0.108140" steps="17968"/></proof>
@@ -24,7 +24,7 @@
   <proof prover="4"><result status="valid" time="0.020386" steps="36537"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="6"><result status="valid" time="0.037012" steps="9"/></proof>
+  <proof prover="0"><result status="valid" time="0.037012" steps="9"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.2" expl="loop invariant init" proved="true">
   <proof prover="2"><result status="valid" time="0.056481" steps="7946"/></proof>
@@ -45,7 +45,7 @@
   <proof prover="4"><result status="valid" time="0.005001" steps="6388"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.886653" steps="5862"/></proof>
+  <proof prover="0"><result status="valid" time="1.096688" steps="5857"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.9" expl="index in array bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.042808" steps="7347"/></proof>
@@ -63,13 +63,13 @@
   <proof prover="5"><result status="valid" time="0.066278" steps="11499"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="1.401268" steps="10043"/></proof>
+  <proof prover="0"><result status="valid" time="2.378911" steps="10037"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="5"><result status="valid" time="1.457809" steps="119331"/></proof>
+  <proof prover="5"><result status="valid" time="2.249798" steps="119331"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="1.513436" steps="9134"/></proof>
+  <proof prover="0"><result status="valid" time="1.513436" steps="9149"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.17" expl="loop variant decrease" proved="true">
   <proof prover="5"><result status="valid" time="0.080340" steps="13964"/></proof>
@@ -78,13 +78,13 @@
   <proof prover="5"><result status="valid" time="0.078050" steps="13816"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.032928" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.032928" steps="36"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.20" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.085545" steps="11334"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.059092" steps="207"/></proof>
+  <proof prover="0"><result status="valid" time="0.059092" steps="207"/></proof>
   </goal>
  </transf>
  </goal>
@@ -123,7 +123,7 @@
   <proof prover="4"><result status="valid" time="0.016194" steps="30171"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="6"><result status="valid" time="0.032763" steps="24"/></proof>
+  <proof prover="0"><result status="valid" time="0.032763" steps="24"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.7" expl="loop invariant preservation" proved="true">
   <proof prover="5"><result status="valid" time="0.043362" steps="7521"/></proof>
@@ -132,7 +132,7 @@
   <proof prover="2"><result status="valid" time="0.067166" steps="8304"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.9" expl="index in array bounds" proved="true">
-  <proof prover="6"><result status="valid" time="0.028877" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.028877" steps="22"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.10" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.010023" steps="4219"/></proof>
@@ -150,7 +150,7 @@
   <proof prover="5"><result status="valid" time="0.074043" steps="11764"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="1.831312" steps="16880"/></proof>
+  <proof prover="0"><result status="valid" time="1.424927" steps="16923"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.16" expl="loop variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.051804" steps="5707"/></proof>
