@@ -56,14 +56,14 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4
     rm -r z3-4.8.10-x64-ubuntu-18.04.zip z3-4.8.10-x64-ubuntu-18.04
 ## Z3 4.11.2
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.11.2/z3-4.11.2-x64-glibc-2.31.zip && \
-    unzip z3-4.11.2-x64-glibc-2.31.zip && \
+        unzip z3-4.11.2-x64-glibc-2.31.zip && \
     mv z3-4.11.2-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.11.2 && \
     rm -r z3-4.11.2-x64-glibc-2.31.zip z3-4.11.2-x64-glibc-2.31
-## Z3 4.12.2
-RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.2/z3-4.12.2-x64-glibc-2.31.zip && \
-    unzip z3-4.12.2-x64-glibc-2.31.zip && \
-    mv z3-4.12.2-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.12.2 && \
-    rm -r z3-4.12.2-x64-glibc-2.31.zip z3-4.12.2-x64-glibc-2.31
+## Z3 4.12.6
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.6/z3-4.12.6-x64-glibc-2.31.zip && \
+    unzip z3-4.12.6-x64-glibc-2.31.zip && \
+    mv z3-4.12.6-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.12.6 && \
+    rm -r z3-4.12.6-x64-glibc-2.31.zip z3-4.12.6-x64-glibc-2.31
 ## Z3 4.13.2
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4.13.2-x64-glibc-2.35.zip && \
     unzip z3-4.13.2-x64-glibc-2.35.zip && \
@@ -86,7 +86,8 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.
     make && \
     make install && \
     cd .. && \
-    rm -rf E.tgz E-2.6
+    rm -rf E.tgz E-2.6 && \
+    mv /usr/local/bin/eprover /usr/local/bin/eprover-2.6
 
 ## E prover 3.2.5
 RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.2/E.tgz && \
@@ -97,7 +98,9 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.
     make && \
     make install && \
     cd .. && \
-    rm -rf E.tgz E-3.2.5
+    rm -rf E.tgz E-3.2.5 && \
+    mv /usr/local/bin/eprover /usr/local/bin/eprover-3.2.5
+
 
 
 ## list installed provers
@@ -127,7 +130,7 @@ RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
     cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.5.4 && \
     opam install -y --switch=bench alt-ergo.2.6.2 && \
     cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.6.2 && \
-    opam install -y --switch=bench menhir zarith camlzip conf-autoconf re zenon.0.8.5 coq.8.16.1 coq-flocq && \
+    opam install -y --switch=bench menhir zarith camlzip conf-autoconf re zenon.0.8.5 coq.8.16.1 coq-flocq coq-interval && \
     opam clean -a -c -r -s --logs
 
 USER root

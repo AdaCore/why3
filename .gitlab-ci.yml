@@ -7,7 +7,7 @@ stages:
 
 variables:
   BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2025-05-20"
-  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11B"
+  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11C"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -129,6 +129,8 @@ nightly-bench-long:
     - misc/ci-local.sh nightly-bench-long
   image: "$BENCH_IMAGE"
   dependencies: []
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"  # only run manually
   tags:
     - large
 
