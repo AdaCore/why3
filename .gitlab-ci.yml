@@ -118,7 +118,10 @@ nightly-bench:
     COMPILER: bench
   script:
     - misc/ci-local.sh nightly-bench-reduced
-  extends: .docker_template
+  image: "$BENCH_IMAGE"
+  dependencies: []
+  tags:
+    - large
 
 nightly-bench-long:
   timeout: 12h
