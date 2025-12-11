@@ -123,8 +123,6 @@ nightly-bench:
   extends: .docker_template
 
 nightly-bench-long:
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "trigger"
   timeout: 12h
   stage: build
   variables:
