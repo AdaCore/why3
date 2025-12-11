@@ -48,11 +48,6 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.
     unzip z3-4.6.0-x64-debian-8.10.zip && \
     mv z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0 && \
     rm -r z3-4.6.0-x64-debian-8.10.zip z3-4.6.0-x64-debian-8.10
-## Z3 4.8.4
-RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.4/z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip && \
-    unzip z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip && \
-    mv z3-4.8.4.d6df51951f4c-x64-debian-8.11/bin/z3 /usr/local/bin/z3-4.8.4 && \
-    rm -r z3-4.8.4.d6df51951f4c-x64-debian-8.11.zip z3-4.8.4.d6df51951f4c-x64-debian-8.11
 ## Z3 4.8.10
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-ubuntu-18.04.zip && \
     unzip z3-4.8.10-x64-ubuntu-18.04.zip && \
@@ -73,9 +68,18 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4
     unzip z3-4.13.2-x64-glibc-2.35.zip && \
     mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
     ls -l /usr/local/bin && \
-    rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35 && \
-    ldd -v /usr/local/bin/z3-4.13.2 && \
-    z3-4.13.2 --version
+    rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
+
+## E prover
+RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz && \
+    tar -xzf E.tgz && \
+    mv E E-2.6 && \\
+    cd E-2.6 && \\
+    ./configure --bindir=/usr/local/bin && \\
+    make && \\
+    make install && \\
+    rm -r E.tgz E-2.6
+
 
 ## list installed provers
 RUN ls -l /usr/local/bin
