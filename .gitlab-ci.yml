@@ -7,7 +7,7 @@ stages:
 
 variables:
   BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2025-05-20"
-  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11A"
+  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11B"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -123,6 +123,8 @@ nightly-bench:
   extends: .docker_template
 
 nightly-bench-long:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"
   timeout: 12h
   stage: build
   variables:
