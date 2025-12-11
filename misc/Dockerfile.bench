@@ -8,6 +8,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
     apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git libgmp-dev opam pkg-config unzip wget zlib1g-dev libgcc-s1 libstdc++6 adduser && \
+    apt-get install -yq spass && \
     apt-get clean
 
 # install provers
@@ -69,8 +70,14 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4
     mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
     ls -l /usr/local/bin && \
     rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
+## Z3 4.14.1
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.14.1/z3-4.14.1-x64-glibc-2.35.zip && \
+    unzip z3-4.14.1-x64-glibc-2.35.zip && \
+    mv z3-4.14.1-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.14.1 && \
+    ls -l /usr/local/bin && \
+    rm -r z3-4.14.1-x64-glibc-2.35.zip z3-4.14.1-x64-glibc-2.35
 
-## E prover
+## E prover 2.6
 RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz && \
     tar -xzf E.tgz && \
     mv E E-2.6 && \
@@ -80,6 +87,17 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.
     make install && \
     cd .. && \
     rm -rf E.tgz E-2.6
+
+## E prover 3.2.5
+RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.2/E.tgz && \
+    tar -xzf E.tgz && \
+    mv E E-3.2.5 && \
+    cd E-3.2.5 && \
+    ./configure --bindir=/usr/local/bin && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf E.tgz E-3.2.5
 
 
 ## list installed provers

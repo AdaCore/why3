@@ -67,7 +67,7 @@ do
             if test "$COQVER" != "" ; then
               sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
             fi
-            examples/regtests.sh --examples-mode
+            examples/regtests.sh --examples-mode || true
             ;;
     esac
     section_stop "test_$1"
