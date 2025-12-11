@@ -35,8 +35,8 @@ cfgfile:
 ;
 
 cfgmodule:
-  | id=module_head_parsing_only dl=cfgdecl* END
-    { (id,dl) }
+  | hd=module_head_parsing_only({ () }) dl=cfgdecl* END
+    { let (id, ()) = hd in (id,dl) }
 
 cfgdecl:
   | scope_head_parsing_only cfgdecl* END

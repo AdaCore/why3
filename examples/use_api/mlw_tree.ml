@@ -47,7 +47,7 @@ let mod_M1 =
     let goal_term = tapp eq_int  [four ; two_plus_two] in
     Dprop(Decl.Pgoal, ident "g", goal_term)
   in
-  (ident "M1",[use_int_Int ; g])
+  (ident "M1",None,[use_int_Int ; g])
 (* END{code1} *)
 
 
@@ -97,7 +97,7 @@ let mod_M2 =
     in
     Dlet(ident "f",false,Expr.RKnone, expr f)
   in
-  (ident "M2",[use_int_Int ; f])
+  (ident "M2",None,[use_int_Int ; f])
 (* END{code2} *)
 
 
@@ -148,7 +148,7 @@ let mod_M3 =
     in
     Dlet(ident "f",false,Expr.RKnone, expr f)
   in
-  (ident "M3",[use_int_Int ; use_ref_Ref ; f])
+  (ident "M3",None,[use_int_Int ; use_ref_Ref ; f])
 (* END{code3} *)
 
 (* declaration of
@@ -209,7 +209,7 @@ let mod_M4 =
     in
     Dlet(ident "f", false, Expr.RKnone, expr f)
   in
-  (ident "M4",[use_int_Int ; use_array_Array ; f])
+  (ident "M4",None,[use_int_Int ; use_array_Array ; f])
 (* END{code4} *)
 
 (* The following example is not in the manual
@@ -248,7 +248,7 @@ let mod_Mglob =
     Dlet(ident "f", false, Expr.RKnone, expr f)
 
   in
-  (ident "Mglob",[use_int_Int ; decl_x; decl_f])
+  (ident "Mglob",None,[use_int_Int ; decl_x; decl_f])
 
 (* The following example is not in the manual
  * it shows how to use Ptree API for scope/import declarations
@@ -290,7 +290,7 @@ let mod_Mscope =
     let goal_term = tapp eq_int [f_of_two ; two] in
     Dprop(Decl.Pgoal,ident "g",goal_term)
   in
-  (ident "Mscope",[use_int_Int ; scope_S ; import_S ; g])
+  (ident "Mscope",None,[use_int_Int ; scope_S ; import_S ; g])
 
 (* BEGIN{getmodules} *)
 let mlw_file = Modules [mod_M1 ; mod_M2 ; mod_M3 ; mod_M4]

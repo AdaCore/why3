@@ -305,7 +305,7 @@ lkeyword:
 /* silent Menhir's errors about unreachable non terminal symbols */
 
 dummy:
-| module_head_parsing_only scope_head_parsing_only dummy_decl* EOF
+| module_head_parsing_only({ () }) scope_head_parsing_only dummy_decl* EOF
     { }
 
 dummy_decl:

@@ -52,7 +52,7 @@ let rec translate_decl d acc =
   | Cfg_ast.Dscope (l, b, i, ds) ->
       Ptree.Dscope (l, b, i, List.fold_right translate_decl ds []) :: acc
 
-let translate (m, dl) = (m, List.fold_right translate_decl dl [])
+let translate (m, dl) = (m, None, List.fold_right translate_decl dl [])
 
 module Typing = struct
   open Theory
@@ -89,7 +89,7 @@ module Typing = struct
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
     | _ -> Unsafe.add_decl muc env file d
 
-  let type_module file env loc path (id, dl) =
+  let type_module file env loc path (id, _, dl) =
     let muc = create_module env ~path (Unsafe.create_user_id id) in
     (* Technically, `add_pdecl` will do this, but if we don't do it upfront it breaks
          the sub-region analysis (name tbd) as we won't have imported ref. Since mlcfg always
@@ -108,9 +108,9 @@ module Typing = struct
     let file =
       match mlw_file with
       | Ptree.Decls decls ->
-          type_module file env loc path (Ptree.{ id_str = ""; id_ats = []; id_loc = loc }, decls)
+          type_module file env loc path (Ptree.{ id_str = ""; id_ats = []; id_loc = loc }, None, decls)
       | Ptree.Modules m_or_t ->
-          let type_module_env_loc_path file (id, dl) = type_module file env loc path (id, dl) in
+          let type_module_env_loc_path file m = type_module file env loc path m in
           List.fold_left type_module_env_loc_path file m_or_t
     in
     file

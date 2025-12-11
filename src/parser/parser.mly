@@ -77,10 +77,13 @@ mlw_module:
     { Typing.close_module (floc $startpos($3) $endpos($3)) }
 
 mlw_module_parsing_only:
-| module_head_parsing_only module_decl_no_head_parsing_only* END { ($1,$2) }
+| module_head_parsing_only(option(preceded(COLON, tqualid)))
+  module_decl_no_head_parsing_only* END
+    { let (id, intf) = $1 in (id, intf, $2) }
 
 module_head:
-| THEORY attrs(uident_nq)  { Typing.open_module $2 }
+| THEORY attrs(uident_nq) intf = option(preceded(COLON, tqualid))
+    { Typing.open_module ?intf $2 }
 | MODULE attrs(uident_nq) intf = option(preceded(COLON, tqualid))
     { Typing.open_module ?intf $2 }
 

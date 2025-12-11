@@ -374,9 +374,9 @@ See also `plugins/cfg/cfg_parser.mly`
 
 %%
 
-%public module_head_parsing_only:
-| THEORY attrs(uident_nq)  { $2 }
-| MODULE attrs(uident_nq)  { $2 }
+%public module_head_parsing_only(intf):
+| THEORY attrs(uident_nq) intf = intf { $2, intf }
+| MODULE attrs(uident_nq) intf = intf { $2, intf }
 
 %public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)
