@@ -73,11 +73,11 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4
 ## E prover
 RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz && \
     tar -xzf E.tgz && \
-    mv E E-2.6 && \\
-    cd E-2.6 && \\
-    ./configure --bindir=/usr/local/bin && \\
-    make && \\
-    make install && \\
+    mv E E-2.6 && \
+    cd E-2.6 && \
+    ./configure --bindir=/usr/local/bin && \
+    make && \
+    make install && \
     rm -r E.tgz E-2.6
 
 
