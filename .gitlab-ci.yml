@@ -35,6 +35,7 @@ bench-image:
     - docker build --force-rm -t "$BENCH_IMAGE" - < misc/Dockerfile.bench
     - docker push "$BENCH_IMAGE"
     - docker rmi "$BENCH_IMAGE"
+  rules:
     - changes:
         - misc/Dockerfile.bench
   tags:
