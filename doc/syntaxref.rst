@@ -75,11 +75,11 @@ a prime (:token:`qident`, used exclusively for type variables):
 
 .. productionlist::
     alpha: "a" - "z" | "A" - "Z"
-    suffix: (`alpha` | "'"* ("0" - "9" | "_")*)* "'"*
-    lident_nq: ("a" - "z") `suffix`* | "_" `suffix`+
-    uident_nq: ("A" - "Z") `suffix`*
+    suffix: (`alpha` | "'"* ("0" - "9" | "_"))* "'"*
+    lident_nq: ("a" - "z" | "_") `suffix` ; except just "_"
+    uident_nq: ("A" - "Z") `suffix`
     ident_nq: `lident_nq` | `uident_nq`
-    qident: "'" ("a" - "z") `suffix`*
+    qident: "'" ("a" - "z") `suffix`
 
 
 Identifiers that contain a prime followed by a letter, such as
@@ -809,7 +809,7 @@ statement and of type ``int`` ; ``e1`` and ``e2`` are program
 expressions of type ``int``, and ``e3`` is an expression of type
 ``unit``. The variable ``v`` may occur both in ``i`` and ``e3``, and
 is not mutable. The execution of such a loop amounts to first evaluate
-``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 >= n2`` then
+``e1`` and ``e2`` to values ``n1`` and ``n2``. If ``n1 > n2`` then
 the loop is not executed at all, otherwise it is executed iteratively
 for ``v`` taking all the values between ``n1`` and ``n2`` included.
 

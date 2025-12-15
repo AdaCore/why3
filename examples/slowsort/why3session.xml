@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="slowsort.mlw"/>
+<theory name="Top" proved="true">
+ <goal name="slow_sort&#39;vc" expl="VC for slow_sort" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="slow_sort&#39;vc.0" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.025181" steps="35886"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.021474" steps="35583"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.013782" steps="3115"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.3" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.034301" steps="45720"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.4" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.020800" steps="43800"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.5" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.008955" steps="3832"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.6" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.011379" steps="3845"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.7" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.024600" steps="42413"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.8" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.024439" steps="47134"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.023393" steps="44697"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.013676" steps="3858"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.018429" steps="44900"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.009152" steps="16710"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.13" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.024555" steps="45108"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.14" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.027973" steps="50038"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.022826" steps="51828"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.16" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.014062" steps="17183"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.17" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.023533" steps="46250"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="1.774996" steps="179201"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.927278" steps="1177"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.20" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.016042" steps="16958"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.023909" steps="45629"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.22" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.940754" steps="2025"/></proof>
+  </goal>
+  <goal name="slow_sort&#39;vc.23" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.329022" steps="633"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

@@ -10,13 +10,6 @@ Sub-goal Assertion of goal main_g'vc.
 Prover result is: Unknown (sat) (97 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File logic_function.mlw:
   Line 4:
     g = fun (x!0:int) -> if x!0 = 2 then 42 else 42
@@ -24,13 +17,12 @@ File logic_function.mlw:
     y = 2
     y = 2
     Execution of main function `main_g` with env:
-      g = fun (x!0:int) -> if x!0 = 2 then 42 else 42
-      y = 2
-      zero = 0
-      one = 1
+      { lsenv = [ g = fun (x!0:int) -> if x!0 = 2 then 42 else 42 ];
+        vsenv = [ y = 2 ]; rsenv = []; idenv = [] }
   Line 8:
-    Property failure at assertion with:
-      y = 2
+    Property failure at assertion with env:
+      { lsenv = [ g = fun (x!0:int) -> if x!0 = 2 then 42 else 42 ];
+        vsenv = [ y = 2 ]; rsenv = []; idenv = [ y = 2 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -44,33 +36,28 @@ Sub-goal Assertion of goal main_h'vc.
 Prover result is: Unknown (sat) (117 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File logic_function.mlw:
   Line 10:
-    h = fun (x!02:int) (x!12:bool) ->
-         if x!02 = 2 /\ x!12 = False then 42 else 42
+    h =
+      fun (x!04:int) (x!14:bool) ->
+       if x!04 = 2 /\ x!14 = False then 42 else 42
   Line 12:
     y1 = 2
     y2 = false
     y1 = 2
     y2 = false
     Execution of main function `main_h` with env:
-      h = fun (x!02:int) (x!12:bool) ->
-           if x!02 = 2 /\ x!12 = False then 42 else 42
-      y1 = 2
-      y2 = false
-      zero = 0
-      one = 1
+      { lsenv =
+          [ h = fun (x!04:int) (x!14:bool) ->
+                 if x!04 = 2 /\ x!14 = False then 42 else 42 ];
+        vsenv = [ y1 = 2, y2 = false ]; rsenv = []; idenv = [] }
   Line 14:
-    Property failure at assertion with:
-      y1 = 2
-      y2 = false
+    Property failure at assertion with env:
+      { lsenv =
+          [ h = fun (x!04:int) (x!14:bool) ->
+                 if x!04 = 2 /\ x!14 = False then 42 else 42 ];
+        vsenv = [ y1 = 2, y2 = false ]; rsenv = [];
+        idenv = [ y1 = 2, y2 = false ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -84,27 +71,19 @@ Sub-goal Assertion of goal main_f'vc.
 Prover result is: Unknown (sat) (137 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File logic_function.mlw:
   Line 16:
-    f = fun (x!02:int) -> if x!02 = 0 then 0 else 0
+    f = fun (x!04:int) -> if x!04 = 0 then 0 else 0
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (x!02:int) -> if x!02 = 0 then 0 else 0
-      y = 0
-      zero = 0
-      one = 1
+      { lsenv = [ f = fun (x!04:int) -> if x!04 = 0 then 0 else 0 ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 21:
-    Property failure at assertion with:
-      y = 0
+    Property failure at assertion with env:
+      { lsenv = [ f = fun (x!04:int) -> if x!04 = 0 then 0 else 0 ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [ y = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -118,25 +97,21 @@ Sub-goal Assertion of goal main_f'vc.
 Prover result is: Unknown (sat) (208 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File logic_function.mlw:
   Line 16:
-    f = fun (x!02:int) -> if x!02 = 0 then 2 else if x!02 = 1 then 0 else 2
+    f = fun (x!04:int) -> if x!04 = 0 then 2 else if x!04 = 1 then 0 else 2
   Line 18:
     y = 0
     y = 0
     Execution of main function `main_f` with env:
-      f = fun (x!02:int) -> if x!02 = 0 then 2 else if x!02 = 1 then 0 else 2
-      y = 0
-      zero = 0
-      one = 1
+      { lsenv =
+          [ f = fun (x!04:int) ->
+                 if x!04 = 0 then 2 else if x!04 = 1 then 0 else 2 ];
+        vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 22:
-    Property failure at assertion with:
-      y = 0
+    Property failure at assertion with env:
+      { lsenv =
+          [ f = fun (x!04:int) ->
+                 if x!04 = 0 then 2 else if x!04 = 1 then 0 else 2 ];
+        vsenv = [ y = 0, _ = () ]; rsenv = []; idenv = [ y = 0 ] }
 

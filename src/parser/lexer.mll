@@ -235,7 +235,6 @@ rule token = parse
 
   open Wstdlib
   open Ident
-  open Theory
   open Pmodule
 
   let parse_term lb =
@@ -268,7 +267,7 @@ rule token = parse
     in
     if path = [] && Debug.test_flag debug then begin
       let print_m _ m = Format.eprintf "%a@\n@." print_module m in
-      let add_m _ m mm = Mid.add m.mod_theory.th_name m mm in
+      let add_m _ m mm = Mid.add (Pmodule.mod_name m) m mm in
       Mid.iter print_m (Mstr.fold add_m mm Mid.empty)
     end;
     mm

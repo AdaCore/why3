@@ -562,6 +562,22 @@ let rec pattern_renaming (bound_vars, mt) p1 p2 =
       end
   | _ -> raise (NoMatchpat (Some (p1, p2)))
 
+let _pp_ty_subst fmt s =
+  Format.fprintf fmt "@[[";
+  Ty.Mtv.iter
+    (fun tv ty -> Format.fprintf fmt "%a -> %a,"
+        Pretty.print_tv tv Pretty.print_ty ty)
+    s;
+  Format.eprintf "]@]"
+
+let _pp_subst fmt s =
+  Format.fprintf fmt "@[[";
+  Mvs.iter
+    (fun v t -> Format.eprintf "%a -> %a,"
+        Pretty.print_vs v Pretty.print_term t)
+    s;
+  Format.eprintf "]@]"
+
 let first_order_matching (vars : Svs.t) (largs : term list)
     (args : term list) : Ty.ty Ty.Mtv.t * substitution =
   let rec loop bound_vars ((mt,mv) as sigma) largs args =
@@ -1095,11 +1111,16 @@ and reduce_eval eng st t ~orig sigma rem =
                           (Keps v,orig,n_eps) :: rem)
     in c
   | Tquant(q,tq) ->
+(*
+    Format.eprintf "reduce_eval Tquant %a@." Pretty.print_term t;
+    Format.eprintf "reduce_eval sigma %a@." pp_subst sigma;
+*)
     let vl,tr,t1 = t_open_quant tq in
     let n1 = Term.term_size t1 in
     let n_quant = n_rem + 1 in
     let n_sigma = subst_size sigma in
     let n_eval = n_quant + n1 + 1 + n_sigma in
+    let tr = List.map (List.map (t_subst sigma)) tr in
     let c =
       mk_config st ((Keval(t1,sigma),t1,n_eval) ::
                     (Kquant(q,vl,tr),orig,n_quant) :: rem)
@@ -1268,43 +1289,32 @@ and reduce_app_no_equ engine st ls ~orig ty rem_cont =
       let rewrite () =
       (* try a rewrite rule *)
         try
-(*
-            Format.eprintf "try a rewrite rule on %a@." Pretty.print_ls ls;
-*)
+          (*
+          Format.eprintf "try a rewrite rule on %a@." Pretty.print_ls ls;
+          *)
           let (mt,mv),rhs = one_step_reduce engine ls args in
-(*
-            Format.eprintf "rhs = %a@." Pretty.print_term rhs;
-            Format.eprintf "sigma = ";
-            Mvs.iter
-              (fun v t -> Format.eprintf "%a -> %a,"
-                Pretty.print_vs v Pretty.print_term t)
-              (snd sigma);
-            Format.eprintf "@.";
-            Format.eprintf "try a type match: %a and %a@."
-              (Pp.print_option Pretty.print_ty) ty
-              (Pp.print_option Pretty.print_ty) rhs.t_ty;
-*)
-(*
-            let type_subst = Ty.oty_match Ty.Mtv.empty rhs.t_ty ty in
-            Format.eprintf "subst of rhs: ";
-            Ty.Mtv.iter
-              (fun tv ty -> Format.eprintf "%a -> %a,"
-                Pretty.print_tv tv Pretty.print_ty ty)
-              type_subst;
-            Format.eprintf "@.";
-            let rhs = t_ty_subst type_subst Mvs.empty rhs in
-            let sigma =
-              Mvs.map (t_ty_subst type_subst Mvs.empty) sigma
-            in
-            Format.eprintf "rhs = %a@." Pretty.print_term rhs;
-            Format.eprintf "sigma = ";
-            Mvs.iter
-              (fun v t -> Format.eprintf "%a -> %a,"
-                Pretty.print_vs v Pretty.print_term t)
-              sigma;
-            Format.eprintf "@.";
-*)
+          (*
+          Format.eprintf "rhs = %a@." Pretty.print_term rhs;
+          Format.eprintf "sigma = %a@." pp_subst mv;
+          Format.eprintf "try a type match: %a and %a@."
+            (Pp.print_option Pretty.print_ty) ty
+            (Pp.print_option Pretty.print_ty) rhs.t_ty;
+          *)
+          (*
+          let type_subst = Ty.oty_match Ty.Mtv.empty rhs.t_ty ty in
+          Format.eprintf "ty_subst of rhs: %a@." pp_ty_subst type_subst;
+          let rhs = t_ty_subst type_subst Mvs.empty rhs in
+          let sigma =
+            Mvs.map (t_ty_subst type_subst Mvs.empty) mv
+          in
+          Format.eprintf "rhs = %a@." Pretty.print_term rhs;
+          Format.eprintf "sigma = %a@." pp_subst sigma;
+          *)
           let mv,rhs = t_subst_types mt mv rhs in
+          (*
+          Format.eprintf "rhs after t_subst_types = %a@." Pretty.print_term rhs;
+          Format.eprintf "mv after t_subst_types = %a@." pp_subst mv;
+          *)
           let n_rhs = Term.term_size rhs in
           let n_mv = subst_size mv in
           let n = Term.term_size orig + n_rhs + n_mv + 1 + cont_stack_size rem_cont in
@@ -1498,7 +1508,11 @@ let rec reconstruct c =
   | _, (k,orig,_) :: rem ->
     let t, st =
       match c.config_value_stack, k with
-      | st, Keval (t,sigma) -> (t_subst sigma t), st
+      | st, Keval (t,sigma) ->
+          (* Format.eprintf "Keval before t_subst@."; *)
+          let t = t_subst sigma t in
+          (* Format.eprintf "Keval after t_subst@."; *)
+          t, st
       | [], Kif _ -> assert false
       | v :: st, Kif(t2,t3,sigma) ->
         (t_if (term_of_value v) (t_subst sigma t2) (t_subst sigma t3)), st

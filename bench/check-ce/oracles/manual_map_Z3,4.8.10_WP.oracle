@@ -10,29 +10,31 @@ Sub-goal Postcondition of goal test_map'vc.
 Prover result is: Unknown (sat) (200 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File manual_map.mlw:
   Line 4:
     x = fun (x!0:int) -> if x!0 = 1 then 3 else 2
     x = fun (x!0:int) -> if x!0 = 1 then 3 else 2
     Execution of main function `test_map` with env:
-      x = fun (x!0:int) -> if x!0 = 1 then 3 else 2
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ x = fun (x!0:int) -> if x!0 = 1 then 3 else 2 ];
+        rsenv = []; idenv = [] }
   Line 7:
     Normal execution of function `set` with args:
-      f = fun (x!0:int) -> if x!0 = 1 then 3 else 2
-      x = 0
-      v = 3
+      [ f = fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v = 3 ]
   Line 5:
-    Property failure at postcondition of `test_map` with:
-      result = (fun y -> if pure { if y = x then True else False } then v
-                  else f y) with f = fun (x!0:int) ->
-                                      if x!0 = 1 then 3 else 2, x = 0, v = 3
+    Property failure at postcondition of `test_map` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = fun (x!0:int) -> if x!0 = 1 then 3 else 2,
+            result = (fun y ->
+                       if pure { if y = x then True else False } then v
+                       else f y) with f =
+                       fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v =
+                       3 ]; rsenv = [];
+        idenv =
+          [ result = (fun y ->
+                       if pure { if y = x then True else False } then v
+                       else f y) with f =
+                       fun (x!0:int) -> if x!0 = 1 then 3 else 2, x = 0, v =
+                       3 ] }
 

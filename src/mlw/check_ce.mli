@@ -81,8 +81,9 @@ val rac_execute : Pinterp.ctx -> Expr.rsymbol -> rac_result_state * Log.exec_log
 val oracle_of_model : Pdecl.known_map -> Model_parser.model -> Pinterp_core.oracle
 (** Create an oracle from a (prover model-derived) candidate counterexample. *)
 
-val model_of_exec_log : known_map:(Decl.decl Ident.Mid.t) -> prover_model:model -> Log.exec_log -> model
-(** [model_of_exec_log ~known_map ~prover_model log] populates a {!Model_parser.model} from an
+val model_of_exec_log : env:Env.env -> known_map:Decl.known_map ->
+  prover_model:model -> Log.exec_log -> model
+(** [model_of_exec_log ~env ~known_map ~prover_model log] populates a {!Model_parser.model} from an
    execution log [log], using information about record declaration from [known_map] *)
 
 (* val find_ls : Theory.theory -> Loc.position -> Term.lsymbol *)
@@ -125,7 +126,9 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
   giant_step_result:rac_result_state * Log.exec_log ->
   classification
 (** Classify a counterexample based on the results of the normal and giant-step
-    RAC executions. *)
+    RAC executions. Returns the log of the RAC execution corresponding to the
+    classification (that is, giant in the case of a subcontract weakness, small-step
+    in the case of a non conformity) *)
 
 (* val is_vc_term : model -> (cntr_ctx * Term.term) -> bool
  * (\** [is_vc_term ~vc_term_loc ~vc_term_attrs fail] tests if the data [fail] from
@@ -138,7 +141,7 @@ val classify : vc_term_loc:Loc.position option -> vc_term_attrs:Ident.Sattr.t ->
     following functions help selecting one counterexample. *)
 
 val models_from_rac : limits:Call_provers.resource_limits ->
-?verb_lvl:int -> ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+?verb_lvl:int -> ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule0 ->
 (Call_provers.prover_answer * model) list -> (model * rac_result * rac_result * classification) list
 
 (** Execute small and giant-step RAC on the models, and compute the classification.
@@ -153,7 +156,7 @@ val models_from_rac : limits:Call_provers.resource_limits ->
 
 val models_from_giant_step :
   limits:Call_provers.resource_limits -> ?verb_lvl:int ->
-  ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule ->
+  ?compute_term:compute_term -> rac -> Env.env -> Pmodule.pmodule0 ->
   (Call_provers.prover_answer * model) list ->
   (model * rac_result) list
 (** Execute only the giant-step RAC. The returned [rac_result] contains a trace of the
@@ -179,7 +182,8 @@ val best_giant_step_result : (model * rac_result) list -> (model * rac_result) o
                               > RAC_not_done _
     *)
 
-val last_nonempty_model : (Decl.known_map) -> (Call_provers.prover_answer * model) list -> model option
+val last_nonempty_model : env:Env.env -> known_map:Decl.known_map ->
+  (Call_provers.prover_answer * model) list -> model option
 (** Select the last non-empty model from the list of models, and builds
     concrete terms based on the terms it contains. Helper function for the
     cases where counterexample checking has not been requested. *)

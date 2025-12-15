@@ -29,7 +29,7 @@ type pexpr = {
 }
 
 and pexpr_desc =
-  | PEsym of qualid (* x *)
+  | PEsym of qualid * Loc.position option (* x *)
   | PEapp of pexpr * pargument (* e <ty>... t... | e... *)
   | PElam of pparam list * pexpr (* fun pl -> e *)
   | PEdef of pexpr * bool * pdefn list (* e / rec? h p = e and ... *)
@@ -133,7 +133,7 @@ module PP = struct
 
   let rec pp_expr fmt = function
     | Eany           -> fprintf fmt "any"
-    | Esym i         -> fprintf fmt "%a"             pp_hs i
+    | Esym (i, _)    -> fprintf fmt "%a"             pp_hs i
     | Ebox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
     | Ewox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
     | Eset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l
@@ -147,7 +147,7 @@ module PP = struct
     | At t        -> fprintf fmt "%a"   pp_ty  t
     | Av v        -> fprintf fmt "%a"   pp_term v
     | Ar r        -> fprintf fmt "%a"   (pp_var true) r
-    | Ac (Esym i) -> fprintf fmt "%a"   pp_hs i
+    | Ac (Esym (i, _)) -> fprintf fmt "%a" pp_hs i
     | Ac e        -> fprintf fmt "(%a)" pp_expr e
 
   and pp_def direct fmt (h, w, pl, e) =
@@ -214,7 +214,7 @@ module PPp = struct
 
   let rec pp_expr fmt e = match e.pexpr_desc with
     | PEany           -> fprintf fmt "any"
-    | PEsym q         -> fprintf fmt "%a"             Typing.print_qualid q
+    | PEsym (q, _)    -> fprintf fmt "%a"             Typing.print_qualid q
     | PEbox e         -> fprintf fmt "(↑@ @[%a@])"    pp_expr e
     | PEwox e         -> fprintf fmt "(↓@ @[%a@])"    pp_expr e
     | PEset (e, l)    -> fprintf fmt "%a@\n[%a]"      pp_expr e pp_set l

@@ -745,7 +745,7 @@ let check_match kn d =
     | Tcase (t1,bl) ->
         let get_constructors ts = List.map fst (find_constructors kn ts) in
         let pl = List.map (fun b -> let p,_ = t_open_branch b in [p]) bl in
-        Loc.try2 ?loc:t.t_loc (Pattern.check_compile ~get_constructors) [t1] pl;
+        Loc.try2 ?loc:(t_loc t) (Pattern.check_compile ~get_constructors) [t1] pl;
         t_fold check () t
     | _ -> t_fold check () t
   in

@@ -18,10 +18,10 @@ open Task
 let intro_attr = create_attribute "introduced"
 let inline_trivial_attr = create_attribute "inline:trivial"
 
-let rec relocate loc t =
-  t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
+let rec relocate locs t =
+  t_map (relocate locs) (t_attr_set ~locs t.t_attrs t)
 
-let t_unfold loc env fs tl ty =
+let t_unfold locs env fs tl ty =
   match Mls.find_opt fs env with
   | None ->
       t_app fs tl ty
@@ -29,14 +29,14 @@ let t_unfold loc env fs tl ty =
       let add (mt,mv) x y = ty_match mt x.vs_ty (t_type y), Mvs.add x y mv in
       let (mt,mv) = List.fold_left2 add (Ty.Mtv.empty, Mvs.empty) vl tl in
       let mt = oty_match mt e.t_ty ty in
-      t_ty_subst mt mv (relocate loc e)
+      t_ty_subst mt mv (relocate locs e)
 
 (* inline every symbol *)
 
 let rec t_replace_all env t =
   let t = t_map (t_replace_all env) t in
   match t.t_node with
-  | Tapp (fs,tl) -> t_attr_copy t (t_unfold t.t_loc env fs tl t.t_ty)
+  | Tapp (fs,tl) -> t_attr_copy t (t_unfold t.t_locs env fs tl t.t_ty)
   | _ -> t
 
 (* inline the top-most symbol *)
@@ -45,7 +45,7 @@ let rec f_replace_top env f = match f.t_node with
   | Tapp (ps,_) when ls_equal ps ps_equ ->
       t_map (f_replace_top env) f
   | Tapp (ls,tl) ->
-      t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty)
+      t_attr_copy f (t_unfold f.t_locs env ls tl f.t_ty)
   | _ when f.t_ty = None ->
       TermTF.t_map (fun t -> t) (f_replace_top env) f
   | _ ->
@@ -68,7 +68,7 @@ let fold in_goal only_top_in_goal notls notdef d (env, task) =
       when not (Sid.mem ls.ls_name (get_used_syms_decl d) || notls ls) ->
         let vl,e = open_ls_defn ld in
         let attrs = Sattr.union e.t_attrs ls.ls_name.id_attrs in
-        let e_ls_attrs = t_attr_set ?loc:e.t_loc attrs e in
+        let e_ls_attrs = t_attr_set ~locs:e.t_locs attrs e in
         if notdef e_ls_attrs then env, Task.add_decl task d
         else Mls.add ls (vl,e) env,
              if in_goal then Task.add_decl task d else task

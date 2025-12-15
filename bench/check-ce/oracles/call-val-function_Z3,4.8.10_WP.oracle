@@ -10,32 +10,21 @@ Sub-goal Postcondition of goal main'vc.
 Prover result is: Unknown (sat) (263 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File call-val-function.mlw:
   Line 8:
     y = 0
     y = 0
     Execution of main function `main` with env:
-      y = 0
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = 0 ]; rsenv = []; idenv = [] }
   Line 11:
-    (giant-step) execution of unimplemented function `f`
-      x = 0
+    (giant-step) execution of unimplemented function `f` with args: [ x = 0 ]
     result of `f` = 43
   Line 12:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 9:
-    Property failure at postcondition of `main` with:
-      result = 44
+    Property failure at postcondition of `main` with env:
+      { lsenv = []; vsenv = [ y = 0, result = 44 ]; rsenv = [];
+        idenv = [ result = 44 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -49,35 +38,25 @@ Sub-goal Postcondition of goal main'vc.
 Prover result is: Unknown (sat) (787 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File call-val-function.mlw:
   Line 20:
-    f = fun (x!01:int) -> if x!01 = 2 then 43 else 43
+    f = fun (x!02:int) -> if x!02 = 2 then 43 else 43
   Line 27:
     y = 2
     y = 2
     Execution of main function `main` with env:
-      f = fun (x!01:int) -> if x!01 = 2 then 43 else 43
-      y = 2
-      zero = 0
-      one = 1
+      { lsenv = [ f = fun (x!02:int) -> if x!02 = 2 then 43 else 43 ];
+        vsenv = [ y = 2 ]; rsenv = []; idenv = [] }
   Line 30:
-    (giant-step) execution of unimplemented function `f1`
-      x = 2
+    (giant-step) execution of unimplemented function `f1` with args:
+      [ x = 2 ]
     result of `f1` = 43
   Line 31:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 28:
-    Property failure at postcondition of `main1` with:
-      result = 44
+    Property failure at postcondition of `main1` with env:
+      { lsenv = [ f = fun (x!02:int) -> if x!02 = 2 then 43 else 43 ];
+        vsenv = [ y = 2, result = 44 ]; rsenv = []; idenv = [ result = 44 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -91,30 +70,20 @@ Sub-goal Postcondition of goal main'vc.
 Prover result is: Unknown (sat) (787 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File call-val-function.mlw:
   Line 43:
     y = 42
     y = 42
     Execution of main function `main` with env:
-      y = 42
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = 42 ]; rsenv = []; idenv = [] }
   Line 46:
-    (giant-step) execution of unimplemented function `f2`
-      x = 42
+    (giant-step) execution of unimplemented function `f2` with args:
+      [ x = 42 ]
     result of `f2` = 43
   Line 47:
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 43, _ = 1 ]
   Line 44:
-    Property failure at postcondition of `main2` with:
-      result = 44
+    Property failure at postcondition of `main2` with env:
+      { lsenv = []; vsenv = [ y = 42, result = 44 ]; rsenv = [];
+        idenv = [ result = 44 ] }
 

@@ -2,18 +2,19 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="Nat.mlw"/>
 <theory name="Nat" proved="true">
  <goal name="nat_to_int_nonnegative&#39;vc" expl="VC for nat_to_int_nonnegative" proved="true">
- <proof prover="0"><result status="valid" time="0.010000" steps="64"/></proof>
+ <proof prover="2"><result status="valid" time="0.065761" steps="668"/></proof>
  </goal>
  <goal name="add_nat_simulate_add_int&#39;vc" expl="VC for add_nat_simulate_add_int" proved="true">
- <proof prover="0"><result status="valid" time="0.030000" steps="120"/></proof>
+ <proof prover="2"><result status="valid" time="0.031511" steps="2019"/></proof>
  </goal>
  <goal name="one_nat_value" proved="true">
- <proof prover="0"><result status="valid" time="0.000000" steps="9"/></proof>
+ <proof prover="1"><result status="valid" time="0.023297" steps="9"/></proof>
  </goal>
 </theory>
 </file>

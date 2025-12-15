@@ -106,7 +106,7 @@ let type_fmla tuc ctx t =
   Typing.type_fmla_in_denv
     (get_namespace tuc) tuc.uc_known tuc.uc_crcmap ctx.denv t
 
-let check_params ~loc p a =
+let check_params ~loc h p a =
   let rec aux ~loc l r = match l, r with
     | [], [] -> ()
     | Pt _  :: ll, Pt _  :: rr -> aux ~loc ll rr
@@ -120,8 +120,9 @@ let check_params ~loc p a =
         aux ~loc ll rr
     | [], _ | _, [] ->
         Loc.errorm ~loc "[coma typing] \
-          bad arity: %d argument(s) expected, %d given"
+          bad arity: %d argument(s) expected, %d given to handler `%a'"
           (List.length p) (List.length a)
+          PP.pp_hs h
     | _ ->
         Loc.errorm ~loc "[coma typing] type error"
   in
@@ -187,11 +188,11 @@ let rec param_spec (pre,name) o a pl e =
         let mke d i = { pexpr_desc = d; pexpr_loc = i.id_loc } in
         let apply d = function
           | PPt u -> mke (PEapp (d, PAt (PTtyvar u))) u
-          | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym (Qident g)) g))) g
+          | PPc (g,_,_) -> mke (PEapp (d, PAc (mke (PEsym (Qident g, None)) g))) g
           | PPv (v,_) -> mke (PEapp (d, PAv (mkt (Tident (Qident v)) v))) v
           | PPr (r,_) -> mke (PEapp (d, PAr r)) r
           | PPa _ | PPl _ | PPo | PPb -> d in
-        let d = List.fold_left apply (mke (PEsym (Qident h)) h) ql in
+        let d = List.fold_left apply (mke (PEsym (Qident h, None)) h) ql in
         let post = false, name ^ "'" ^ h.id_str in
         let ql,d = Loc.try4 ~loc:h.id_loc param_spec post o a ql d in
         let d = { pdefn_name = h; pdefn_writes = wr;
@@ -210,7 +211,7 @@ let dl_split flat dl =
   let iter fn (_,_,_,d) =
     (* we assume no collisions *)
     let rec inspect = function
-      | Esym h -> fn h
+      | Esym (h, _) -> fn h
       | Edef (e,_,dl) ->
           let check (_,_,_,d) = inspect d
           in List.iter check dl; inspect e
@@ -251,7 +252,27 @@ let rec subs_param (mty, mvs as acc) = function
       let _, pl = Lists.map_fold_left subs_param acc pl in
       acc, Pc (h, ws, pl)
 
-let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
+let curr_prog = ref ""
+
+let expected_param_kind = function
+  | Pv _ -> "{TERM}"
+  | Pc _ -> "expression"
+  | Pt _ -> "<TYPE>"
+  | Pr _ -> "&REF"
+
+let pp_actual_arg_kind ty_of_pty h = function
+  | PAv _ -> Format.pp_print_string h "term"
+  | PAc _ -> Format.pp_print_string h "expression"
+  | PAt ty -> Format.fprintf h "type %a" PP.pp_ty (ty_of_pty ty)
+  | PAr id -> Format.fprintf h "reference &%s" id.id_str
+
+let arg_loc ~default = function
+  | PAv t -> t.term_loc
+  | PAc e -> e.pexpr_loc
+  | PAt _ -> default
+  | PAr id -> id.id_loc
+
+let rec type_expr (Pmodule.{muc_intf = {muc_theory = tuc}} as muc) ctx { pexpr_desc=d; pexpr_loc=loc } =
   match d with
   | PEany -> Eany, []
   | PEbox e -> let e = type_prog ~loc muc ctx e in Ebox e, []
@@ -262,29 +283,35 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
         (fun acc (t,b) -> Ecut (type_fmla tuc ctx t, b, acc))
         e (List.rev l) in
       ll, []
-  | PEsym q ->
+  | PEsym (q, loc) ->
       let h, _, pl =
         try let nm = match q with
               | Qdot _ -> raise Not_found
               | Qident id -> id.id_str in
             Mstr.find nm ctx.hdls with Not_found ->
         try let sl = Typing.string_list_of_qualid q in
-            let ns = List.hd muc.Pmodule.muc_import in
+            let ns = List.hd muc.Pmodule.muc_intf.Pmodule.muc_import in
             hs_of_xs (Pmodule.ns_find_xs ns sl)
         with Not_found ->
           Loc.errorm ~loc:(qloc q) "[coma typing] \
             unbound handler `%a'" Typing.print_qualid q
       in
-      Esym h, pl
+      Esym (h, Option.to_list loc @ [qloc q]), pl
   | PEapp (pe, a) ->
       let e, te = type_expr muc ctx pe in
-      (match te, a with
+      begin match te, a with
        | Pv vs :: tes, PAv t ->
            let tt = type_term tuc ctx t in
            let () = match tt.t_ty with
              | Some ty when ty_equal ty vs.vs_ty -> ()
-             | _ -> Loc.errorm ~loc:t.term_loc "[coma typing] \
-                      type error in application" in
+             | Some ty ->
+                 Loc.errorm ~loc:t.term_loc "[coma typing] \
+                   type error in application (expected %a, got %a)"
+                   PP.pp_ty vs.vs_ty
+                   PP.pp_ty ty
+             | None ->
+                 Loc.errorm ~loc:t.term_loc "[coma typing] \
+                   type error in application: could not type argument" in
            Eapp (e, Av tt), tes
        | Pr rs :: tes, PAr id ->
            let s = match Mstr.find id.id_str ctx.vars with
@@ -298,9 +325,9 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
            let m = Mvs.singleton rs s in
            let _, tes = Lists.map_fold_left subs_param (Mtv.empty, m) tes in
            Eapp (e, Ar s), tes
-       | Pc (_h, _vs, pl) :: tes, PAc ea ->
+       | Pc (h, _vs, pl) :: tes, PAc ea ->
            let ea, tea = type_expr muc ctx ea in
-           check_params ~loc pl tea;
+           check_params ~loc h pl tea;
            Eapp (e, Ac ea), tes
        | Pt tv :: tes, PAt pty ->
            let ty = Typing.ty_of_pty tuc pty in
@@ -308,9 +335,17 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
            let _, tes = Lists.map_fold_left subs_param (m, Mvs.empty) tes in
            Eapp (e, At ty), tes
        | [], _ ->
-          Loc.errorm ~loc:pe.pexpr_loc "[coma typing] \
-            the expression `%a' is already fully applied" PP.pp_expr e
-       | _ -> Loc.errorm ~loc "[coma typing] type error with the application")
+           Loc.errorm ~loc:pe.pexpr_loc "[coma typing] \
+             the expression `%a' is already fully applied" PP.pp_expr e
+
+        (* error message *)
+       | expected :: _, actual ->
+           Loc.errorm ~loc:(arg_loc ~default:loc actual) "[coma typing] \
+             type error with the application \
+             (expected %s, got %a)"
+             (expected_param_kind expected)
+             (pp_actual_arg_kind (Typing.ty_of_pty tuc)) actual
+       end
   | PElet (e, l) ->
       let ctx0 = ctx in
       let typ_let ctx (id, t, pty, mut) =
@@ -353,11 +388,13 @@ let rec type_expr ({Pmodule.muc_theory = tuc} as muc) ctx { pexpr_desc=d; pexpr_
 and type_prog ?loc muc ctx d =
   let e, te = type_expr muc ctx d in
   if te <> [] then
-    Loc.errorm ?loc "[coma typing] every program must be box-typed";
+    Loc.errorm ?loc "[coma typing] \
+      the body of handler `%s' must be box-typed"
+      !curr_prog;
   e
 
 and type_defn_list muc ctx flat dl =
-  let tuc = muc.Pmodule.muc_theory in
+  let tuc = muc.Pmodule.muc_intf.Pmodule.muc_theory in
   let ctx_full, dl =
     Lists.map_fold_left
       (fun acc { pdefn_desc = d; pdefn_loc=loc} ->
@@ -373,6 +410,7 @@ and type_defn_list muc ctx flat dl =
     List.map
       (fun (h, writes, params, loc, b) ->
          let ctx = List.fold_left add_param ctx params in
+         curr_prog := h.hs_name.id_string;
          let d = type_prog ~loc muc ctx b in
          h, writes, params, d)
       dl in

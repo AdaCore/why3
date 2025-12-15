@@ -15,13 +15,6 @@ Prover result is: Unknown (sat) (1990 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
-File int.mlw:
   Line 285:
     Constant min_int32 initialization
     min_int32 = (-2147483648)
@@ -30,24 +23,24 @@ File int.mlw:
     max_int32 = 2147483647
 File int32_mono.mlw:
   Line 7:
-    r = {c= epsilon x:int32. int32'int x = 22}
-    r = {c= epsilon x:int32. int32'int x = 22}
+    r = { c = epsilon x:int32. int32'int x = 22 }
+    r = { c = epsilon x:int32. int32'int x = 22 }
     Execution of main function `dummy_update` with env:
-      r = {c= epsilon x:int32. int32'int x = 22}
-      zero = 0
-      one = 1
-      min_int32 = (-2147483648)
-      max_int32 = 2147483647
+      { lsenv = [];
+        vsenv = [ r = { c = epsilon x:int32. int32'int x = 22 } ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv = [] }
   Line 11:
-    Normal execution of function `c` with args:
-      arg = {c= 42}
-    Normal execution of function `c` with args:
-      arg = {c= 42}
-    (giant-step) execution of unimplemented function `(+)`
-      a = 42
-      b = 42
+    Normal execution of function `c` with args: [ arg = { c = 42 } ]
+    Normal execution of function `c` with args: [ arg = { c = 42 } ]
+    (giant-step) execution of unimplemented function `(+)` with args:
+      [ a = 42, b = 42 ]
     result of `(+)` = epsilon x:int32. int32'int x = 84
   Line 9:
-    Property failure at postcondition of `dummy_update` with:
-      r = {c= epsilon x:int32. int32'int x = 84}
+    Property failure at postcondition of `dummy_update` with env:
+      { lsenv = [];
+        vsenv =
+          [ r = { c = epsilon x:int32. int32'int x = 84 }, result = () ];
+        rsenv = [ min_int32 = (-2147483648), max_int32 = 2147483647 ];
+        idenv = [ r = { c = epsilon x:int32. int32'int x = 84 } ] }
 
