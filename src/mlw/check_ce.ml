@@ -988,13 +988,14 @@ let rec value_to_concrete_term ~env ~known_map v =
 let model_element_of_unmatched_log_entry ?loc id me_concrete_value ty =
   let dummy_term = Term.t_true in
   let dummy_ls = create_lsymbol (Ident.id_clone id) [] (Some ty) in
-  {me_concrete_value;
-   me_lsymbol = dummy_ls;
-   (* TODO we should provide the Sattr of the VC term here *)
-   me_kind = Model_parser.compute_kind Ident.Sattr.empty loc id.id_attrs;
-   me_value = dummy_term;
-   me_location = loc;
-   me_attrs = id.id_attrs}
+  { me_name = id_name id;
+    me_concrete_value;
+    me_lsymbol = dummy_ls;
+    (* TODO we should provide the Sattr of the VC term here *)
+    me_kind = Model_parser.compute_kind Ident.Sattr.empty loc id.id_attrs;
+    me_value = dummy_term;
+    me_location = loc;
+    me_attrs = id.id_attrs}
 
 let debug_print_original_model = Debug.register_info_flag "print-original-model"
     ~desc:"Print original counterexample model when --check-ce"
