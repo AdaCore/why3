@@ -345,9 +345,9 @@ and print_lterm pri fmt t =
       print_attrs t.t_attrs (print_tnode 0) t
     else print_tnode pri fmt t in
   let print_tloc pri fmt t =
-    if Debug.test_flag debug_print_locs && t.t_loc <> None
+    if Debug.test_flag debug_print_locs && t.t_locs <> []
     then fprintf fmt (protect_on (pri > 0) "@[<hov 0>%a@ %a@]")
-      (print_option print_loc_as_attribute) t.t_loc (print_tattr 0) t
+      (print_list pp_print_space print_loc_as_attribute) t.t_locs (print_tattr 0) t
     else print_tattr pri fmt t in
   let print_types pri fmt t =
     if Debug.test_flag debug_print_types && t.t_ty <> None

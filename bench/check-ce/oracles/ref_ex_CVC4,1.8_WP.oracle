@@ -10,55 +10,39 @@ Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown (unknown + incomplete) (1148 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 8:
     x = 1
-    y = {contents= 0}
+    y = { contents = 0 }
     x = 1
-    y = {contents= 0}
+    y = { contents = 0 }
     Execution of main function `test_post` with env:
-      x = 1
-      y = {contents= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 1, y = { contents = 0 } ]; rsenv = [];
+        idenv = [] }
   Line 11:
-    Normal execution of function `(!)` with args:
-      r = {contents= 0}
+    Normal execution of function `(!)` with args: [ r = { contents = 0 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
 File ref_ex.mlw:
   Line 11:
-    Normal execution of function `(-)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 1, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = (-1) ]
 File ref_ex.mlw:
   Line 11:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 0
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 0 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 0
+      [ r = { contents = 0 }, v = 0 ]
   Line 9:
-    Property failure at postcondition of `test_post` with:
-      x = 1
-      y = {contents= 0}
+    Property failure at postcondition of `test_post` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = 1, y = { contents = 0 }, y = { contents = 0 }, result = () ];
+        rsenv = []; idenv = [ x = 1, y = { contents = 0 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -72,56 +56,41 @@ Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown (unknown + incomplete) (1205 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 13:
     x = 43
-    y = {contents= (- 42)}
+    y = { contents = (- 42) }
     x = 43
-    y = {contents= (- 42)}
+    y = { contents = (- 42) }
     Execution of main function `test_post2` with env:
-      x = 43
-      y = {contents= (- 42)}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 43, y = { contents = (- 42) } ];
+        rsenv = []; idenv = [] }
   Line 17:
     Normal execution of function `(!)` with args:
-      r = {contents= (- 42)}
+      [ r = { contents = (- 42) } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 42)}
+      [ arg = { contents = (- 42) } ]
 File ref_ex.mlw:
   Line 17:
-    Normal execution of function `(-)` with args:
-      x = 43
-      y = 1
+    Normal execution of function `(-)` with args: [ x = 43, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 43, _ = (-1) ]
 File ref_ex.mlw:
   Line 17:
-    Normal execution of function `(+)` with args:
-      _ = 42
-      _ = (- 42)
+    Normal execution of function `(+)` with args: [ _ = 42, _ = (- 42) ]
     Normal execution of function `(:=)` with args:
-      r = {contents= (- 42)}
-      v = 0
+      [ r = { contents = (- 42) }, v = 0 ]
   Line 15:
-    Property failure at postcondition of `test_post2` with:
-      x = 43
-      y = {contents= 0}
-      y = {contents= (- 42)}
+    Property failure at postcondition of `test_post2` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = 43, y = { contents = 0 }, y = { contents = (- 42) },
+            result = () ]; rsenv = [];
+        idenv = [ x = 43, y = { contents = 0 }, y = { contents = (- 42) } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -135,74 +104,61 @@ Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (unknown + incomplete) (1348 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex.mlw:
   Line 23:
-    y = {contents= (- 1)}
+    y = { contents = (- 1) }
   Line 25:
-    x23 = {contents= (- 2)}
-    x23 = {contents= (- 2)}
+    x23 = { contents = (- 2) }
+    x23 = { contents = (- 2) }
     Execution of main function `incr` with env:
-      y = {contents= (- 1)}
-      x23 = {contents= (- 2)}
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ y = { contents = (- 1) }, x23 = { contents = (- 2) } ];
+        rsenv = []; idenv = [] }
   Line 29:
     Normal execution of function `(!)` with args:
-      r = {contents= (- 1)}
+      [ r = { contents = (- 1) } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 1)}
+      [ arg = { contents = (- 1) } ]
 File ref_ex.mlw:
   Line 29:
-    Normal execution of function `(+)` with args:
-      _ = (- 1)
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = (- 1), _ = 1 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= (- 1)}
-      v = 0
+      [ r = { contents = (- 1) }, v = 0 ]
   Line 30:
     Normal execution of function `(!)` with args:
-      r = {contents= (- 2)}
+      [ r = { contents = (- 2) } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= (- 2)}
+      [ arg = { contents = (- 2) } ]
 File ref_ex.mlw:
   Line 30:
-    Normal execution of function `(+)` with args:
-      _ = (- 2)
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = (- 2), _ = 1 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= (- 2)}
-      v = (-1)
+      [ r = { contents = (- 2) }, v = (-1) ]
   Line 31:
-    Normal execution of function `(!)` with args:
-      r = {contents= (-1)}
+    Normal execution of function `(!)` with args: [ r = { contents = (-1) } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= (-1)}
+      [ arg = { contents = (-1) } ]
 File ref_ex.mlw:
   Line 31:
-    Normal execution of function `(+)` with args:
-      _ = (-1)
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = (-1), _ = 1 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= (-1)}
-      v = 0
+      [ r = { contents = (-1) }, v = 0 ]
   Line 26:
-    Property failure at postcondition of `incr` with:
-      x23 = {contents= 0}
-      x23 = {contents= (- 2)}
-      y = {contents= (- 1)}
+    Property failure at postcondition of `incr` with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { contents = 0 }, x23 = { contents = 0 },
+            x23 = { contents = (- 2) }, y = { contents = (- 1) },
+            result = () ]; rsenv = [];
+        idenv =
+          [ x23 = { contents = 0 }, x23 = { contents = (- 2) },
+            y = { contents = (- 1) } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

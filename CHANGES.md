@@ -1,5 +1,12 @@
 :x: marks a potential source of incompatibility
 
+API
+  * The `module Impl : Intf` feature is now supported at the level of the Ptree
+    API. This include a breaking change in the Ptree.mlw_file type. :x:
+  * Type Pmodule.pmodule now includes both the interface and implementation
+    versions of a module for a better support of the `module Impl : Intf`
+    feature :x:
+
 Version 1.8.2, September 16, 2025
 ---------------------------
 

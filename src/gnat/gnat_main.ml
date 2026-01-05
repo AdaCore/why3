@@ -171,14 +171,14 @@ let maybe_giant_step_rac ctr parent models =
     parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
     Session_itp.theory_name |> Theory.restore_theory in
   let pm = Pmodule.restore_module th in
+  let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
   if not Gnat_config.giant_step_rac then
-    begin match Check_ce.last_nonempty_model th.Theory.th_known models with
+    begin match Check_ce.last_nonempty_model ~env ~known_map:th.Theory.th_known models with
     | None -> []
     | Some m -> [(m, None)]
     end
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
-    let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
     let rac_limits =
       match Gnat_config.prover_ce with
       | Some pr -> Gnat_config.limit ~prover:pr ~warning:false
@@ -194,7 +194,7 @@ let maybe_giant_step_rac ctr parent models =
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
     let models = Check_ce.models_from_giant_step  ~limits:rac_limits ~compute_term
-        rac env pm models in
+        rac env (pm.Pmodule.mod_impl) models in
     List.map (fun model ->
     match model with
     | (m, Check_ce.RAC_not_done reason) -> (

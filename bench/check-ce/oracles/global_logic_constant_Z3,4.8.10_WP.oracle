@@ -10,13 +10,6 @@ Sub-goal Postcondition of goal f1'vc.
 Prover result is: Unknown (sat) (119 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File global_logic_constant.mlw:
   Line 6:
     v1 = 2
@@ -26,13 +19,11 @@ File global_logic_constant.mlw:
   Line 8:
     _ = ()
     Execution of main function `f1` with env:
-      _ = ()
-      zero = 0
-      one = 1
-      v1 = 2
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = [ v1 = 2 ]; idenv = [] }
   Line 9:
-    Property failure at postcondition of `f1` with:
-      result = 2
+    Property failure at postcondition of `f1` with env:
+      { lsenv = []; vsenv = [ _ = (), result = 2 ]; rsenv = [ v1 = 2 ];
+        idenv = [ result = 2 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -46,33 +37,24 @@ Sub-goal Postcondition of goal f2'vc.
 Prover result is: Step limit exceeded (3000015 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File global_logic_constant.mlw:
   Line 6:
     v1 = 0
   Line 12:
-    v2 = {contents= 2}
+    v2 = { contents = 2 }
 Unknown location:
     _ = ()
 File global_logic_constant.mlw:
   Line 14:
     _ = ()
     Execution of main function `f2` with env:
-      v2 = {contents= 2}
-      _ = ()
-      zero = 0
-      one = 1
-      v1 = 0
+      { lsenv = []; vsenv = [ v2 = { contents = 2 }, _ = () ];
+        rsenv = [ v1 = 0 ]; idenv = [] }
   Line 16:
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
+      [ arg = { contents = 2 } ]
   Line 15:
-    Property failure at postcondition of `f2` with:
-      result = 2
+    Property failure at postcondition of `f2` with env:
+      { lsenv = []; vsenv = [ v2 = { contents = 2 }, _ = (), result = 2 ];
+        rsenv = [ v1 = 0 ]; idenv = [ result = 2 ] }
 

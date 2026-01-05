@@ -185,27 +185,19 @@ Goal T11.
 Prover result is: Unknown (unknown) (12 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 16:
     s = ""
     s = ""
     Execution of main function `T11'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 16:
-    Property failure at postcondition of `T11'goal` with:
-      s = ""
+    Property failure at postcondition of `T11'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 Warning: Error while interpreting length: No variable in bound_vars matching qualified identifier (Qident (Isymbol x))
 
@@ -223,7 +215,7 @@ The following counterexample model could not be verified
   (both RAC terminated because Postcondition of `T12'goal1` cannot be evaluated):
 File string.mlw:
   Line 111:
-    le : string -> string -> bool = (fun _arg_07 _arg_17 -> true)
+    le : string -> string -> bool = (fun _arg_08 _arg_18 -> true)
   Line 343:
     to_int : string -> int = [|_ => -1|]
 File strings.mlw:
@@ -243,27 +235,19 @@ Goal T13.
 Prover result is: Unknown (unknown) (8 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 18:
     s = ""
     s = ""
     Execution of main function `T13'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 18:
-    Property failure at postcondition of `T13'goal` with:
-      s = ""
+    Property failure at postcondition of `T13'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -277,27 +261,19 @@ Goal T14.
 Prover result is: Unknown (unknown) (8 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 19:
     s = ""
     s = ""
     Execution of main function `T14'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 19:
-    Property failure at postcondition of `T14'goal` with:
-      s = ""
+    Property failure at postcondition of `T14'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -311,13 +287,6 @@ Goal T15.
 Prover result is: Unknown (unknown) (11 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 20:
     s = ""
@@ -325,17 +294,14 @@ File strings.mlw:
     s = ""
     i = 0
     Execution of main function `T15'goal` with env:
-      i = 0
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ i = 0, s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 20:
-    Property failure at postcondition of `T15'goal` with:
-      i = 0
-      s = ""
+    Property failure at postcondition of `T15'goal` with env:
+      { lsenv = []; vsenv = [ i = 0, s = "", result = () ]; rsenv = [];
+        idenv = [ i = 0, s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -353,7 +319,7 @@ File string.mlw:
   Line 86:
     length : string -> int = [|_ => 0|]
   Line 198:
-    prefixof : string -> string -> bool = (fun _arg_010 _arg_110 -> false)
+    prefixof : string -> string -> bool = (fun _arg_013 _arg_113 -> false)
   Line 343:
     to_int : string -> int = [|_ => -1|]
 File strings.mlw:
@@ -377,7 +343,7 @@ File string.mlw:
   Line 86:
     length : string -> int = [|_ => 0|]
   Line 198:
-    prefixof : string -> string -> bool = (fun _arg_011 _arg_111 -> true)
+    prefixof : string -> string -> bool = (fun _arg_014 _arg_114 -> true)
   Line 343:
     to_int : string -> int = [|_ => -1|]
 File strings.mlw:

@@ -18,36 +18,25 @@ Sub-goal Assertion of goal f1'vc.
 Prover result is: Step limit exceeded (3000032 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-call-nc.mlw:
   Line 9:
-    x = {contents= 0}
+    x = { contents = 0 }
 Unknown location:
     _ = ()
 File log-call-nc.mlw:
   Line 17:
     _ = ()
     Execution of main function `f1` with env:
-      x = {contents= 0}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 19:
-    Normal execution of function `f` with args:
-      y = 1
+    Normal execution of function `f` with args: [ y = 1 ]
   Line 15:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+      [ arg = { contents = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 20:
-    Property failure at assertion with:
-      x = {contents= 1}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = { contents = 1 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ x = { contents = 1 } ] }
 

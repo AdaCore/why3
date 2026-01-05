@@ -7,6 +7,7 @@ stages:
 
 variables:
   BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2025-05-20"
+  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11C"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
 
@@ -22,6 +23,21 @@ build-image:
   rules:
     - changes:
         - misc/Dockerfile.build
+  tags:
+    - large
+
+bench-image:
+  stage: docker
+  image: docker
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
+    - if docker manifest inspect "$BENCH_IMAGE"; then echo "Image already exists!"; exit 0; fi
+    - docker build --force-rm -t "$BENCH_IMAGE" - < misc/Dockerfile.bench
+    - docker push "$BENCH_IMAGE"
+    - docker rmi "$BENCH_IMAGE"
+  rules:
+    - changes:
+        - misc/Dockerfile.bench
   tags:
     - large
 
@@ -102,7 +118,23 @@ nightly-bench:
     COMPILER: bench
   script:
     - misc/ci-local.sh nightly-bench-reduced
-  extends: .docker_template
+  image: "$BENCH_IMAGE"
+  dependencies: []
+  tags:
+    - large
+
+nightly-bench-long:
+  timeout: 12h
+  stage: build
+  variables:
+    COMPILER: bench
+  when: manual
+  script:
+    - misc/ci-local.sh nightly-bench-long
+  image: "$BENCH_IMAGE"
+  dependencies: []
+  tags:
+    - large
 
 ce-bench:
   stage: nightly

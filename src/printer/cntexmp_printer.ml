@@ -86,7 +86,7 @@ let check_enter_vc_term t in_goal vc_term_info =
   *)
   if in_goal && Sattr.mem Ity.annot_attr t.t_attrs then begin
     vc_term_info.vc_inside <- true;
-    vc_term_info.vc_loc <- t.t_loc
+    vc_term_info.vc_loc <- t_loc t
   end
 
 let check_exit_vc_term t in_goal info =
@@ -113,7 +113,7 @@ let update_info_labels lsname cur_attrs t ls =
     Sattr.fold (fun attr acc ->
         if Strings.has_prefix ~prefix:"at:" attr.attr_string then
           let (f, l, _, _, _) =
-            match t.t_loc with
+            match t_loc t with
             | None -> Loc.get (Option.value ~default:Loc.dummy_position ls.ls_name.id_loc)
             | Some loc -> Loc.get loc
           in
@@ -135,4 +135,4 @@ let check_for_counterexample t =
     | _ -> false
   in
   not (Sattr.mem proxy_attr t.t_attrs) &&
-  t.t_loc <> None && (is_app t)
+  t.t_locs <> [] && is_app t

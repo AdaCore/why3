@@ -1327,7 +1327,7 @@ let mk_theory_declaration (node : theory_declaration_id) =
         ([],Include_type_set.empty)
         include_vars in
       let declarations = List.concat (List.map mk_declaration r.declarations) in
-      [name, List.rev_append includes declarations]
+      [name, None, List.rev_append includes declarations]
 
 let mlw_file nodes =
   Modules (List.concat (List.map mk_theory_declaration nodes))

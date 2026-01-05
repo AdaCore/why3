@@ -121,7 +121,7 @@ type term = private {
   t_node  : term_node;
   t_ty    : ty option;
   t_attrs : Sattr.t;
-  t_loc   : Loc.position option;
+  t_locs  : Loc.position list;
 }
 
 and term_node =
@@ -149,6 +149,9 @@ val term_size : term -> int
 
 val term_branch_size : term_branch -> int
 (** [term_branch_size t] is the size of the term in the given term branch *)
+
+val t_loc : term -> Loc.position option
+(** The first location *)
 
 (** {2 Generic term equality} *)
 
@@ -309,12 +312,15 @@ val t_quant_close : quant -> vsymbol list -> trigger -> term -> term
 val t_forall_close : vsymbol list -> trigger -> term -> term
 val t_exists_close : vsymbol list -> trigger -> term -> term
 
-val t_attr_set : ?loc:Loc.position -> Sattr.t -> term -> term
+val t_attr_set : ?locs:Loc.position list -> Sattr.t -> term -> term
 val t_attr_add : attribute -> term -> term
 val t_attr_remove : attribute -> term -> term
 val t_attr_copy : term -> term -> term
 (** [t_attr_copy src dst] returns the term [dst] with attributes and
    locations augmented with those of term [src] *)
+
+val t_locs_append : Loc.position list -> term -> term
+(** Append locations to the end of the [t_locs] field *)
 
 (** Constructors with propositional simplification *)
 

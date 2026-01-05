@@ -23,43 +23,31 @@ Prover result is: Unknown (unknown + incomplete) (405 steps).
 The contracts of the following functions/loops are too weak :
   - Loop at "bench/check-ce/while1.mlw", line 8, character 4 to line 13, character 8
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File while1.mlw:
   Line 4:
     _ = ()
     Execution of main function `f` with env:
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 6:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    Giant-step execution of function `ref` with args: [ contents = 0 ]
+    result of `ref` = { contents = 0 }
   Line 7:
-    Giant-step execution of function `ref` with args:
-      contents = 0
-    result of `ref` = {contents= 0}
+    Giant-step execution of function `ref` with args: [ contents = 0 ]
+    result of `ref` = { contents = 0 }
   Line 8:
     Giant-step iteration of loop
-    x = {contents= 0}
-    i = {contents= 2}
+    x = { contents = 0 }
+    i = { contents = 2 }
     Normal execution of function `contents` with args:
-      arg = {contents= 2}
-    Normal execution of function `(<)` with args:
-      _ = 2
-      _ = 2
+      [ arg = { contents = 2 } ]
+    Normal execution of function `(<)` with args: [ _ = 2, _ = 2 ]
   Line 14:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
   Line 5:
-    Property failure at postcondition of `f` with:
-      result = 0
+    Property failure at postcondition of `f` with env:
+      { lsenv = []; vsenv = [ _ = (), result = 0 ]; rsenv = [];
+        idenv = [ result = 0 ] }
 

@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="whyml">
+<path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
+<path name="map.mlw"/>
+<theory name="Map">
+ <goal name="set&#39;vc" expl="VC for set">
+ </goal>
+</theory>
+<theory name="Const">
+ <goal name="const&#39;vc" expl="VC for const">
+ </goal>
+</theory>
+<theory name="MapExt">
+ <goal name="extensionality">
+ </goal>
+</theory>
+<theory name="MapExchange">
+ <goal name="exchange_set">
+ </goal>
+</theory>
+<theory name="Occ">
+ <goal name="occ_left_no_add">
+ </goal>
+ <goal name="occ_left_add">
+ </goal>
+ <goal name="occ_bounds">
+ </goal>
+ <goal name="occ_append">
+ </goal>
+ <goal name="occ_neq">
+ </goal>
+ <goal name="occ_exists">
+ </goal>
+ <goal name="occ_pos">
+ </goal>
+ <goal name="occ_eq">
+ </goal>
+ <goal name="occ_exchange">
+ </goal>
+</theory>
+<theory name="MapPermut">
+ <goal name="permut_trans">
+ </goal>
+ <goal name="permut_exists">
+ </goal>
+</theory>
+<theory name="MapPermutation" proved="true">
+ <goal name="inverse&#39;vc" expl="VC for inverse" proved="true">
+ <proof prover="3"><result status="valid" time="0.042717" steps="253270"/></proof>
+ </goal>
+ <goal name="permutation&#39;vc" expl="VC for permutation" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="permutation&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.010051" steps="7919"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.1" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.023147" steps="68740"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.2" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.019906" steps="69551"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.029846" steps="70932"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.023912" steps="71761"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.5" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.021931" steps="72015"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.6" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.022036" steps="72264"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.7" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.017833" steps="72198"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.020142" steps="72636"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.019540" steps="73201"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.10" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.018427" steps="73243"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.11" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.015835" steps="7986"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.12" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.031066" steps="70502"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.13" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.046366" steps="78098"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.14" expl="precondition" proved="true">
+  <transf name="rewrite" proved="true" arg1="H7">
+   <goal name="permutation&#39;vc.14.0" expl="precondition" proved="true">
+   <transf name="rewrite" proved="true" arg1="H7">
+    <goal name="permutation&#39;vc.14.0.0" expl="precondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="permutation&#39;vc.14.0.0.0" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.011077" steps="8184"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.14.0.0.1" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.036435" steps="86409"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.14.0.0.2" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.008734" steps="8281"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.14.0.0.3" expl="precondition" proved="true">
+     <transf name="assert" proved="true" arg1="(p&#39; i = p i)">
+      <goal name="permutation&#39;vc.14.0.0.3.0" expl="asserted formula" proved="true">
+      <proof prover="3"><result status="valid" time="0.034934" steps="75818"/></proof>
+      </goal>
+      <goal name="permutation&#39;vc.14.0.0.3.1" expl="precondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.032033" steps="81843"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="permutation&#39;vc.15" expl="precondition" proved="true">
+  <transf name="rewrite" proved="true" arg1="H8">
+   <goal name="permutation&#39;vc.15.0" expl="precondition" proved="true">
+   <transf name="rewrite" proved="true" arg1="H8">
+    <goal name="permutation&#39;vc.15.0.0" expl="precondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="permutation&#39;vc.15.0.0.0" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.012186" steps="8304"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.15.0.0.1" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.037301" steps="88378"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.15.0.0.2" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.012608" steps="8312"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.15.0.0.3" expl="precondition" proved="true">
+     <transf name="assert" proved="true" arg1="(p&#39; i = p i)">
+      <goal name="permutation&#39;vc.15.0.0.3.0" expl="asserted formula" proved="true">
+      <proof prover="3"><result status="valid" time="0.036789" steps="76816"/></proof>
+      </goal>
+      <goal name="permutation&#39;vc.15.0.0.3.1" expl="precondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.038149" steps="82861"/></proof>
+      </goal>
+     </transf>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="permutation&#39;vc.16" expl="assertion" proved="true">
+  <transf name="rewrite" proved="true" arg1="H7">
+   <goal name="permutation&#39;vc.16.0" expl="assertion" proved="true">
+   <transf name="rewrite" proved="true" arg1="H8">
+    <goal name="permutation&#39;vc.16.0.0" expl="assertion" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="permutation&#39;vc.16.0.0.0" expl="assertion" proved="true">
+     <transf name="assert" proved="true" arg1="(p&#39; k = j)">
+      <goal name="permutation&#39;vc.16.0.0.0.0" expl="asserted formula" proved="true">
+      <proof prover="3"><result status="valid" time="0.039022" steps="75555"/></proof>
+      </goal>
+      <goal name="permutation&#39;vc.16.0.0.0.1" expl="assertion" proved="true">
+      <proof prover="3"><result status="valid" time="0.034754" steps="76078"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="permutation&#39;vc.16.0.0.1" expl="assertion" proved="true">
+     <proof prover="3"><result status="valid" time="0.012816" steps="8120"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="permutation&#39;vc.17" expl="precondition" proved="true">
+  <transf name="rewrite" proved="true" arg1="H9">
+   <goal name="permutation&#39;vc.17.0" expl="precondition" proved="true">
+   <transf name="rewrite" proved="true" arg1="H9">
+    <goal name="permutation&#39;vc.17.0.0" expl="precondition" proved="true">
+    <transf name="split_vc" proved="true" >
+     <goal name="permutation&#39;vc.17.0.0.0" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.013821" steps="8353"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.17.0.0.1" expl="precondition" proved="true">
+     <transf name="assert" proved="true" arg1="(p&#39; i = p i)">
+      <goal name="permutation&#39;vc.17.0.0.1.0" expl="asserted formula" proved="true">
+      <proof prover="3"><result status="valid" time="0.040655" steps="78221"/></proof>
+      </goal>
+      <goal name="permutation&#39;vc.17.0.0.1.1" expl="precondition" proved="true">
+      <proof prover="3"><result status="valid" time="0.037213" steps="84281"/></proof>
+      </goal>
+     </transf>
+     </goal>
+     <goal name="permutation&#39;vc.17.0.0.2" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.011452" steps="8345"/></proof>
+     </goal>
+     <goal name="permutation&#39;vc.17.0.0.3" expl="precondition" proved="true">
+     <proof prover="3"><result status="valid" time="0.040366" steps="112587"/></proof>
+     </goal>
+    </transf>
+    </goal>
+   </transf>
+   </goal>
+  </transf>
+  </goal>
+  <goal name="permutation&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.036567" steps="78869"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.19" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.011980" steps="31869"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.20" expl="variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.029057" steps="71874"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.21" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.279799" steps="41779"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.22" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.030036" steps="87196"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.23" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.183908" steps="27574"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.24" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.032897" steps="73695"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.25" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.688056" steps="110500"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.26" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.059464" steps="116683"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.27" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.041004" steps="82420"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.28" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.073110" steps="116635"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.29" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.034765" steps="82534"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.30" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.043491" steps="82240"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.31" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.036739" steps="82288"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.32" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.036235" steps="82295"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.33" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.041438" steps="82336"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.34" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.041928" steps="80994"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.35" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.033764" steps="69028"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.36" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.040246" steps="76740"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.37" expl="unreachable point" proved="true">
+  <proof prover="3"><result status="valid" time="0.044959" steps="77911"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.38" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.013005" steps="7948"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.39" expl="assertion" proved="true">
+  <proof prover="3"><result status="valid" time="0.033711" steps="69719"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.40" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.032781" steps="70327"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.41" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.030999" steps="73772"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.42" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.034981" steps="101403"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.43" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.028932" steps="73033"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.44" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.009766" steps="7839"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.45" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.015951" steps="7801"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.46" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.030886" steps="66453"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.47" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.014202" steps="7903"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.48" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.013937" steps="7914"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.49" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.040202" steps="67725"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.50" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.039861" steps="71231"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.51" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.035773" steps="71455"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.52" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.039134" steps="71345"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.53" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.037278" steps="71569"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.54" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.038549" steps="71374"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.55" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.038765" steps="71423"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.56" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.043094" steps="71465"/></proof>
+  </goal>
+  <goal name="permutation&#39;vc.57" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.038583" steps="71506"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="MapInjection">
+ <goal name="injective_surjective">
+ </goal>
+ <goal name="injection_occ">
+ </goal>
+</theory>
+</file>
+</why3session>

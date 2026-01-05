@@ -13,35 +13,27 @@ Sub-goal Assertion of goal f'vc.
 Prover result is: Unknown (unknown) (15 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File func_call4_mono.mlw:
   Line 6:
     Constant z initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {c= 0}
-    z = {c= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { c = 0 }
+    z = { c = 0 }
 Unknown location:
     _ = ()
 File func_call4_mono.mlw:
   Line 12:
     _ = ()
     Execution of main function `f` with env:
-      z = {c= 0}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ z = { c = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 13:
-    Normal execution of function `Tuple0` with args:
-    (giant-step) execution of unimplemented function `g`
-      _ = ()
-    z = {c= 2}
+    Normal execution of function `Tuple0` with args: []
+    (giant-step) execution of unimplemented function `g` with args:
+      [ _ = () ]
+    z = { c = 2 }
     result of `g` = ()
-    Property failure at assertion with:
-      z = {c= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { c = 2 }, _ = (), _ = (), _ = () ];
+        rsenv = []; idenv = [ z = { c = 2 } ] }
 

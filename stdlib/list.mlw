@@ -512,12 +512,11 @@ module Distinct
   use List
   use Mem
 
-  inductive distinct (l: list 'a) =
-    | distinct_zero: distinct (Nil: list 'a)
-    | distinct_one : forall x:'a. distinct (Cons x Nil)
-    | distinct_many:
-        forall x:'a, l: list 'a.
-        not (mem x l) -> distinct l -> distinct (Cons x l)
+  predicate distinct (l: list 'a) =
+    match l with
+    | Nil | Cons _ Nil -> true
+    | Cons x xs -> not (mem x xs) /\ distinct xs
+    end
 
   use Append
 

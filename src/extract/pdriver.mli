@@ -46,25 +46,25 @@ val load_driver : Whyconf.main -> Env.env -> string -> string list -> driver
       @param string driver file name
       @param string list additional drivers containing only theories/modules *)
 
-type filename_generator = ?fname:string -> Pmodule.pmodule -> string
+type filename_generator = ?fname:string -> Pmodule.pmodule0 -> string
 
 type decl_printer =
   printer_args -> ?old:in_channel -> ?fname:string ->
-  Pmodule.pmodule -> Mltree.decl Pp.pp
+  Pmodule.pmodule0 -> Mltree.decl Pp.pp
 
 (** Things to print as header/footer. *)
 type border_printer =
   printer_args -> ?old:in_channel -> ?fname:string ->
-  Pmodule.pmodule Pp.pp
+  Pmodule.pmodule0 Pp.pp
 
 (** Things to do at the beginning of a module, e.g. open/#include.
     Only used in modular extraction. *)
 type prelude_printer =
   printer_args -> ?old:in_channel -> ?fname:string ->
-  deps:Pmodule.pmodule list ->
+  deps:Pmodule.pmodule0 list ->
   global_prelude:Printer.prelude ->
   prelude:Printer.prelude ->
-  Pmodule.pmodule Pp.pp
+  Pmodule.pmodule0 Pp.pp
 
 type file_printer = {
   filename_generator : filename_generator;

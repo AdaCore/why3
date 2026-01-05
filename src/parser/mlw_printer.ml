@@ -1251,8 +1251,10 @@ let pp_mlw_file ?(attr=true) fmt = function
   | Decls decls ->
       pp_decls ~attr fmt decls
   | Modules modules ->
-      let pp_module fmt (id, decls) =
-        fprintf fmt "@[<v0>@[<v2>module %a@ %a@]@ end@]"
-          (pp_id ~attr) id (pp_decls ~attr) decls in
+      let pp_module fmt (id, intf, decls) =
+        fprintf fmt "@[<v0>@[<v2>module %a%a@ %a@]@ end@]"
+          (pp_id ~attr) id
+          (pp_opt ~prefix:" : " (pp_qualid ~attr)) intf
+          (pp_decls ~attr) decls in
       let pp_modules = pp_print_list ~pp_sep:(pp_sep "@\n@\n") pp_module in
       fprintf fmt "@[<v>%a@]" pp_modules modules

@@ -249,7 +249,7 @@ let find_module_path mm path m =
     match path with
     | [] -> Mstr.find m mm
     | path -> let mm = Env.read_library Pmodule.mlw_language env path in
-              mod_impl env (Mstr.find m mm)
+              (Mstr.find m mm).mod_impl
   with Not_found ->
     raise (UnknownModule m)
 
@@ -386,7 +386,7 @@ let read_mlw_file ?format env fname =
   let cin = open_in fname in
   let mm = Env.read_channel ?format mlw_language env fname cin in
   close_in cin;
-  Mstr.map (mod_impl env) mm
+  Mstr.map (fun m -> m.mod_impl) mm
 
 let do_modular target =
   let format = !opt_parser in

@@ -2,9 +2,9 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Eprover" version="2.0" timelimit="30" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="proper_cuts.mlw"/>
 <theory name="ProperCut" proved="true">
@@ -41,7 +41,7 @@
      <proof prover="1"><result status="valid" time="0.122922" steps="22602"/></proof>
      </goal>
      <goal name="proper_cuts&#39;vc.1.1.0.2" expl="VC for proper_cuts" proved="true">
-     <proof prover="0"><result status="valid" time="0.684054"/></proof>
+     <proof prover="3"><result status="valid" time="1.745628" steps="121424"/></proof>
      </goal>
     </transf>
     </goal>

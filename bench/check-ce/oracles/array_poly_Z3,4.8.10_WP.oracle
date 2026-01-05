@@ -10,28 +10,17 @@ Sub-goal Index in array bounds of goal f1'vc.
 Prover result is: Step limit exceeded (3000017 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File array_poly.mlw:
   Line 7:
     a = []
     a = []
     Execution of main function `f1` with env:
-      a = []
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = [] ]; rsenv = []; idenv = [] }
   Line 8:
-    Normal execution of function `([])` with args:
-      a = []
-      i = 0
-    Property failure at precondition of `([])` with:
-      a = []
-      i = 0
+    Normal execution of function `([])` with args: [ a = [], i = 0 ]
+    Property failure at precondition of `([])` with env:
+      { lsenv = []; vsenv = [ a = [], i = 0, a = [], o = 0 ]; rsenv = [];
+        idenv = [ a = [], i = 0 ] }
 
 File "bench/check-ce/array_poly.mlw", line 13, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.

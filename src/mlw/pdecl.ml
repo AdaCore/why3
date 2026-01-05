@@ -725,7 +725,7 @@ let check_match kn d =
   let rec check_term () t = match t.t_node with
     | Tcase (t1,bl) ->
         let pat b = let p,_ = t_open_branch b in [p] in
-        Loc.try2 ?loc:t.t_loc check [t1] (List.map pat bl);
+        Loc.try2 ?loc:(t_loc t) check [t1] (List.map pat bl);
         t_fold check_term () t
     | _ -> t_fold check_term () t in
   let check_term t = check_term () t in
