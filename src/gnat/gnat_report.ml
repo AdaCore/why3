@@ -15,16 +15,18 @@ type result_info =
   | Not_Proved of
        Gnat_expl.extra_info *
        (Model_parser.model * Check_ce.rac_result option) list *
-       (string * string) option
+       (string * string) option *
+        Gnat_expl.unproved_status
 
 type msg =
-  { result         : bool;
-    stats          : stats option;
-    stats_checker  : int;
-    check_tree     : Json_base.json;
-    extra_info     : Gnat_expl.extra_info;
-    cntexmp_models : (Model_parser.model * Check_ce.rac_result option) list;
-    manual_proof   : (string * string) option
+  { result           : bool;
+    stats            : stats option;
+    stats_checker    : int;
+    check_tree       : Json_base.json;
+    extra_info       : Gnat_expl.extra_info;
+    cntexmp_models   : (Model_parser.model * Check_ce.rac_result option) list;
+    manual_proof     : (string * string) option;
+    unproved_status : Gnat_expl.unproved_status
   }
 
 let msg_set : msg Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
@@ -55,16 +57,17 @@ let adapt_stats statsopt =
       Some newstats
 
 let register check check_tree result =
-  let valid, extra_info, stats, models, manual =
+  let valid, extra_info, stats, models, manual, unproved_status =
     match result with
     | Proved (stats, stats_checker) ->
         true,
         {Gnat_expl.pretty_node = None; inlined = None},
         Some (stats, stats_checker),
         [],
-        None
-    | Not_Proved (extra_info, models, manual) ->
-        false, extra_info, None, models, manual
+        None,
+        Gnat_expl.Unknown
+    | Not_Proved (extra_info, models, manual, unproved_status) ->
+        false, extra_info, None, models, manual, unproved_status
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
@@ -77,11 +80,12 @@ let register check check_tree result =
       stats_checker  = Option.value ~default:0 stats_checker;
       check_tree     = check_tree;
       cntexmp_models = models;
-      manual_proof   = manual } in
+      manual_proof   = manual;
+      unproved_status = unproved_status } in
     Gnat_expl.HCheck.add msg_set check msg
   end
 
-let get_cntexmp_models = 
+let get_cntexmp_models =
   List.map (function
   (m, r) ->
       let json_result_state (state, _log) =
@@ -161,6 +165,23 @@ let get_extra_info i =
         "inline", Int (opt_int inline)
       ]
 
+let get_unproved_status status =
+  let status, time, steps, memory =
+    match status with
+    | Gnat_expl.Unknown ->
+        "unknown", false, false, false
+    | Gnat_expl.Gave_up ->
+        "gave_up", false, false, false
+    | Gnat_expl.Limit { timeout; step; memory } ->
+        "limit", timeout, step, memory
+  in
+  Record [
+    "status", String status;
+    "time", Bool time;
+    "steps", Bool steps;
+    "memory", Bool memory
+  ]
+
 let get_msg (check, m) =
   Record (
     List.concat [
@@ -168,7 +189,8 @@ let get_msg (check, m) =
         "check_kind", String (Gnat_expl.check_kind_to_ada check.Gnat_expl.check_kind) ;
         "result", Bool m.result ;
         "check_tree", m.check_tree ;
-        "extra_info", get_extra_info m.extra_info
+        "extra_info", get_extra_info m.extra_info ;
+        "unproved_status", get_unproved_status m.unproved_status
       ] ;
       get_stats (m.stats, m.stats_checker);
       ["cntexmps", List (get_cntexmp_models m.cntexmp_models)];
