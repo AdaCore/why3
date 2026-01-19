@@ -231,6 +231,17 @@ type ident_printer = {
 
 (* name is already sanitized *)
 let find_unique indices name =
+  let name =
+    let last_non_num_index =
+      let rec aux i =
+        if i < 0 then -1 else
+        match name.[i] with
+        | '0'..'9' -> aux (pred i)
+        | _ -> i
+      in aux (String.length name - 1)
+    in
+    String.sub name 0 (last_non_num_index + 1)
+  in
   let specname ind =
     (* If the symbol is infix/prefix *and* the name has not been
        sanitized for provers, we don't want to disambiguate with
