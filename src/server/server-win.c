@@ -592,12 +592,13 @@ void schedule_new_jobs() {
   }
 }
 
-void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {
+void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, LPOVERLAPPED ov) {
    DWORD exitcode;
    bool timeout;
    FILETIME ft_start, ft_stop, ft_system, ft_user;
    ULARGE_INTEGER ull_system, ull_user;
    double cpu_time;
+   DWORD triggering_pid = (DWORD)(uintptr_t)ov;
    switch (event) {
       //creation of a new process can be ignored
       case JOB_OBJECT_MSG_NEW_PROCESS:
@@ -613,6 +614,10 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) 
       //normal exit
       case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
+         if (triggering_pid != GetProcessId(child->handle)) {
+             // It was a grandchild or helper process. Ignore it.
+             return;
+         }
          // This wait is necessary to be sure that the handles of the child
          // process have been closed. In measurements, the wait takes a couple
          // of milliseconds.
@@ -754,7 +759,7 @@ int main(int argc, char **argv) {
             if (proc != NULL) {
                client = (pclient) list_lookup(clients, proc->client_key);
                if (client != NULL) {
-                  handle_child_event(proc, client, key, numbytes);
+                  handle_child_event(proc, client, key, numbytes, ov);
                }
             }
             break;
