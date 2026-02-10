@@ -605,17 +605,16 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, 
    switch (event) {
       //creation of a new process can be ignored
       case JOB_OBJECT_MSG_NEW_PROCESS:
-         return;
-
-      //violation of some limit
       case JOB_OBJECT_MSG_END_OF_JOB_TIME:
+      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
+      // violations are just notifications, we will get an exit event later
       case JOB_OBJECT_MSG_END_OF_PROCESS_TIME:
       case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT:
       case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT:
-      //some error
+         return;
+
+      //  only exit events need to be handled explicitly
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
-      //normal exit
-      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
          if (triggering_pid != GetProcessId(child->handle)) {
              // It was a grandchild or helper process. Ignore it.
