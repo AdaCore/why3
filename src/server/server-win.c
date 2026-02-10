@@ -368,19 +368,22 @@ void run_request (prequest r) {
            }
        }
    }
-   if (r->timeout!=0||r->memlimit!=0) {
+
+   // Always configure job object to terminate children when server exits
+   {
      LONGLONG timeout;
      ZeroMemory(&limits, sizeof(limits));
-     limits.BasicLimitInformation.LimitFlags =
-       ((r->timeout==0)?0:JOB_OBJECT_LIMIT_PROCESS_TIME)
-       |((r->memlimit==0)?0:JOB_OBJECT_LIMIT_PROCESS_MEMORY);
+     limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 
-     // seconds to W32 kernel ticks
+     // Add optional timeout and memory limits if specified
      if (r->timeout!=0) {
+       limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_PROCESS_TIME;
+       // seconds to W32 kernel ticks
        timeout = 1000LL * 1000LL * 10LL * (LONGLONG)r->timeout;
        limits.BasicLimitInformation.PerProcessUserTimeLimit.QuadPart=timeout;
      }
      if (r->memlimit!=0) {
+       limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_PROCESS_MEMORY;
        size_t memory = 1024 * 1024 * (size_t)r->memlimit;
        limits.ProcessMemoryLimit = memory;
      }
