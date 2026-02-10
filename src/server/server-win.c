@@ -616,17 +616,27 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, 
       //  only exit events need to be handled explicitly
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
-         if (triggering_pid != GetProcessId(child->handle)) {
-             // It was a grandchild or helper process. Ignore it.
-             return;
+         {
+            DWORD pid = GetProcessId(child->handle);
+            if (pid == 0) {
+               shutdown_with_msg("GetProcessId failed");
+            }
+            if (triggering_pid != pid) {
+               // It was a grandchild or helper process. Ignore it.
+               return;
+            }
          }
          // This wait is necessary to be sure that the handles of the child
          // process have been closed. In measurements, the wait takes a couple
          // of milliseconds.
          WaitForSingleObject(child->handle, INFINITE);
          list_remove(processes, proc_key);
-         GetExitCodeProcess(child->handle, (LPDWORD) &exitcode);
-         GetProcessTimes(child->handle, &ft_start, &ft_stop, &ft_system, &ft_user);
+         if (!GetExitCodeProcess(child->handle, (LPDWORD) &exitcode)) {
+            shutdown_with_msg("GetExitCodeProcess failed");
+         }
+         if (!GetProcessTimes(child->handle, &ft_start, &ft_stop, &ft_system, &ft_user)) {
+            shutdown_with_msg("GetProcessTimes failed");
+         }
          ull_system.LowPart = ft_system.dwLowDateTime;
          ull_system.HighPart = ft_system.dwHighDateTime;
          ull_user.LowPart = ft_user.dwLowDateTime;
