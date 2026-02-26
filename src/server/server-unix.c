@@ -69,6 +69,7 @@ plist clients;
 char *current_dir;
 
 static int cpipe[2];
+static volatile sig_atomic_t shutdown_requested = 0;
 
 void shutdown_with_msg(char* msg);
 
@@ -163,14 +164,17 @@ void server_accept_client() {
 
 // Handling of termination
 void sigterm_handler(int sig) {
-  shutdown_with_msg("");
+  shutdown_requested = 1;
+  // Wake up the main loop via the self-pipe
+  char c = 1;
+  write(cpipe[1], &c, 1);
 }
 
 void set_sigterm_handler() {
   struct sigaction sa;
   sigemptyset (&sa.sa_mask);
   sa.sa_handler = &sigterm_handler;
-  sa.sa_flags = 0;
+  sa.sa_flags = SA_RESTART;
   if (sigaction(SIGTERM, &sa, NULL) == -1) {
     shutdown_with_msg("error installing signal handler");
   }
@@ -178,6 +182,9 @@ void set_sigterm_handler() {
     shutdown_with_msg("error installing signal handler");
   }
   if (sigaction(SIGINT, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
+  if (sigaction(SIGQUIT, &sa, NULL) == -1) {
     shutdown_with_msg("error installing signal handler");
   }
 }
@@ -656,12 +663,16 @@ int main(int argc, char **argv) {
       if (cur->revents == 0) {
         continue;
       }
-      // a child has terminated
+      // a child has terminated or shutdown was requested
       if (cur->fd == cpipe[0]) {
         while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR)
           continue;
         if (res == -1) {
           shutdown_with_msg("call to read shouldn't fail");
+        }
+        // Check if shutdown was requested via signal
+        if (shutdown_requested) {
+          shutdown_with_msg("termination signal received");
         }
         handle_child_events();
         continue;
