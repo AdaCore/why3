@@ -369,19 +369,22 @@ void run_request (prequest r) {
            }
        }
    }
-   if (r->timeout!=0||r->memlimit!=0) {
+
+   // Always configure job object to terminate children when server exits
+   {
      LONGLONG timeout;
      ZeroMemory(&limits, sizeof(limits));
-     limits.BasicLimitInformation.LimitFlags =
-       ((r->timeout==0)?0:JOB_OBJECT_LIMIT_PROCESS_TIME)
-       |((r->memlimit==0)?0:JOB_OBJECT_LIMIT_PROCESS_MEMORY);
+     limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 
-     // seconds to W32 kernel ticks
+     // Add optional timeout and memory limits if specified
      if (r->timeout!=0) {
+       limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_PROCESS_TIME;
+       // seconds to W32 kernel ticks
        timeout = 1000LL * 1000LL * 10LL * (LONGLONG)r->timeout;
        limits.BasicLimitInformation.PerProcessUserTimeLimit.QuadPart=timeout;
      }
      if (r->memlimit!=0) {
+       limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_PROCESS_MEMORY;
        size_t memory = 1024 * 1024 * (size_t)r->memlimit;
        limits.ProcessMemoryLimit = memory;
      }
@@ -593,34 +596,48 @@ void schedule_new_jobs() {
   }
 }
 
-void handle_child_event(pproc child, pclient client, int proc_key, DWORD event) {
+void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, LPOVERLAPPED ov) {
    DWORD exitcode;
    bool timeout;
    FILETIME ft_start, ft_stop, ft_system, ft_user;
    ULARGE_INTEGER ull_system, ull_user;
    double cpu_time;
+   DWORD triggering_pid = (DWORD)(uintptr_t)ov;
    switch (event) {
       //creation of a new process can be ignored
       case JOB_OBJECT_MSG_NEW_PROCESS:
-         return;
-
-      //violation of some limit
       case JOB_OBJECT_MSG_END_OF_JOB_TIME:
+      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
+      // violations are just notifications, we will get an exit event later
       case JOB_OBJECT_MSG_END_OF_PROCESS_TIME:
       case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT:
       case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT:
-      //some error
+         return;
+
+      //  only exit events need to be handled explicitly
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
-      //normal exit
-      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
+         {
+            DWORD pid = GetProcessId(child->handle);
+            if (pid == 0) {
+               shutdown_with_msg("GetProcessId failed");
+            }
+            if (triggering_pid != pid) {
+               // It was a grandchild or helper process. Ignore it.
+               return;
+            }
+         }
          // This wait is necessary to be sure that the handles of the child
          // process have been closed. In measurements, the wait takes a couple
          // of milliseconds.
          WaitForSingleObject(child->handle, INFINITE);
          list_remove(processes, proc_key);
-         GetExitCodeProcess(child->handle, (LPDWORD) &exitcode);
-         GetProcessTimes(child->handle, &ft_start, &ft_stop, &ft_system, &ft_user);
+         if (!GetExitCodeProcess(child->handle, (LPDWORD) &exitcode)) {
+            shutdown_with_msg("GetExitCodeProcess failed");
+         }
+         if (!GetProcessTimes(child->handle, &ft_start, &ft_stop, &ft_system, &ft_user)) {
+            shutdown_with_msg("GetProcessTimes failed");
+         }
          ull_system.LowPart = ft_system.dwLowDateTime;
          ull_system.HighPart = ft_system.dwHighDateTime;
          ull_user.LowPart = ft_user.dwLowDateTime;
@@ -704,7 +721,7 @@ int main(int argc, char **argv) {
                                       &mskey,
                                       &ov,
                                       INFINITE);
-      if (mskey == 0) {
+      if (!res && ov == NULL) {
         shutdown_with_msg("GetQueuedCompletionStatus failed");
       }
       key = key_of_ms_key(mskey);
@@ -755,7 +772,7 @@ int main(int argc, char **argv) {
             if (proc != NULL) {
                client = (pclient) list_lookup(clients, proc->client_key);
                if (client != NULL) {
-                  handle_child_event(proc, client, key, numbytes);
+                  handle_child_event(proc, client, key, numbytes, ov);
                }
             }
             break;
