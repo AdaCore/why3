@@ -162,7 +162,7 @@ void server_accept_client() {
 }
 
 // Handling of termination
-void sigterm_handler(int sig) {
+void sigterm_handler(__attribute__((unused)) int sig) {
   shutdown_requested = 1;
   // Wake up the main loop via the self-pipe
   char c = 1;
@@ -191,7 +191,7 @@ void set_sigterm_handler() {
 // The next two functions implement the "self pipe trick". A pipe is used as
 // boolean information whether child processes have terminated. The code is
 // "data to read on the pipe" = "child processes have terminated"
-static void sigchld_handle(int sig) {
+static void sigchld_handle(__attribute__((unused)) int sig) {
   int saved_errno;
   saved_errno = errno;
   if (write(cpipe[1], "x", 1) == -1 && errno != EAGAIN && errno != EINTR) {
