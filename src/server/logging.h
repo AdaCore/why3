@@ -14,6 +14,6 @@
 void init_logging();
 
 void log_msg(char* s, ...) __attribute__ ((format (printf, 1, 2)));
-void logging_shutdown(char* s);
+void logging_shutdown(char* s) __attribute__((noreturn));
 
 #endif
