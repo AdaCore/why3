@@ -132,6 +132,27 @@ void send_msg_to_client(int key,
 //
 void send_started_msg_to_client(int key, pclient client, char* id);
 //send msg to [client] that the VC [id] has been started
+void close_client(pclient client, int key);
+
+void free_server_socket(pserver server) {
+   if (server == NULL) {
+      return;
+   }
+   if (server->connect.hEvent != NULL) {
+      CloseHandle(server->connect.hEvent);
+   }
+   if (server->handle != INVALID_HANDLE_VALUE) {
+      CloseHandle(server->handle);
+   }
+   free(server);
+}
+
+bool is_transient_connect_error(DWORD err) {
+   return err == ERROR_NO_DATA ||
+             err == ERROR_BROKEN_PIPE ||
+             err == ERROR_PIPE_NOT_CONNECTED ||
+             err == ERROR_OPERATION_ABORTED;
+}
 
 void add_to_completion_port(HANDLE h, ULONG_PTR key) {
    HANDLE tmp = CreateIoCompletionPort(h, completion_port, key, 1);
@@ -167,40 +188,65 @@ void try_write(pclient client) {
 // create a server socket and store it in the ith component of the
 // server_socket array
 void create_server_socket (int socket_num) {
-   pserver server;
-   int key = keygen();
-   server = (pserver) malloc(sizeof(t_server));
-   server->handle = CreateNamedPipe(
-      pipe_name,
-      PIPE_ACCESS_DUPLEX |
-      FILE_FLAG_OVERLAPPED,     // non-blocking IO
-      PIPE_TYPE_MESSAGE |       // message-type pipe
-      PIPE_READMODE_MESSAGE |   // message read mode
-      PIPE_WAIT,                // blocking mode
-      PIPE_UNLIMITED_INSTANCES, // number of instances
-      BUFSIZE*sizeof(TCHAR),    // output buffer size
-      BUFSIZE*sizeof(TCHAR),    // input buffer size
-      5000,                     // client time-out
-      NULL);
-   if (server->handle == INVALID_HANDLE_VALUE) {
-      exit(1);
-   }
-   add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
-   ZeroMemory(&server->connect, sizeof(OVERLAPPED));
-   server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
-   server_socket[socket_num] = server;
-   server_key[socket_num] = key;
-   if (!ConnectNamedPipe(server->handle, (LPOVERLAPPED) &server->connect)) {
-      DWORD err = GetLastError();
-      if (err == ERROR_IO_PENDING) {
-         //this is the state we want: server socket is waiting
-         return;
-      } else if (err == ERROR_PIPE_CONNECTED) {
-        //connection works, ignore
-        ;
-      } else {
-        shutdown_with_msg("error connecting to socket");
+   while (1) {
+      pserver server;
+      int key = keygen();
+      server = (pserver) malloc(sizeof(t_server));
+      server->handle = CreateNamedPipe(
+         pipe_name,
+         PIPE_ACCESS_DUPLEX |
+         FILE_FLAG_OVERLAPPED,     // non-blocking IO
+         PIPE_TYPE_MESSAGE |       // message-type pipe
+         PIPE_READMODE_MESSAGE |   // message read mode
+         PIPE_WAIT,                // blocking mode
+         PIPE_UNLIMITED_INSTANCES, // number of instances
+         BUFSIZE*sizeof(TCHAR),    // output buffer size
+         BUFSIZE*sizeof(TCHAR),    // input buffer size
+         5000,                     // client time-out
+         NULL);
+      if (server->handle == INVALID_HANDLE_VALUE) {
+         exit(1);
       }
+      add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
+      ZeroMemory(&server->connect, sizeof(OVERLAPPED));
+      server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
+      if (server->connect.hEvent == NULL) {
+         shutdown_with_msg("error creating connect event");
+      }
+
+      if (!ConnectNamedPipe(server->handle, (LPOVERLAPPED) &server->connect)) {
+         DWORD err = GetLastError();
+         if (err == ERROR_IO_PENDING) {
+            // This is the normal state: the server socket is waiting.
+            server_socket[socket_num] = server;
+            server_key[socket_num] = key;
+            return;
+         } else if (err == ERROR_PIPE_CONNECTED) {
+            // A client connected between CreateNamedPipe and ConnectNamedPipe.
+            // In this case no completion is queued automatically, so queue one
+            // ourselves to make sure this connected instance is accepted.
+            server_socket[socket_num] = server;
+            server_key[socket_num] = key;
+            if (!PostQueuedCompletionStatus(completion_port,
+                                            0,
+                                            to_ms_key(key, SOCKET),
+                                            (LPOVERLAPPED) &server->connect)) {
+               shutdown_with_msg("error posting connected socket event");
+            }
+            return;
+         } else if (is_transient_connect_error(err)) {
+            // Rapid connect/disconnect race: recycle this socket instance.
+            free_server_socket(server);
+            continue;
+         } else {
+            shutdown_with_msg("error connecting to socket");
+         }
+      }
+
+      // ConnectNamedPipe may also complete synchronously.
+      server_socket[socket_num] = server;
+      server_key[socket_num] = key;
+      return;
    }
 }
 
@@ -427,8 +473,6 @@ void run_request (prequest r) {
    proc->client_key = r->key;
    proc->outfile    = outfile;
    key              = keygen();
-   list_append(processes, key, (void*) proc);
-   send_started_msg_to_client(r->key, client, r->id);
    portassoc.CompletionKey = (void*) to_ms_key(key, PROCESS);
    portassoc.CompletionPort = completion_port;
    if (!SetInformationJobObject
@@ -438,6 +482,9 @@ void run_request (prequest r) {
           sizeof( portassoc ) ) ) {
      shutdown_with_msg( "Could not associate job with IO completion port");
    }
+
+    list_append(processes, key, (void*) proc);
+    send_started_msg_to_client(r->key, client, r->id);
 
    /* Let's resume the process */
    ResumeThread(pi.hThread);
@@ -460,6 +507,9 @@ void handle_queue_remove(prequest r) {
 
 void handle_msg(pclient client, int key) {
    prequest r;
+   if (client->readbuf->len == 0) {
+      return;
+   }
    //the read buffer also contains the newline, skip it
    r = parse_request(client->readbuf->data, client->readbuf->len - 1, key);
    if (r) {
@@ -485,14 +535,31 @@ void handle_msg(pclient client, int key) {
    }
 }
 
-void do_read(pclient client) {
+void do_read(pclient client, int key) {
+   BOOL res;
    DWORD has_read;
    char* buf = prepare_read(client->readbuf, READ_ONCE);
-   ReadFile(client->handle,
-            buf,
-            READ_ONCE,
-            &has_read,
-            (LPOVERLAPPED) &client->read);
+   res = ReadFile(client->handle,
+                  buf,
+                  READ_ONCE,
+                  &has_read,
+                  (LPOVERLAPPED) &client->read);
+   if (!res) {
+      DWORD err = GetLastError();
+      if (err == ERROR_IO_PENDING) {
+         return;
+      }
+      if (is_transient_connect_error(err) || err == ERROR_BROKEN_PIPE) {
+         close_client(client, key);
+      }
+      return;
+   }
+
+   // ReadFile can complete synchronously. If peer already closed, no bytes are
+   // read and no useful work remains for this client.
+   if (has_read == 0) {
+      close_client(client, key);
+   }
 }
 
 // the server socket with [key] and whose handle is stored in the [socket_num]
@@ -505,11 +572,14 @@ void accept_client(int key, int socket_num) {
    client->writebuf = init_writebuf(16);
    init_connect_data(&(client->read), READOP);
    init_connect_data(&(client->write), WRITEOP);
+   if (server_socket[socket_num]->connect.hEvent != NULL) {
+      CloseHandle(server_socket[socket_num]->connect.hEvent);
+   }
    free(server_socket[socket_num]);
    create_server_socket(socket_num);
    list_append(clients, key, (void*)client);
    log_msg("accepted client %d", key);
-   do_read(client);
+   do_read(client, key);
 }
 
 void send_started_msg_to_client(int key,
@@ -577,6 +647,12 @@ void close_client(pclient client, int key) {
   // we remove and kill all running requests for this client
   kill_processes(key, NULL);
   list_remove(clients, key);
+   if (client->read.overlap.hEvent != NULL) {
+      CloseHandle(client->read.overlap.hEvent);
+   }
+   if (client->write.overlap.hEvent != NULL) {
+      CloseHandle(client->write.overlap.hEvent);
+   }
   CloseHandle(client->handle);
   free_readbuf(client->readbuf);
   free_writebuf(client->writebuf);
@@ -606,7 +682,6 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, 
       //creation of a new process can be ignored
       case JOB_OBJECT_MSG_NEW_PROCESS:
       case JOB_OBJECT_MSG_END_OF_JOB_TIME:
-      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       // memory violations are just notifications, we will get an exit event later
       case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT:
       case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT:
@@ -615,17 +690,21 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, 
       // process time limit: the process has already been terminated by Windows,
       // but a subsequent EXIT event is not guaranteed to arrive, so handle it here
       case JOB_OBJECT_MSG_END_OF_PROCESS_TIME:
+      // for explicit TerminateJobObject, some systems report only this event
+      case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
       //  exit events need to be handled explicitly
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
          {
-            DWORD pid = GetProcessId(child->handle);
-            if (pid == 0) {
-               shutdown_with_msg("GetProcessId failed");
-            }
-            if (triggering_pid != pid) {
-               // It was a grandchild or helper process. Ignore it.
-               return;
+            if (event != JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO) {
+               DWORD pid = GetProcessId(child->handle);
+               if (pid == 0) {
+                  shutdown_with_msg("GetProcessId failed");
+               }
+               if (triggering_pid != pid) {
+                  // It was a grandchild or helper process. Ignore it.
+                  return;
+               }
             }
          }
          // This wait is necessary to be sure that the handles of the child
@@ -683,6 +762,7 @@ void init() {
 
    init_logging();
    for (int i = 0; i < parallel; i++) {
+      server_socket[i] = NULL;
       create_server_socket(i);
    }
    free(socketname_copy);
@@ -731,8 +811,19 @@ int main(int argc, char **argv) {
       switch (kind) {
          case SOCKET:
             if (server_num != -1) {
-               if (!res && GetLastError () != ERROR_PIPE_CONNECTED) {
-                  shutdown_with_msg("error connecting client");
+               if (!res) {
+                  DWORD err = GetLastError();
+                  if (err == ERROR_PIPE_CONNECTED) {
+                     accept_client(key, server_num);
+                  } else if (is_transient_connect_error(err)) {
+                     if (server_socket[server_num] != NULL) {
+                        free_server_socket(server_socket[server_num]);
+                        server_socket[server_num] = NULL;
+                     }
+                     create_server_socket(server_num);
+                  } else {
+                     shutdown_with_msg("error connecting client");
+                  }
                } else {
                   accept_client(key, server_num);
                }
@@ -748,16 +839,23 @@ int main(int argc, char **argv) {
                case READOP:
                   have_read(client->readbuf, numbytes);
                   if (res) {
+                     if (numbytes == 0) {
+                        close_client(client, key);
+                        break;
+                     }
                      // we can be sure that we have read a single message
                      // entirely, that's how ReadFile works on pipes
                      handle_msg(client, key);
                      clear_readbuf(client->readbuf);
-                     do_read(client);
-                  } else if
-                     (numbytes == 0 && GetLastError() == ERROR_BROKEN_PIPE) {
-                     close_client(client, key);
+                     do_read(client, key);
                   } else {
-                     do_read(client);
+                     DWORD err = GetLastError();
+                     if ((numbytes == 0 && err == ERROR_BROKEN_PIPE) ||
+                         is_transient_connect_error(err)) {
+                        close_client(client, key);
+                     } else {
+                        do_read(client, key);
+                     }
                   }
                   break;
                case WRITEOP:
