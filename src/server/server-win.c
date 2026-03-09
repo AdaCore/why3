@@ -608,13 +608,15 @@ void handle_child_event(pproc child, pclient client, int proc_key, DWORD event, 
       case JOB_OBJECT_MSG_NEW_PROCESS:
       case JOB_OBJECT_MSG_END_OF_JOB_TIME:
       case JOB_OBJECT_MSG_ACTIVE_PROCESS_ZERO:
-      // violations are just notifications, we will get an exit event later
-      case JOB_OBJECT_MSG_END_OF_PROCESS_TIME:
+      // memory violations are just notifications, we will get an exit event later
       case JOB_OBJECT_MSG_JOB_MEMORY_LIMIT:
       case JOB_OBJECT_MSG_PROCESS_MEMORY_LIMIT:
          return;
 
-      //  only exit events need to be handled explicitly
+      // process time limit: the process has already been terminated by Windows,
+      // but a subsequent EXIT event is not guaranteed to arrive, so handle it here
+      case JOB_OBJECT_MSG_END_OF_PROCESS_TIME:
+      //  exit events need to be handled explicitly
       case JOB_OBJECT_MSG_ABNORMAL_EXIT_PROCESS:
       case JOB_OBJECT_MSG_EXIT_PROCESS:
          {
