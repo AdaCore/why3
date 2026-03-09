@@ -16,7 +16,13 @@ workflow:
 
 stages:
   - build
+  - test
   - check
+
+variables:
+  WHY3_PACKAGE_BASE_NAME: why3.tar.gz
+  WHY3_PACKAGE_ABSOLUTE_NAME: $CI_PROJECT_DIR/$WHY3_PACKAGE_BASE_NAME
+  WHY3_PACKAGE_EXPORT: /tmp/why3-export
 
 .common_test:
   stage: build
@@ -33,6 +39,11 @@ stages:
     # Go to the sandbox dir
     - cd $ANOD_DEFAULT_SANDBOX_DIR
     - anod build why3 --latest
+    - anod-copy-components --standalone-export $ANOD_DEFAULT_SANDBOX_DIR $WHY3_PACKAGE_EXPORT
+    - tar czf $WHY3_PACKAGE_ABSOLUTE_NAME -C / $WHY3_PACKAGE_EXPORT
+  artifacts:
+    paths:
+      - $WHY3_PACKAGE_BASE_NAME
 
 linux:
   extends: .common_test
@@ -48,6 +59,45 @@ windows:
     - cpu:2
     - mem:4
     - disk:100
+
+.common_server_test:
+  stage: test
+  interruptible: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+    - when: never
+  script:
+    # Move the package so generic_anod_ci doesn't pick it up as a VCS change
+    - if [ -f $WHY3_PACKAGE_ABSOLUTE_NAME ] ; then mv $WHY3_PACKAGE_ABSOLUTE_NAME /tmp ; fi
+    # Set up the anod environment (needed for anod-copy-components and anod printenv)
+    - generic_anod_ci $GENERIC_ANOD_CI_OPTIONS
+    - cat /tmp/ci_env.sh
+    - . /tmp/ci_env.sh
+    # Go to the sandbox dir
+    - cd $ANOD_DEFAULT_SANDBOX_DIR
+    # Extract the built artifact (no anod build needed)
+    - tar zxf /tmp/$WHY3_PACKAGE_BASE_NAME -C /
+    - anod-copy-components $WHY3_PACKAGE_EXPORT $ANOD_DEFAULT_SANDBOX_DIR
+    - anod install why3
+    - eval `anod printenv why3`
+    # Run the test
+    - python $CI_PROJECT_DIR/test_server.py
+
+linux_server_test:
+  extends: .common_server_test
+  needs: [linux]
+  services:
+    - image:pe-base
+    - cpu:4
+
+windows_server_test:
+  extends: .common_server_test
+  needs: [windows]
+  services:
+    - image:e3-windows-2022
+    - platform:x86_64-windows-2022
+    - cpu:4
 
 submodule:
   stage: build
