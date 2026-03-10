@@ -667,8 +667,7 @@ int main(int argc, char **argv) {
   while (1) {
     schedule_new_jobs();
     poll_list_clean();
-    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
-      continue;
+    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR);
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
@@ -679,8 +678,7 @@ int main(int argc, char **argv) {
       }
       // a child has terminated or shutdown was requested
       if (cur->fd == cpipe[0]) {
-        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR)
-          continue;
+        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR);
         if (res == -1) {
           shutdown_with_msg("call to read shouldn't fail");
         }
