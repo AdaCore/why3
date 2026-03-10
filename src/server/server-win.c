@@ -134,17 +134,23 @@ void send_started_msg_to_client(int key, pclient client, char* id);
 //send msg to [client] that the VC [id] has been started
 void close_client(pclient client, int key);
 
+void cleanup_server_socket_attempt(pserver server) __attribute__((nonnull));
+void free_server_socket(pserver server) __attribute__((nonnull));
+
 void free_server_socket(pserver server) {
-   if (server == NULL) {
-      return;
-   }
+   cleanup_server_socket_attempt(server);
+   free(server);
+}
+
+void cleanup_server_socket_attempt(pserver server) {
    if (server->connect.hEvent != NULL) {
       CloseHandle(server->connect.hEvent);
+      server->connect.hEvent = NULL;
    }
    if (server->handle != INVALID_HANDLE_VALUE) {
       CloseHandle(server->handle);
+      server->handle = INVALID_HANDLE_VALUE;
    }
-   free(server);
 }
 
 bool is_transient_connect_error(DWORD err) {
@@ -188,10 +194,16 @@ void try_write(pclient client) {
 // create a server socket and store it in the ith component of the
 // server_socket array
 void create_server_socket (int socket_num) {
+   pserver server = (pserver) malloc(sizeof(t_server));
+   if (server == NULL) {
+      shutdown_with_msg("error allocating memory for server socket");
+   }
+   // This initialization is necessary as we reuse the memory
+   // and need to know if cleanup is required for this field.
+   ZeroMemory(&server->connect, sizeof(OVERLAPPED));
+
    while (1) {
-      pserver server;
       int key = keygen();
-      server = (pserver) malloc(sizeof(t_server));
       server->handle = CreateNamedPipe(
          pipe_name,
          PIPE_ACCESS_DUPLEX |
@@ -205,12 +217,14 @@ void create_server_socket (int socket_num) {
          5000,                     // client time-out
          NULL);
       if (server->handle == INVALID_HANDLE_VALUE) {
-         exit(1);
+         free_server_socket(server);
+         shutdown_with_msg("error creating named pipe");
       }
       add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
       ZeroMemory(&server->connect, sizeof(OVERLAPPED));
       server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
       if (server->connect.hEvent == NULL) {
+         free_server_socket(server);
          shutdown_with_msg("error creating connect event");
       }
 
@@ -236,9 +250,10 @@ void create_server_socket (int socket_num) {
             return;
          } else if (is_transient_connect_error(err)) {
             // Rapid connect/disconnect race: recycle this socket instance.
-            free_server_socket(server);
+            cleanup_server_socket_attempt(server);
             continue;
          } else {
+            free_server_socket(server);
             shutdown_with_msg("error connecting to socket");
          }
       }
@@ -549,7 +564,7 @@ void do_read(pclient client, int key) {
       if (err == ERROR_IO_PENDING) {
          return;
       }
-      if (is_transient_connect_error(err) || err == ERROR_BROKEN_PIPE) {
+      if (is_transient_connect_error(err)) {
          close_client(client, key);
       }
       return;
