@@ -134,15 +134,9 @@ void send_started_msg_to_client(int key, pclient client, char* id);
 //send msg to [client] that the VC [id] has been started
 void close_client(pclient client, int key);
 
-void cleanup_server_socket_attempt(pserver server) __attribute__((nonnull));
 void free_server_socket(pserver server) __attribute__((nonnull));
 
 void free_server_socket(pserver server) {
-   cleanup_server_socket_attempt(server);
-   free(server);
-}
-
-void cleanup_server_socket_attempt(pserver server) {
    if (server->connect.hEvent != NULL) {
       CloseHandle(server->connect.hEvent);
       server->connect.hEvent = NULL;
@@ -151,6 +145,7 @@ void cleanup_server_socket_attempt(pserver server) {
       CloseHandle(server->handle);
       server->handle = INVALID_HANDLE_VALUE;
    }
+   free(server);
 }
 
 bool is_transient_connect_error(DWORD err) {
@@ -217,7 +212,6 @@ void create_server_socket (int socket_num) {
       5000,                     // client time-out
       NULL);
    if (server->handle == INVALID_HANDLE_VALUE) {
-      free_server_socket(server);
       shutdown_with_msg("error creating named pipe");
    }
    add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
@@ -226,7 +220,6 @@ void create_server_socket (int socket_num) {
       ZeroMemory(&server->connect, sizeof(OVERLAPPED));
       server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
       if (server->connect.hEvent == NULL) {
-         free_server_socket(server);
          shutdown_with_msg("error creating connect event");
       }
 
@@ -258,13 +251,11 @@ void create_server_socket (int socket_num) {
             if (!DisconnectNamedPipe(server->handle)) {
                DWORD disconnect_err = GetLastError();
                if (disconnect_err != ERROR_PIPE_NOT_CONNECTED) {
-                  free_server_socket(server);
                   shutdown_with_msg("error resetting named pipe");
                }
             }
             continue;
          } else {
-            free_server_socket(server);
             shutdown_with_msg("error connecting to socket");
          }
       }
