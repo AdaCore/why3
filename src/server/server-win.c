@@ -195,6 +195,7 @@ void try_write(pclient client) {
 // server_socket array
 void create_server_socket (int socket_num) {
    pserver server = (pserver) malloc(sizeof(t_server));
+   int key;
    if (server == NULL) {
       shutdown_with_msg("error allocating memory for server socket");
    }
@@ -202,25 +203,26 @@ void create_server_socket (int socket_num) {
    // and need to know if cleanup is required for this field.
    ZeroMemory(&server->connect, sizeof(OVERLAPPED));
 
+   key = keygen();
+   server->handle = CreateNamedPipe(
+      pipe_name,
+      PIPE_ACCESS_DUPLEX |
+      FILE_FLAG_OVERLAPPED,     // non-blocking IO
+      PIPE_TYPE_MESSAGE |       // message-type pipe
+      PIPE_READMODE_MESSAGE |   // message read mode
+      PIPE_WAIT,                // blocking mode
+      PIPE_UNLIMITED_INSTANCES, // number of instances
+      BUFSIZE*sizeof(TCHAR),    // output buffer size
+      BUFSIZE*sizeof(TCHAR),    // input buffer size
+      5000,                     // client time-out
+      NULL);
+   if (server->handle == INVALID_HANDLE_VALUE) {
+      free_server_socket(server);
+      shutdown_with_msg("error creating named pipe");
+   }
+   add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
+
    while (1) {
-      int key = keygen();
-      server->handle = CreateNamedPipe(
-         pipe_name,
-         PIPE_ACCESS_DUPLEX |
-         FILE_FLAG_OVERLAPPED,     // non-blocking IO
-         PIPE_TYPE_MESSAGE |       // message-type pipe
-         PIPE_READMODE_MESSAGE |   // message read mode
-         PIPE_WAIT,                // blocking mode
-         PIPE_UNLIMITED_INSTANCES, // number of instances
-         BUFSIZE*sizeof(TCHAR),    // output buffer size
-         BUFSIZE*sizeof(TCHAR),    // input buffer size
-         5000,                     // client time-out
-         NULL);
-      if (server->handle == INVALID_HANDLE_VALUE) {
-         free_server_socket(server);
-         shutdown_with_msg("error creating named pipe");
-      }
-      add_to_completion_port(server->handle, to_ms_key(key, SOCKET));
       ZeroMemory(&server->connect, sizeof(OVERLAPPED));
       server->connect.hEvent = CreateEvent(NULL, FALSE, TRUE, NULL);
       if (server->connect.hEvent == NULL) {
@@ -249,8 +251,17 @@ void create_server_socket (int socket_num) {
             }
             return;
          } else if (is_transient_connect_error(err)) {
-            // Rapid connect/disconnect race: recycle this socket instance.
-            cleanup_server_socket_attempt(server);
+            // Rapid connect/disconnect race: keep this socket instance and
+            // retry ConnectNamedPipe.
+            CloseHandle(server->connect.hEvent);
+            server->connect.hEvent = NULL;
+            if (!DisconnectNamedPipe(server->handle)) {
+               DWORD disconnect_err = GetLastError();
+               if (disconnect_err != ERROR_PIPE_NOT_CONNECTED) {
+                  free_server_socket(server);
+                  shutdown_with_msg("error resetting named pipe");
+               }
+            }
             continue;
          } else {
             free_server_socket(server);
