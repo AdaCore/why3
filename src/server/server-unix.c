@@ -94,6 +94,9 @@ void add_to_poll_list(int sock, short events) {
   if (poll_num == poll_len) {
     poll_len *= 2;
     poll_list = (struct pollfd*) realloc(poll_list, sizeof(struct pollfd) * poll_len);
+    if (poll_list == NULL) {
+      shutdown_with_msg("error reallocating poll list");
+    }
   }
   poll_list[poll_num].fd = sock;
   poll_list[poll_num].events = events;
@@ -135,6 +138,9 @@ int open_temp_file(char* dir, char** outfile) {
   size_t len;
   len = strlen(dir);
   template = (char*) malloc(sizeof(char) * (len + 12));
+  if (template == NULL) {
+    shutdown_with_msg("error allocating temp file name");
+  }
   strcpy(template, dir);
   strcat(template, "/why3");
   strcat(template, "XXXXXX");
@@ -153,6 +159,9 @@ void server_accept_client() {
     shutdown_with_msg("error accepting a client");
   }
   client = (pclient) malloc(sizeof(t_client));
+  if (client == NULL) {
+    shutdown_with_msg("error allocating client");
+  }
   client->fd = fd;
   client->readbuf = init_readbuf(READ_ONCE);
   client->writebuf = init_writebuf(parallel);
@@ -333,6 +342,9 @@ pid_t create_process(char* cmd,
     count--;
   }
   unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
+  if (unix_argv == NULL) {
+    shutdown_with_msg("error allocating process comand line parameters");
+  }
   unix_argv[0] = cmd;
   unix_argv[count + 1] = NULL;
   for (int i = 0; i < count; i++) {
@@ -341,7 +353,7 @@ pid_t create_process(char* cmd,
 
   pid_t pid = fork ();
   if (pid == -1) {
-      shutdown_with_msg("failed to fork");
+    shutdown_with_msg("failed to fork");
   }
 
   // the server process simply collects the created pid and returns
@@ -532,6 +544,9 @@ void run_request (prequest r) {
   close(out_descr);
 
   proc = (pproc) malloc(sizeof(t_proc));
+  if (proc == NULL) {
+    shutdown_with_msg ("error allocating request");
+  }
   proc->task_id = r->id;
   proc->client_key = r->key;
   proc->id = id;
@@ -652,8 +667,7 @@ int main(int argc, char **argv) {
   while (1) {
     schedule_new_jobs();
     poll_list_clean();
-    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
-      continue;
+    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR);
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
@@ -664,8 +678,7 @@ int main(int argc, char **argv) {
       }
       // a child has terminated or shutdown was requested
       if (cur->fd == cpipe[0]) {
-        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR)
-          continue;
+        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR);
         if (res == -1) {
           shutdown_with_msg("call to read shouldn't fail");
         }
