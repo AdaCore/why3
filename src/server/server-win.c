@@ -194,9 +194,6 @@ void create_server_socket (int socket_num) {
    if (server == NULL) {
       shutdown_with_msg("error allocating memory for server socket");
    }
-   // This initialization is necessary as we reuse the memory
-   // and need to know if cleanup is required for this field.
-   ZeroMemory(&server->connect, sizeof(OVERLAPPED));
 
    key = keygen();
    server->handle = CreateNamedPipe(
