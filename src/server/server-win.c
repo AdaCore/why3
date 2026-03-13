@@ -139,11 +139,9 @@ void free_server_socket(pserver server) __attribute__((nonnull));
 void free_server_socket(pserver server) {
    if (server->connect.hEvent != NULL) {
       CloseHandle(server->connect.hEvent);
-      server->connect.hEvent = NULL;
    }
    if (server->handle != INVALID_HANDLE_VALUE) {
       CloseHandle(server->handle);
-      server->handle = INVALID_HANDLE_VALUE;
    }
    free(server);
 }
