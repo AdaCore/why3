@@ -173,7 +173,6 @@ void init_connect_data(t_conn_data* data, int kind) {
 
 void try_write(pclient client) {
    int num_write;
-   DWORD num_written;
    char* buf;
    if (has_write_data (client->writebuf) &&
        can_write(client->writebuf)) {
@@ -181,7 +180,7 @@ void try_write(pclient client) {
       WriteFile (client->handle,
                  buf,
                  num_write,
-                 &num_written,
+                 NULL,
                  (LPOVERLAPPED) &client->write);
    }
 }
