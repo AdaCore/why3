@@ -1285,7 +1285,11 @@ and replay_goal c goal =
       let proof_attempt_ids = Session_itp.get_proof_attempt_ids session goal in
       Whyconf.Hprover.iter (fun _ paid ->
         let pa = Session_itp.get_proof_attempt_node session paid in
-        if is_valid_pa pa then raise (PA_Found paid)) proof_attempt_ids;
+        match pa.Session_itp.proof_state with
+        | Some pr when pr.Call_provers.pr_answer = Call_provers.Valid
+                    && pr.Call_provers.pr_steps > 0 ->
+            raise (PA_Found paid)
+        | _ -> ()) proof_attempt_ids;
       (* we go here only if no such PA was found. We now replay the
          transformations *)
 
@@ -1305,11 +1309,8 @@ and replay_goal c goal =
           None in
       Option.iter (fun prover ->
           let pa_node = Session_itp.get_proof_attempt_node session pa in
-          let limits =
-            match pa_node.Session_itp.proof_state with
-            | Some pas when pas.Call_provers.pr_answer = Call_provers.Valid ->
-                compute_replay_limit_from_pas pas
-            | _ -> assert false in
+          let pas = Option.get pa_node.Session_itp.proof_state in
+          let limits = compute_replay_limit_from_pas pas in
           C.schedule_proof_attempt
             c goal prover
             ~limits ~callback:(fun _ _ -> ())
