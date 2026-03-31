@@ -138,7 +138,8 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
    end else begin
      (* Maybe the goal is already proved *)
       if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
-         Gnat_checks.mark_goal_from_session_cache g;
+         if not (Gnat_checks.is_goal_trivially_proved g) then
+           Gnat_checks.mark_goal_from_session_cache g;
          handle_vc_result c g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin

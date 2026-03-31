@@ -188,11 +188,17 @@ let goals_from_session_cache : GoalSet.t = GoalSet.empty ()
 let mark_goal_from_session_cache goal = GoalSet.add goals_from_session_cache goal
 let is_goal_from_session_cache goal = GoalSet.mem goals_from_session_cache goal
 
+let goals_proved_trivially : GoalSet.t = GoalSet.empty ()
+
+let mark_goal_trivially_proved goal = GoalSet.add goals_proved_trivially goal
+let is_goal_trivially_proved goal = GoalSet.mem goals_proved_trivially goal
+
 let clear () =
    Gnat_expl.HCheck.clear explmap;
    GoalMap.clear goalmap;
    GoalSet.reset not_interesting;
    GoalSet.reset goals_from_session_cache;
+   GoalSet.reset goals_proved_trivially;
    total_nb_goals := 0;
    nb_checks := 0
 
@@ -262,6 +268,7 @@ let trivial_result =
   }
 
 let add_trivial_proof s goal_id =
+  mark_goal_trivially_proved goal_id;
   let _ = Session_itp.graft_proof_attempt s goal_id trivial_prover ~limits:trivial_resource_limits in
   Session_itp.update_proof_attempt (fun _ -> ()) s goal_id trivial_prover trivial_result;
   Session_itp.update_goal_node (fun _ -> ()) s goal_id
