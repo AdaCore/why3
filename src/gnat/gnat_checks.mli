@@ -53,18 +53,22 @@ type goal_id = Session_itp.proofNodeID
 (* This is the type of identifier of goal. They can be queried from the session
    through Session_itp functions *)
 
-val add_to_check : Gnat_expl.vc_info -> goal_id -> unit
-(* register the goal with the given check. If this is the
-   first time we register a goal for given check, the check is
-   registered as well. Only do the registering if the check is to be
-   discharged (ie, if the --limit-subp / --limit-line directives apply). *)
+val add_to_check : Gnat_expl.vc_info -> goal_id -> trivially_proved:bool -> unit
+(* Register the goal with the given check. If this is the first time we
+   register a goal for the given check, the check is registered as well.
+   Only do the registering if the check is to be discharged (ie, if the
+   --limit-subp / --limit-line directives apply). [trivially_proved] records
+   whether the goal was proved by a trivial transformation in the current run,
+   which prevents it from being attributed to the session cache. *)
 
 val set_not_interesting : goal_id -> unit
-(* Goals can be not interesting, when they are trivial *)
+(* Goals can be not interesting, when they are trivial. Goals not added via
+   add_to_check are implicitly not interesting; this function is a no-op kept
+   for readability at call sites. *)
 
 val is_not_interesting : goal_id -> bool
 val is_interesting : goal_id -> bool
-(* query the "interesting" bit *)
+(* Query the "interesting" bit. *)
 
 val mark_goal_from_session_cache : goal_id -> unit
 (* Mark a goal as having been proved from the session cache, meaning the
@@ -74,8 +78,8 @@ val is_goal_from_session_cache : goal_id -> bool
 (* Query whether a goal was marked as proved from the session cache. *)
 
 val is_goal_trivially_proved : goal_id -> bool
-(* Query whether a goal was proved trivially in the current run via
-   add_trivial_proof. Such goals must not be attributed to the session cache. *)
+(* Query whether a goal was proved trivially in the current run. Such goals
+   must not be attributed to the session cache. *)
 
 val add_trivial_proof : Session_itp.session -> goal_id -> unit
 

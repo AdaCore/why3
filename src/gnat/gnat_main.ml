@@ -69,7 +69,7 @@ let register_goal cont goal_id =
         if c.Gnat_expl.check.Gnat_expl.already_proved then
           Gnat_checks.set_not_interesting goal_id
         else
-          Gnat_checks.add_to_check c goal_id
+          Gnat_checks.add_to_check c goal_id ~trivially_proved:is_trivial
       end
 
 let rec handle_vc_result c goal result =

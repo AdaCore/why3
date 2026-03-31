@@ -175,30 +175,35 @@ let empty_check () =
 let explmap : check_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 (* maps proof checks to goals *)
 
-let goalmap : Gnat_expl.vc_info GoalMap.t = GoalMap.create 17
-(* maps goals to their checks *)
+type goal_record = {
+  vc_info                    : Gnat_expl.vc_info;
+  mutable from_session_cache : bool;
+  mutable trivially_proved   : bool;
+}
+
+let goalmap : goal_record GoalMap.t = GoalMap.create 17
+(* maps goals to their checks and per-goal flags *)
 
 let total_nb_goals : int ref = ref 0
 let nb_checks : int ref = ref 0
 
-let not_interesting : GoalSet.t = GoalSet.empty ()
+let set_not_interesting _x = ()
+(* Goals not added to goalmap are implicitly not interesting. *)
 
-let goals_from_session_cache : GoalSet.t = GoalSet.empty ()
+let is_not_interesting x = not (GoalMap.mem goalmap x)
+let is_interesting x = GoalMap.mem goalmap x
 
-let mark_goal_from_session_cache goal = GoalSet.add goals_from_session_cache goal
-let is_goal_from_session_cache goal = GoalSet.mem goals_from_session_cache goal
+let mark_goal_from_session_cache goal =
+  (GoalMap.find goalmap goal).from_session_cache <- true
+let is_goal_from_session_cache goal =
+  (GoalMap.find goalmap goal).from_session_cache
 
-let goals_proved_trivially : GoalSet.t = GoalSet.empty ()
-
-let mark_goal_trivially_proved goal = GoalSet.add goals_proved_trivially goal
-let is_goal_trivially_proved goal = GoalSet.mem goals_proved_trivially goal
+let is_goal_trivially_proved goal =
+  (GoalMap.find goalmap goal).trivially_proved
 
 let clear () =
    Gnat_expl.HCheck.clear explmap;
    GoalMap.clear goalmap;
-   GoalSet.reset not_interesting;
-   GoalSet.reset goals_from_session_cache;
-   GoalSet.reset goals_proved_trivially;
    total_nb_goals := 0;
    nb_checks := 0
 
@@ -210,7 +215,7 @@ let find e =
       incr nb_checks;
       r
 
-let add_to_check ~toplevel ex go =
+let add_to_check_impl ~toplevel ~trivially_proved ex go =
   let check = ex.Gnat_expl.check in
   (* add a goal to a check.
    * A goal can be "top-level", that is a direct goal coming from WP, or not
@@ -231,20 +236,21 @@ let add_to_check ~toplevel ex go =
    in
    if filter_line && filter_region then begin
       incr total_nb_goals;
-      GoalMap.add goalmap go ex;
+      GoalMap.add goalmap go
+        { vc_info = ex; from_session_cache = false; trivially_proved };
       let cr = find check in
       GoalSet.add cr.to_be_scheduled go;
       GoalSet.add cr.to_be_proved go;
       if toplevel then GoalSet.add cr.toplevel go;
    end
 
-let get_vc_info goal = GoalMap.find goalmap goal
+let get_vc_info goal = (GoalMap.find goalmap goal).vc_info
 let get_check_of_goal goal = (get_vc_info goal).Gnat_expl.check
 let get_extra_info goal = (get_vc_info goal).Gnat_expl.extra_info
 
 let add_clone derive goal =
    let check = get_vc_info derive in
-   add_to_check ~toplevel:false check goal
+   add_to_check_impl ~toplevel:false ~trivially_proved:false check goal
 
 let trivial_prover =
   { Whyconf.prover_name = "Trivial";
@@ -268,19 +274,14 @@ let trivial_result =
   }
 
 let add_trivial_proof s goal_id =
-  mark_goal_trivially_proved goal_id;
   let _ = Session_itp.graft_proof_attempt s goal_id trivial_prover ~limits:trivial_resource_limits in
   Session_itp.update_proof_attempt (fun _ -> ()) s goal_id trivial_prover trivial_result;
   Session_itp.update_goal_node (fun _ -> ()) s goal_id
 
 
-let add_to_check = add_to_check ~toplevel:true
-(* we mask the add_to_check function here and fix it's toplevel argument to
-   "true", so that outside calls always set toplevel to true *)
-
-let set_not_interesting x = GoalSet.add not_interesting x
-let is_not_interesting x = GoalSet.mem not_interesting x
-let is_interesting x = not (is_not_interesting x)
+let add_to_check ex go ~trivially_proved =
+  add_to_check_impl ~toplevel:true ~trivially_proved ex go
+(* Outside callers always register top-level goals. *)
 
 let next check =
    (* this lookup should always succeed, otherwise it would mean we have a
@@ -664,7 +665,10 @@ let register_result c goal result : 'a * 'b =
            check_rec.not_proved <- true;
            let ce_goal = add_ce_goal c goal in
            check_rec.counter_example <- Some ce_goal;
-           GoalMap.add goalmap ce_goal (get_vc_info goal);
+           GoalMap.add goalmap ce_goal
+             { vc_info = get_vc_info goal;
+               from_session_cache = false;
+               trivially_proved = false };
            (* The goal will be scheduled manually in Gnat_main.handle_result
               so it is not put to the check_rec.to_be_scheduled *)
            check, Counter_Example
