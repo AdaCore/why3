@@ -183,10 +183,16 @@ let nb_checks : int ref = ref 0
 
 let not_interesting : GoalSet.t = GoalSet.empty ()
 
+let goals_from_session_cache : GoalSet.t = GoalSet.empty ()
+
+let mark_goal_from_session_cache goal = GoalSet.add goals_from_session_cache goal
+let is_goal_from_session_cache goal = GoalSet.mem goals_from_session_cache goal
+
 let clear () =
    Gnat_expl.HCheck.clear explmap;
    GoalMap.clear goalmap;
    GoalSet.reset not_interesting;
+   GoalSet.reset goals_from_session_cache;
    total_nb_goals := 0;
    nb_checks := 0
 
@@ -858,7 +864,17 @@ module Save_VCs = struct
     let stat_checkers = ref 0 in
     let check_rec = Gnat_expl.HCheck.find explmap check in
     GoalSet.iter (extract_stat_goal c stats stat_checkers) check_rec.toplevel;
-    (stats, !stat_checkers)
+    let total = GoalSet.count check_rec.toplevel in
+    let from_session = ref 0 in
+    GoalSet.iter (fun g ->
+      if is_goal_from_session_cache g then incr from_session) check_rec.toplevel;
+    let cache_status =
+      if !from_session = 0 then Gnat_report.No_cache
+      else if !from_session = total
+      then Gnat_report.All_from_cache [Gnat_report.Session]
+      else Gnat_report.Partly_from_cache [Gnat_report.Session]
+    in
+    (stats, !stat_checkers, cache_status)
 
   let count_map : (int ref) Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 

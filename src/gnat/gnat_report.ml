@@ -10,8 +10,15 @@ type prover_stat =
 
 type stats = prover_stat Whyconf.Hprover.t
 
+type cache_source = Session
+
+type cache_status =
+  | All_from_cache of cache_source list
+  | Partly_from_cache of cache_source list
+  | No_cache
+
 type result_info =
-  | Proved of stats * int
+  | Proved of stats * int * cache_status
   | Not_Proved of
        Gnat_expl.extra_info *
        (Model_parser.model * Check_ce.rac_result option) list *
@@ -26,7 +33,8 @@ type msg =
     extra_info       : Gnat_expl.extra_info;
     cntexmp_models   : (Model_parser.model * Check_ce.rac_result option) list;
     manual_proof     : (string * string) option;
-    unproved_status : Gnat_expl.unproved_status
+    unproved_status  : Gnat_expl.unproved_status;
+    cache_status     : cache_status
   }
 
 let msg_set : msg Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
@@ -57,17 +65,18 @@ let adapt_stats statsopt =
       Some newstats
 
 let register check check_tree result =
-  let valid, extra_info, stats, models, manual, unproved_status =
+  let valid, extra_info, stats, models, manual, unproved_status, cache_status =
     match result with
-    | Proved (stats, stats_checker) ->
+    | Proved (stats, stats_checker, cache_status) ->
         true,
         {Gnat_expl.pretty_node = None; inlined = None},
         Some (stats, stats_checker),
         [],
         None,
-        Gnat_expl.Unknown
+        Gnat_expl.Unknown,
+        cache_status
     | Not_Proved (extra_info, models, manual, unproved_status) ->
-        false, extra_info, None, models, manual, unproved_status
+        false, extra_info, None, models, manual, unproved_status, No_cache
   in
   if (Gnat_expl.HCheck.mem msg_set check) then assert false
   else begin
@@ -81,7 +90,8 @@ let register check check_tree result =
       check_tree     = check_tree;
       cntexmp_models = models;
       manual_proof   = manual;
-      unproved_status = unproved_status } in
+      unproved_status = unproved_status;
+      cache_status   = cache_status } in
     Gnat_expl.HCheck.add msg_set check msg
   end
 
@@ -182,6 +192,25 @@ let get_unproved_status status =
     "memory", Bool memory
   ]
 
+let get_cache_source s =
+  match s with
+  | Session -> "session"
+
+let get_cache_status status =
+  match status with
+  | No_cache ->
+      [ "cache_status", Record [ "use", String "none" ] ]
+  | All_from_cache sources ->
+      [ "cache_status", Record [
+          "use", String "full";
+          "sources", List (List.map (fun s -> String (get_cache_source s)) sources)
+        ] ]
+  | Partly_from_cache sources ->
+      [ "cache_status", Record [
+          "use", String "partial";
+          "sources", List (List.map (fun s -> String (get_cache_source s)) sources)
+        ] ]
+
 let get_msg (check, m) =
   Record (
     List.concat [
@@ -194,7 +223,8 @@ let get_msg (check, m) =
       ] ;
       get_stats (m.stats, m.stats_checker);
       ["cntexmps", List (get_cntexmp_models m.cntexmp_models)];
-      get_manual_proof_info m.manual_proof
+      get_manual_proof_info m.manual_proof;
+      (if m.result then get_cache_status m.cache_status else [])
     ]
   )
 

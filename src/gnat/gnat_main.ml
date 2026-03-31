@@ -138,6 +138,7 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
    end else begin
      (* Maybe the goal is already proved *)
       if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
+         Gnat_checks.mark_goal_from_session_cache g;
          handle_vc_result c g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin
@@ -214,8 +215,8 @@ let report_messages c check =
   let s = c.Controller_itp.controller_session in
   let result =
     if C.session_proved_status c check then
-      let (stats, stat_checker) = C.Save_VCs.extract_stats c check in
-      Gnat_report.Proved (stats, stat_checker)
+      let (stats, stat_checker, cache_status) = C.Save_VCs.extract_stats c check in
+      Gnat_report.Proved (stats, stat_checker, cache_status)
     else
       let models =
         let ce_pa = C.session_find_ce_pa c check in

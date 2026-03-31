@@ -119,6 +119,18 @@ open Why3
                    was made, or the goal was proved)
   The "time", "steps" and "memory" fields are booleans indicating whether
   the corresponding resource limit was reached.
+
+  The "cache_status" field is present only on proved checks. It summarizes
+  whether the proof was retrieved from a cache or freshly computed:
+      cache_status = { "use"     : string,
+                       "sources" : list string }
+  The "use" field is one of:
+    - "full"    : all goals were retrieved from a cache
+    - "partial" : some goals were retrieved from a cache, others freshly proved
+    - "none"    : no goals were retrieved from a cache (all freshly proved)
+  The "sources" field is absent when "use" is "none". Otherwise it lists the
+  cache sources that contributed, e.g. ["session"]. Additional sources may
+  appear in the future.
    *)
 
 type prover_stat =
@@ -130,10 +142,19 @@ type prover_stat =
 
 type stats = prover_stat Whyconf.Hprover.t
 
+type cache_source = Session
+
+type cache_status =
+  | All_from_cache of cache_source list
+  | Partly_from_cache of cache_source list
+  | No_cache
+
 type result_info =
-  | Proved of stats * int
+  | Proved of stats * int * cache_status
   (* extra information about the run. The integer is the number of
-     subgoals proven by transformations. *)
+     subgoals proven by transformations. The cache_status indicates
+     whether the proof was retrieved from a cache (session or other
+     future sources) or freshly computed. *)
   | Not_Proved of
       Gnat_expl.extra_info *     (* VC Info for the unproved goal *)
       (Model_parser.model * Check_ce.rac_result option) list *
