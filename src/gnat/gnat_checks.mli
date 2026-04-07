@@ -81,6 +81,10 @@ val is_goal_trivially_proved : goal_id -> bool
 (* Query whether a goal was proved trivially in the current run. Such goals
    must not be attributed to the session cache. *)
 
+val mark_goal_from_wrapper_cache : goal_id -> Gnat_report.cache_source -> unit
+(* Mark a goal as having been proved via the memcached wrapper cache from the
+   given source. *)
+
 val add_trivial_proof : Session_itp.session -> goal_id -> unit
 
 val get_check_of_goal : goal_id -> Gnat_expl.check

@@ -10,7 +10,7 @@ type prover_stat =
 
 type stats = prover_stat Whyconf.Hprover.t
 
-type cache_source = Session
+type cache_source = Session | File | Memcached
 
 type cache_status =
   | All_from_cache of cache_source list
@@ -195,6 +195,8 @@ let get_unproved_status status =
 let get_cache_source s =
   match s with
   | Session -> "session"
+  | File -> "file"
+  | Memcached -> "memcached"
 
 let get_cache_status status =
   match status with

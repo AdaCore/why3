@@ -106,6 +106,12 @@ and interpret_result c pa pas =
         | _ -> false &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
+     (if answer = Call_provers.Valid then
+       match r.Call_provers.pr_cache_source with
+       | Some "file" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.File
+       | Some "memcached" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
+       | Some _ -> assert false
+       | None -> ());
      handle_vc_result c goal (answer = Call_provers.Valid)
    | Controller_itp.InternalFailure e ->
        let s = Format.asprintf "Internal Why3 unexpected error during \

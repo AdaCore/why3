@@ -622,7 +622,8 @@ let parse_prover_result j =
     pr_output = pr_output;
     pr_time = pr_time;
     pr_steps = pr_steps;
-    pr_models = [] (* pr_model *)}
+    pr_models = []; (* pr_model *)
+    pr_cache_source = None }
     (* TODO pr_model is a string, should be model *)
 
 exception NotProofAttempt

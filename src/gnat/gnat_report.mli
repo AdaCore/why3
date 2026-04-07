@@ -129,8 +129,8 @@ open Why3
     - "partial" : some goals were retrieved from a cache, others freshly proved
     - "none"    : no goals were retrieved from a cache (all freshly proved)
   The "sources" field is absent when "use" is "none". Otherwise it lists the
-  cache sources that contributed, e.g. ["session"]. Additional sources may
-  appear in the future.
+  cache sources that contributed, e.g. ["session", "memcached", "file"].
+  Additional sources may appear in the future.
    *)
 
 type prover_stat =
@@ -142,7 +142,7 @@ type prover_stat =
 
 type stats = prover_stat Whyconf.Hprover.t
 
-type cache_source = Session
+type cache_source = Session | File | Memcached
 
 type cache_status =
   | All_from_cache of cache_source list

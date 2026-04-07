@@ -178,6 +178,7 @@ let explmap : check_rec Gnat_expl.HCheck.t = Gnat_expl.HCheck.create 17
 type goal_record = {
   vc_info                    : Gnat_expl.vc_info;
   mutable from_session_cache : bool;
+  mutable from_wrapper_cache : Gnat_report.cache_source option;
   mutable trivially_proved   : bool;
 }
 
@@ -197,6 +198,11 @@ let mark_goal_from_session_cache goal =
   (GoalMap.find goalmap goal).from_session_cache <- true
 let is_goal_from_session_cache goal =
   (GoalMap.find goalmap goal).from_session_cache
+
+let mark_goal_from_wrapper_cache goal source =
+  (GoalMap.find goalmap goal).from_wrapper_cache <- Some source
+let goal_wrapper_cache_source goal =
+  (GoalMap.find goalmap goal).from_wrapper_cache
 
 let is_goal_trivially_proved goal =
   (GoalMap.find goalmap goal).trivially_proved
@@ -237,7 +243,8 @@ let add_to_check_impl ~toplevel ~trivially_proved ex go =
    if filter_line && filter_region then begin
       incr total_nb_goals;
       GoalMap.add goalmap go
-        { vc_info = ex; from_session_cache = false; trivially_proved };
+        { vc_info = ex; from_session_cache = false;
+          from_wrapper_cache = None; trivially_proved };
       let cr = find check in
       GoalSet.add cr.to_be_scheduled go;
       GoalSet.add cr.to_be_proved go;
@@ -270,7 +277,8 @@ let trivial_result =
     pr_output = "unsat";
     pr_time   = 0.0;
     pr_steps = 1;
-    pr_models = []
+    pr_models = [];
+    pr_cache_source = None;
   }
 
 let add_trivial_proof s goal_id =
@@ -668,6 +676,7 @@ let register_result c goal result : 'a * 'b =
            GoalMap.add goalmap ce_goal
              { vc_info = get_vc_info goal;
                from_session_cache = false;
+               from_wrapper_cache = None;
                trivially_proved = false };
            (* The goal will be scheduled manually in Gnat_main.handle_result
               so it is not put to the check_rec.to_be_scheduled *)
@@ -877,13 +886,25 @@ module Save_VCs = struct
     GoalSet.iter (extract_stat_goal c stats stat_checkers) check_rec.toplevel;
     let total = GoalSet.count check_rec.toplevel in
     let from_session = ref 0 in
+    let from_wrapper = ref 0 in
+    let wrapper_sources : Gnat_report.cache_source list ref = ref [] in
     GoalSet.iter (fun g ->
-      if is_goal_from_session_cache g then incr from_session) check_rec.toplevel;
+      if is_goal_from_session_cache g then incr from_session
+      else
+        match goal_wrapper_cache_source g with
+        | Some src ->
+            incr from_wrapper;
+            if not (List.mem src !wrapper_sources) then
+              wrapper_sources := src :: !wrapper_sources
+        | None -> ()) check_rec.toplevel;
+    let cached = !from_session + !from_wrapper in
+    let all_sources =
+      (if !from_session > 0 then [Gnat_report.Session] else [])
+      @ !wrapper_sources in
     let cache_status =
-      if !from_session = 0 then Gnat_report.No_cache
-      else if !from_session = total
-      then Gnat_report.All_from_cache [Gnat_report.Session]
-      else Gnat_report.Partly_from_cache [Gnat_report.Session]
+      if cached = 0 then Gnat_report.No_cache
+      else if cached = total then Gnat_report.All_from_cache all_sources
+      else Gnat_report.Partly_from_cache all_sources
     in
     (stats, !stat_checkers, cache_status)
 
