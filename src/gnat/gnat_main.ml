@@ -69,7 +69,7 @@ let register_goal cont goal_id =
         if c.Gnat_expl.check.Gnat_expl.already_proved then
           Gnat_checks.set_not_interesting goal_id
         else
-          Gnat_checks.add_to_check c goal_id
+          Gnat_checks.add_to_check c goal_id ~trivially_proved:is_trivial
       end
 
 let rec handle_vc_result c goal result =
@@ -106,6 +106,12 @@ and interpret_result c pa pas =
         | _ -> false &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
+     (if answer = Call_provers.Valid then
+       match r.Call_provers.pr_cache_source with
+       | Some "file" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.File
+       | Some "memcached" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
+       | Some _ -> assert false
+       | None -> ());
      handle_vc_result c goal (answer = Call_provers.Valid)
    | Controller_itp.InternalFailure e ->
        let s = Format.asprintf "Internal Why3 unexpected error during \
@@ -138,6 +144,8 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
    end else begin
      (* Maybe the goal is already proved *)
       if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
+         if not (Gnat_checks.is_goal_trivially_proved g) then
+           Gnat_checks.mark_goal_from_session_cache g;
          handle_vc_result c g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin
@@ -214,8 +222,8 @@ let report_messages c check =
   let s = c.Controller_itp.controller_session in
   let result =
     if C.session_proved_status c check then
-      let (stats, stat_checker) = C.Save_VCs.extract_stats c check in
-      Gnat_report.Proved (stats, stat_checker)
+      let (stats, stat_checker, cache_status) = C.Save_VCs.extract_stats c check in
+      Gnat_report.Proved (stats, stat_checker, cache_status)
     else
       let models =
         let ce_pa = C.session_find_ce_pa c check in
