@@ -172,10 +172,15 @@ void server_accept_client() {
 
 // Handling of termination
 void sigterm_handler(__attribute__((unused)) int sig) {
+  int saved_errno;
   shutdown_requested = 1;
   // Wake up the main loop via the self-pipe
   char c = 1;
-  write(cpipe[1], &c, 1);
+  saved_errno = errno;
+  if (write(cpipe[1], &c, 1) == -1) {
+    // Best-effort wakeup: ignore failures in the signal handler.
+  }
+  errno = saved_errno;
 }
 
 void set_sigterm_handler() {
