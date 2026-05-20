@@ -1380,7 +1380,7 @@ let save_mlw_as_sexp mlw fn =
   close_out out_channel
 
 let read_channel env path filename c =
-  let json = Yojson.Safe.from_channel c in
+  let json = Yojson.Safe.to_basic (Yojson.Safe.from_channel c) in
   let gnat_file =
     let open Gnat_ast in
     try From_json.file_from_json json
