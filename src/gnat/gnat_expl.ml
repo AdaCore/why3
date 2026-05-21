@@ -58,6 +58,7 @@ type check_kind =
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -131,6 +132,7 @@ let is_warning_kind r =
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -253,6 +255,7 @@ let check_kind_from_string s =
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
    | "VC_UC_ALIGN_OVERLAY"          -> VC_UC_Align_Overlay
    | "VC_UC_ALIGN_UC"               -> VC_UC_Align_UC
+   | "VC_MODIFIES"                  -> VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -331,6 +334,7 @@ let check_kind_to_ada kind =
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
    | VC_UC_Align_Overlay          -> "VC_UC_ALIGN_OVERLAY"
    | VC_UC_Align_UC               -> "VC_UC_ALIGN_UC"
+   | VC_Modifies                  -> "VC_MODIFIES"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -404,6 +408,7 @@ let check_kind_to_string kind =
    | VC_UC_Same_Size              -> "uc_same_size"
    | VC_UC_Align_Overlay          -> "address_alignment_check"
    | VC_UC_Align_UC               -> "alignment_check"
+   | VC_Modifies                  -> "modifies"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"
