@@ -577,6 +577,7 @@ PLUGGENERATED = \
 PLUG_PARSER = genequlin dimacs
 PLUG_PRINTER =
 PLUG_TRANSFORM =
+PLUG_STRATEGIES = forward_propagation
 PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
 PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_main
 PLUG_PYTHON = py_parser py_lexer py_main
@@ -634,6 +635,7 @@ endif
 PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
 	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
 	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
+	      $(addprefix plugins/strategies/, $(PLUG_STRATEGIES)) \
 	      $(TPTPMODULES) $(COMAMODULES) \
 	      $(PYTHONMODULES) $(MICROCMODULES) $(CFGMODULES) \
 	      $(ADAMODULES) $(GNATJSONMODULES)
@@ -686,6 +688,8 @@ $(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
 $(PLUG_PRINTER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/printer/%.cmo
 $(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
 $(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
+$(PLUG_STRATEGIES:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/strategies/%.cmx
+$(PLUG_STRATEGIES:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/strategies/%.cmo
 lib/plugins/tptp.cmxs: $(TPTPCMX)
 lib/plugins/tptp.cma: $(TPTPCMO)
 lib/plugins/coma.cmxs: $(COMACMX)
