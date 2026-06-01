@@ -51,6 +51,7 @@ type check_kind =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
@@ -123,6 +124,7 @@ let is_warning_kind r =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
@@ -244,6 +246,7 @@ let check_kind_from_string s =
    | "VC_PROGRAM_EXIT_POST"         -> VC_Program_Exit_Post
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
+   | "VC_ITERABLE_CHECK"            -> VC_Iterable_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
    | "VC_RECLAMATION_CHECK"         -> VC_Reclamation_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
@@ -321,6 +324,7 @@ let check_kind_to_ada kind =
    | VC_Program_Exit_Post         -> "VC_PROGRAM_EXIT_POST"
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
+   | VC_Iterable_Check            -> "VC_ITERABLE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
    | VC_Reclamation_Check         -> "VC_RECLAMATION_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
@@ -393,6 +397,7 @@ let check_kind_to_string kind =
    | VC_Program_Exit_Post         -> "program_exit_post"
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
+   | VC_Iterable_Check            -> "iterable_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
    | VC_Reclamation_Check         -> "reclamation_check"
    | VC_UC_No_Holes               -> "uc_no_holes"

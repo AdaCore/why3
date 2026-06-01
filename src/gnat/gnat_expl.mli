@@ -55,6 +55,7 @@ type check_kind =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
