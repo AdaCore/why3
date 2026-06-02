@@ -1260,7 +1260,7 @@ Command ``info``
 
 .. program:: why3 session info
 
-The :program:`why3 session info` command reports various informations about the
+The :program:`why3 session info` command reports various information about the
 session, depending on the following specific options.
 
 .. option:: --provers

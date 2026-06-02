@@ -2,122 +2,121 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="vstte12_combinators.mlw"/>
 <theory name="Combinators" proved="true">
  <goal name="eq&#39;vc" expl="VC for eq" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="1036"/></proof>
+ <proof prover="6"><result status="valid" time="0.029243" steps="1161"/></proof>
  </goal>
  <goal name="subst_c&#39;vc" expl="VC for subst_c" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="3322"/></proof>
+ <proof prover="6"><result status="valid" time="0.035479" steps="2941"/></proof>
  </goal>
  <goal name="subst_c_commute" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="subst_c_commute.0" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="4709"/></proof>
+  <proof prover="5"><result status="valid" time="0.051495" steps="78"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="reduction&#39;vc" expl="VC for reduction" proved="true">
- <proof prover="3" timelimit="5"><result status="valid" time="2.874564" steps="1569956"/></proof>
+ <proof prover="5"><result status="valid" time="0.476529" steps="4041"/></proof>
  </goal>
  <goal name="test_SKK&#39;vc" expl="VC for test_SKK" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="2652"/></proof>
+ <proof prover="6"><result status="valid" time="0.052553" steps="2683"/></proof>
  </goal>
  <goal name="reduce_step&#39;vc" expl="VC for reduce_step" proved="true">
- <proof prover="3"><result status="valid" time="0.090000" steps="14990"/></proof>
+ <proof prover="5"><result status="valid" time="0.078163" steps="560"/></proof>
  </goal>
  <goal name="value_in_context&#39;vc" expl="VC for value_in_context" proved="true">
- <proof prover="1"><result status="valid" time="0.030000" steps="3731"/></proof>
+ <proof prover="2"><result status="valid" time="0.011018" steps="12132"/></proof>
  </goal>
  <goal name="irreducible_is_value&#39;vc" expl="VC for irreducible_is_value" proved="true">
- <proof prover="4"><result status="valid" time="0.070191" steps="677"/></proof>
+ <proof prover="5"><result status="valid" time="0.071297" steps="677"/></proof>
  </goal>
  <goal name="reduction2&#39;vc" expl="VC for reduction2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="reduction2&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="3303"/></proof>
+  <proof prover="6"><result status="valid" time="0.027996" steps="2526"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="3655"/></proof>
+  <proof prover="6"><result status="valid" time="0.050267" steps="2706"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.050000" steps="3389"/></proof>
+  <proof prover="2"><result status="valid" time="0.006966" steps="3611"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="4256"/></proof>
+  <proof prover="6"><result status="valid" time="0.043363" steps="3251"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.4" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="15879"/></proof>
+  <proof prover="6"><result status="valid" time="0.078053" steps="8358"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.5" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.050000" steps="4651"/></proof>
+  <proof prover="6"><result status="valid" time="0.038802" steps="3579"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.6" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="3334"/></proof>
+  <proof prover="2"><result status="valid" time="0.015080" steps="11704"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1" timelimit="1"><result status="valid" time="0.050000" steps="10506"/></proof>
+  <proof prover="6"><result status="valid" time="0.067067" steps="7160"/></proof>
   </goal>
   <goal name="reduction2&#39;vc.8" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="reduction2&#39;vc.8.0" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.040000" steps="3203"/></proof>
+   <proof prover="6"><result status="valid" time="0.047709" steps="2440"/></proof>
    </goal>
    <goal name="reduction2&#39;vc.8.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.504798" steps="186576"/></proof>
+   <proof prover="6"><result status="valid" time="0.293286" steps="21201"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
  <goal name="ks&#39;vc" expl="VC for ks" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="2839"/></proof>
+ <proof prover="6"><result status="valid" time="0.042017" steps="2770"/></proof>
  </goal>
  <goal name="reduction3&#39;vc" expl="VC for reduction3" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="reduction3&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.004811" steps="2229"/></proof>
+  <proof prover="5"><result status="valid" time="0.036245" steps="24"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.058131" steps="7557"/></proof>
+  <proof prover="6"><result status="valid" time="0.049046" steps="5502"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.013261" steps="24909"/></proof>
+  <proof prover="6"><result status="valid" time="0.041639" steps="6315"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.055053" steps="8409"/></proof>
+  <proof prover="3"><result status="valid" time="0.055053" steps="8409"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.4" expl="unreachable point" proved="true">
-  <proof prover="4"><result status="valid" time="0.054732" steps="296"/></proof>
+  <proof prover="5"><result status="valid" time="0.066219" steps="296"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.5" expl="unreachable point" proved="true">
-  <proof prover="4"><result status="valid" time="0.036443" steps="111"/></proof>
+  <proof prover="6"><result status="valid" time="0.075852" steps="10395"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.6" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.051503" steps="6173"/></proof>
+  <proof prover="2"><result status="valid" time="0.013902" steps="24071"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.235672" steps="43742"/></proof>
+  <proof prover="6"><result status="valid" time="0.159191" steps="19638"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.117238" steps="14707"/></proof>
+  <proof prover="6"><result status="valid" time="0.095814" steps="9848"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.075130" steps="9771"/></proof>
+  <proof prover="5"><result status="valid" time="0.077565" steps="642"/></proof>
   </goal>
   <goal name="reduction3&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.114376" steps="14804"/></proof>
+  <proof prover="6"><result status="valid" time="0.068880" steps="10226"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="ks_even_odd&#39;vc" expl="VC for ks_even_odd" proved="true">
- <proof prover="1"><result status="valid" time="0.030000" steps="6174"/></proof>
+ <proof prover="6"><result status="valid" time="0.033960" steps="5324"/></proof>
  </goal>
 </theory>
 </file>

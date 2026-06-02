@@ -144,3 +144,7 @@ let init n f =
     if i >= n then List.rev acc
     else loop (f i :: acc) (i + 1) in
   loop [] 0
+
+let hd_opt = function
+  | [] -> None
+  | h :: _ -> Some h

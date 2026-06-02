@@ -10,63 +10,47 @@ Sub-goal Postcondition of goal p1'vc.
 Prover result is: Unknown (unknown + incomplete) (677 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File result.mlw:
   Line 7:
-    a = {contents= 0}
+    a = { contents = 0 }
   Line 9:
-    b = {contents= 3}
-    b = {contents= 3}
+    b = { contents = 3 }
+    b = { contents = 3 }
     Execution of main function `p1` with env:
-      a = {contents= 0}
-      b = {contents= 3}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { contents = 0 }, b = { contents = 3 } ];
+        rsenv = []; idenv = [] }
   Line 12:
-    Normal execution of function `(!)` with args:
-      r = {contents= 3}
+    Normal execution of function `(!)` with args: [ r = { contents = 3 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      [ arg = { contents = 3 } ]
 File result.mlw:
   Line 12:
-    Normal execution of function `(!)` with args:
-      r = {contents= 0}
+    Normal execution of function `(!)` with args: [ r = { contents = 0 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 0}
+      [ arg = { contents = 0 } ]
 File result.mlw:
   Line 12:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 3
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 3 ]
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 3
+      [ r = { contents = 0 }, v = 3 ]
   Line 13:
-    Normal execution of function `(!)` with args:
-      r = {contents= 3}
+    Normal execution of function `(!)` with args: [ r = { contents = 3 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 3}
+      [ arg = { contents = 3 } ]
 File result.mlw:
   Line 13:
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 3, _ = 1 ]
   Line 11:
-    Property failure at postcondition of `p1` with:
-      a = {contents= 3}
-      result = 4
+    Property failure at postcondition of `p1` with env:
+      { lsenv = [];
+        vsenv = [ a = { contents = 3 }, b = { contents = 3 }, result = 4 ];
+        rsenv = []; idenv = [ a = { contents = 3 }, result = 4 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -80,50 +64,38 @@ Sub-goal Postcondition of goal f'vc.
 Prover result is: Unknown (unknown + incomplete) (431 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File result.mlw:
   Line 7:
     Constant a initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {contents= 0}
-    a = {contents= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { contents = 0 }
+    a = { contents = 0 }
   Line 16:
-    a = {contents= 42}
-    a = {contents= 42}
+    a = { contents = 42 }
+    a = { contents = 42 }
     Execution of main function `f` with env:
-      a = {contents= 0}
-      a = {contents= 42}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { contents = 0 }, a = { contents = 42 } ];
+        rsenv = []; idenv = [] }
   Line 19:
     Normal execution of function `(:=)` with args:
-      r = {contents= 42}
-      v = 0
+      [ r = { contents = 42 }, v = 0 ]
   Line 20:
     Normal execution of function `(:=)` with args:
-      r = {contents= 0}
-      v = 1
+      [ r = { contents = 0 }, v = 1 ]
   Line 21:
-    Normal execution of function `(!)` with args:
-      r = {contents= 1}
+    Normal execution of function `(!)` with args: [ r = { contents = 1 } ]
 File ref.mlw:
   Line 18:
     Normal execution of function `contents` with args:
-      arg = {contents= 1}
+      [ arg = { contents = 1 } ]
 File result.mlw:
   Line 21:
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = 1
+    Normal execution of function `(+)` with args: [ _ = 1, _ = 1 ]
   Line 18:
-    Property failure at postcondition of `f` with:
-      a = {contents= 1}
-      a = {contents= 42}
-      result = 2
+    Property failure at postcondition of `f` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { contents = 0 }, a = { contents = 1 },
+            a = { contents = 42 }, result = 2 ]; rsenv = [];
+        idenv = [ a = { contents = 1 }, a = { contents = 42 }, result = 2 ] }
 

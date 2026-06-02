@@ -1,0 +1,83 @@
+
+(** Alpha-Beta Pruning
+
+  Reference:
+    Donald E. Knuth, Ronald W. Moore,
+    An analysis of alpha-beta pruning,
+    Artificial Intelligence, Volume 6, Issue 4, 1975.
+
+  Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.MinMax
+
+type position
+
+val constant inf: int
+  ensures { 0 < result }
+
+val function f (p: position) : int
+  ensures { -inf <= result <= inf }
+
+(** A game tree is either a leaf with a position or some internal node with
+   a non-empty list of sub-game trees. *)
+
+type game_tree =
+  | Leaf position
+  | Node game_trees
+with game_trees =
+  | Last game_tree
+  | More game_tree game_trees
+
+(** The full evaluation of a game tree. This is the specification of the
+   value we intend to compute. *)
+
+let rec function eval (g: game_tree) : int
+  variant { g }
+  ensures { -inf <= result <= inf }
+= match g with
+  | Leaf p -> f p
+  | Node f -> evals f
+  end
+with function evals (s: game_trees) : int
+  variant { s }
+  ensures { -inf <= result <= inf }
+= match s with
+  | Last g   -> - eval g
+  | More g s -> max (- eval g) (evals s)
+  end
+
+(** The alpha-beta pruning procedure *)
+
+let rec f2 (g: game_tree) (alpha beta: int) : int
+  requires { -inf <= alpha < beta <= inf }
+  variant { g }
+  ensures { -inf <= result <= inf }
+  ensures { eval g <= alpha                           -> result <= alpha  }
+  ensures {           alpha < eval g < beta           -> result =  eval g }
+  ensures {                            beta <= eval g -> result >= beta   }
+= match g with
+  | Leaf p -> f p
+  | Node s -> f2s alpha beta alpha s
+  end
+
+with f2s (ghost alpha) (beta: int) (m: int) (s: game_trees) : int
+  requires { -inf <= alpha <= m < beta <= inf }
+  variant  { s }
+  ensures  { alpha <= result <= inf }
+  ensures  { evals s < beta  -> result = max m (evals s) }
+  ensures  { beta <= evals s -> beta <= result }
+= match s with
+  | Last g ->
+      max m (- f2 g (-beta) (-m))
+  | More g s ->
+      let m = max m (- f2 g (-beta) (-m)) in
+      if m >= beta then m else f2s alpha beta m s
+  end
+
+(** Running alpha-beta with bounds `-inf` and `inf` returns the exact value. *)
+
+let f2full (g: game_tree) : int
+  ensures { result = eval g }
+= f2 g (-inf) inf

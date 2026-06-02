@@ -18,13 +18,13 @@ val debug_type_only : Debug.flag
 
 val warn_useless_at : Loc.warning_id
 
-val type_mlw_file : Env.env -> string list -> string -> Ptree.mlw_file -> Pmodule.pmodule Wstdlib.Mstr.t
+val type_mlw_file : Env.env -> string list -> string -> Ptree.mlw_file -> Pmodule.mlw_file
 
 (** {2 Incremental typing of parsed modules} *)
 
 val open_file : Env.env -> Env.pathname -> unit
 
-val close_file : unit -> Pmodule.pmodule Wstdlib.Mstr.t
+val close_file : unit -> Pmodule.mlw_file
 
 val discard_file : unit -> unit
 
@@ -57,7 +57,7 @@ module Unsafe : sig
   val dexpr : Pmodule.pmodule_uc -> Dexpr.denv -> Ptree.expr -> Dexpr.dexpr
   val drec_defn : Pmodule.pmodule_uc -> Dexpr.denv -> Ptree.fundef list -> Dexpr.denv * Dexpr.drec_defn
 
-  val add_decl : Pmodule.pmodule_uc -> Env.env -> Pmodule.pmodule Wstdlib.Mstr.t -> Ptree.decl -> Pmodule.pmodule_uc
+  val add_decl : Pmodule.pmodule_uc -> Env.env -> Pmodule.mlw_file -> Ptree.decl -> Pmodule.pmodule_uc
   val create_user_id : Ptree.ident -> Ident.preid
   val create_user_prog_id : Ptree.ident -> Ident.preid
 end

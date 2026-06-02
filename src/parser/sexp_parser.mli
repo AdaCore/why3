@@ -11,5 +11,5 @@
 
 
 val read_channel :
-  Env.env -> string list -> string -> in_channel -> Pmodule.pmodule Wstdlib.Mstr.t
+  Env.env -> string list -> string -> in_channel -> Pmodule.mlw_file
 (** [read_channel env path file chan] *)

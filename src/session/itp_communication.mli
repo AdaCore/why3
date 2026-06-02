@@ -109,7 +109,7 @@ type notification =
   (** an informative message, can be an error message *)
   | Dead         of string
   (** server exited *)
-  | Task         of node_ID * string * (Loc.position * color) list * Loc.position option * string
+  | Task         of node_ID * string * (Loc.position * color) list * Loc.position list * string
   (** [n, s, list_loc, goal_loc, lang] with
      - [n] the node_ID's task,
      - [s] the task to be displayed

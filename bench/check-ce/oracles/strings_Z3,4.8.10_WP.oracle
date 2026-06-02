@@ -10,27 +10,19 @@ Goal T1.
 Prover result is: Step limit exceeded (3010 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 6:
     s = ("\x00":string)
     s = ("\x00":string)
     Execution of main function `T1'goal` with env:
-      s = ("\x00":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = ("\x00":string) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 6:
-    Property failure at postcondition of `T1'goal` with:
-      s = ("\x00":string)
+    Property failure at postcondition of `T1'goal` with env:
+      { lsenv = []; vsenv = [ s = ("\x00":string), result = () ]; rsenv = [];
+        idenv = [ s = ("\x00":string) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -44,27 +36,20 @@ Goal T2.
 Prover result is: Step limit exceeded (3012 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 7:
     s = ("\x00\x00\x00\x00":string)
     s = ("\x00\x00\x00\x00":string)
     Execution of main function `T2'goal` with env:
-      s = ("\x00\x00\x00\x00":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = ("\x00\x00\x00\x00":string) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 7:
-    Property failure at postcondition of `T2'goal` with:
-      s = ("\x00\x00\x00\x00":string)
+    Property failure at postcondition of `T2'goal` with env:
+      { lsenv = []; vsenv = [ s = ("\x00\x00\x00\x00":string), result = () ];
+        rsenv = []; idenv = [ s = ("\x00\x00\x00\x00":string) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -78,13 +63,6 @@ Goal T3.
 Prover result is: Step limit exceeded (3010 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 8:
     s1 = ("\x00":string)
@@ -92,17 +70,16 @@ File strings.mlw:
     s1 = ("\x00":string)
     s2 = ("\x02":string)
     Execution of main function `T3'goal` with env:
-      s2 = ("\x02":string)
-      s1 = ("\x00":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s2 = ("\x02":string), s1 = ("\x00":string) ];
+        rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 8:
-    Property failure at postcondition of `T3'goal` with:
-      s2 = ("\x02":string)
-      s1 = ("\x00":string)
+    Property failure at postcondition of `T3'goal` with env:
+      { lsenv = [];
+        vsenv = [ s2 = ("\x02":string), s1 = ("\x00":string), result = () ];
+        rsenv = []; idenv = [ s2 = ("\x02":string), s1 = ("\x00":string) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: BAD_CE
@@ -143,27 +120,19 @@ Goal T7.
 Prover result is: Step limit exceeded (3021 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 12:
     s = ""
     s = ""
     Execution of main function `T7'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 12:
-    Property failure at postcondition of `T7'goal` with:
-      s = ""
+    Property failure at postcondition of `T7'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -174,27 +143,19 @@ Goal T8.
 Prover result is: Step limit exceeded (3017 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 13:
     s = ""
     s = ""
     Execution of main function `T8'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 13:
-    Property failure at postcondition of `T8'goal` with:
-      s = ""
+    Property failure at postcondition of `T8'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: BAD_CE
@@ -225,27 +186,19 @@ Goal T11.
 Prover result is: Step limit exceeded (3025 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 16:
     s = ""
     s = ""
     Execution of main function `T11'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 16:
-    Property failure at postcondition of `T11'goal` with:
-      s = ""
+    Property failure at postcondition of `T11'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -256,27 +209,19 @@ Goal T12.
 Prover result is: Step limit exceeded (3021 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 17:
     s = ""
     s = ""
     Execution of main function `T12'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 17:
-    Property failure at postcondition of `T12'goal` with:
-      s = ""
+    Property failure at postcondition of `T12'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -287,27 +232,19 @@ Goal T13.
 Prover result is: Step limit exceeded (3007 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 18:
     s = ""
     s = ""
     Execution of main function `T13'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 18:
-    Property failure at postcondition of `T13'goal` with:
-      s = ""
+    Property failure at postcondition of `T13'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -318,27 +255,19 @@ Goal T14.
 Prover result is: Step limit exceeded (3013 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 19:
     s = ""
     s = ""
     Execution of main function `T14'goal` with env:
-      s = ""
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = "" ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 19:
-    Property failure at postcondition of `T14'goal` with:
-      s = ""
+    Property failure at postcondition of `T14'goal` with env:
+      { lsenv = []; vsenv = [ s = "", result = () ]; rsenv = [];
+        idenv = [ s = "" ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -352,13 +281,6 @@ Goal T15.
 Prover result is: Step limit exceeded (3010 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 20:
     s = ("":string)
@@ -366,17 +288,15 @@ File strings.mlw:
     s = ("":string)
     i = (- 1)
     Execution of main function `T15'goal` with env:
-      i = (- 1)
-      s = ("":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ i = (- 1), s = ("":string) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 20:
-    Property failure at postcondition of `T15'goal` with:
-      i = (- 1)
-      s = ("":string)
+    Property failure at postcondition of `T15'goal` with env:
+      { lsenv = []; vsenv = [ i = (- 1), s = ("":string), result = () ];
+        rsenv = []; idenv = [ i = (- 1), s = ("":string) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -390,27 +310,19 @@ Goal T16.
 Prover result is: Step limit exceeded (3006 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 21:
     s = ("":string)
     s = ("":string)
     Execution of main function `T16'goal` with env:
-      s = ("":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = ("":string) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 21:
-    Property failure at postcondition of `T16'goal` with:
-      s = ("":string)
+    Property failure at postcondition of `T16'goal` with env:
+      { lsenv = []; vsenv = [ s = ("":string), result = () ]; rsenv = [];
+        idenv = [ s = ("":string) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -424,25 +336,17 @@ Goal T17.
 Prover result is: Step limit exceeded (3015 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File strings.mlw:
   Line 22:
     s = ("abc":string)
     s = ("abc":string)
     Execution of main function `T17'goal` with env:
-      s = ("abc":string)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ s = ("abc":string) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File strings.mlw:
   Line 22:
-    Property failure at postcondition of `T17'goal` with:
-      s = ("abc":string)
+    Property failure at postcondition of `T17'goal` with env:
+      { lsenv = []; vsenv = [ s = ("abc":string), result = () ]; rsenv = [];
+        idenv = [ s = ("abc":string) ] }
 

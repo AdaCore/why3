@@ -19,29 +19,19 @@ Prover result is: Unknown (unknown + incomplete) (307 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'g1' at "bench/check-ce/func_call5.mlw", line 14, characters 10-14
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File func_call5.mlw:
   Line 11:
     x = 1
     x = 1
     Execution of main function `f1` with env:
-      x = 1
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 1 ]; rsenv = []; idenv = [] }
   Line 14:
-    Giant-step execution of function `g1` with args:
-      y = 1
-    result of `g1` = {contents= 2}
+    Giant-step execution of function `g1` with args: [ y = 1 ]
+    result of `g1` = { contents = 2 }
   Line 15:
-    Property failure at assertion with:
-      x = 1
-      z = {contents= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 1, z = { contents = 2 } ]; rsenv = [];
+        idenv = [ x = 1, z = { contents = 2 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -55,34 +45,20 @@ Sub-goal Assertion of goal f2'vc.
 Prover result is: Unknown (unknown + incomplete) (272 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File func_call5.mlw:
   Line 19:
     x = 0
     x = 0
     Execution of main function `f2` with env:
-      x = 0
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 20:
-    Normal execution of function `g2` with args:
-      y = 0
+    Normal execution of function `g2` with args: [ y = 0 ]
   Line 17:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
-    Normal execution of function `ref` with args:
-      contents = 1
-    Normal execution of function `ref'mk` with args:
-      contents = 1
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
+    Normal execution of function `ref` with args: [ contents = 1 ]
+    Normal execution of function `ref'mk` with args: [ contents = 1 ]
   Line 21:
-    Property failure at assertion with:
-      x = 0
-      z = {contents= 1}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 0, z = { contents = 1 } ]; rsenv = [];
+        idenv = [ x = 0, z = { contents = 1 } ] }
 

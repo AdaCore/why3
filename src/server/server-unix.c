@@ -68,6 +68,7 @@ plist clients;
 char *current_dir;
 
 static int cpipe[2];
+static volatile sig_atomic_t shutdown_requested = 0;
 
 void shutdown_with_msg(char* msg);
 
@@ -93,6 +94,9 @@ void add_to_poll_list(int sock, short events) {
   if (poll_num == poll_len) {
     poll_len *= 2;
     poll_list = (struct pollfd*) realloc(poll_list, sizeof(struct pollfd) * poll_len);
+    if (poll_list == NULL) {
+      shutdown_with_msg("error reallocating poll list");
+    }
   }
   poll_list[poll_num].fd = sock;
   poll_list[poll_num].events = events;
@@ -134,6 +138,9 @@ int open_temp_file(char* dir, char** outfile) {
   size_t len;
   len = strlen(dir);
   template = (char*) malloc(sizeof(char) * (len + 12));
+  if (template == NULL) {
+    shutdown_with_msg("error allocating temp file name");
+  }
   strcpy(template, dir);
   strcat(template, "/why3");
   strcat(template, "XXXXXX");
@@ -152,6 +159,9 @@ void server_accept_client() {
     shutdown_with_msg("error accepting a client");
   }
   client = (pclient) malloc(sizeof(t_client));
+  if (client == NULL) {
+    shutdown_with_msg("error allocating client");
+  }
   client->fd = fd;
   client->readbuf = init_readbuf(READ_ONCE);
   client->writebuf = init_writebuf(parallel);
@@ -161,15 +171,18 @@ void server_accept_client() {
 }
 
 // Handling of termination
-void sigterm_handler(int sig) {
-  shutdown_with_msg("");
+void sigterm_handler(__attribute__((unused)) int sig) {
+  shutdown_requested = 1;
+  // Wake up the main loop via the self-pipe
+  char c = 1;
+  write(cpipe[1], &c, 1);
 }
 
 void set_sigterm_handler() {
   struct sigaction sa;
   sigemptyset (&sa.sa_mask);
   sa.sa_handler = &sigterm_handler;
-  sa.sa_flags = 0;
+  sa.sa_flags = SA_RESTART;
   if (sigaction(SIGTERM, &sa, NULL) == -1) {
     shutdown_with_msg("error installing signal handler");
   }
@@ -179,12 +192,15 @@ void set_sigterm_handler() {
   if (sigaction(SIGINT, &sa, NULL) == -1) {
     shutdown_with_msg("error installing signal handler");
   }
+  if (sigaction(SIGQUIT, &sa, NULL) == -1) {
+    shutdown_with_msg("error installing signal handler");
+  }
 }
 
 // The next two functions implement the "self pipe trick". A pipe is used as
 // boolean information whether child processes have terminated. The code is
 // "data to read on the pipe" = "child processes have terminated"
-static void sigchld_handle(int sig) {
+static void sigchld_handle(__attribute__((unused)) int sig) {
   int saved_errno;
   saved_errno = errno;
   if (write(cpipe[1], "x", 1) == -1 && errno != EAGAIN && errno != EINTR) {
@@ -326,6 +342,9 @@ pid_t create_process(char* cmd,
     count--;
   }
   unix_argv = (char**)malloc(sizeof(char*) * (count + 2));
+  if (unix_argv == NULL) {
+    shutdown_with_msg("error allocating process comand line parameters");
+  }
   unix_argv[0] = cmd;
   unix_argv[count + 1] = NULL;
   for (int i = 0; i < count; i++) {
@@ -334,7 +353,7 @@ pid_t create_process(char* cmd,
 
   pid_t pid = fork ();
   if (pid == -1) {
-      shutdown_with_msg("failed to fork");
+    shutdown_with_msg("failed to fork");
   }
 
   // the server process simply collects the created pid and returns
@@ -525,6 +544,9 @@ void run_request (prequest r) {
   close(out_descr);
 
   proc = (pproc) malloc(sizeof(t_proc));
+  if (proc == NULL) {
+    shutdown_with_msg ("error allocating request");
+  }
   proc->task_id = r->id;
   proc->client_key = r->key;
   proc->id = id;
@@ -645,8 +667,7 @@ int main(int argc, char **argv) {
   while (1) {
     schedule_new_jobs();
     poll_list_clean();
-    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR)
-      continue;
+    while ((res = poll(poll_list, poll_num, -1)) == -1 && errno == EINTR);
     if (res == -1) {
       shutdown_with_msg("call to poll failed");
     }
@@ -655,12 +676,15 @@ int main(int argc, char **argv) {
       if (cur->revents == 0) {
         continue;
       }
-      // a child has terminated
+      // a child has terminated or shutdown was requested
       if (cur->fd == cpipe[0]) {
-        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR)
-          continue;
+        while ((res = read(cpipe[0], &ch, 1)) == -1 && errno == EINTR);
         if (res == -1) {
           shutdown_with_msg("call to read shouldn't fail");
+        }
+        // Check if shutdown was requested via signal
+        if (shutdown_requested) {
+          shutdown_with_msg("termination signal received");
         }
         handle_child_events();
         continue;

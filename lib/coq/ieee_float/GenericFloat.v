@@ -698,6 +698,45 @@ destruct h as [h|h]; contradict h; easy.
 Qed.
 
 (* Why3 goal *)
+Definition plus_infinity : t.
+Proof.
+exact (B754_infinity false).
+Defined.
+
+(* Why3 goal *)
+Lemma plus_infinity_spec : is_plus_infinity plus_infinity.
+Proof.
+unfold is_plus_infinity, plus_infinity.
+now simpl.
+Qed.
+
+(* Why3 goal *)
+Definition minus_infinity : t.
+Proof.
+exact (B754_infinity true).
+Defined.
+
+(* Why3 goal *)
+Lemma minus_infinity_spec : is_minus_infinity minus_infinity.
+Proof.
+unfold is_minus_infinity, minus_infinity.
+now simpl.
+Qed.
+
+(* Why3 goal *)
+Definition not_a_number : t.
+Proof.
+exact B754_nan.
+Defined.
+
+(* Why3 goal *)
+Lemma not_a_number_spec : is_nan not_a_number.
+Proof.
+unfold is_nan, not_a_number.
+now simpl.
+Qed.
+
+(* Why3 goal *)
 Definition to_real : t -> Reals.Rdefinitions.R.
 Proof.
   exact B2R.

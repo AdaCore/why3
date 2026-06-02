@@ -268,6 +268,7 @@ let create_colors config
           < create_tag : ?name:string -> GText.tag_property list -> GText.tag
           ; .. >
       ; .. >) =
+  Debug.dprintf debug "create_colors@.";
   let list_tags = color_tags_list config in
   List.iter
     (fun (name, props) ->
@@ -276,12 +277,14 @@ let create_colors config
     list_tags
 
 let remove_tag v tag_name =
+  Debug.dprintf debug "remove_tag@.";
   let tag = GtkText.TagTable.lookup v#buffer#tag_table tag_name in
   match tag with
   | None -> ()
   | Some tag -> GtkText.TagTable.remove v#buffer#tag_table tag
 
 let remove_all_tags config v =
+  Debug.dprintf debug "remove_all_tags@.";
   List.iter (fun (s, _) -> remove_tag v s) (color_tags_list config)
 
 (* When colors are changed in the preferences, the tag need to change so we
@@ -293,6 +296,7 @@ let update_tags config v =
 
 (* Erase all the source location tags in a source file *)
 let erase_color_loc (v : GSourceView.source_view) =
+  Debug.dprintf debug "erase_color_loc@.";
   let buf = v#buffer in
   buf#remove_tag_by_name "premise_tag" ~start:buf#start_iter ~stop:buf#end_iter;
   buf#remove_tag_by_name "neg_premise_tag" ~start:buf#start_iter
@@ -377,10 +381,12 @@ let exit_function_handler b =
 
 (* Erase colors in all source views *)
 let erase_loc_all_view () =
+  Debug.dprintf debug "erase_loc_all_view@.";
   Hstr.iter (fun _ (_, v, _, _) -> erase_color_loc v) source_view_table
 
 (* Update name of the tab when the label changes so that it has a * as prefix *)
 let update_label_change (label : GMisc.label) =
+  Debug.dprintf debug "update_label_change@.";
   let s = label#text in
   erase_loc_all_view ();
   if not (Strings.has_prefix ~prefix:"*" s) then label#set_text ("*" ^ s)
@@ -823,6 +829,7 @@ let print_message ~kind ~notif_kind fmt =
         if
           Strings.has_suffix ~suffix:"error" notif_kind
           || Strings.has_suffix ~suffix:"Error" notif_kind
+          || notif_kind = "warning"
         then
           buf#insert ~tags:[ !message_zone_error_tag ] (s ^ "\n")
         else
@@ -830,38 +837,6 @@ let print_message ~kind ~notif_kind fmt =
         messages_notebook#goto_page error_page
       ))
     fmt
-
-let display_warnings fmt warnings =
-  let nwarn = ref 0 in
-  try
-    Queue.iter
-      (fun (loc, msg) ->
-        if !nwarn = 4 then (
-          Format.fprintf fmt "[%d more warnings. See stderr for details]@\n"
-            (Queue.length warnings - !nwarn);
-          raise Exit
-        );
-        incr nwarn;
-        match loc with
-        | None -> Format.fprintf fmt "%s@\n@\n" msg
-        | Some l ->
-          (* scroll_to_loc ~color:error_tag ~yalign:0.5 loc; *)
-          Format.fprintf fmt "File %a: %s@\n@\n" Loc.pp_position l msg)
-      warnings
-  with
-  | Exit -> ()
-
-let display_warnings () =
-  if Queue.is_empty warnings then
-    ()
-  else (
-    print_message ~kind:1 ~notif_kind:"warning" "%a" display_warnings warnings;
-    Queue.clear warnings
-  )
-
-let print_message ~kind ~notif_kind fmt =
-  display_warnings ();
-  print_message ~kind ~notif_kind fmt
 
 (***********************************)
 (*    notebook on the top 2.2.2.1  *)
@@ -1103,6 +1078,8 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
       if f = "Task" then
         (0, task_view)
       else
+        begin
+          (* Format.eprintf "scroll_to_loc to loc='%a'@." Loc.pp_position loc; *)
         try
           let n, v, _, _ = get_source_view_table f in
           (n, v)
@@ -1117,6 +1094,7 @@ let scroll_to_loc ~force_tab_switch loc_of_goal =
           let n, v = create_raw_source_view ~read_only:true f s in
           change_lang v (Filename.extension f);
           (n, v)
+        end
     in
 
     if force_tab_switch then (
@@ -1159,6 +1137,7 @@ let save_cursor_loc cursor_ref =
     (* Get current line *)
     let line = (view#buffer#get_iter_at_mark `INSERT)#line + 1 in
     cursor_ref := Some (Loc.user_position cur_file line 0 line 0)
+
 
 (******************)
 (* Reload actions *)
@@ -1326,11 +1305,11 @@ let color_line ~color loc =
     let stop = start#forward_lines 1 in
     buf#apply_tag_by_name ~start ~stop color
   in
-
   let f, l, _, _, _ = Loc.get loc in
   try
     let v = get_source_view f in
     let color = convert_color color in
+    Debug.dprintf debug "color_line %a in color %s@." Loc.pp_position loc color;
     color_line ~color v l
   with
   | Nosourceview f ->
@@ -1352,7 +1331,6 @@ let color_loc ?(ce = false) ~color loc =
     let stop = stop#forward_chars ec in
     buf#apply_tag_by_name ~start ~stop color
   in
-
   let f, bl, bc, el, ec = Loc.get loc in
   try
     let v =
@@ -1362,6 +1340,7 @@ let color_loc ?(ce = false) ~color loc =
         get_source_view f
     in
     let color = convert_color color in
+    Debug.dprintf debug "color_loc %a in color %s@." Loc.pp_position loc color;
     color_loc ~color v bl bc el ec
   with
   | Nosourceview f ->
@@ -1372,8 +1351,13 @@ let color_loc ?(ce = false) ~color loc =
 (* Erase the colors and apply the colors given by l (which come from the task)
    to appropriate source files *)
 let apply_loc_on_source (l : (Loc.position * color) list) loc_goal =
+  Debug.dprintf debug "apply_loc_on_source@.";
   erase_loc_all_view ();
-  scroll_to_loc ~force_tab_switch:false loc_goal;
+  (* When a goal has associated locations in multiple files, open them all.
+    Do [List.rev] so that if two locations are in the same file,
+    we scroll to the first one in the list. *)
+  loc_goal |> List.rev |> List.iter (fun loc_goal ->
+    scroll_to_loc ~force_tab_switch:false (Some loc_goal));
   List.iter (fun (loc, color) -> color_loc ~color loc) l
 
 (* Erase the colors and apply the colors given by l (which come from the task)
@@ -1415,6 +1399,46 @@ let () =
   task_view#source_buffer#set_language (why_lang ());
   counterexample_view#source_buffer#set_language (why_lang ());
   Gconfig.set_fonts ()
+
+
+(** {2 warnings} *)
+
+let display_warnings fmt warnings =
+  let nwarn = ref 0 in
+  try
+    Queue.iter
+      (fun (loc, msg) ->
+        if !nwarn = 4 then (
+          Format.fprintf fmt "[%d more warnings. See stderr for details]@\n"
+            (Queue.length warnings - !nwarn);
+          raise Exit
+        );
+        incr nwarn;
+        match loc with
+        | None -> Format.fprintf fmt "%s@\n@\n" msg
+        | Some loc ->
+            (*            scroll_to_loc ~color:Error_color ~yalign:0.5 loc; *)
+            scroll_to_loc ~force_tab_switch:true (Some loc);
+            color_line ~color:Error_line_color loc;
+            color_loc ~color:Error_color loc;
+            color_loc ~color:Error_font_color loc;
+            Format.fprintf fmt "File %a: %s@\n@\n" Loc.pp_position loc msg)
+      warnings
+  with
+  | Exit -> ()
+
+let display_warnings () =
+  if Queue.is_empty warnings then
+    ()
+  else (
+    print_message ~kind:1 ~notif_kind:"warning" "%a" display_warnings warnings;
+    Queue.clear warnings
+  )
+
+
+let print_message ~kind ~notif_kind fmt =
+  if !initialization_complete then display_warnings ();
+  print_message ~kind ~notif_kind fmt
 
 (******************)
 (*    actions     *)
@@ -1614,10 +1638,6 @@ let on_selected_row r =
     let id = get_node_id r#iter in
     let typ = get_node_type id in
     match typ with
-    | NGoal ->
-      let c = gconfig.show_full_context in
-      let show_uses_clones_metas = gconfig.show_uses_clones_metas in
-      send_request (Get_task (id, c, show_uses_clones_metas, true))
     | NProofAttempt ->
       let pa, _obs, _l = Hint.find node_id_pa id in
       let output_text =
@@ -1646,6 +1666,10 @@ let on_selected_row r =
       edited_view#scroll_to_mark `INSERT;
       counterexample_view#source_buffer#set_text "(not yet available)";
       counterexample_view#scroll_to_mark `INSERT;
+      let c = gconfig.show_full_context in
+      let show_uses_clones_metas = gconfig.show_uses_clones_metas in
+      send_request (Get_task (id, c, show_uses_clones_metas, true))
+    | NGoal ->
       let c = gconfig.show_full_context in
       let show_uses_clones_metas = gconfig.show_uses_clones_metas in
       send_request (Get_task (id, c, show_uses_clones_metas, true))
@@ -3009,11 +3033,11 @@ let treat_notification n =
   | Initialized g_info ->
     initialization_complete := true;
     main_window#show ();
-    display_warnings ();
     init_completion g_info.provers g_info.transformations g_info.strategies
       g_info.commands;
     complete_context_menu ();
-    Option.iter select_iter goals_model#get_iter_first
+    Option.iter select_iter goals_model#get_iter_first;
+    display_warnings ()
   | Saved ->
     print_message ~kind:1 ~notif_kind:"Saved action info" "Session saved.";
     if !quit_on_saved = true then exit_function_safe ()
@@ -3027,11 +3051,13 @@ let treat_notification n =
          other cases, it should change nothing. *)
       if list_loc != [] then
         apply_loc_on_source list_loc goal_loc
-      else (
-        erase_loc_all_view ();
+      else begin
+        Debug.dprintf debug "Task(), list_loc = []@.";
+        (* erase_loc_all_view (); this would make warnings disappear *)
         (* Still scroll to the ident (for example for modules) *)
-        scroll_to_loc ~force_tab_switch:true goal_loc
-      );
+        (* Format.eprintf "before scroll_to_loc, loc = %a@." (Pp.print_option Loc.pp_position) goal_loc; *)
+        scroll_to_loc ~force_tab_switch:true (Lists.hd_opt goal_loc);
+      end;
       (* Scroll to the end of task text without any animation. We cannot use the
          scroll_to methods, as they eventually call
          gtk_adjustment_animate_to_value in GTK3. So, we manually call

@@ -34,5 +34,5 @@ val value_of_term: Decl.known_map -> Term.term -> value
 val term_of_value: value -> Term.term
 
 (** interp [env] [mm] [rs] [vars] interprets the program function [rs] using the values in [vars] for parameters and global variables. *)
-val interp: Env.env -> Pmodule.pmodule Mstr.t -> Expr.rsymbol -> value Ident.Mid.t
+val interp: Env.env -> Pmodule.pmodule0 Mstr.t -> Expr.rsymbol -> value Ident.Mid.t
             -> value

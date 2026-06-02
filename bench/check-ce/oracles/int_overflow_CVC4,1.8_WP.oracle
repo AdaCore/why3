@@ -14,27 +14,19 @@ Goal test1.
 Prover result is: Unknown (sat) (90 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 9:
     x = 0
     x = 0
     Execution of main function `test1'goal` with env:
-      x = 0
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 9:
-    Property failure at postcondition of `test1'goal` with:
-      x = 0
+    Property failure at postcondition of `test1'goal` with env:
+      { lsenv = []; vsenv = [ x = 0, result = () ]; rsenv = [];
+        idenv = [ x = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE
@@ -108,13 +100,6 @@ Goal test_overflow_int16.
 Prover result is: Unknown (sat) (208 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 30:
     x = (- 65536)
@@ -123,17 +108,15 @@ File int_overflow.mlw:
     x = (- 65536)
     y = (- 1)
     Execution of main function `test_overflow_int16'goal` with env:
-      y = (- 1)
-      x = (- 65536)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = (- 1), x = (- 65536) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 31:
-    Property failure at postcondition of `test_overflow_int16'goal` with:
-      y = (- 1)
-      x = (- 65536)
+    Property failure at postcondition of `test_overflow_int16'goal` with env:
+      { lsenv = []; vsenv = [ y = (- 1), x = (- 65536), result = () ];
+        rsenv = []; idenv = [ y = (- 1), x = (- 65536) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -173,13 +156,6 @@ Goal test_overflow_int16_bis.
 Prover result is: Unknown (sat) (258 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 40:
     x = 32768
@@ -188,17 +164,16 @@ File int_overflow.mlw:
     x = 32768
     y = 32768
     Execution of main function `test_overflow_int16_bis'goal` with env:
-      y = 32768
-      x = 32768
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = 32768, x = 32768 ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 42:
-    Property failure at postcondition of `test_overflow_int16_bis'goal` with:
-      y = 32768
-      x = 32768
+    Property failure at postcondition of `test_overflow_int16_bis'goal`
+      with env:
+      { lsenv = []; vsenv = [ y = 32768, x = 32768, result = () ];
+        rsenv = []; idenv = [ y = 32768, x = 32768 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -212,13 +187,6 @@ Goal test_overflow_int32.
 Prover result is: Unknown (sat) (208 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 48:
     x = (- 2147483648)
@@ -227,17 +195,15 @@ File int_overflow.mlw:
     x = (- 2147483648)
     y = (- 1)
     Execution of main function `test_overflow_int32'goal` with env:
-      y = (- 1)
-      x = (- 2147483648)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = (- 1), x = (- 2147483648) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 49:
-    Property failure at postcondition of `test_overflow_int32'goal` with:
-      y = (- 1)
-      x = (- 2147483648)
+    Property failure at postcondition of `test_overflow_int32'goal` with env:
+      { lsenv = []; vsenv = [ y = (- 1), x = (- 2147483648), result = () ];
+        rsenv = []; idenv = [ y = (- 1), x = (- 2147483648) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -251,13 +217,6 @@ Goal test_overflow_int32_bis.
 Prover result is: Unknown (sat) (258 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File int_overflow.mlw:
   Line 53:
     x = 1073741824
@@ -266,17 +225,16 @@ File int_overflow.mlw:
     x = 1073741824
     y = 1073741824
     Execution of main function `test_overflow_int32_bis'goal` with env:
-      y = 1073741824
-      x = 1073741824
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = 1073741824, x = 1073741824 ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File int_overflow.mlw:
   Line 54:
-    Property failure at postcondition of `test_overflow_int32_bis'goal` with:
-      y = 1073741824
-      x = 1073741824
+    Property failure at postcondition of `test_overflow_int32_bis'goal`
+      with env:
+      { lsenv = []; vsenv = [ y = 1073741824, x = 1073741824, result = () ];
+        rsenv = []; idenv = [ y = 1073741824, x = 1073741824 ] }
 
 File "bench/check-ce/int_overflow.mlw", line 59, characters 88-108:
 Goal test_overflow_int32_bis_inline.

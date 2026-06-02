@@ -41,6 +41,9 @@ type prover_result = {
   pr_time   : float;
   pr_steps  : int;		(* -1 if unknown *)
   pr_models : (prover_answer * model) list;
+  pr_cache_source : string option;
+  (* Cache source name injected by spark_memcached_wrapper on a cache hit,
+     or None if the result was computed fresh. *)
 }
 (* END{proverresult} anchor for automatic documentation, do not remove *)
 
@@ -339,6 +342,34 @@ let analyse_result exit_result res_parser get_model out =
 
 let backup_file f = f ^ ".save"
 
+let wrapper_line_prefix = "spark_memcached_wrapper: "
+
+let strip_wrapper_source out =
+  (* If the output ends with a "spark_memcached_wrapper: <source>" line, as
+     appended by the caching wrapper on cache hits, strip that line and return
+     the source name. Otherwise return None and the output unchanged. *)
+  let plen = String.length wrapper_line_prefix in
+  let lines = String.split_on_char '\n' out in
+  let lines =
+    match List.rev lines with
+    | "" :: rest -> List.rev rest
+    | _ -> lines
+  in
+  match List.rev lines with
+  | [] -> None, out
+  | last_line :: rest ->
+      if String.length last_line >= plen &&
+         String.sub last_line 0 plen = wrapper_line_prefix then
+        let source = String.sub last_line plen (String.length last_line - plen) in
+        let stripped_lines = List.rev rest in
+        let stripped =
+          if stripped_lines = [] then ""
+          else String.concat "\n" stripped_lines ^ "\n"
+        in
+        Some source, stripped
+      else
+        None, out
+
 let parse_prover_run res_parser signaled time out exitcode limit get_model =
   Debug.dprintf debug "Call_provers: exited with status %Ld@." exitcode;
   (* the following conversion is incorrect (but does not fail) on 32bit, but if
@@ -346,6 +377,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
      value is meaningless for Why3 anyway (e.g. some windows status codes). If
      it becomes meaningful, we might want to change the conversion here *)
   let int_exitcode = Int64.to_int exitcode in
+  let cache_source, out = strip_wrapper_source out in
   let ans, models =
     let exit_result =
       if signaled then [Answer (HighFailure "signaled")] else
@@ -387,6 +419,7 @@ let parse_prover_run res_parser signaled time out exitcode limit get_model =
     pr_time   = time;
     pr_steps  = steps;
     pr_models = models;
+    pr_cache_source = cache_source;
   }
 
 let parse_prover_run res_parser signaled time outfile exitcode limit get_model =
@@ -396,7 +429,8 @@ let parse_prover_run res_parser signaled time outfile exitcode limit get_model =
       pr_output = "";
       pr_time = time;
       pr_steps = 0;
-      pr_models = [] }
+      pr_models = [];
+      pr_cache_source = None; }
   else
     let out = read_and_delete_file outfile in
     parse_prover_run res_parser signaled time out exitcode limit get_model
@@ -571,6 +605,7 @@ let editor_result ret = {
   pr_time   = 0.0;
   pr_steps  = 0;
   pr_models = [];
+  pr_cache_source = None;
 }
 
 let query_call = function

@@ -10,9 +10,9 @@
 
 
 module Translate : sig
-  val module_ : Pmodule.pmodule -> Mltree.pmodule
+  val module_ : Pmodule.pmodule0 -> Mltree.pmodule
 
-  val pdecl_m : Pmodule.pmodule -> Pdecl.pdecl -> Mltree.decl list
+  val pdecl_m : Pmodule.pmodule0 -> Pdecl.pdecl -> Mltree.decl list
 end
 
 

@@ -1,17 +1,26 @@
 
-(** Binomial coefficients
+(** {1 Binomial coefficients}
 
     The binomial coefficient C(n,k) is equal to
-
+    {h <pre>
       n*(n-1)*(n-2)*...*(n-k+1)
       -------------------------
          k*(k-1)*(k-2)*...*1
+    </pre>}
 
     This can be readily computed with three lines of C:
-
+    {h <pre>
       int c = 1;
       for (int i = 1; i <= k ; i++)
         c = c * (n - i + 1) / i;
+    </pre>}
+    or even better
+
+    {h <pre>
+      int c = 1;
+      for (int i = 1; i <= k ; i++)
+        c = c * (n - k + i) / i;
+    </pre>}
 
     In the code above, it is not obvious that each division is exact.
     Below is a proof.
@@ -33,11 +42,17 @@ let rec function comb (n k: int) : int
   ensures  { result >= 1 }
 = if k = 0 || k = n then 1 else comb (n-1) k + comb (n-1) (k-1)
 
-let rec lemma prop1 (n k: int)
+let rec lemma symmetry (n k: int)
   requires { 0 <= k <= n }
   ensures  { comb n (n - k) = comb n k }
   variant  { n }
-= if 0 < k < n then (prop1 (n-1) k; prop1 (n-1) (k-1))
+= if 0 < k < n then (symmetry (n-1) k; symmetry (n-1) (k-1))
+
+(** Starting from the biggest number in the numerator.
+
+    The key property is that the accumulator is always a binomial
+    coefficient. And the lemma below states the identity that shows
+    why the division is exact. *)
 
 let rec lemma prop2 (n k: int)
   requires { 1 <= k <= n }
@@ -56,5 +71,31 @@ let compute (n k: int) : (r: int)
     invariant { r = comb n (i - 1) }
     r <- r * (n - i + 1) / i;
     prop2 n i;
+  done;
+  r
+
+(** And now starting from the smallest number in the numerator,
+    which incurs smaller intermediate values and thus possibly
+    less integer overflows.
+
+    Again, the key property is that the accumulator is a binomial
+    coefficient, with the following lemma showing why the division is
+    exact. *)
+
+let lemma prop3 (n k: int)
+  requires { 1 <= k <= n }
+  ensures  { k * comb n k = comb (n - 1) (k - 1) * n }
+= ()
+
+let compute2 (n k: int) : (r: int)
+  requires { 0 <= k <= n }
+  ensures  { r = comb n k }
+= let k = min k (n - k) in
+  let ref r = 1 in
+  for i = 1 to k do
+    invariant { 1 <= i <= k + 1 }
+    invariant { r = comb (n - k + i - 1) (i - 1) }
+    r <- r * (n - k + i) / i;
+    prop3 (n - k + i) i;
   done;
   r

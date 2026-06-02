@@ -132,8 +132,8 @@ let should_unfold ls =
   Sattr.mem inline_attr (ls.ls_name.id_attrs)
 
 (* copied relocate and t_unfold from inlining.ml *)
-let rec relocate loc t =
-  t_map (relocate loc) (t_attr_set ?loc t.t_attrs t)
+let rec relocate locs t =
+  t_map (relocate locs) (t_attr_set ~locs t.t_attrs t)
 
 let t_unfold loc env fs tl ty =
   match Mls.find_opt fs env with
@@ -177,7 +177,7 @@ let rec unfold_right n env f =
   | Tapp (ls, tl) ->
     let tl = List.map (unfold_right n env) tl in
     if Mls.mem ls env then
-      let f = t_attr_copy f (t_unfold f.t_loc env ls tl f.t_ty) in
+      let f = t_attr_copy f (t_unfold f.t_locs env ls tl f.t_ty) in
       unfold_right (n-1) env f
     else
       t_attr_copy f (t_app ls tl f.t_ty)

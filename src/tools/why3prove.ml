@@ -277,7 +277,7 @@ let print_th_namespace fmt th =
 let really_do_task (task: task) =
   let t = task_goal_fmla task in
   let aux (f,l,e) =
-    match t.Term.t_loc with
+    match Term.t_loc t with
     | None -> false
     | Some loc ->
         let goal_f, goal_l, _, _, _ = Loc.get loc in
@@ -405,13 +405,13 @@ let select_ce env th models =
           (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
       if !opt_rac_only_giant then
         let res =
-          Check_ce.models_from_giant_step ~limits ?verb_lvl:!opt_ce_log_verbosity rac env pm models
+          Check_ce.models_from_giant_step ~limits ?verb_lvl:!opt_ce_log_verbosity rac env pm.Pmodule.mod_intf models
         in Option.bind (Check_ce.best_giant_step_result res)
           (fun (m, r) -> Some (m, Result r))
       else
         let res =
            Check_ce.models_from_rac ~limits ?verb_lvl:!opt_ce_log_verbosity
-           rac env pm models
+           rac env pm.Pmodule.mod_intf models
         in Option.bind (Check_ce.best_rac_result res)
           (fun (m, r) -> Some (m, Classification r))
   | exception Not_found -> None
@@ -437,11 +437,11 @@ let do_task config env drv fname tname (th : Theory.theory) (task : Task.task) =
         if !opt_check_ce_model then select_ce env th res.pr_models
         else
           Option.bind
-            (Check_ce.last_nonempty_model known_map res.pr_models)
+            (Check_ce.last_nonempty_model ~env ~known_map res.pr_models)
             (fun m -> Some (m, Not_checked))
         in
           printf "%a@." (print_result !opt_json)
-            (fname, t.Term.t_loc, goal_name, expls, res, ce);
+            (fname, Term.t_loc t, goal_name, expls, res, ce);
         if res.pr_answer <> Valid then unproved := true
     | None, None ->
         Driver.print_task drv std_formatter task

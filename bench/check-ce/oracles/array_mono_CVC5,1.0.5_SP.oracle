@@ -14,28 +14,22 @@ Sub-goal Index in array bounds of goal f1'vc.
 Prover result is: Unknown (unknown + incomplete) (161 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File array_mono.mlw:
   Line 35:
-    a = {elts= UNDEFINED; length= 0}
-    a = {elts= UNDEFINED; length= 0}
+    a = { elts = UNDEFINED; length = 0 }
+    a = { elts = UNDEFINED; length = 0 }
     Execution of main function `f1` with env:
-      a = {elts= UNDEFINED; length= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ a = { elts = UNDEFINED; length = 0 } ];
+        rsenv = []; idenv = [] }
   Line 36:
-    (giant-step) execution of unimplemented function `([])`
-      a = {elts= UNDEFINED; length= 0}
-      i = 0
-    Property failure at precondition of `([])` with:
-      a = {elts= UNDEFINED; length= 0}
-      i = 0
+    (giant-step) execution of unimplemented function `([])` with args:
+      [ a = { elts = UNDEFINED; length = 0 }, i = 0 ]
+    Property failure at precondition of `([])` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = { elts = UNDEFINED; length = 0 }, i = 0,
+            a = { elts = UNDEFINED; length = 0 }, o = 0 ]; rsenv = [];
+        idenv = [ a = { elts = UNDEFINED; length = 0 }, i = 0 ] }
 
 File "bench/check-ce/array_mono.mlw", line 41, characters 4-14:
 Sub-goal Index in array bounds of goal f2'vc.

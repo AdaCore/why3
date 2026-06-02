@@ -46,6 +46,9 @@ type prover_result = {
   (** The number of steps taken by the prover (-1 if not available) *)
   pr_models : (prover_answer * model) list;
   (** The models produced by a the solver *)
+  pr_cache_source : string option;
+  (** Cache source name injected by spark_memcached_wrapper on a cache hit,
+      or [None] if the result was computed fresh or the source is unknown. *)
 }
 
 val print_prover_answer : Format.formatter -> prover_answer -> unit

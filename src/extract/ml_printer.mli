@@ -27,7 +27,7 @@ type info = private {
   info_syn          : syntax_map;
   info_literal      : syntax_map;
   info_current_th   : Theory.theory;
-  info_current_mo   : Pmodule.pmodule option;
+  info_current_mo   : Pmodule.pmodule0 option;
   info_th_known_map : Decl.known_map;
   info_mo_known_map : Pdecl.known_map;
   info_fname        : string option;
@@ -36,7 +36,7 @@ type info = private {
 }
 
 val create_info :
-  Pdriver.printer_args -> string option -> flat:bool -> Pmodule.pmodule -> info
+  Pdriver.printer_args -> string option -> flat:bool -> Pmodule.pmodule0 -> info
 
 val add_current_path : info -> string -> info
 

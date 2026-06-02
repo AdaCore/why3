@@ -1,0 +1,36 @@
+module Spec
+  use int.Int
+
+  type param
+
+  predicate p param
+
+  val main  (x:param) : int
+    requires { p x }
+    ensures { result > 0 }
+end
+
+module Impl : Spec
+  use int.Int
+
+  type param
+
+  predicate p param
+
+  let main (x: param) : int
+    requires { p x }
+    ensures { result > 0 }
+  =
+    42
+end
+
+module Clone
+  use int.Int
+
+  predicate p (x:int) =
+    x > 42
+
+  clone Impl with
+    type param = int,
+    predicate p = p
+end

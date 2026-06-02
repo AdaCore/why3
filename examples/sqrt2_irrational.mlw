@@ -1,0 +1,20 @@
+
+(** The square root of 2 is irrational.
+
+    Proof by infinite descent.
+*)
+
+use int.Int
+use int.EuclideanDivision
+use number.Parity
+
+let rec lemma sqrt2_irrational (a b: int) : unit
+  requires { 1 <= a } requires { 1 <= b }
+  requires { a*a = 2*b*b } ensures { false }
+  variant  { a+b }
+= assert { even a by even (a*a) };
+  let a' = any int ensures { a = 2 * result } in
+  assert { even (b*b) };
+  assert { even b };
+  let b' = any int ensures { b = 2 * result } in
+  sqrt2_irrational a' b'

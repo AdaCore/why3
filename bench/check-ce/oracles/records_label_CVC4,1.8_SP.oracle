@@ -10,29 +10,26 @@ Sub-goal Postcondition of goal record_old_test1'vc.
 Prover result is: Unknown (sat) (650 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
-    y = {f= 0; g= false}
+    y = { f = 0; g = false }
   Line 11:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `record_old_test1` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 12:
-    Property failure at postcondition of `record_old_test1` with:
-      x = {f= 6; g= false}
-      x = {f= 0; g= false}
-      y = {f= 0; g= false}
+    Property failure at postcondition of `record_old_test1` with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 6; g = false },
+            x = { f = 0; g = false }, y = { f = 0; g = false }, result = () ];
+        rsenv = [];
+        idenv =
+          [ x = { f = 6; g = false }, x = { f = 0; g = false },
+            y = { f = 0; g = false } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -46,30 +43,25 @@ Sub-goal Assertion of goal record_at_test2'vc.
 Prover result is: Unknown (sat) (862 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
-    y = {f= 0; g= false}
+    y = { f = 0; g = false }
   Line 16:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `record_at_test2` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 22:
-    Property failure at assertion with:
-      y = {f= 0; g= false}
-      x = {f= 12; g= false}
-      x = r'mk 0 False
-      x = r'mk 6 False
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 12; g = false }, _ = (),
+            _ = (), x = r'mk 0 False, x = r'mk 6 False ]; rsenv = [];
+        idenv =
+          [ y = { f = 0; g = false }, x = { f = 12; g = false },
+            x = r'mk 0 False, x = r'mk 6 False ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -83,29 +75,24 @@ Sub-goal Assertion of goal several_hats'vc.
 Prover result is: Unknown (sat) (129 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File records_label.mlw:
   Line 9:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {f= 0; g= false}
-    y = {f= 0; g= false}
+    (giant-step) execution of unimplemented function with args: []
+    result = { f = 0; g = false }
+    y = { f = 0; g = false }
   Line 24:
-    x = {f= 0; g= false}
-    x = {f= 0; g= false}
+    x = { f = 0; g = false }
+    x = { f = 0; g = false }
     Execution of main function `several_hats` with env:
-      y = {f= 0; g= false}
-      x = {f= 0; g= false}
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv = [ y = { f = 0; g = false }, x = { f = 0; g = false } ];
+        rsenv = []; idenv = [] }
   Line 30:
-    Property failure at assertion with:
-      x = r'mk 0 False
-      x = r'mk 0 False
+    Property failure at assertion with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { f = 0; g = false }, x = { f = 6; g = false }, _ = (),
+            x = r'mk 0 False, x = r'mk 0 False ]; rsenv = [];
+        idenv = [ x = r'mk 0 False, x = r'mk 0 False ] }
 

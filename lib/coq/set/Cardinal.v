@@ -14,10 +14,10 @@ Require Import BuiltIn.
 Require BuiltIn.
 Require HighOrd.
 Require int.Int.
-Require set.Set.
 Require map.Map.
 Require map.Const.
 Require map.MapExt.
+Require set.Set.
 
 Require Import Lia.
 

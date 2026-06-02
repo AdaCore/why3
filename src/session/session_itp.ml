@@ -1046,6 +1046,7 @@ let load_result a (path,acc) r =
        Call_provers.pr_status = Unix.WEXITED 0;
        Call_provers.pr_steps = steps;
        Call_provers.pr_models = [];
+       Call_provers.pr_cache_source = None;
        }
      in (path,Some res)
   | "undone" | "unedited" -> (path,acc)

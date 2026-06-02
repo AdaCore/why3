@@ -147,7 +147,7 @@ let do_input f =
     let metas = !opt_metas in
     let rac = Pinterp.mk_rac ~ignore_incomplete:!opt_rac_ignore_incomplete
         (Rac.Why.mk_check_term_lit config env ~metas ~why_prover ()) in
-    let env = Pinterp.mk_empty_env env pmod in
+    let env = Pinterp.mk_empty_env env pmod.mod_intf in
     let ctx = Pinterp.mk_ctx env ~do_rac:!opt_enable_rac ~rac ~giant_steps:false
         ~compute_term ~limits () in
     let res = Pinterp.exec_global_fundef ctx [] None expr in

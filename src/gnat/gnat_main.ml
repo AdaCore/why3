@@ -69,7 +69,7 @@ let register_goal cont goal_id =
         if c.Gnat_expl.check.Gnat_expl.already_proved then
           Gnat_checks.set_not_interesting goal_id
         else
-          Gnat_checks.add_to_check c goal_id
+          Gnat_checks.add_to_check c goal_id ~trivially_proved:is_trivial
       end
 
 let rec handle_vc_result c goal result =
@@ -106,6 +106,12 @@ and interpret_result c pa pas =
         | _ -> false &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
+     (if answer = Call_provers.Valid then
+       match r.Call_provers.pr_cache_source with
+       | Some "file" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.File
+       | Some "memcached" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
+       | Some _ -> assert false
+       | None -> ());
      handle_vc_result c goal (answer = Call_provers.Valid)
    | Controller_itp.InternalFailure e ->
        let s = Format.asprintf "Internal Why3 unexpected error during \
@@ -138,6 +144,8 @@ and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
    end else begin
      (* Maybe the goal is already proved *)
       if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
+         if not (Gnat_checks.is_goal_trivially_proved g) then
+           Gnat_checks.mark_goal_from_session_cache g;
          handle_vc_result c g true
       (* Maybe there was a previous proof attempt with identical parameters *)
       end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin
@@ -171,14 +179,14 @@ let maybe_giant_step_rac ctr parent models =
     parent |> Session_itp.find_th ctr.Controller_itp.controller_session |>
     Session_itp.theory_name |> Theory.restore_theory in
   let pm = Pmodule.restore_module th in
+  let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
   if not Gnat_config.giant_step_rac then
-    begin match Check_ce.last_nonempty_model th.Theory.th_known models with
+    begin match Check_ce.last_nonempty_model ~env ~known_map:th.Theory.th_known models with
     | None -> []
     | Some m -> [(m, None)]
     end
   else (
     Debug.dprintf Check_ce.debug_check_ce_categorization "Running giant-step RAC@.";
-    let Controller_itp.{controller_config= cnf; controller_env= env} = ctr in
     let rac_limits =
       match Gnat_config.prover_ce with
       | Some pr -> Gnat_config.limit ~prover:pr ~warning:false
@@ -194,7 +202,7 @@ let maybe_giant_step_rac ctr parent models =
     let compute_term = Rac.Why.mk_compute_term_lit env () in
     let rac = Pinterp.mk_rac check_term in
     let models = Check_ce.models_from_giant_step  ~limits:rac_limits ~compute_term
-        rac env pm models in
+        rac env (pm.Pmodule.mod_impl) models in
     List.map (fun model ->
     match model with
     | (m, Check_ce.RAC_not_done reason) -> (
@@ -214,8 +222,8 @@ let report_messages c check =
   let s = c.Controller_itp.controller_session in
   let result =
     if C.session_proved_status c check then
-      let (stats, stat_checker) = C.Save_VCs.extract_stats c check in
-      Gnat_report.Proved (stats, stat_checker)
+      let (stats, stat_checker, cache_status) = C.Save_VCs.extract_stats c check in
+      Gnat_report.Proved (stats, stat_checker, cache_status)
     else
       let models =
         let ce_pa = C.session_find_ce_pa c check in

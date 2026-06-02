@@ -144,7 +144,7 @@ val td_hash : tdecl -> int
 
 (** theories under constructions *)
 type theory_uc = private {
-  uc_name   : ident;
+  uc_name   : preid;
   uc_path   : string list;
   uc_decls  : tdecl list;
   uc_ranges : tdecl Mts.t;

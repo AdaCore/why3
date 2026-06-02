@@ -2,70 +2,70 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.4" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="array_most_frequent.mlw"/>
 <theory name="Top" proved="true">
  <goal name="most_frequent&#39;vc" expl="VC for most_frequent" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="most_frequent&#39;vc.0" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="4270"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="4271"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="6443"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="6448"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="4702"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="4703"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="7248"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="7252"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.4" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="5062"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="5063"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.5" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="5059"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="5060"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.6" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="5209"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="5210"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.7" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="8573"/></proof>
+  <proof prover="5"><result status="valid" time="0.070000" steps="8580"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="5278"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="5279"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.9" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.170000" steps="32683"/></proof>
+  <proof prover="5"><result status="valid" time="0.297060" steps="32690"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="9862"/></proof>
+  <proof prover="5"><result status="valid" time="0.070000" steps="9893"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="10954"/></proof>
+  <proof prover="5"><result status="valid" time="0.060000" steps="10997"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.290000" steps="52264"/></proof>
+  <proof prover="5"><result status="valid" time="0.290000" steps="52737"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="86115"/></proof>
+  <proof prover="4"><result status="valid" time="0.030000" steps="44960"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.208668" steps="3247"/></proof>
+  <proof prover="1"><result status="valid" time="0.366218" steps="3248"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.090000" steps="206935"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="1.916605" steps="8717"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.102997" steps="2132"/></proof>
+  <proof prover="1"><result status="valid" time="0.102997" steps="2136"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="5594"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="5597"/></proof>
   </goal>
   <goal name="most_frequent&#39;vc.18" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="4717"/></proof>
+  <proof prover="5"><result status="valid" time="0.030000" steps="4718"/></proof>
   </goal>
  </transf>
  </goal>

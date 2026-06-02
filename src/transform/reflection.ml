@@ -267,7 +267,7 @@ let rec reify_term renv t rt =
            | Ttrue | Tfalse -> t
            | _ -> t (* FIXME some cases missing *)
          in
-         t_attr_set ?loc:t.t_loc Sattr.empty t
+         t_attr_set ~locs:t.t_locs Sattr.empty t
        in
        let t = rm t in
        (* remove attributes to identify terms modulo attributes *)
@@ -661,7 +661,7 @@ let reflection_by_function do_trans s env =
        let es = Format.sprintf  "Symbol %s not found@." s in
        raise (Arg_error es)
     | [id] ->
-       let pm = restore_module_id id in
+       let pm = (restore_module_id id).mod_intf in
        Debug.dprintf debug_refl "symbol in module %s@." pm.mod_theory.th_name.id_string;
        (pm, ns_find_rs pm.mod_export qs)
     | _ -> raise (Arg_error "symbol found twice")
@@ -676,7 +676,7 @@ let reflection_by_function do_trans s env =
              (fun id th acc ->
                try
                  let pm = Pmodule.restore_module th in
-                 Mstr.add id.id_string pm acc
+                 Mstr.add id.id_string pm.mod_intf acc
                with Not_found -> acc)
              ths (Mstr.singleton pmod.mod_theory.th_name.id_string pmod) in
   Debug.dprintf debug_refl "module map built@.";

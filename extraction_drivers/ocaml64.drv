@@ -84,8 +84,6 @@ module ref.Refint
 end
 
 module int.Int
-  syntax val zero "Z.zero"
-  syntax val one  "Z.one"
 
   syntax val (<)   "Z.lt"
   syntax val (<=)  "Z.leq"
@@ -158,6 +156,8 @@ module set.SetAppInt
    \n    else aux (SetAppInt.add l acc) (Z.add l Z.one) r\
    \n  in aux SetAppInt.empty l r\n"
 
+  prelude export "exception SetAppIntIterDone\n"
+
   syntax type set      "SetAppInt.t"
   syntax val  (==)     "SetAppInt.equal %1 %2" prec 4 3 3
   syntax val  subset   "SetAppInt.subset %1 %2" prec 4 3 3
@@ -175,6 +175,38 @@ module set.SetAppInt
   syntax val  min_elt  "SetAppInt.min_elt %1" prec 4 3
   syntax val  max_elt  "SetAppInt.max_elt %1" prec 4 3
   syntax val  interval "interval %1 %2" prec 4 3 3
+
+  syntax type Iter.t        "(Z.t Seq.t) ref"
+  syntax exception Iter.Done "SetAppIntIterDone"
+  syntax val  Iter.create   "ref (SetAppInt.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise SetAppIntIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+end
+
+module set.SetAppString
+  prelude export "module SetAppString = Set.Make(String)\nexception SetAppStringIterDone\n"
+  syntax type set      "SetAppString.t"
+  syntax val  (==)     "SetAppString.equal %1 %2" prec 4 3 3
+  syntax val  subset   "SetAppString.subset %1 %2" prec 4 3 3
+  syntax val  empty    "%1; SetAppString.empty" prec 17 16
+  syntax val  is_empty "SetAppString.is_empty %1" prec 4 3
+  syntax val  add      "SetAppString.add %1 %2" prec 4 3 3
+  syntax val  mem      "SetAppString.mem %1 %2" prec 4 3 3
+  syntax val  remove   "SetAppString.remove %1 %2" prec 4 3 3
+  syntax val  union    "SetAppString.union %1 %2" prec 4 3 3
+  syntax val  inter    "SetAppString.inter %1 %2" prec 4 3 3
+  syntax val  diff     "SetAppString.diff %1 %2" prec 4 3 3
+  syntax val  choose   "SetAppString.choose %1" prec 4 3
+  syntax val  disjoint "SetAppString.disjoint %1 %2" prec 4 3 3
+  syntax val  cardinal "Z.of_int (SetAppString.cardinal %1)" prec 4 3
+  syntax val  singleton "SetAppString.add %1 (SetAppString.empty)" prec 4 3
+
+  syntax type Iter.t        "(string Seq.t) ref"
+  syntax exception Iter.Done "SetAppStringIterDone"
+  syntax val  Iter.create   "ref (SetAppString.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise SetAppStringIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+
 end
 
 module set.SetImpInt

@@ -10,26 +10,18 @@ Goal g1.
 Prover result is: Unknown (sat) (65 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 43
   Line 12:
     Execution of main function `g1'goal` with env:
-      a = 43
-      zero = 0
-      one = 1
+      { lsenv = [ a = 43 ]; vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 12:
-    Property failure at postcondition of `g1'goal` with:
+    Property failure at postcondition of `g1'goal` with env:
+      { lsenv = [ a = 43 ]; vsenv = [ result = () ]; rsenv = []; idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -43,13 +35,6 @@ Goal g2.
 Prover result is: Unknown (sat) (83 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 2
@@ -57,15 +42,14 @@ File log-logic.mlw:
     b = 0
   Line 26:
     Execution of main function `g2'goal` with env:
-      a = 2
-      b = 0
-      zero = 0
-      one = 1
+      { lsenv = [ a = 2, b = 0 ]; vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 26:
-    Property failure at postcondition of `g2'goal` with:
+    Property failure at postcondition of `g2'goal` with env:
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ result = () ]; rsenv = [];
+        idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -79,13 +63,6 @@ Goal g3.
 Prover result is: Unknown (sat) (86 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 2
@@ -95,17 +72,14 @@ File log-logic.mlw:
     x = 0
     x = 0
     Execution of main function `g3'goal` with env:
-      a = 2
-      b = 0
-      x = 0
-      zero = 0
-      one = 1
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 37:
-    Property failure at postcondition of `g3'goal` with:
-      x = 0
+    Property failure at postcondition of `g3'goal` with env:
+      { lsenv = [ a = 2, b = 0 ]; vsenv = [ x = 0, result = () ]; rsenv = [];
+        idenv = [ x = 0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -119,13 +93,6 @@ Goal g4.
 Prover result is: Unknown (sat) (89 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 0
@@ -135,16 +102,15 @@ File log-logic.mlw:
     f = fun (bOUND_VARIABLE_318:int) -> 43
   Line 53:
     Execution of main function `g4'goal` with env:
-      a = 0
-      b = 0
-      f = fun (bOUND_VARIABLE_318:int) -> 43
-      zero = 0
-      one = 1
+      { lsenv = [ a = 0, b = 0, f = fun (bOUND_VARIABLE_318:int) -> 43 ];
+        vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 53:
-    Property failure at postcondition of `g4'goal` with:
+    Property failure at postcondition of `g4'goal` with env:
+      { lsenv = [ a = 0, b = 0, f = fun (bOUND_VARIABLE_318:int) -> 43 ];
+        vsenv = [ result = () ]; rsenv = []; idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -158,32 +124,28 @@ Goal g5.
 Prover result is: Unknown (sat) (186 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = (- 1)
   Line 24:
     b = 0
   Line 64:
-    p = fun (bOUND_VARIABLE_3332:int) -> bOUND_VARIABLE_3332 = 0
+    p = fun (bOUND_VARIABLE_3334:int) -> bOUND_VARIABLE_3334 = 0
   Line 68:
     Execution of main function `g5'goal` with env:
-      a = (- 1)
-      b = 0
-      p = fun (bOUND_VARIABLE_3332:int) -> bOUND_VARIABLE_3332 = 0
-      zero = 0
-      one = 1
+      { lsenv =
+          [ a = (- 1), b = 0,
+            p = fun (bOUND_VARIABLE_3334:int) -> bOUND_VARIABLE_3334 = 0 ];
+        vsenv = []; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 68:
-    Property failure at postcondition of `g5'goal` with:
+    Property failure at postcondition of `g5'goal` with env:
+      { lsenv =
+          [ a = (- 1), b = 0,
+            p = fun (bOUND_VARIABLE_3334:int) -> bOUND_VARIABLE_3334 = 0 ];
+        vsenv = [ result = () ]; rsenv = []; idenv = [] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -197,13 +159,6 @@ Goal g6.
 Prover result is: Unknown (sat) (137 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File log-logic.mlw:
   Line 10:
     a = 43
@@ -217,17 +172,17 @@ File log-logic.mlw:
     x = 0
     x = 0
     Execution of main function `g6'goal` with env:
-      a = 43
-      b = 0
-      f = fun (bOUND_VARIABLE_337:int) -> 0
-      p = fun (bOUND_VARIABLE_342:int) -> true
-      x = 0
-      zero = 0
-      one = 1
+      { lsenv =
+          [ a = 43, b = 0, f = fun (bOUND_VARIABLE_337:int) -> 0,
+            p = fun (bOUND_VARIABLE_342:int) -> true ]; vsenv = [ x = 0 ];
+        rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File log-logic.mlw:
   Line 80:
-    Property failure at postcondition of `g6'goal` with:
-      x = 0
+    Property failure at postcondition of `g6'goal` with env:
+      { lsenv =
+          [ a = 43, b = 0, f = fun (bOUND_VARIABLE_337:int) -> 0,
+            p = fun (bOUND_VARIABLE_342:int) -> true ];
+        vsenv = [ x = 0, result = () ]; rsenv = []; idenv = [ x = 0 ] }
 

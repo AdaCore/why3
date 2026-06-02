@@ -106,7 +106,7 @@ module BVCheck_Gen
                   to_uint a * to_uint b < two_power_size
                \/ BV128.ule (BV128.mul (uto_bv128 a) (uto_bv128 b)) max_uint_as_bv128 }
     ensures  { result = mul a b }
-    ensures  { to_int result = to_uint a * to_uint b }
+    ensures  { to_uint result = to_uint a * to_uint b }
 
   (** signed multiplication with overflow check *)
   val s_mul (a b:t) : t

@@ -539,8 +539,8 @@ let is_rlpv s = match s.rs_logic with
 
 let copy_attrs e t =
   if e.e_loc = None && Sattr.is_empty e.e_attrs then t else
-  let loc = if t.t_loc = None then e.e_loc else t.t_loc in
-  t_attr_set ?loc (Sattr.union e.e_attrs t.t_attrs) t
+  let locs = if t.t_locs = [] then Option.to_list e.e_loc else t.t_locs in
+  t_attr_set ~locs (Sattr.union e.e_attrs t.t_attrs) t
 
 let term_of_fmla f = match f.t_node with
   | _ when f.t_ty <> None -> f
@@ -632,7 +632,7 @@ let term_of_expr ~prop e =
   try Some (pure_of_expr prop e) with Exit -> None
 
 let post_of_term res t =
-  let loca f = t_attr_set ?loc:t.t_loc Sattr.empty f in
+  let loca f = t_attr_set ~locs:t.t_locs Sattr.empty f in
   let f_of_t t = loca (t_equ_simp t t_bool_true) in
   match res.t_ty, t.t_ty with
   | Some _, Some _ -> loca (t_equ_simp res t)

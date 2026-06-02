@@ -2,56 +2,58 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="snapshotable_trees.mlw"/>
 <theory name="Enum" proved="true">
  <goal name="enum&#39;vc" expl="VC for enum" proved="true">
- <proof prover="1"><result status="valid" time="0.010000" steps="141"/></proof>
+ <proof prover="3"><result status="valid" time="0.047978" steps="3896"/></proof>
  </goal>
 </theory>
 <theory name="Iterator" proved="true">
  <goal name="create_iterator&#39;vc" expl="VC for create_iterator" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="17"/></proof>
+ <proof prover="3"><result status="valid" time="0.028162" steps="2308"/></proof>
  </goal>
  <goal name="hasNext&#39;vc" expl="VC for hasNext" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="30"/></proof>
+ <proof prover="2"><result status="valid" time="0.037370" steps="30"/></proof>
  </goal>
  <goal name="next&#39;vc" expl="VC for next" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="66"/></proof>
+ <proof prover="0"><result status="valid" time="0.012930" steps="15928"/></proof>
  </goal>
 </theory>
 <theory name="BSTree" proved="true">
  <goal name="bst_mem&#39;vc" expl="VC for bst_mem" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="194"/></proof>
+ <proof prover="2"><result status="valid" time="0.040058" steps="185"/></proof>
  </goal>
  <goal name="bst_add&#39;vc" expl="VC for bst_add" proved="true">
- <proof prover="1"><result status="valid" time="0.080000" steps="562"/></proof>
+ <proof prover="2"><result status="valid" time="0.088010" steps="561"/></proof>
  </goal>
 </theory>
 <theory name="ITree" proved="true">
  <goal name="itree&#39;vc" expl="VC for itree" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="4"/></proof>
+ <proof prover="3"><result status="valid" time="0.027429" steps="1733"/></proof>
  </goal>
  <goal name="create&#39;vc" expl="VC for create" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="4"/></proof>
+ <proof prover="0"><result status="valid" time="0.013414" steps="13689"/></proof>
  </goal>
  <goal name="contains&#39;vc" expl="VC for contains" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="3"><result status="valid" time="0.030447" steps="1783"/></proof>
  </goal>
  <goal name="add&#39;vc" expl="VC for add" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="31"/></proof>
+ <proof prover="3"><result status="valid" time="0.028367" steps="2883"/></proof>
  </goal>
  <goal name="snapshot&#39;vc" expl="VC for snapshot" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
+ <proof prover="0"><result status="valid" time="0.012025" steps="9982"/></proof>
  </goal>
  <goal name="iterator&#39;vc" expl="VC for iterator" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="6"/></proof>
+ <proof prover="3"><result status="valid" time="0.031976" steps="1558"/></proof>
  </goal>
 </theory>
 <theory name="Harness" proved="true">
  <goal name="test&#39;vc" expl="VC for test" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="189"/></proof>
+ <proof prover="2"><result status="valid" time="0.042775" steps="189"/></proof>
  </goal>
 </theory>
 </file>

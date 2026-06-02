@@ -40,18 +40,18 @@ let find_module env cenv q = match q with
       read_module env (Typing.string_list_of_qualid p) nm
 
 let eval_match = let pr = Decl.create_prsymbol (Ident.id_fresh "dummy'pr") in
-  fun muc vl f -> try Eval_match.eval_match ~keep_trace:false muc.muc_known f
+  fun muc vl f -> try Eval_match.eval_match ~keep_trace:false muc.muc_intf.muc_known f
     with Not_found -> (* make a throwout muc with the required imports *)
       let muc = Pmodule.add_pdecl ~vc:false muc @@ Pdecl.create_pure_decl @@
         Decl.create_prop_decl Decl.Pgoal pr @@ Term.t_forall_close vl [] f in
-      Eval_match.eval_match ~keep_trace:false muc.muc_known f
+      Eval_match.eval_match ~keep_trace:false muc.muc_intf.muc_known f
 
 let eval_match muc vl f =
   if Debug.test_flag debug_no_eval then f else eval_match muc vl f
 
 let add_def (c,muc) (flat,dfl) =
   Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block dfl;
-  let c, gl = vc_defn (c_known c muc.muc_theory.uc_known) flat dfl in
+  let c, gl = vc_defn (c_known c muc.muc_intf.muc_theory.uc_known) flat dfl in
   let add muc ({hs_name = {Ident.id_string = s}}, f) =
     let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
     let d = Decl.create_prop_decl Decl.Pgoal pr (eval_match muc [] f) in
