@@ -223,15 +223,21 @@ let preid_name id = id.pre_name
 (** Unique names for pretty printing *)
 
 type ident_printer = {
-  indices   : int Hstr.t;
-  values    : string Hid.t;
-  sanitizer : string -> string;
-  blacklist : string list;
+  indices       : int Hstr.t;
+  values        : string Hid.t;
+  sanitizer     : string -> string;
+  blacklist     : string list;
+  strip_numbers : bool;
 }
 
-(* name is already sanitized *)
-let find_unique indices name =
+(* name is already sanitized.  When [strip] is set, any trailing digits are
+   dropped before disambiguation so that pre-existing numbering is
+   canonicalized away; uniqueness is then re-established by the usual indexing.
+   This loses information, so it should only be requested where the original
+   numbering is known to be irrelevant. *)
+let find_unique ?(strip = false) indices name =
   let name =
+    if not strip then name else
     let last_non_num_index =
       let rec aux i =
         if i < 0 then -1 else
@@ -270,13 +276,14 @@ let reserve indices name = ignore (find_unique indices name)
 
 let same x = x
 
-let create_ident_printer ?(sanitizer = same) sl =
+let create_ident_printer ?(sanitizer = same) ?(strip_numbers = false) sl =
   let indices = Hstr.create 1997 in
   List.iter (reserve indices) sl;
-  { indices   = indices;
-    values    = Hid.create 1997;
-    sanitizer = sanitizer;
-    blacklist = sl }
+  { indices       = indices;
+    values        = Hid.create 1997;
+    sanitizer     = sanitizer;
+    blacklist     = sl;
+    strip_numbers = strip_numbers }
 
 let duplicate_ident_printer id_printer =
   {id_printer with
@@ -295,11 +302,12 @@ let id_unique printer ?(sanitizer = same) id =
     Hid.find printer.values id
   with Not_found ->
     let name = sanitizer (printer.sanitizer id.id_string) in
-    let name = find_unique printer.indices name in
+    let name = find_unique ~strip:printer.strip_numbers printer.indices name in
     Hid.replace printer.values id name;
     name
 
-let string_unique printer s = find_unique printer.indices (printer.sanitizer s)
+let string_unique printer s =
+  find_unique ~strip:printer.strip_numbers printer.indices (printer.sanitizer s)
 
 let forget_id printer id =
   try
