@@ -429,6 +429,24 @@ module Sum
   use Seq
   use int.Sum as S
 
+  function sum (f: 'a -> int) (s: seq 'a) : int =
+    S.sum (fun i -> f s[i]) 0 (length s)
+
+  lemma sum_cons:
+    forall f: 'a -> int, x: 'a, s: seq 'a. sum f (cons x s) = f x + sum f s
+  lemma sum_snoc:
+    forall f: 'a -> int, s: seq 'a, x: 'a. sum f (snoc s x) = sum f s + f x
+  lemma sum_append:
+    forall f: 'a -> int, s1 s2: seq 'a. sum f (s1 ++ s2) = sum f s1 + sum f s2
+
+end
+
+module SumInt
+
+  use int.Int
+  use Seq
+  use int.Sum as S
+
   function sum (s: seq int) : int = S.sum (fun i -> s[i]) 0 (length s)
 
   lemma sum_snoc:

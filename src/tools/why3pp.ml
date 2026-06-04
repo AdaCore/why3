@@ -30,6 +30,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | "++" -> "\\mathbin{+\\mkern-10mu+}"
     | "<=" -> "\\le"
     | ">=" -> "\\ge"
+    | "*" -> "\\times"
     | s -> s
 
   (** Optionally extract trailing numbers and quotes, after an optional single or double
@@ -55,21 +56,21 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
 
   (** Requirements *)
 
-  type command_shape = {name: string; name': string; arity: int}
+  type command_shape = {name: string; name': string; arity: int; iscomment: bool}
 
   module Requirements = Set.Make (struct type t = command_shape let compare = compare end)
 
   let requirements = ref Requirements.empty
 
-  let record_command_shape name name' arity =
-    requirements := Requirements.add {name; name'; arity} !requirements
+  let record_command_shape ~iscomment name name' arity =
+    requirements := Requirements.add {name; name'; arity; iscomment} !requirements
 
   (** {2 Printers} *)
   let pp_command' ~suffix fmt base =
     fprintf fmt "\\%s%s%s" prefix (sanitize base) suffix
 
   (** Print a string as a LaTeX command *)
-  let pp_command ~arity ~is_field fmt name =
+  let pp_command ~iscomment ~arity ~is_field fmt name =
     if match sn_decode name with | SNword _ -> false | _ -> true then
       failwith ("pp_command: argument not word: "^name);
     let name, name', suffix =
@@ -92,22 +93,22 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       else
         (assert (not is_field);
          name^string_of_int arity, name, "") in
-    record_command_shape name name' arity;
+    record_command_shape ~iscomment name name' arity;
     pp_command' ~suffix fmt name
 
-  let pp_var' ~arity fmt s =
-    pp_command ~arity ~is_field:false fmt s
+  let pp_var' ~iscomment ~arity fmt s =
+    pp_command ~iscomment ~arity ~is_field:false fmt s
 
   let pp_var ~arity fmt id =
-    pp_var' ~arity fmt id.id_str
+    pp_var' ~iscomment:false ~arity fmt id.id_str
 
   let pp_field fmt id =
-    pp_command ~arity:0 ~is_field:true fmt id.id_str
+    pp_command ~iscomment:false ~arity:0 ~is_field:true fmt id.id_str
 
   let pp_str str fmt () =
     fprintf fmt str
 
-  let pp_command_shape ~comment_macros fmt {name; name'; arity} =
+  let pp_command_shape ~comment_macros fmt {name; name'; arity; iscomment} =
     let rec mk_args acc = function
       | 0 -> acc
       | n -> mk_args (sprintf "#%d" n::acc) (pred n) in
@@ -117,9 +118,11 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       else
         let args = mk_args [] n in
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_print_string) args in
-    fprintf fmt "%s\\newcommand{%a}[%d]{\\mathsf{%s}%a}@."
+    fprintf fmt "%s\\newcommand{%a}[%d]{\\%s{%s}%a}@."
       (if comment_macros then "% " else "")
-      (pp_command' ~suffix:"") name arity (sanitize name') pp_args arity
+      (pp_command' ~suffix:"") name arity
+      (if iscomment then "textit" else "mathsf")
+      (sanitize name') pp_args arity
 
   (** {2 Pretty-print inductive definition to latex }*)
 
@@ -151,7 +154,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
           (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_type)) ts
     | PTtuple ts ->
         fprintf fmt "(%a)"
-          (pp_print_list ~pp_sep:(pp_str "") pp_type) ts
+          (pp_print_list ~pp_sep:(pp_str ",") pp_type) ts
     | PTarrow (ty1, ty2) ->
         fprintf fmt "%a \\rightarrow %a"
           pp_type ty1 pp_type ty2
@@ -166,7 +169,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
   let rec pp_pattern fmt p =
     match p.pat_desc with
     | Pwild ->
-        pp_print_string fmt "~\\_~"
+        pp_print_string fmt "\\_"
     | Pvar id ->
         pp_var ~arity:0 fmt id
     | Papp (qid, ps) ->
@@ -176,7 +179,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Prec fs ->
         fprintf fmt "\\texttt{\\{}%a\\texttt{\\}}"
           (pp_print_list ~pp_sep:(pp_str "\\texttt{;} ") (pp_field pp_pattern)) fs
-    | Ptuple ps ->
+    | Pparen { pat_desc = Ptuple ps } | Ptuple ps ->
         fprintf fmt "(%a)" (pp_print_list ~pp_sep:(pp_str ", ") pp_pattern) ps
     | Pas (p, id, _) ->
         fprintf fmt "%a \\texttt{as} %a" pp_pattern p (pp_var ~arity:0) id
@@ -206,8 +209,16 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | DTexists -> fprintf fmt "\\exists"
     | DTlambda -> fprintf fmt "\\lambda")
 
-  let pp_binder fmt (_loc,id,_ghost,_type) =
-    Pp.print_option (pp_var ~arity:0) fmt id
+  let pp_param_binder ~with_type fmt (_loc,id,_ghost,ty) =
+    Pp.print_option (pp_var ~arity:0) fmt id;
+    if with_type then fprintf fmt ":%a" pp_type ty
+
+  let pp_binder ~with_type fmt (_loc,id,_ghost,ty) =
+    Pp.print_option (pp_var ~arity:0) fmt id;
+    if with_type then
+      match ty with
+      | Some ty -> fprintf fmt ":%a" pp_type ty
+      | None -> ()
 
   let rec pp_term fmt t =
     match t.term_desc with
@@ -215,6 +226,8 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         pp_print_string fmt "\\top"
     | Tfalse ->
         pp_print_string fmt "\\bot"
+    | Tconst (Constant.ConstStr s) ->
+        fprintf fmt "\\WHYstringliteral{\\detokenize{%s}}" s
     | Tconst n ->
         Constant.print_def fmt n
     | Tident qid ->
@@ -249,7 +262,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
          | SNword s, ts ->
              let arity = List.length ts in
              let pp_args = pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_term) in
-             fprintf fmt "%a%a" (pp_var' ~arity) s pp_args ts
+             fprintf fmt "%a%a" (pp_var' ~iscomment:false ~arity) s pp_args ts
          | SNinfix s, [t1; t2] ->
              fprintf fmt "%a %s %a" pp_term t1 (sanitize_op s) pp_term t2
          | SNprefix s, [t]
@@ -279,12 +292,12 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
              fprintf fmt "%a%a" (pp_var ~arity) (id_of_qualid qid)
                (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_term)) ts
          | None ->
-             fprintf fmt "%a %a" pp_term t1 pp_term t2)
+             fprintf fmt "%a~%a" pp_term t1 pp_term t2)
     | Tnot {term_desc=Tinfix (t1, op, t2)} when
         sn_decode op.id_str = SNinfix "=" ->
         fprintf fmt "%a \\neq %a" pp_term t1 pp_term t2
     | Tnot t ->
-        fprintf fmt "\\neg %a" pp_term t
+        fprintf fmt "\\neg~%a" pp_term t
     | Tif (t1, t2, t3) ->
         fprintf fmt "\\texttt{if}~%a~\\texttt{then}~%a~\\texttt{else}~%a"
           pp_term t1 pp_term t2 pp_term t3
@@ -294,8 +307,11 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Tquant (q, bl, _, t) ->
         fprintf fmt "%a~%a.~%a"
           pp_quant q
-          (Pp.print_list Pp.comma pp_binder) bl
+          (Pp.print_list Pp.comma (pp_binder ~with_type:true)) bl
           pp_term t
+    | Tcase (t, [(p,t')]) ->
+        fprintf fmt "\\texttt{let}~%a~\\texttt{=}~%a~\\texttt{in}~%a"
+          pp_pattern p pp_term t pp_term t'
     | Tcase (t, bs) ->
         let pp_sep = pp_str "\\\\@\n\\mid~ " in
         let pp_branch fmt (p, t') = fprintf fmt "%a \\rightarrow \\\\ \\qquad %a" pp_pattern p pp_term t' in
@@ -314,7 +330,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
         fprintf fmt "\\{%a~\\texttt{with}~%a\\}" pp_term t pp_fs fs
     | Tscope (_, t) ->
         pp_term fmt t
-    | Tattr _ -> failwith "pp_term: attr"
+    | Tattr(_,t1) -> pp_term fmt t1
     | Tat _ -> failwith "pp_term: at"
     | Tasref _ -> failwith "pp_term: asref"
     | Teps _ -> failwith "pp_term: teps"
@@ -341,15 +357,23 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
       match path, mlw_file with
       | [name], Decls decls -> name, decls
       | [module_name; name], Modules modules ->
-          let aux (id, _) = String.compare id.id_str module_name = 0 in
-          name, snd (List.find aux modules)
+          let aux (id, _, _) = String.compare id.id_str module_name = 0 in
+          name, let (_, _, decls) = List.find aux modules in decls
       | _ -> raise Not_found
     in
-    let aux acc = function
+    let aux acc d = match d with
       | Dind (ind_kind, ind_decls) ->
           let aux acc decl =
-            if String.compare decl.in_ident.id_str name = 0 then
-              (Dind (ind_kind, [decl])) :: acc else acc
+            let acc =
+              if String.compare decl.in_ident.id_str name = 0 then
+                (Dind (ind_kind, [decl])) :: acc else acc
+            in
+            List.fold_left
+              (fun acc (_loc,id,f) ->
+                 if String.compare id.id_str name = 0 then
+                   (Dprop (Decl.Paxiom,id,f)) :: acc else acc)
+              acc
+              decl.in_def
           in
           List.fold_left aux acc ind_decls
       | Dlogic dl ->
@@ -362,7 +386,25 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
             if String.compare decl.td_ident.id_str name = 0 then
               (Dtype [decl]) :: acc else acc in
           List.fold_left aux acc dl
-      | _ -> acc
+      | Dprop (_, id, _) ->
+            if String.compare id.id_str name = 0 then
+              d :: acc else acc
+      | Dlet (id, _, _, _) ->
+          if String.compare id.id_str name = 0 then
+            d :: acc else acc
+      | Drec fdl ->
+          let aux acc ((id,_,_,_,_,_,_,_,_) as d) =
+            if String.compare id.id_str name = 0 then
+              (Drec [d]) :: acc else acc in
+          List.fold_left aux acc fdl
+      | Dexn (_, _, _) -> acc
+      | Dmeta (_, _) -> acc
+      | Dcloneexport (_, _, _) -> acc
+      | Duseexport (_, _)  -> acc
+      | Dcloneimport (_, _, _, _, _) -> acc
+      | Duseimport (_, _, _) -> acc
+      | Dimport _ -> acc
+      | Dscope (_, _, _, _)  -> acc
     in
     List.fold_left aux [] decls
 
@@ -390,7 +432,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     fprintf fmt "\\begin{displaymath} %% %s@." (String.concat "." path);
     fprintf fmt "\\begin{array}{l}@.";
     fprintf fmt "%a%a \\quad ::= \\\\ \\qquad %a@." (pp_var ~arity) id
-      (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_binder)) params
+      (pp_print_list ~pp_sep:(pp_str "") (pp_arg (pp_param_binder ~with_type:true))) params
          (Pp.print_option pp_term) body;
     fprintf fmt "\\end{array}@.";
     fprintf fmt "\\end{displaymath}@."
@@ -403,7 +445,7 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
           let arity = List.length params in
           fprintf fmt "%a%a & %a" (pp_var ~arity) id
             (pp_print_list ~pp_sep:(pp_str "") (pp_arg pp_param)) params
-            (pp_var' ~arity:0) ("comment" ^ id.id_str)
+            (pp_var' ~iscomment:true ~arity:0) ("comment" ^ id.id_str)
         in
         fprintf fmt "%a" (Pp.print_list pp_sep pp_constr) dl
     | _ -> ()
@@ -418,6 +460,39 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     fprintf fmt "\\end{array}@.";
     fprintf fmt "\\end{displaymath}@."
 
+  let pp_pre fmt f =
+    fprintf fmt "  requires { $%a$ }@." pp_term f
+
+  let pp_post fmt (_loc,l) =
+    match l with
+    | [pat,f] -> fprintf fmt "  returns  { $%a$  ->  $%a$ }@." pp_pattern pat pp_term f
+    | _ -> assert false
+
+  let pp_xpost fmt (xid,opt) =
+    fprintf fmt "  raises   { $%a$" (pp_var ~arity:0) (id_of_qualid xid);
+    match opt with
+    | None -> fprintf fmt " }@."
+    | Some (pat,f) ->
+        fprintf fmt "$%a$  ->  $%a$ }@." pp_pattern pat pp_term f
+
+  let pp_xpost fmt (_loc,l) = List.iter (pp_xpost fmt) l
+
+  let pp_spec fmt spec =
+    List.iter (pp_pre fmt) spec.sp_pre;
+    fprintf fmt "  writes   { %a }@." (Pp.print_list (pp_str ",") pp_term) spec.sp_writes;
+    List.iter (pp_post fmt) spec.sp_post;
+    List.iter (pp_xpost fmt) spec.sp_xpost
+
+  let pp_fun_arg fmt arg =
+    fprintf fmt "$%a$" (pp_binder ~with_type:true) arg
+
+  let pp_fundecl fmt _path id args ret_ty spec =
+    fprintf fmt "\\begin{lstlisting}[mathescape=true]@.";
+    fprintf fmt "val %s (%a) : $%a$@." id.id_str (Pp.print_list (pp_str ", ") pp_fun_arg)
+      args (Pp.print_option pp_type) ret_ty;
+    pp_spec fmt spec;
+    fprintf fmt "\\end{lstlisting}@."
+
   let pp_decl fmt path d : unit =
     match d with
     | Dind(_k, dl) ->
@@ -430,7 +505,24 @@ module LatexInd (Conf: sig val prefix: string val flatten_applies : bool val com
     | Dtype dl ->
         List.iter (fun d ->
             pp_type_decl fmt path d.td_ident d.td_params d.td_def) dl
-    | _ -> ()
+    | Dprop (_, id, f) ->  pp_rules fmt path [(id,flatten_implies f)]
+    | Drec dl ->
+        List.iter (fun (id,_gh,_rsk,args,ret_ty,_pat,_mask,spec,_body) ->
+            pp_fundecl fmt path id args ret_ty spec) dl
+    | Dlet (id, _gh, _rsk, { expr_desc = Efun(args,ret_ty, _pat,_mask,spec,_body) } ) ->
+        pp_fundecl fmt path id args ret_ty spec
+    | Dlet (id, _gh, _rsk1, { expr_desc = Eany(args, _rsk2, ret_ty, _pat, _mask,spec) } ) ->
+        let args = List.map (fun (loc,id,gh,ty) -> (loc,id, gh, Some ty)) args in
+        pp_fundecl fmt path id args ret_ty spec
+    | Dlet (_, _, _, _) -> assert false
+    | Dexn (_, _, _) -> assert false
+    | Dmeta (_, _) -> assert false
+    | Dcloneexport (_, _, _) -> assert false
+    | Duseexport (_, _) -> assert false
+    | Dcloneimport (_, _, _, _, _) -> assert false
+    | Duseimport (_, _, _) -> assert false
+    | Dimport _ -> assert false
+    | Dscope (_, _, _, _) -> assert false
 
   let path_not_found = Loc.register_warning "path_not_found"
       "Path given to `why3 pp` is not found"
@@ -531,7 +623,8 @@ let deps_decl fmt filename modname d =
   | Dimport _ -> ()
   | Dscope _ -> ())
 
-let deps_module fmt filename modname dl =
+let deps_module fmt filename modname intf dl =
+  Option.iter (fun q -> deps_use fmt filename modname q) intf;
   List.iter (deps_decl fmt filename modname) dl
 
 let deps_file fmt header filename f =
@@ -543,9 +636,9 @@ let deps_file fmt header filename f =
   begin
     Ptree.(match f with
   | Modules ml ->
-     List.iter (fun (n,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) dl) ml
+     List.iter (fun (n,i,dl) -> deps_module fmt filename (filename ^ "." ^ n.id_str) i dl) ml
     (* a list of modules containing lists of declarations *)
-  | Decls dl -> deps_module fmt filename (filename ^ ".Top") dl)
+  | Decls dl -> deps_module fmt filename (filename ^ ".Top") None dl)
   end;
   if header then fprintf fmt "}@."
 

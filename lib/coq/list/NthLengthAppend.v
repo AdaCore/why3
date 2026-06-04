@@ -16,8 +16,8 @@ Require int.Int.
 Require list.List.
 Require list.Length.
 Require list.Mem.
-Require list.Nth.
 Require option.Option.
+Require list.Nth.
 Require list.NthLength.
 Require list.Append.
 

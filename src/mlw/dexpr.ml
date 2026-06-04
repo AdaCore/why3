@@ -948,7 +948,7 @@ let binders ghost bl =
 let to_fmla f = match f.t_ty with
   | None -> f
   | Some ty when ty_equal ty ty_bool -> t_equ f t_bool_true
-  | _ -> Loc.error ?loc:f.t_loc Dterm.FmlaExpected
+  | _ -> Loc.error ?loc:(t_loc f) Dterm.FmlaExpected
 
 let create_assert = to_fmla
 
@@ -962,7 +962,7 @@ let create_xpost xql = Mxs.mapi (fun xs ql -> create_post xs.xs_ity ql) xql
 (** User effects *)
 
 let rec effect_of_term t =
-  let quit () = Loc.errorm ?loc:t.t_loc "unsupported effect expression" in
+  let quit () = Loc.errorm ?loc:(t_loc t) "unsupported effect expression" in
   match t.t_node with
   | Tapp (fs, [ta]) ->
       let v, ity, fa = effect_of_term ta in
@@ -990,12 +990,12 @@ let effect_of_dspec dsp =
           | Some fd -> Spv.singleton (Option.get fd.rs_field)
           | None -> Spv.of_list reg.reg_its.its_mfields in
         if not reg.reg_its.its_private && Spv.is_empty fs then
-          Loc.errorm ?loc:t.t_loc "mutable expression expected";
+          Loc.errorm ?loc:(t_loc t) "mutable expression expected";
         let rd = Spv.singleton v and wr = Mreg.singleton reg fs in
-        let e = Loc.try2 ?loc:t.t_loc eff_write rd wr in
+        let e = Loc.try2 ?loc:(t_loc t) eff_write rd wr in
         (e,t)::l, eff_union_par eff e
     | _ ->
-        Loc.errorm ?loc:t.t_loc "mutable expression expected" in
+        Loc.errorm ?loc:(t_loc t) "mutable expression expected" in
   let wl, eff = List.fold_left add_write ([], eff_read pvs) dsp.ds_writes in
   let eff = Mxs.fold (fun xs _ eff -> eff_raise eff xs) dsp.ds_xpost eff in
   let eff = if dsp.ds_partial then eff_partial eff else eff in
@@ -1026,7 +1026,7 @@ let check_spec inr dsp ecty ({e_loc = loc} as e) =
     "variable@ %a@ does@ not@ occur@ in@ this@ expression"
     Pretty.print_vs (Spv.choose (Spv.diff ueff.eff_reads eeff.eff_reads)).pv_vs;
   if check_ue && bad_write ueff eeff then List.iter (fun (weff,t) ->
-    if bad_write weff eeff then Loc.errorm ?loc:t.t_loc
+    if bad_write weff eeff then Loc.errorm ?loc:(t_loc t)
       "this@ write@ effect@ does@ not@ happen@ in@ the@ expression") uwrl;
   if check_ue && bad_raise ueff eeff then Loc.errorm ?loc
     "this@ expression@ does@ not@ raise@ exception@ %a"

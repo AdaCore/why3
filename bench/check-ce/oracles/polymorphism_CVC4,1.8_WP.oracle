@@ -15,13 +15,14 @@ File polymorphism.mlw:
     x = (B 1)
     x = (B 1)
     Execution of main function `gm'goal` with env:
-      x = (B 1)
+      { lsenv = []; vsenv = [ x = (B 1) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File polymorphism.mlw:
   Line 7:
-    Property failure at postcondition of `gm'goal` with:
-      x = (B 1)
+    Property failure at postcondition of `gm'goal` with env:
+      { lsenv = []; vsenv = [ x = (B 1), result = () ]; rsenv = [];
+        idenv = [ x = (B 1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -40,14 +41,14 @@ File polymorphism.mlw:
     x = (C 0 true)
     x = (C 0 true)
     Execution of main function `gm2'goal` with env:
-      x = (C 0 true)
+      { lsenv = []; vsenv = [ x = (C 0 true) ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File polymorphism.mlw:
   Line 11:
-    Property failure at postcondition of `gm2'goal` with:
-      False = UNDEFINED
-      x = (C 0 true)
+    Property failure at postcondition of `gm2'goal` with env:
+      { lsenv = []; vsenv = [ x = (C 0 true), result = () ]; rsenv = [];
+        idenv = [ False = UNDEFINED, x = (C 0 true) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: BAD_CE

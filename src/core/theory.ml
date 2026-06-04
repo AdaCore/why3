@@ -286,7 +286,7 @@ let td_hash td = td.td_tag
 (** Constructors and utilities *)
 
 type theory_uc = {
-  uc_name   : ident;
+  uc_name   : preid;
   uc_path   : string list;
   uc_decls  : tdecl list;
   uc_ranges : tdecl Mts.t;
@@ -305,7 +305,7 @@ exception CloseTheory
 exception NoOpenedNamespace
 
 let empty_theory n p = {
-  uc_name   = id_register n;
+  uc_name   = n;
   uc_path   = p;
   uc_decls  = [];
   uc_ranges = Mts.empty;
@@ -322,7 +322,7 @@ let empty_theory n p = {
 
 let close_theory uc = match uc.uc_export with
   | [e] ->
-    { th_name   = uc.uc_name;
+    { th_name   = id_register uc.uc_name;
       th_path   = uc.uc_path;
       th_decls  = List.rev uc.uc_decls;
       th_ranges = uc.uc_ranges;
@@ -476,7 +476,7 @@ let store_path, store_theory, restore_path, restore_theory =
     (* this symbol already belongs to some theory *)
     if Wid.mem id_to_path id then () else
     let prefix = List.rev (id.id_string :: path @ uc.uc_prefix) in
-    Wid.set id_to_path id (uc.uc_path, uc.uc_name.id_string, prefix)
+    Wid.set id_to_path id (uc.uc_path, uc.uc_name.pre_name, prefix)
   in
   let store_theory th =
     let id = th.th_name in
@@ -543,8 +543,8 @@ let warn_dubious_axiom uc k p syms =
 let attr_w_non_conservative_extension_no =
   Ident.create_attribute "W:non_conservative_extension:N"
 
-let should_be_conservative id =
-  not (Sattr.mem attr_w_non_conservative_extension_no id.id_attrs)
+let should_be_conservative attrs =
+  not (Sattr.mem attr_w_non_conservative_extension_no attrs)
 
 let add_decl ?(warn=true) uc d =
   let uc = add_tdecl uc (create_decl d) in
@@ -574,8 +574,8 @@ let add_decl ?(warn=true) uc d =
         List.fold_left add uc la in
       List.fold_left add_ind uc dl
   | Dprop (k,pr,_) ->
-      if warn && should_be_conservative uc.uc_name &&
-         should_be_conservative pr.pr_name
+      if warn && should_be_conservative uc.uc_name.pre_attrs &&
+         should_be_conservative pr.pr_name.id_attrs
       then warn_dubious_axiom uc k pr.pr_name (get_used_syms_decl d);
       add_symbol_pr uc pr
 

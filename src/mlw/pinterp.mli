@@ -25,7 +25,7 @@ val init_real : int * int * int -> unit
 (** The execution context *)
 type ctx
 
-val mk_empty_env : Env.env -> Pmodule.pmodule -> Pinterp_core.env
+val mk_empty_env : Env.env -> Pmodule.pmodule0 -> Pinterp_core.env
 (** {!Pinterp_core.env} repeated here for convenience. *)
 
 val mk_rac : ?ignore_incomplete:bool -> check_term -> rac

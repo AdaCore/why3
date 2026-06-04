@@ -1,5 +1,5 @@
 
-(* Sorting a list of integers using insertion sort *)
+(** Sorting a list using insertion sort *)
 
 module InsertionSort
 
@@ -32,5 +32,169 @@ module InsertionSort
     | Nil -> Nil
     | Cons x r -> insert x (insertion_sort r)
     end
+
+end
+
+(** In the following variant, we use a single recursive function
+    (with tail calls only).
+
+    Author: Andrei Paskevich (Univ Paris-Saclay)
+*)
+
+module SingleFunction
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Permut
+
+  type elt
+  val predicate le elt elt
+  val predicate eq (x y: elt) ensures { result <-> x=y }
+
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+  clone list.Sorted with
+    type t = elt, predicate le  = le, goal Transitive.Trans
+
+  let predicate ge (x y: elt) = le y x
+  clone list.Sorted as R with
+    type t = elt, predicate le  = ge, goal Transitive.Trans
+
+  let predicate gt (x y: elt) = ge x y && not (eq x y)
+
+  let rec sort (ul dl sl cl: list elt) : list elt
+    requires { sorted sl }
+    requires { R.sorted dl }
+    requires { R.sorted cl }
+    requires { match ul, cl with Cons u _, Cons v _ -> ge u v | _ -> true end }
+    requires { match sl, cl with Cons u _, Cons v _ -> ge u v | _ -> true end }
+    requires { match sl, dl with Cons u _, Cons v _ -> ge u v | _ -> true end }
+    requires { cl <> Nil -> dl = Nil /\ ul <> Nil }
+    variant  { ul,dl,sl,cl }
+    ensures  { sorted result }
+    ensures  { forall v. num_occ v result = num_occ v ul + num_occ v dl +
+                                            num_occ v sl + num_occ v cl }
+  = match ul,dl,sl,cl with
+    | _, Cons v dx,         _, _ ->                sort ul dx (Cons v sl) cl
+    | Cons u ux, _, Cons v sx, _ -> if gt u v then sort ul dl sx (Cons v cl)
+                                              else sort ux cl (Cons u sl) dl
+    | Cons u ux, _,         _, _ ->                sort ux cl (Cons u sl) dl
+    | _, _, _, _                 -> sl
+    end
+
+  let insertion_sort (ul: list elt) : list elt
+    ensures  { sorted result }
+    ensures  { permut result ul }
+  = sort ul Nil Nil Nil
+
+end
+
+
+(** An improved zipper-based algorithm
+
+    Author: Andrei Paskevich (Univ Paris-Saclay)
+*)
+
+module ZipperInsertion
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Permut
+
+  type elt
+  val predicate le elt elt
+  val predicate eq (x y: elt) ensures { result <-> x = y }
+
+  clone relations.TotalPreOrder with
+    type t = elt, predicate rel = le, axiom .
+
+  clone list.Sorted with
+    type t = elt, predicate le = le, goal Transitive.Trans
+
+  let predicate ge (x y: elt) = le y x
+
+  clone list.Sorted as R with
+    type t = elt, predicate le = ge, goal Transitive.Trans
+
+  predicate list_le (ul vl: list elt) = match ul, vl with
+    | Cons u _, Cons v _ -> le u v | _ -> true end
+
+  let rec sort (ll ul rl: list elt) (lu ur: bool) : list elt
+    requires { sorted rl }
+    requires { R.sorted ll }
+    requires { list_le ll rl }
+    requires { list_le ll ul \/ lu }
+    requires { list_le ul rl \/ ur }
+    requires { ul = Nil -> lu /\ ur }
+    requires { ll = Nil -> lu }
+    requires { rl = Nil -> ur }
+    variant  { ul, (if lu then ll else Nil),
+                   (if ur then rl else Nil),
+                   (if lu then Nil else ll),
+                   (if ur then Nil else rl) }
+    ensures  { sorted result }
+    ensures  { forall v. num_occ v result = num_occ v ll +
+                             num_occ v ul + num_occ v rl }
+  = match ll,ul,rl,lu,ur with
+    | _, Cons u _, Cons r rt, _, True ->
+        if le u r then sort         ll  ul rl lu   False
+                  else sort (Cons r ll) ul rt False True
+    | Cons l lt, Cons u _, _, True, _ ->
+        if le l u then sort ll ul         rl  False   ur
+                  else sort lt ul (Cons l rl) True False
+    | lx, Cons v ux, _, _, _
+    | Cons v lx, ux, _, _, _ ->
+                       sort lx ux (Cons v rl) True True
+    | _, _, rl, _, _ -> rl
+    end
+
+  let insertion_sort (ul: list elt) : list elt
+    ensures  { sorted result }
+    ensures  { permut result ul }
+  = sort Nil ul Nil True True
+
+  (* A slightly optimized version, where we move
+     an element on every iteration. *)
+
+  let rec sort_bis (ll ul rl: list elt) (lu ur: bool) : list elt
+    requires { sorted rl }
+    requires { R.sorted ll }
+    requires { list_le ll rl }
+    requires { list_le ll ul \/ lu }
+    requires { list_le ul rl \/ ur }
+    requires { ul = Nil -> lu /\ ur }
+    requires { ll = Nil -> lu }
+    requires { rl = Nil -> ur }
+    variant  { ul, (if lu then ll else Nil),
+                   (if ur then rl else Nil),
+                   (if lu then Nil else ll),
+                   (if ur then Nil else rl) }
+    ensures  { sorted result }
+    ensures  { forall v. num_occ v result = num_occ v ll +
+                             num_occ v ul + num_occ v rl }
+  = match ll,ul,rl,lu,ur with
+    | Cons l lt, Cons u ut, Cons r rt, True, True ->
+        if le u r then
+        if le l u then sort_bis ll ut (Cons u rl) True True
+                  else sort_bis lt ul (Cons l rl) True False
+                  else sort_bis (Cons r ll) ul rt False True
+    | _, Cons u ut, Cons r rt, _, True ->
+        if le u r then sort_bis ll ut (Cons u rl) True True
+                  else sort_bis (Cons r ll) ul rt False True
+    | Cons l lt, Cons u ut, _, True, _ ->
+        if le l u then sort_bis ll ut (Cons u rl) True True
+                  else sort_bis lt ul (Cons l rl) True False
+    | lx, Cons v ux, _, _, _
+    | Cons v lx, ux, _, _, _ ->
+                       sort_bis lx ux (Cons v rl) True True
+    | _, _, rl, _, _ -> rl
+    end
+
+  let insertion_sort_bis (ul: list elt) : list elt
+    ensures  { sorted result }
+    ensures  { permut result ul }
+  = sort_bis Nil ul Nil True True
 
 end

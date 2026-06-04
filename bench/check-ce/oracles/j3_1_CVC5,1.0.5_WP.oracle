@@ -1,0 +1,26 @@
+File "bench/check-ce/j3_1.mlw", line 13, characters 11-33:
+Sub-goal Assertion of goal test'vc.
+Prover result is: Valid (257 steps).
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+- Selected model 1: INCOMPLETE
+  - Concrete RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+  - Abstract RAC: INCOMPLETE (terminated because Assertion cannot be evaluated)
+File "bench/check-ce/j3_1.mlw", line 14, characters 11-46:
+Sub-goal Assertion of goal test'vc.
+Prover result is: Unknown (unknown + incomplete) (406 steps).
+The following counterexample model could not be verified
+  (both RAC terminated because Assertion cannot be evaluated):
+File int.mlw:
+  Line 285:
+    min_int32 :  = -2147483648
+  Line 286:
+    max_int32 :  = 2147483647
+File j3_1.mlw:
+  Line 10:
+    x :  = {int32'int => 0}
+    x : int32 = {int32'int => 0}
+

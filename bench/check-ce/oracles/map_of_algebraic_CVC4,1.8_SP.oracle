@@ -10,35 +10,39 @@ Sub-goal Precondition of goal not_valid'vc.
 Prover result is: Unknown (sat) (343 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File map_of_algebraic.mlw:
   Line 33:
-    m = {block_size= fun (x:int) -> (0:t);
-         mem_access_address= fun (x:int) -> Freeable}
-    x = {base_addr= 0; offset= (0:t)}
-    m = {block_size= fun (x:int) -> (0:t);
-         mem_access_address= fun (x:int) -> Freeable}
-    x = {base_addr= 0; offset= (0:t)}
+    m =
+      { block_size = fun (x:int) -> (0:t);
+        mem_access_address = fun (x:int) -> Freeable }
+    x = { base_addr = 0; offset = (0:t) }
+    m =
+      { block_size = fun (x:int) -> (0:t);
+        mem_access_address = fun (x:int) -> Freeable }
+    x = { base_addr = 0; offset = (0:t) }
     Execution of main function `not_valid` with env:
-      m = {block_size= fun (x:int) -> (0:t);
-           mem_access_address= fun (x:int) -> Freeable}
-      x = {base_addr= 0; offset= (0:t)}
-      zero = 0
-      one = 1
+      { lsenv = [];
+        vsenv =
+          [ m = { block_size = fun (x:int) -> (0:t);
+                  mem_access_address = fun (x:int) -> Freeable },
+            x = { base_addr = 0; offset = (0:t) } ]; rsenv = []; idenv = [] }
   Line 34:
-    (giant-step) execution of unimplemented function `load_val`
-      m = {block_size= fun (x:int) -> (0:t);
-           mem_access_address= fun (x:int) -> Freeable}
-      x = {base_addr= 0; offset= (0:t)}
-    Property failure at precondition of `load_val` with:
-      Writable = UNDEFINED
-      m = {block_size= fun (x:int) -> (0:t);
-           mem_access_address= fun (x:int) -> Freeable}
-      x = {base_addr= 0; offset= (0:t)}
+    (giant-step) execution of unimplemented function `load_val` with args:
+      [ m = { block_size = fun (x:int) -> (0:t);
+              mem_access_address = fun (x:int) -> Freeable },
+        x = { base_addr = 0; offset = (0:t) } ]
+    Property failure at precondition of `load_val` with env:
+      { lsenv = [];
+        vsenv =
+          [ m = { block_size = fun (x:int) -> (0:t);
+                  mem_access_address = fun (x:int) -> Freeable },
+            x = { base_addr = 0; offset = (0:t) },
+            m = { block_size = fun (x:int) -> (0:t);
+                  mem_access_address = fun (x:int) -> Freeable },
+            x = { base_addr = 0; offset = (0:t) } ]; rsenv = [];
+        idenv =
+          [ Writable = UNDEFINED,
+            m = { block_size = fun (x:int) -> (0:t);
+                  mem_access_address = fun (x:int) -> Freeable },
+            x = { base_addr = 0; offset = (0:t) } ] }
 

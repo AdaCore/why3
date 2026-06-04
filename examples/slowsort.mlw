@@ -1,0 +1,43 @@
+
+(** {1 Slowsort}
+
+    See https://en.wikipedia.org/wiki/Slowsort
+
+    Humorous sorting algorithm, yet a small verification
+    exercise nonetheless.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.ComputerDivision
+use array.Array
+use array.ArraySwap
+use array.ArrayPermut
+
+type elt
+
+val predicate le elt elt
+
+clone relations.TotalPreOrder with
+  type t = elt, predicate rel = le, axiom .
+
+clone export array.Sorted with type
+  elt = elt, predicate le = le, axiom .
+
+let rec slow_sort (a: array elt) (lo hi: int) : unit
+  requires { 0 <= lo <= hi <= length a }
+  variant  { hi - lo }
+  ensures  { permut_sub (old a) a lo hi }
+  ensures  { sorted_sub a lo hi }
+= if hi - lo <= 1 then return;
+  let mid = lo + div (hi - lo) 2 in
+  slow_sort a lo mid;
+  permut_sub_weakening'lemma (pure{old a}) a lo mid lo hi;
+  label L in
+  slow_sort a mid hi;
+  permut_sub_weakening'lemma (pure{a at L}) a mid hi lo hi;
+  if not (le a[mid - 1] a[hi - 1]) then swap a (mid - 1) (hi - 1);
+  slow_sort a lo (hi - 1)
+
+

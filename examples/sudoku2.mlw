@@ -1,0 +1,93 @@
+(** Sudoku solver
+
+    Author: Paul Patault (Université Paris-Saclay)
+
+    See also sudoku.mlw
+*)
+
+use int.Int
+use seq.Seq
+use seq.FreeMonoid
+use int.EuclideanDivision
+
+type sudoku = seq int
+
+let function row (c: int) : int = div c 9
+let function col (c: int) : int = mod c 9
+let function grp (c: int) : int = 3 * (div (row c) 3) + div (col c) 3
+
+let predicate same_zone (c1 c2: int) =
+  row c1 = row c2 ||
+  col c1 = col c2 ||
+  grp c1 = grp c2
+
+predicate bounds (c: int) = 0 <= c < 81
+predicate filled (v: int) = 1 <= v <= 9
+
+let predicate clash (g: sudoku) (i1 i2: int) =
+  i1 <> i2 && same_zone i1 i2 && g[i1] = g[i2]
+
+predicate correct (g: sudoku) (p: int) =
+  bounds p /\
+  filled g[p] /\
+  forall c. bounds c -> not clash g c p
+
+predicate wf (g: sudoku) =
+  length g = 81 /\
+  (forall i. bounds i -> 0 <= g[i] <= 9) /\
+  (forall i. bounds i -> filled g[i] -> correct g i)
+
+predicate solution (g: sudoku) =
+  forall i. bounds i -> correct g i
+
+predicate filled_upto (g: sudoku) (c: int) =
+  forall i. 0 <= i < c -> filled g[i]
+
+predicate extends (g1 g2: sudoku) =
+  forall i. bounds i -> filled g1[i] -> g2[i] = g1[i]
+
+predicate impossible (g: sudoku) =
+  forall g'. extends g g' -> solution g' -> False
+
+lemma filled_upto_lemma :
+  forall c g v.
+    bounds c ->
+    wf g ->
+    filled v ->
+    filled_upto g c ->
+    filled_upto g[c<-v] (c+1)
+
+let check_ (g: sudoku) (c: int) : bool
+  requires { bounds c } requires { filled g[c] }
+  ensures  { result <-> correct g c }
+= for i = 0 to 80 do
+    invariant { forall j. 0 <= j < i -> not clash g c j }
+    if clash g c i then return false
+  done;
+  return true
+
+exception NoSolution
+
+let rec solve (g: sudoku) (c: int) : (g': sudoku)
+  requires { wf g }
+  requires { 0 <= c <= 81 }
+  requires { filled_upto g c }
+  ensures  { extends g g' }
+  ensures  { solution g' }
+  raises   { NoSolution -> impossible g }
+  variant  { 81 - c }
+= if c = 81 then return g;
+  if g[c] <> 0 then return solve g (c+1);
+  for v = 1 to 9 do
+    invariant { forall w. 1 <= w < v -> impossible g[c<-w] }
+    let g = g[c <- v] in
+    if check_ g c then
+      try return solve g (c+1) with NoSolution -> () end
+  done;
+  raise NoSolution
+
+let solve_main (g: sudoku) : (g': sudoku)
+  requires { wf g }
+  ensures  { extends g g' } ensures { solution g' }
+  raises   { NoSolution -> impossible g }
+= return solve g 0

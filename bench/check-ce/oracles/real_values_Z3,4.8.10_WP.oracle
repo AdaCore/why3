@@ -15,13 +15,14 @@ File real_values.mlw:
     x = (- 1.0) / 2.0
     x = (- 1.0) / 2.0
     Execution of main function `test1'goal` with env:
-      x = (- 1.0) / 2.0
+      { lsenv = []; vsenv = [ x = (- 1.0) / 2.0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File real_values.mlw:
   Line 3:
-    Property failure at postcondition of `test1'goal` with:
-      x = (- 1.0) / 2.0
+    Property failure at postcondition of `test1'goal` with env:
+      { lsenv = []; vsenv = [ x = (- 1.0) / 2.0, result = () ]; rsenv = [];
+        idenv = [ x = (- 1.0) / 2.0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -40,13 +41,14 @@ File real_values.mlw:
     x = 10.0
     x = 10.0
     Execution of main function `test2'goal` with env:
-      x = 10.0
+      { lsenv = []; vsenv = [ x = 10.0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File real_values.mlw:
   Line 5:
-    Property failure at postcondition of `test2'goal` with:
-      x = 10.0
+    Property failure at postcondition of `test2'goal` with env:
+      { lsenv = []; vsenv = [ x = 10.0, result = () ]; rsenv = [];
+        idenv = [ x = 10.0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -65,13 +67,14 @@ File real_values.mlw:
     x = 1.0 / 2.0
     x = 1.0 / 2.0
     Execution of main function `test3'goal` with env:
-      x = 1.0 / 2.0
+      { lsenv = []; vsenv = [ x = 1.0 / 2.0 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File real_values.mlw:
   Line 7:
-    Property failure at postcondition of `test3'goal` with:
-      x = 1.0 / 2.0
+    Property failure at postcondition of `test3'goal` with env:
+      { lsenv = []; vsenv = [ x = 1.0 / 2.0, result = () ]; rsenv = [];
+        idenv = [ x = 1.0 / 2.0 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: INCOMPLETE

@@ -10,26 +10,18 @@ Sub-goal Assertion of goal test2'vc.
 Prover result is: Unknown (sat) (138 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File test_result_ce_value0.mlw:
   Line 6:
     x = 0
     x = 0
     Execution of main function `test2` with env:
-      x = 0
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 0 ]; rsenv = []; idenv = [] }
   Line 7:
-    (giant-step) execution of unimplemented function `id`
-      x = 0
+    (giant-step) execution of unimplemented function `id` with args:
+      [ x = 0 ]
     result of `id` = 42
   Line 8:
-    Property failure at assertion with:
-      a = 42
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ x = 0, a = 42 ]; rsenv = [];
+        idenv = [ a = 42 ] }
 

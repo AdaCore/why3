@@ -465,7 +465,20 @@ let predicate eq0_int (x:int) = x=0
 
 let function ($$) (x y:int) :int = x * y
 
-clone export AssocAlgebraDecision with type r = int, type a = int, val rzero = Int.zero, val rone = Int.one, val rplus = (+), val ropp = (-_), val rtimes = (*), val azero = Int.zero, val aone = Int.one, val aplus = (+), val aopp = (-_), val atimes = (*), val ($) = ($$), goal AUnitary, goal ANonTrivial, goal ExtDistSumA, goal ExtDistSumR, goal AssocMulExt, goal UnitExt, goal CommMulExt, val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l, goal A.Unit_def_r, goal A.Comm, goal A.Assoc,
+let constant izero = 0
+let constant ione = 1
+
+clone export AssocAlgebraDecision with type r = int, type a = int,
+  val rzero = izero, val rone = ione,
+  val rplus = (+), val ropp = (-_), val rtimes = (*),
+  val azero = izero, val aone = ione,
+  val aplus = (+), val aopp = (-_), val atimes = (*),
+  val ($) = ($$),
+  goal AUnitary, goal ANonTrivial,
+  goal ExtDistSumA, goal ExtDistSumR,
+  goal AssocMulExt, goal UnitExt, goal CommMulExt,
+  val eq0 = eq0_int, goal A.MulAssoc.Assoc, goal A.Unit_def_l,
+  goal A.Unit_def_r, goal A.Comm, goal A.Assoc,
   axiom . (* FIXME: replace with "goal" and prove *)
 
 

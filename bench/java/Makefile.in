@@ -256,6 +256,7 @@ endif
 #
 # Running java programs
 # ---------------------
+ifneq (@JAVAC@,no)
 ifneq (@JAVA@,no)
 run : compile
 	@ for cls in ${RUNNABLE_CLASSES}; do \
@@ -272,6 +273,10 @@ run : compile
 else
 run :
 	@echo "No JVM (java program) found during configuration."
+endif
+else
+run :
+	@echo "No java compiler found during configuration."
 endif
 
 #

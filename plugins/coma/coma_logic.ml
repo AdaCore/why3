@@ -322,7 +322,7 @@ type param =
   | Pc of hsymbol * vsymbol list * param list
 
 type expr =
-  | Esym of hsymbol
+  | Esym of hsymbol * Loc.position list
   | Eapp of expr * argument
   | Elam of param list * expr
   | Edef of expr * bool * defn list
@@ -344,7 +344,7 @@ and defn = hsymbol * vsymbol list * param list * expr
 (* VC formulas *)
 
 type formula =
-  | Fsym of hsymbol
+  | Fsym of hsymbol * Loc.position list
   | Fagt of formula * ty
   | Fagv of formula * term
   | Fagr of formula * vsymbol
@@ -364,7 +364,7 @@ type cache = {
   c_go : bool;
 }
 
-and handler = bool -> binding list -> wpsp
+and handler = bool -> binding list -> Loc.position list -> wpsp
 
 and binding =
   | Bt of ty
@@ -400,8 +400,8 @@ let c_neutralize c ph =
   let ph = if c.c_go then ph else Shs.inter c.c_ph ph in
   { c with c_go = false; c_ph = ph }
 
-let c_call_hs c h go bl =
-  Mhs.find h c.c_hs (go && (c.c_go || Shs.mem h c.c_ph)) bl
+let c_call_hs c h go bl ls =
+  Mhs.find h c.c_hs (go && (c.c_go || Shs.mem h c.c_ph)) bl ls
 
 let no_bc bl = List.for_all (function
   | Bc _ -> false | Bt _ | Bv _ | Bu -> true) bl
@@ -450,7 +450,7 @@ let print_formula fmt e =
     | Pr vs -> Format.pp_print_char fmt '&'; Format.pp_print_string fmt vs.vs_name.id_string
     | Pc (hs,_,_) -> Format.pp_print_string fmt hs.hs_name.id_string in
   let rec pp fmt = function
-    | Fsym h -> Format.pp_print_string fmt h.hs_name.id_string
+    | Fsym (h, _) -> Format.pp_print_string fmt h.hs_name.id_string
     | Flam (pl,_,f) -> Format.fprintf fmt "@[<hov 2>(lambda %a .@ %a)@]"
         (Pp.print_list Pp.space pp_p) pl pp f
     | Fcut (s,true,f) -> Format.fprintf fmt "@[<hov 2>{ %a }@ %a@]"
@@ -475,7 +475,7 @@ let print_formula fmt e =
 
 exception BadUndef of hsymbol
 
-let rec joker h pl og go bl =
+let rec joker h pl og go bl ls =
   if og && go then raise (BadUndef h);
   (* we only care about Pc and Bc *)
   let rec link wl pl bl = match pl,bl with
@@ -484,7 +484,7 @@ let rec joker h pl og go bl =
         link wl pl bl
     | Pc (_,rl,ql)::pl, Bc k::bl ->
         let jj = jack false rl ql in
-        link (k true jj :: wl) pl bl
+        link (k true jj ls :: wl) pl bl
     | _ -> w_and_l_rev wl in
   link [] pl bl
 
@@ -495,14 +495,14 @@ and jack go rl pl =
     | Pv _ | Pr _ -> Bu) pl in
   List.fold_left (fun l _ -> Bu::l) bl rl
 
-let rec consume mm c pl bl =
+let rec consume mm c pl bl ls =
   let link (c,vl,hl) p b = match p,b with
     | Pt u, Bt t -> c_add_tv c u t, vl, hl
     | (Pv v | Pr v), Bv s -> c_add_vs c v s, vl, hl
     | (Pv v | Pr v), Bu -> let u = c_clone_vs c v in
                            c_add_vs c v (t_var u), u::vl, hl
     | Pc (h,wr,pl), Bc kk ->
-        let hl,kk = factorize mm c hl h wr pl kk in
+        let hl,kk = factorize mm c hl h wr pl ls kk in
         c_add_hs c h kk, vl, hl
     | _ -> assert false in
   let rec fold (c,vl,hl as acc) pl bl = match pl,bl with
@@ -511,13 +511,13 @@ let rec consume mm c pl bl =
     | _ -> assert false in
   fold (c,[],[]) pl bl
 
-and factorize mm c hl h wr pl kk =
+and factorize mm c hl h wr pl ls kk =
   if Debug.test_flag debug_slow || unmergeable pl then hl,kk else
-  let lz = lazy (prefact (Shs.mem h mm) c h (wr_to_pl wr pl) kk) in
-  lz::hl, fun go bl -> if go then let lazy (_,_,_,zk) = lz in zk bl
+  let lz = lazy (prefact (Shs.mem h mm) c h (wr_to_pl wr pl) ls kk) in
+  lz::hl, fun go bl ls -> if go then let lazy (_,_,_,zk) = lz in zk bl ls
                              else w_true
 
-and prefact mh c h pl kk =
+and prefact mh c h pl ls kk =
   let rec fields v (vz,zl,zv,vt) =
     let z = c_clone_vs c v in
     let zl,zv,vt = if mh then zl,zv,vt else try
@@ -531,15 +531,15 @@ and prefact mh c h pl kk =
     let _,zl,zv,vt = fields v (Mvs.empty,zl,zv,vt) in
     zl, zv, vt, Bv (snd (List.hd vt))::bl in
   let zl,zv,vt,bl = List.fold_right dup pl ([],Mvs.empty,[],[]) in
-  let zw = kk true bl in
+  let zw = kk true bl ls in
   let abort_mh = mh && w_solid zw in let mh = mh && not abort_mh in
   let [@warning "-8"] ripe (Pv v|Pr v) = Wvs.mem record_fields v in
-  if abort_mh && List.exists ripe pl then prefact mh c h pl kk else
+  if abort_mh && List.exists ripe pl then prefact mh c h pl ls kk else
   let h = if mh then create_hsymbol (id_clone h.hs_name) else h in
-  h, zl, zw, fun bl ->
+  h, zl, zw, fun bl ls ->
     let sph f = {wp = t_true; sp = Mhs.singleton h f} in
     if pl = [] then if mh then sph t_true else zw else
-    let c,ul,_,_ = consume Shs.empty c pl bl in
+    let c,ul,_,_ = consume Shs.empty c pl bl ls in
     let link (v,t) = t_equ t (c_find_vs c v) in
     w_forall ul (if mh then sph (t_and_l (List.map link vt))
                  else w_subst (Mvs.map (c_find_vs c) zv) zw)
@@ -552,32 +552,32 @@ let close vl hl {wp;sp} =
   let vl,wl,sh = List.fold_left pile (vl,[],Shs.empty) hl in
   w_forall vl @@ w_and_l {wp; sp = Mhs.set_diff sp sh} wl
 
-let rec f_eval c o bl = match o with
-  | Fsym h -> c_call_hs c h true bl
+let rec f_eval c ls o bl = match o with
+  | Fsym (h, locs) -> c_call_hs c h true bl (locs @ ls)
   | Flam (pl, mm, f) ->
-      let c,vl,hl,bl = consume mm c pl bl in
-      close vl hl (f_eval c f bl)
+      let c,vl,hl,bl = consume mm c pl bl ls in
+      close vl hl (f_eval c ls f bl)
   | Fcut (s, pp, f) ->
       (if pp && c.c_go then w_and_asym else w_implies)
-        (add_stop_split (c_inst_t c s)) (f_eval c f bl)
-  | Fall (pl,f) -> f_eval c (f_lambda pl f) (jack c.c_go [] pl)
-  | Fand (f, g) -> w_and (f_eval c f bl) (f_eval c g bl)
-  | Fagt (f, t) -> f_eval c f (Bt (c_inst_ty c t) :: bl)
-  | Fagv (f, s) -> f_eval c f (Bv (c_inst_t  c s) :: bl)
-  | Fagr (f, r) -> f_eval c f (Bv (c_find_vs c r) :: bl)
-  | Fagc (f, g) -> f_eval c f (Bc (f_handler c g) :: bl)
-  | Fneu (f,ss) -> f_pass (c_neutralize c ss) f bl
+        (c_inst_t c s |> add_stop_split |> t_locs_append ls) (f_eval c ls f bl)
+  | Fall (pl,f) -> f_eval c ls (f_lambda pl f) (jack c.c_go [] pl)
+  | Fand (f, g) -> w_and (f_eval c ls f bl) (f_eval c ls g bl)
+  | Fagt (f, t) -> f_eval c ls f (Bt (c_inst_ty c t) :: bl)
+  | Fagv (f, s) -> f_eval c ls f (Bv (c_inst_t  c s) :: bl)
+  | Fagr (f, r) -> f_eval c ls f (Bv (c_find_vs c r) :: bl)
+  | Fagc (f, g) -> f_eval c ls f (Bc (f_handler c g) :: bl)
+  | Fneu (f,ss) -> f_pass (c_neutralize c ss) ls f bl
   | Fany -> w_true
 
-and f_pass ({c_go = go; c_ph = ph} as c) o bl =
+and f_pass ({c_go = go; c_ph = ph} as c) ls o bl =
   if not go && Shs.is_empty ph && no_bc bl then w_true
-  else f_eval c o bl
+  else f_eval c ls o bl
 
-and f_handler c o go bl =
-  f_pass (if go then c else c_neutralize c Shs.empty) o bl
+and f_handler c o go bl ls =
+  f_pass (if go then c else c_neutralize c Shs.empty) ls o bl
 
 let rec fill_mm lh = function
-  | Fsym h as f ->
+  | Fsym (h, _) as f ->
       (try incr (Mhs.find h lh) with Not_found -> ()); f
   | Flam (pl, mm, f) ->
       let mm = Shs.inter mm (lh_of_pl pl) in
@@ -617,7 +617,7 @@ let rec quick_fields kn = function
 let top_eval kn c f =
   let f = fill_mm Mhs.empty f in
   Debug.dprintf debug_recipe "@[%a@]@." print_formula f;
-  vc_simp (f_eval c (quick_fields kn f) []).wp
+  vc_simp (f_eval c [] (quick_fields kn f) []).wp
 
 let top_handler kn c f =
   let f = fill_mm Mhs.empty f in
@@ -648,19 +648,43 @@ let vc_map2 fn v w = match v,w with
   | TB (vf,vg), TB(wf,wg)  -> TB (fn vf wf, fn vg wg)
   | _ -> invalid_arg "vc_map2"
 
+type cell = { csh: cell ref Mhs.t; cg: formula }
+let c_dummy = ref { csh = Mhs.empty; cg = Fany }
+
 let dl_split flat pl dl =
   if flat || List.length dl = 1 then [pl,dl] else
   let [@warning "-8"] head (Pc (h,_,_),_) = h in
   let iter fn (_,g) =
-    let rec inspect sh = function
-      | Fsym h -> if not (Shs.mem h sh) then fn h
-      | Flam (pl,_,f) | Fall (pl,f) ->
-          inspect (Shs.union sh (lh_of_pl pl)) f
+    let rec inspect sh st = function
+      | Fsym (h, _) ->
+          (* h may be external or dummy, therefore
+             we inspect every term on the stack *)
+          let pop ({contents = {csh; cg}} as r) =
+            r := !c_dummy; inspect csh [] cg in
+          let () = match Mhs.find h sh with
+            | exception Not_found -> fn h
+            | r -> pop r in
+          List.iter pop st
+      | Flam (pl,_,f) ->
+          let rec move sh pl st = match pl,st with
+            | Pc (g,_,_)::pl, r::st ->
+                move (Mhs.add g r sh) pl st
+            | Pc (g,_,_)::pl, [] ->
+                move (Mhs.add g c_dummy sh) pl st
+            | _::pl, st -> move sh pl st
+            | [], st -> inspect sh st f in
+          move sh pl st
+      | Fall (pl,f) ->
+          let lh = lh_of_pl pl in
+          let nh = Mhs.map (fun _ -> c_dummy) lh in
+          inspect (Mhs.set_union nh sh) st f
       | Fcut (_,_,f) | Fneu (f,_) | Fagt (f,_)
-      | Fagv (f,_) | Fagr (f,_) -> inspect sh f
-      | Fagc (f,g) | Fand (f,g) -> inspect sh f; inspect sh g
+      | Fagv (f,_) | Fagr (f,_) -> inspect sh st f
+      | Fagc (f,g) -> let c = {csh = sh; cg = g} in
+                      inspect sh (ref c :: st) f
+      | Fand (f,g) -> inspect sh st f; inspect sh st g
       | Fany -> () in
-    inspect Shs.empty g in
+    inspect Mhs.empty [] g in
   let module SCC = MakeSCC(Hhs) in
   List.map (fun (_,dl) -> List.split dl) @@
     SCC.scc head iter @@ List.combine pl dl
@@ -683,9 +707,9 @@ let rec vc tt hc o al =
   match o with
   | Eapp (e,a) ->
       vc tt hc e (a::al)
-  | Esym h ->
+  | Esym (h, locs) ->
       let (wr,pl) = Mhs.find h hc in
-      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym h) wr in
+      let f = List.fold_left (fun f r -> Fagr (f,r)) (Fsym (h, locs)) wr in
       let w = if tt then TT f else TB (f, Fneu (f, Shs.empty)) in
       apply w Mvs.empty pl al
   | Elam (pl,e) ->
@@ -798,7 +822,7 @@ let rec fill_wr hc lh lr wm o al =
   match o with
   | Eapp (e,a) ->
       fill_wr hc lh lr wm e (a::al)
-  | Esym h ->
+  | Esym (h, _) ->
       let lc,(_,pl) = try true, Mhs.find h lh
         with Not_found -> false, Mhs.find h hc in
       if lc && not (Mhs.mem h !wm) then
@@ -912,7 +936,7 @@ let vc_expr (kn,hc,c) e =
 let vc_defn (kn,hc,c) flat dfl =
   let dfl = wox_defn (wr_defn hc flat dfl) in
   let pl,ll,fl,_ = vc_defn true hc flat dfl in
-  let ctx c pl bl = let c,_,_,_ = consume Shs.empty c pl bl in c in
+  let ctx c pl bl = let c,_,_,_ = consume Shs.empty c pl bl [] in c in
   let bl_of_gl c gl = List.map (fun g -> Bc (top_handler kn c g)) gl in
   let cc = if flat then c else ctx c pl (jack true [] pl) in
   let add_dl (pl,gl) c = ctx c pl (bl_of_gl c gl) in
@@ -929,7 +953,7 @@ let vc_spec (_,hc,c) h =
   if unspeccable pl then [] else
   let n = h.hs_name.id_string in
   let id_pre = id_fresh (n ^ "'pre") in
-  let y = Bc (fun _ _ -> w_true) in
+  let y = Bc (fun _ _ _ -> w_true) in
   let param (ul,bl,outs) = function
     | Pt _ -> assert false
     | Pv v | Pr v -> let u = c_clone_vs c v in let b = Bv (t_var u) in
@@ -941,22 +965,32 @@ let vc_spec (_,hc,c) h =
           z::zl, t_equ (t_var z) (t_var v) :: fl in
         let zl,fl = List.fold_left add (ul,[]) pl in
         let f = t_not_simp (t_and_l (List.rev fl)) in
-        let kk go bl = if not go then w_true else
-          let c,_,_,_ = consume Shs.empty c pl bl in
+        let kk go bl ls = if not go then w_true else
+          let c,_,_,_ = consume Shs.empty c pl bl ls in
           { wp = c_inst_t c f; sp = Mhs.empty } in
         let oo = id_fresh (n ^ "'post'" ^ s), zl, Bc kk::bl in
         ul, y::bl, oo :: List.map (fun (id,ul,bl) -> id, ul, y::bl) outs
   in
   let ul,bl,outs = List.fold_left param ([],[],[]) (wr_to_pl wr pl) in
-  let call go ul bl = spec_simp ul (c_call_hs c h go (List.rev bl)).wp in
+  let call go ul bl = spec_simp ul (c_call_hs c h go (List.rev bl) []).wp in
   (id_pre, List.rev ul, call true ul bl) :: List.rev_map (fun (id,ul,bl) ->
        id, List.rev ul, t_neg (call false ul bl)) outs
 
+let print_some_loc fmt = function
+  | None -> ()
+  | Some loc -> Format.fprintf fmt "File %a: " Loc.pp_position loc
+
 let () = Exn_printer.register (fun fmt -> function
-  | BadUndef h -> Format.fprintf fmt
+  | BadUndef h ->
+    print_some_loc fmt h.hs_name.id_loc;
+    Format.fprintf fmt
       "Handler `%s' is used in an illegal position" h.hs_name.id_string
-  | CollisionHs h -> Format.fprintf fmt
+  | CollisionHs h ->
+    print_some_loc fmt h.hs_name.id_loc;
+    Format.fprintf fmt
       "Handler `%s' is introduced twice in an expression" h.hs_name.id_string
-  | CollisionRs r -> Format.fprintf fmt
+  | CollisionRs r ->
+    print_some_loc fmt r.vs_name.id_loc;
+    Format.fprintf fmt
       "Reference `%s' is introduced twice in an expression" r.vs_name.id_string
   | exn -> raise exn)

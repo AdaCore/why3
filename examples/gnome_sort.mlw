@@ -21,7 +21,7 @@ module GnomeSort
       invariant { 0 <= pos <= length a }
       invariant { sorted_sub a 0 pos }
       invariant { permut_all (old a) a }
-      variant   { inversions a, length a - pos }
+      variant   { 2 * inversions a + length a - pos }
       if pos = 0 || a[pos] >= a[pos - 1] then
         incr pos
       else begin

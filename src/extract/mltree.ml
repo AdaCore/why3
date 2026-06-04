@@ -121,7 +121,7 @@ type decl =
   | Dmodule of string * decl list
 
 type from_module = {
-  from_mod: Pmodule.pmodule option;
+  from_mod: Pmodule.pmodule0 option;
   from_km : Pdecl.known_map;
 }
 

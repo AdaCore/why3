@@ -1,0 +1,42 @@
+
+module M1
+
+use ieee_float.RoundingMode
+use ieee_float.Float64 as F
+
+val (+) (x y:F.t) : F.t
+  ensures { result = F.add RNE x y }
+
+val (-) (x y:F.t) : F.t
+  ensures { result = F.sub RNE x y }
+
+val (*) (x y:F.t) : F.t
+  ensures { result = F.mul RNE x y }
+
+val (/) (x y:F.t) : F.t
+  ensures { result = F.div RNE x y }
+
+let f (y : F.t) : unit
+  requires { F.t'isFinite y }
+=
+  let z : F.t = (y * y) - (0.25:F.t) in
+  let t : F.t = y / z in
+  assert { F.t'isFinite t }
+
+end
+
+
+
+module M2
+
+use ieee_float.RoundingMode
+use ieee_float.Float64 as F
+
+let f (y : F.t) : unit
+  requires { F.t'isFinite y }
+=
+  let z : F.t = F.sub RNE (F.mul RNE y y) (0.25:F.t) in
+  let t : F.t = F.div RNE y z in
+  assert { F.t'isFinite t }
+
+end

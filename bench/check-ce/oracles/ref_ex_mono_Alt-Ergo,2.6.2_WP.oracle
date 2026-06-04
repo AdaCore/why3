@@ -13,46 +13,30 @@ Sub-goal Postcondition of goal test_post'vc.
 Prover result is: Unknown (unknown) (18 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 9:
     x = 1
-    y = {c= 0}
+    y = { c = 0 }
     x = 1
-    y = {c= 0}
+    y = { c = 0 }
     Execution of main function `test_post` with env:
-      x = 1
-      y = {c= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 1, y = { c = 0 } ]; rsenv = [];
+        idenv = [] }
   Line 12:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(-)` with args:
-      x = 1
-      y = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(-)` with args: [ x = 1, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = (-1) ]
 File ref_ex_mono.mlw:
   Line 12:
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 0
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 0 ]
   Line 10:
-    Property failure at postcondition of `test_post` with:
-      x = 1
-      y = {c= 0}
+    Property failure at postcondition of `test_post` with env:
+      { lsenv = [];
+        vsenv = [ x = 1, y = { c = 0 }, y = { c = 0 }, result = () ];
+        rsenv = []; idenv = [ x = 1, y = { c = 0 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -69,47 +53,30 @@ Sub-goal Postcondition of goal test_post2'vc.
 Prover result is: Unknown (unknown) (25 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 14:
     x = 43
-    y = {c= 0}
+    y = { c = 0 }
     x = 43
-    y = {c= 0}
+    y = { c = 0 }
     Execution of main function `test_post2` with env:
-      x = 43
-      y = {c= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ x = 43, y = { c = 0 } ]; rsenv = [];
+        idenv = [] }
   Line 18:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(-)` with args:
-      x = 43
-      y = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(-)` with args: [ x = 43, y = 1 ]
 File int.mlw:
   Line 23:
-    Normal execution of function `(-_)` with args:
-      _ = 1
-    Normal execution of function `(+)` with args:
-      _ = 43
-      _ = (-1)
+    Normal execution of function `(-_)` with args: [ _ = 1 ]
+    Normal execution of function `(+)` with args: [ _ = 43, _ = (-1) ]
 File ref_ex_mono.mlw:
   Line 18:
-    Normal execution of function `(+)` with args:
-      _ = 42
-      _ = 0
+    Normal execution of function `(+)` with args: [ _ = 42, _ = 0 ]
   Line 16:
-    Property failure at postcondition of `test_post2` with:
-      x = 43
-      y = {c= 42}
-      y = {c= 0}
+    Property failure at postcondition of `test_post2` with env:
+      { lsenv = [];
+        vsenv = [ x = 43, y = { c = 42 }, y = { c = 0 }, result = () ];
+        rsenv = []; idenv = [ x = 43, y = { c = 42 }, y = { c = 0 } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -126,47 +93,31 @@ Sub-goal Postcondition of goal incr'vc.
 Prover result is: Unknown (unknown) (44 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 24:
-    y = {c= (- 1)}
+    y = { c = (- 1) }
   Line 26:
-    x23 = {c= 0}
-    x23 = {c= 0}
+    x23 = { c = 0 }
+    x23 = { c = 0 }
     Execution of main function `incr` with env:
-      y = {c= (- 1)}
-      x23 = {c= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = { c = (- 1) }, x23 = { c = 0 } ];
+        rsenv = []; idenv = [] }
   Line 30:
-    Normal execution of function `c` with args:
-      arg = {c= (- 1)}
-    Normal execution of function `(+)` with args:
-      _ = (- 1)
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = (- 1) } ]
+    Normal execution of function `(+)` with args: [ _ = (- 1), _ = 1 ]
   Line 31:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 32:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = 1 ]
   Line 27:
-    Property failure at postcondition of `incr` with:
-      x23 = {c= 2}
-      x23 = {c= 0}
-      y = {c= (- 1)}
+    Property failure at postcondition of `incr` with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { c = 0 }, x23 = { c = 2 }, x23 = { c = 0 },
+            y = { c = (- 1) }, result = () ]; rsenv = [];
+        idenv = [ x23 = { c = 2 }, x23 = { c = 0 }, y = { c = (- 1) } ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -183,53 +134,36 @@ Sub-goal Loop invariant init of goal test_loop'vc.
 Prover result is: Unknown (unknown) (23 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 24:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {c= 0}
-    y = {c= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { c = 0 }
+    y = { c = 0 }
   Line 34:
-    x = {c= 0}
-    x = {c= 0}
+    x = { c = 0 }
+    x = { c = 0 }
     Execution of main function `test_loop` with env:
-      y = {c= 0}
-      x = {c= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = { c = 0 }, x = { c = 0 } ]; rsenv = [];
+        idenv = [] }
   Line 38:
-    Normal execution of function `incr` with args:
-      x23 = {c= 0}
+    Normal execution of function `incr` with args: [ x23 = { c = 0 } ]
   Line 30:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 31:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 32:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = 1 ]
   Line 41:
-    Property failure at loop invariant init with:
-      x = {c= 2}
-      x = t'mk 0
-      x = t'mk 2
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { c = 1 }, x = { c = 2 }, _ = (), x = t'mk 0, x = t'mk 2,
+            x = { c = 0 } ]; rsenv = [];
+        idenv = [ x = { c = 2 }, x = t'mk 0, x = t'mk 2 ] }
 
 File "bench/check-ce/ref_ex_mono.mlw", line 42, characters 12-15:
 Sub-goal Loop variant decrease of goal test_loop'vc.
@@ -250,53 +184,36 @@ Sub-goal Loop invariant preservation of goal test_loop'vc.
 Prover result is: Unknown (unknown) (60 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File ref_ex_mono.mlw:
   Line 24:
     Constant y initialization
-    (giant-step) execution of unimplemented function with args:
-    result = {c= 0}
-    y = {c= 0}
+    (giant-step) execution of unimplemented function with args: []
+    result = { c = 0 }
+    y = { c = 0 }
   Line 34:
-    x = {c= 0}
-    x = {c= 0}
+    x = { c = 0 }
+    x = { c = 0 }
     Execution of main function `test_loop` with env:
-      y = {c= 0}
-      x = {c= 0}
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ y = { c = 0 }, x = { c = 0 } ]; rsenv = [];
+        idenv = [] }
   Line 38:
-    Normal execution of function `incr` with args:
-      x23 = {c= 0}
+    Normal execution of function `incr` with args: [ x23 = { c = 0 } ]
   Line 30:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 31:
-    Normal execution of function `c` with args:
-      arg = {c= 0}
-    Normal execution of function `(+)` with args:
-      _ = 0
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 0 } ]
+    Normal execution of function `(+)` with args: [ _ = 0, _ = 1 ]
   Line 32:
-    Normal execution of function `c` with args:
-      arg = {c= 1}
-    Normal execution of function `(+)` with args:
-      _ = 1
-      _ = 1
+    Normal execution of function `c` with args: [ arg = { c = 1 } ]
+    Normal execution of function `(+)` with args: [ _ = 1, _ = 1 ]
   Line 41:
-    Property failure at loop invariant init with:
-      x = {c= 2}
-      x = t'mk 0
-      x = t'mk 2
+    Property failure at loop invariant init with env:
+      { lsenv = [];
+        vsenv =
+          [ y = { c = 1 }, x = { c = 2 }, _ = (), x = t'mk 0, x = t'mk 2,
+            x = { c = 0 } ]; rsenv = [];
+        idenv = [ x = { c = 2 }, x = t'mk 0, x = t'mk 2 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

@@ -1164,7 +1164,7 @@ let letify f =
         if n <= 1 then
           acc
         else
-          let id = Ident.id_fresh ?loc:t.t_loc "t" in
+          let id = Ident.id_fresh ?loc:(t_loc t) "t" in
           let vs = create_vsymbol id (Option.get t.t_ty) in
           Mterm.add t vs acc)
       m Mterm.empty

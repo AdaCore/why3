@@ -252,7 +252,7 @@ and print_value' fmt v =
   | Vfloat_mode m -> pp_print_string fmt (mode_to_string m)
   | Vstring s -> Constant.print_string_def fmt s
   | Vfun (mvs, vs, e) ->
-      fprintf fmt "@[<h>@[<v3>(fun %a -> %a)@]%a@]"
+      fprintf fmt "@[<hov 2>@[<hov 2>(fun %a ->@ %a)@]%a@]"
         print_vs vs print_expr e
         Pp.(let start = constant_formatted "@ with " in
             print_list_delim ~start ~sep:comma ~stop:nothing
@@ -263,25 +263,28 @@ and print_value' fmt v =
       fprintf fmt "{%a => %a}" print_ls ls print_value v
   | Vconstr (Some rs, fs, vs) ->
       if is_rs_tuple rs then
-        fprintf fmt "@[<hv1>(%a)@]" (Pp.print_list Pp.comma print_field) vs
+        match vs with
+        | [] -> fprintf fmt "()"
+        | _ ->
+            fprintf fmt "@[<hov 2>( %a )@]" (Pp.print_list Pp.comma print_field) vs
       else if Strings.has_suffix ~suffix:"'mk" rs.rs_name.id_string then
-        let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
-        fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
+        let print_field fmt (rs, v) = fprintf fmt "@[<hov 2>%a =@ %a@]" print_rs rs print_field v in
+        fprintf fmt "@[<hov 2>{ %a }@]" (Pp.print_list Pp.semi print_field)
           (List.combine fs vs)
       else if vs = [] then
         print_rs fmt rs
       else
-        fprintf fmt "@[<h>(%a%a)@]" print_rs rs
+        fprintf fmt "@[<hov 2>(%a%a)@]" print_rs rs
           Pp.(print_list_pre space print_value) (List.map field_get vs)
   | Vconstr (None, fs, vs) ->
-      let print_field fmt (rs, v) = fprintf fmt "@[%a=@ %a@]" print_rs rs print_field v in
-      fprintf fmt "@[<hv1>{%a}@]" (Pp.print_list Pp.semi print_field)
+      let print_field fmt (rs, v) = fprintf fmt "@[<hov 2>%a =@ %a@]" print_rs rs print_field v in
+      fprintf fmt "@[<hov 2>{ %a }@]" (Pp.print_list Pp.semi print_field)
         (List.combine fs vs)
   | Varray a ->
       fprintf fmt "@[[%a]@]"
         (Pp.print_list Pp.semi print_value) (Array.to_list a)
   | Vpurefun (_, mv, v) ->
-      fprintf fmt "@[[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
+      fprintf fmt "@[<hov 2>[|%a; _ -> %a|]@]" (pp_bindings ~delims:Pp.(nothing,nothing) print_value print_value)
         (Mv.bindings mv) print_value v
   | Vterm t ->
       print_term fmt t
@@ -419,65 +422,74 @@ module Log = struct
         | Some _ ->
             consecutives key ~sofar:(to_list current @ sofar) ~current:(k, [x]) xs
 
-  let print_log_entry_desc fmt e =
-    let ls2string ls = ls.ls_name.id_string in
-    let vs2string vs = vs.vs_name.id_string in
-    let rs2string rs = rs.rs_name.id_string in
-    let id2string id = id.id_string in
+    let ls2string ls = ls.ls_name.id_string
+    let vs2string vs = vs.vs_name.id_string
+    let rs2string rs = rs.rs_name.id_string
+    let id2string id = id.id_string
+
     let filter_invalid_values l =
-      List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l in
+     List.filter_map (function (x,Value v) -> Some (x,v) | (_,Invalid) -> None) l
+
     let print_assoc key2string print_value fmt (k,v) =
       fprintf fmt "@[%a = %a@]"
-        print_decoded (key2string k) print_value v in
-    let print_list key2string =
-      Pp.print_list_pre Pp.newline (print_assoc key2string print_value) in
+        print_decoded (key2string k) print_value v
+
+    let print_list key2string fmt l =
+      match l with
+      | [] -> fprintf fmt "[]"
+      | _ ->
+          fprintf fmt "@[<hov 2>[ %a ]@]"
+            (Pp.print_list Pp.comma (print_assoc key2string print_value)) l
+
+    let print_envs fmt (lsenv,vsenv,rsenv,idenv) =
+    fprintf fmt "@[<hov 2>{ @[<hov 2>lsenv =@ %a@];@ @[<hov 2>vsenv =@ %a@];@ @[<hov 2>rsenv =@ %a@];@ @[<hov 2>idenv =@ %a@] }@]"
+      (print_list ls2string) (filter_invalid_values (Mls.bindings lsenv))
+      (print_list vs2string) (Mvs.bindings vsenv)
+      (print_list rs2string) (filter_invalid_values (Mrs.bindings rsenv))
+      (print_list id2string) (Mid.bindings idenv)
+
+  let print_log_entry_desc fmt e =
     match e.log_desc with
     | Val_assumed (id, v) ->
-        fprintf fmt "@[<h2>%a = %a@]" print_decoded id.id_string print_value v;
+        fprintf fmt "@[<hov 2>%a =@ %a@]" print_decoded id.id_string print_value v;
     | Res_assumed (None,v) ->
-        fprintf fmt "@[<h2>result = %a@]" print_value v
+        fprintf fmt "@[<hov 2>result =@ %a@]" print_value v
     | Res_assumed (Some rs,v) ->
-        fprintf fmt "@[<h2>result of `%a` = %a@]" print_rs rs print_value v
+        fprintf fmt "@[<hov 2>result of `%a` =@ %a@]" print_rs rs print_value v
     | Const_init id ->
-        fprintf fmt "@[<h2>Constant %a initialization@]" print_decoded id.id_string;
+        fprintf fmt "@[Constant %a initialization@]" print_decoded id.id_string;
     | Exec_call (None, mvs, k) ->
-        fprintf fmt "@[<h2>%s execution of anonymous function with args:%a@]"
+        fprintf fmt "@[<hov 2>%s execution of anonymous function with args:@ %a@]"
           (exec_kind_to_string k)
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_call (Some rs, mvs, k) ->
-        fprintf fmt "@[<h2>%s execution of function `%a` with args:%a@]"
+        fprintf fmt "@[<hov 2>%s execution of function `%a` with args:@ %a@]"
           (exec_kind_to_string k)
           print_decoded rs.rs_name.id_string
           (print_list vs2string) (Mvs.bindings mvs)
     | Exec_pure (ls,k) ->
-        fprintf fmt "@[<h2>%s execution of function `%a`@]" (exec_kind_to_string k)
+        fprintf fmt "@[<hov 2>%s execution of function `%a`@]" (exec_kind_to_string k)
           print_decoded ls.ls_name.id_string
     | Exec_any (rs,mvs) ->
          fprintf fmt
-           "@[<h2>(giant-step) execution of unimplemented function%t%t%a@]"
+           "@[<hov 2>(giant-step) execution of unimplemented function%t@ with args:@ %a@]"
            (fun fmt -> Option.iter (fprintf fmt " `%a`" print_rs) rs)
-           (fun fmt -> if Mvs.is_empty mvs then fprintf fmt " with args:")
            (print_list vs2string) (Mvs.bindings mvs)
     | Iter_loop k ->
-        fprintf fmt "@[<h2>%s iteration of loop@]" (exec_kind_to_string k)
+        fprintf fmt "@[<hov 2>%s iteration of loop@]" (exec_kind_to_string k)
     | Exec_main (rs, mls, mvs, mrs) ->
-        fprintf fmt "@[<h2>Execution of main function `%a` with env:%a%a%a@]"
+        fprintf fmt "@[<hov 2>Execution of main function `%a`@ with env:@ %a@]"
           print_decoded rs.rs_name.id_string
-          (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
-          (print_list vs2string) (Mvs.bindings mvs)
-          (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
+          print_envs (mls,mvs,mrs,Mid.empty)
     | Exec_failed (msg,mrs,mls,mvs,mid) ->
-       fprintf fmt "@[<h2>Property failure at %s with:%a%a%a%a@]"
+       fprintf fmt "@[<hov 2>Property failure at %s@ with env:@ %a@]"
          msg
-         (print_list rs2string) (filter_invalid_values (Mrs.bindings mrs))
-         (print_list ls2string) (filter_invalid_values (Mls.bindings mls))
-         (print_list vs2string) (Mvs.bindings mvs)
-         (print_list id2string) (Mid.bindings mid)
+         print_envs (mls,mvs,mrs,mid)
     | Exec_stucked (msg,mid) ->
-       fprintf fmt "@[<h2>Execution got stuck at %s with:%a@]"
+       fprintf fmt "@[<hov 2>Execution got stuck at %s with:@ %a@]"
          msg (print_list id2string) (Mid.bindings mid)
     | Exec_ended ->
-        fprintf fmt "@[<h2>Execution of main function terminated normally@]"
+        fprintf fmt "@[<hov 2>Execution of main function terminated normally@]"
 
   let json_log entry_log =
     let open Json_base in
@@ -567,6 +579,7 @@ module Log = struct
                 "reason", String reason;
                 "state", List (List.concat [List.map (key_value id2string) (Mid.bindings mid);
                                             List.map (key_value_or_undefined rs2string) (Mrs.bindings mrs);
+                                            List.map (key_value vs2string) (Mvs.bindings mvs);
                                             List.map (key_value_or_undefined ls2string) (Mls.bindings mls)])
               ]
         | Exec_stucked (reason,mid) ->
@@ -694,7 +707,7 @@ let fold_premises f (premises: premises) init =
 
 type env = {
   why_env  : Env.env;
-  pmodule  : Pmodule.pmodule;
+  pmodule  : Pmodule.pmodule0;
   funenv   : (cexp * rec_defn list option) Mrs.t;
   tvenv    : Ty.ty Mtv.t;
   vsenv    : value Mvs.t;
@@ -831,7 +844,7 @@ let report_cntr_title fmt (ctx, msg) =
 let report_cntr_head fmt (ctx, msg, term) =
   fprintf fmt "@[<v>%a%t@]" report_cntr_title (ctx, msg)
     (fun fmt ->
-       match ctx.loc, term.t_loc with
+       match ctx.loc, t_loc term with
        | Some t1, Some t2 ->
            fprintf fmt " at %a@,- Defined at %a" Loc.pp_position t1 Loc.pp_position t2
        | Some t, None | None, Some t ->
@@ -988,7 +1001,7 @@ let value_of_free_vars ctx t =
     ) mid t
 
 let stuck_for_fail ?loc ctx t =
-  let loc = opt_or loc (opt_or ctx.loc t.t_loc) in
+  let loc = opt_or loc (opt_or ctx.loc (t_loc t)) in
   let mid = value_of_free_vars ctx t in
   register_stucked ctx.cntr_env loc (describe_cntr_ctx ctx) mid;
   stuck ?loc ctx "failure in %s" (describe_cntr_ctx ctx)
@@ -1011,14 +1024,14 @@ let check_term rac ?vsenv ctx t =
   try check_term rac ?vsenv ctx t with (Fail (ctx,t)) as e ->
     let mid = value_of_free_vars ctx t in
     register_failure ctx.cntr_env
-      (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
+      (opt_or ctx.loc (t_loc t)) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_terms rac ctx tl =
   try check_terms rac ctx tl with (Fail (ctx,t)) as e ->
     let mid = value_of_free_vars ctx t in
     register_failure ctx.cntr_env
-      (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
+      (opt_or ctx.loc (t_loc t)) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_posts rac ctx v posts =
@@ -1027,7 +1040,7 @@ let check_posts rac ctx v posts =
   with (Fail (ctx,t)) as e ->
     let mid = value_of_free_vars ctx t in
     register_failure ctx.cntr_env
-      (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
+      (opt_or ctx.loc (t_loc t)) (describe_cntr_ctx ctx) mid;
     raise e
 
 let check_assume_type_invs rac ?loc ~giant_steps env ity v =
@@ -1040,7 +1053,7 @@ let check_type_invs rac ?loc ~giant_steps env ity v =
   try check_type_invs rac ?loc ~giant_steps env ity v with Fail (ctx, t) as e ->
     let mid = value_of_free_vars ctx t in
     register_failure ctx.cntr_env
-      (opt_or ctx.loc t.t_loc) (describe_cntr_ctx ctx) mid;
+      (opt_or ctx.loc (t_loc t)) (describe_cntr_ctx ctx) mid;
     raise e
 
 (** [oldify_varl env vars] returns a pair [vars', oldies] where [vars'] are the
@@ -1059,7 +1072,7 @@ let oldify_varl env varl =
 (** [variant_term env loc olds news] creates a term representing the validity of
     variants [news] at location [loc], where [olds] are the oldified variants. *)
 let variant_term env olds news =
-  let {Pmodule.mod_theory= {Theory.th_export= ns}} =
+  let {Pmodule.mod_intf= {Pmodule.mod_theory= {Theory.th_export= ns}}} =
     Pmodule.read_module env.why_env ["int"] "Int" in
   let ls_int_le = Theory.ns_find_ls ns [Ident.op_infix "<="] in
   let ls_int_lt = Theory.ns_find_ls ns [Ident.op_infix "<"] in
@@ -1098,15 +1111,15 @@ let variant_term env olds news =
     | _ -> t_false in
   decr (olds, news)
 
-let rec relocate loc t =
-  t_attr_set ?loc t.t_attrs (TermTF.t_map (fun t -> t) (relocate loc) t)
+let rec relocate locs t =
+  t_attr_set ~locs t.t_attrs (TermTF.t_map (fun t -> t) (relocate locs) t)
 
 let check_variant rac expl loc ~giant_steps env (old_varl, oldies) varl =
   let env = {env with vsenv=Mvs.union (fun _ _ v -> Some v) env.vsenv oldies} in
-  let loc = match varl with (t,_)::_ when t.t_loc<>None -> t.t_loc | _ -> loc in
-  let t = relocate loc (variant_term env old_varl varl) in
+  let locs = match varl with (t,_)::_ when t.t_locs<>[] -> t.t_locs | _ -> Option.to_list loc in
+  let t = relocate locs (variant_term env old_varl varl) in
   let ctx = mk_cntr_ctx env ~giant_steps:(Some giant_steps) expl in
-  check_term rac ctx (t_attr_set ?loc (Sattr.singleton expl) t)
+  check_term rac ctx (t_attr_set ~locs (Sattr.singleton expl) t)
 
 (******************************************************************************)
 (*                                 Auxiliaries                                *)
@@ -1211,7 +1224,7 @@ let rec term_of_value ?(ty_mt=Mtv.empty) (env: env) vsenv v : (vsymbol * term) l
       vsenv, t_lambda [vs_arg] [] t
   | Varray arr ->
       let open Pmodule in
-      let {mod_theory= {Theory.th_export= ns}} =
+      let {mod_intf= {mod_theory= {Theory.th_export= ns}}} =
         read_module env.why_env ["array"] "Array" in
       let ts_array = Theory.ns_find_ts ns ["array"] in
       if Debug.test_flag debug_array_as_update_chains_not_epsilon then
@@ -1269,7 +1282,7 @@ let compute_term_dummy : compute_term = fun _ t -> t
 
 let is_array_its env its =
   let pm = Pmodule.read_module env ["array"] "Array" in
-  let array_its = Pmodule.ns_find_its pm.Pmodule.mod_export ["array"] in
+  let array_its = Pmodule.ns_find_its pm.Pmodule.mod_intf.Pmodule.mod_export ["array"] in
   its_equal its array_its
 
 (* TODO Remove argument [env] after replacing Varray by model substitution *)

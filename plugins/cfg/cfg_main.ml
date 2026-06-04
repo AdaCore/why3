@@ -52,7 +52,7 @@ let rec translate_decl d acc =
   | Cfg_ast.Dscope (l, b, i, ds) ->
       Ptree.Dscope (l, b, i, List.fold_right translate_decl ds []) :: acc
 
-let translate (m, dl) = (m, List.fold_right translate_decl dl [])
+let translate (m, dl) = (m, None, List.fold_right translate_decl dl [])
 
 module Typing = struct
   open Theory
@@ -68,14 +68,14 @@ module Typing = struct
     | _ -> e
 
   let add_decl muc env file d =
-    let vc = muc.muc_theory.uc_path = [] && Debug.test_noflag debug_type_only in
+    let vc = muc.muc_intf.muc_theory.uc_path = [] && Debug.test_noflag debug_type_only in
     match d with
     | Ptree.Dlet (id, gh, kind, e) ->
         let e = update_any kind e in
         let ld = (Unsafe.create_user_prog_id id, gh, kind, Unsafe.dexpr muc Dexpr.denv_empty e) in
         let ld = Dexpr.let_defn ~keep_loc:true ld in
         let ld =
-          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc ld else ld
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc.muc_intf ld else ld
         in
         add_pdecl ~vc muc (Pdecl.create_let_decl ld)
     | Ptree.Drec fdl ->
@@ -84,12 +84,12 @@ module Typing = struct
         let _, rd = Unsafe.drec_defn muc Dexpr.denv_empty fdl in
         let rd = Dexpr.rec_defn ~keep_loc:true rd in
         let rd =
-          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc rd else rd
+          if has_attr id subregion_attr then Subregion_analysis.transform_letdefn muc.muc_intf rd else rd
         in
         add_pdecl ~vc muc (Pdecl.create_let_decl rd)
     | _ -> Unsafe.add_decl muc env file d
 
-  let type_module file env loc path (id, dl) =
+  let type_module file env loc path (id, _, dl) =
     let muc = create_module env ~path (Unsafe.create_user_id id) in
     (* Technically, `add_pdecl` will do this, but if we don't do it upfront it breaks
          the sub-region analysis (name tbd) as we won't have imported ref. Since mlcfg always
@@ -98,7 +98,7 @@ module Typing = struct
     let add_decl_env_file muc d = add_decl muc env file d in
     let muc = List.fold_left add_decl_env_file muc dl in
     let m = Loc.try1 ~loc Pmodule.close_module muc in
-    let file = Mstr.add m.mod_theory.th_name.id_string m file in
+    let file = Mstr.add (Pmodule.mod_name m).id_string m file in
     file
 
   let type_mlw_file env path filename mlw_file =
@@ -108,9 +108,9 @@ module Typing = struct
     let file =
       match mlw_file with
       | Ptree.Decls decls ->
-          type_module file env loc path (Ptree.{ id_str = ""; id_ats = []; id_loc = loc }, decls)
+          type_module file env loc path (Ptree.{ id_str = ""; id_ats = []; id_loc = loc }, None, decls)
       | Ptree.Modules m_or_t ->
-          let type_module_env_loc_path file (id, dl) = type_module file env loc path (id, dl) in
+          let type_module_env_loc_path file m = type_module file env loc path m in
           List.fold_left type_module_env_loc_path file m_or_t
     in
     file

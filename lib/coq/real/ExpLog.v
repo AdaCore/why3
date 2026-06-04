@@ -79,7 +79,16 @@ Lemma exp_sum_opposite :
   (2%R <= ((Reals.Rtrigo_def.exp x) + (Reals.Rtrigo_def.exp (-x)%R))%R)%R.
 Proof.
 intros x.
-Admitted.
+rewrite exp_inv.
+apply Rmult_le_reg_r with (exp x).
+apply exp_pos.
+apply Rplus_le_reg_r with (- (2 * exp x))%R.
+rewrite Rplus_opp_r.
+replace ((exp x + / exp x) * exp x + - (2 * exp x))%R with ((exp x - 1) * (exp x - 1))%R.
+apply Rle_0_sqr.
+field.
+apply Rgt_not_eq, exp_pos.
+Qed.
 
 (* Why3 comment *)
 (* log is replaced with (Reals.Rpower.ln x) by the coq driver *)
@@ -141,12 +150,24 @@ Lemma log2_increasing :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   (0%R < x)%R /\ (x <= y)%R -> ((log2 x) <= (log2 y))%R.
 Proof.
-Admitted.
+intros x y H.
+apply Rmult_le_compat_r.
+2: now apply log_increasing.
+apply Rlt_le, Rinv_0_lt_compat.
+rewrite <- ln_1.
+apply ln_increasing ; now apply IZR_lt.
+Qed.
 
 (* Why3 goal *)
 Lemma log10_increasing :
   forall (x:Reals.Rdefinitions.R) (y:Reals.Rdefinitions.R),
   (0%R < x)%R /\ (x <= y)%R -> ((log10 x) <= (log10 y))%R.
 Proof.
-Admitted.
+intros x y H.
+apply Rmult_le_compat_r.
+2: now apply log_increasing.
+apply Rlt_le, Rinv_0_lt_compat.
+rewrite <- ln_1.
+apply ln_increasing ; now apply IZR_lt.
+Qed.
 

@@ -10,28 +10,20 @@ Sub-goal Precondition of goal ok'vc.
 Prover result is: Unknown (sat) (859 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File 657.mlw:
   Line 8:
     i = (11:t)
     i = (11:t)
     Execution of main function `ok` with env:
-      i = (11:t)
-      zero = 0
-      one = 1
-    (giant-step) execution of unimplemented function `toBig`
-      _ = (11:t)
+      { lsenv = []; vsenv = [ i = (11:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `toBig` with args:
+      [ _ = (11:t) ]
     result of `toBig` = (11:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (11:t1)
-    Property failure at precondition of `u` with:
-      i = (11:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (11:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = []; vsenv = [ i = (11:t1), i = (11:t), o = (11:t1) ];
+        rsenv = []; idenv = [ i = (11:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -45,28 +37,20 @@ Sub-goal Precondition of goal ko'vc.
 Prover result is: Unknown (sat) (847 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File 657.mlw:
   Line 10:
     i = (11:t)
     i = (11:t)
     Execution of main function `ko` with env:
-      i = (11:t)
-      zero = 0
-      one = 1
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (11:t)
+      { lsenv = []; vsenv = [ i = (11:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (11:t) ]
     result of `stoBig` = (11:t1)
-    (giant-step) execution of unimplemented function `u`
-      i = (11:t1)
-    Property failure at precondition of `u` with:
-      i = (11:t1)
+    (giant-step) execution of unimplemented function `u` with args:
+      [ i = (11:t1) ]
+    Property failure at precondition of `u` with env:
+      { lsenv = []; vsenv = [ i = (11:t1), i = (11:t), o = (11:t1) ];
+        rsenv = []; idenv = [ i = (11:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -80,25 +64,18 @@ Sub-goal Postcondition of goal ko2'vc.
 Prover result is: Unknown (sat) (728 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File 657.mlw:
   Line 12:
     i = (2147483648:t)
     i = (2147483648:t)
     Execution of main function `ko2` with env:
-      i = (2147483648:t)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ i = (2147483648:t) ]; rsenv = []; idenv = [] }
   Line 13:
-    (giant-step) execution of unimplemented function `stoBig`
-      _ = (2147483648:t)
+    (giant-step) execution of unimplemented function `stoBig` with args:
+      [ _ = (2147483648:t) ]
     result of `stoBig` = (18446744071562067968:t1)
-    Property failure at postcondition of `ko2` with:
-      result = (18446744071562067968:t1)
+    Property failure at postcondition of `ko2` with env:
+      { lsenv = [];
+        vsenv = [ i = (2147483648:t), result = (18446744071562067968:t1) ];
+        rsenv = []; idenv = [ result = (18446744071562067968:t1) ] }
 

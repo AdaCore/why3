@@ -105,7 +105,7 @@ let find_module_path env mm path m =
   match path with
   | [] -> Mstr.find m mm
   | path -> let mm = Env.read_library Pmodule.mlw_language env path in
-            Mstr.find m mm
+            (Mstr.find m mm).Pmodule.mod_intf
 
 let find_module_id env mm id =
   let (path, m, _) = Pmodule.restore_path id in find_module_path env mm path m
@@ -521,8 +521,8 @@ let built_in_modules =
 
 let add_builtin_mo env (l,n,t,d) =
   let mo = Pmodule.read_module env l n in
-  let exp = mo.Pmodule.mod_export in
-  let kn = mo.Pmodule.mod_known in
+  let exp = Pmodule.mod_export_intf mo in
+  let kn = Pmodule.mod_known_intf mo in
   List.iter
     (fun (id,r) ->
       let its = Pmodule.ns_find_its exp [id] in

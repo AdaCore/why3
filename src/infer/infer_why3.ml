@@ -190,7 +190,7 @@ module Make(S: sig
         raise Not_found
 
   (** Inline every symbol *)
-  let t_unfold _ fs tl ty =
+  let t_unfold fs tl ty =
     let open Ty in
     if ls_equal fs ps_equ then t_app fs tl ty else
       match find_definition { known = th_known; funenv = Mls.empty; } fs with
@@ -211,6 +211,6 @@ module Make(S: sig
     let t = t_map t_inline_all t in
     match t.t_node with
     | Tapp (fs,tl) ->
-      t_attr_copy t (t_unfold t.t_loc fs tl t.t_ty)
+      t_attr_copy t (t_unfold fs tl t.t_ty)
     | _ -> t
 end

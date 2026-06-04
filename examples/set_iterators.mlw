@@ -1,0 +1,55 @@
+
+
+(** {1 testing iterators on set of integers} *)
+
+
+module TestIntSetIterator
+
+  use int.Int
+  use mach.int.Int63
+
+  use set.SetAppInt as S
+
+  let filter_non_neg (s:S.set)
+    ensures { forall x. S.mem x result <-> S.mem x s /\ x >= 0 }
+  =
+    let ref acc = S.empty () in
+    for x in s with S.Iter do
+      invariant { forall x. S.mem x acc -> S.mem x s /\ x >= 0 }
+      invariant { forall x. S.mem x it.S.Iter.visited /\ x >= 0 -> S.mem x acc }
+      variant { S.cardinal s - S.cardinal it.S.Iter.visited }
+      if x >= 0 then
+          acc <- S.add x acc
+    done;
+    acc
+
+
+end
+
+(** {1 testing iterators on set of strings} *)
+
+module TestStringSetIterator
+
+  use int.Int
+  use mach.int.Int63
+  use string.String
+  use string.OCaml as Str
+
+  use set.SetAppString as S
+
+  (** filters all strings whose length is at least m *)
+  let filter_minlength (s:S.set) (m:int63)
+    partial (* because of the call to Str.length *)
+    ensures { forall x. S.mem x result <-> S.mem x s /\ length x >= m }
+  =
+    let ref acc = S.empty () in
+    for x in s with S.Iter do
+      invariant { forall x. S.mem x acc -> S.mem x s /\ length x >= m }
+      invariant { forall x. S.mem x it.S.Iter.visited /\ length x >= m -> S.mem x acc }
+      variant { S.cardinal s - S.cardinal it.S.Iter.visited }
+      if Str.length x >= m then
+          acc <- S.add x acc
+    done;
+    acc
+
+end

@@ -51,10 +51,10 @@ let fmla2 : Term.term =
   Term.t_implies atom_A (Term.t_and atom_A atom_B)
 (* We add a location and attribute to indicate the start of a goal *)
 let fmla2 : Term.term =
-  let loc = Loc.user_position "myfile.my_ext" 42 28 42 91  in
+  let locs = [Loc.user_position "myfile.my_ext" 42 28 42 91] in
   let attrs = Ident.Sattr.singleton Ity.annot_attr in
   (* Note that this remove any existing attribute/locations on fmla2 *)
-  Term.t_attr_set ~loc attrs fmla2
+  Term.t_attr_set ~locs attrs fmla2
 (* END{ce_adaptgoals} *)
 
 let () = printf "@[formula 2 is:@ %a@]@." Pretty.print_term fmla2
@@ -126,7 +126,7 @@ let () = printf "@[On task2, CVC4,1.7 answers %a@."
 
 let () = printf "@[A candidate counterexample obtained from the prover is@\n%t@]@."
     (fun fmt ->
-       match Check_ce.last_nonempty_model (Task.task_known task2)
+       match Check_ce.last_nonempty_model ~env ~known_map:(Task.task_known task2)
                result1.Call_provers.pr_models with
        | Some m -> Json_base.print_json fmt (Model_parser.json_model m)
        | None -> fprintf fmt "unavailable")
@@ -158,7 +158,7 @@ let mlw_file =
 
 let pm =
   let pms = Typing.type_mlw_file env [] "myfile.mlw" mlw_file in
-  Wstdlib.Mstr.find "" pms
+  (Wstdlib.Mstr.find "" pms).Pmodule.mod_intf
 
 let task =
   match Task.split_theory pm.Pmodule.mod_theory None None with
@@ -176,7 +176,7 @@ let () = print_endline "\n== Check CE"
 
 (* BEGIN{check_ce} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
+  let why_prover = Some ("Alt-Ergo,^2.6.*$",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
       (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let results = Check_ce.models_from_rac ~limits rac env pm models in
@@ -190,7 +190,7 @@ let () = print_endline "\n== RAC execute giant steps\n"
 
 (* BEGIN{check_ce_giant_step} *)
 let () =
-  let why_prover = Some ("Alt-Ergo,2.6.0",limits) in
+  let why_prover = Some ("Alt-Ergo,^2.6.*$",limits) in
   let rac = Pinterp.mk_rac ~ignore_incomplete:false
     (Rac.Why.mk_check_term_lit config env ~why_prover ()) in
   let rac_results = Check_ce.models_from_giant_step ~limits

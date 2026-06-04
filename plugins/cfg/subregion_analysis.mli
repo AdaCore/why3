@@ -10,4 +10,4 @@
 
 open Why3
 
-val transform_letdefn: Pmodule.pmodule_uc -> Expr.let_defn -> Expr.let_defn
+val transform_letdefn: Pmodule.pmodule_uc0 -> Expr.let_defn -> Expr.let_defn

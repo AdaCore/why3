@@ -1,5 +1,5 @@
-Technical Informations
-======================
+Technical Information
+=====================
 
 .. _sec.proverdetectiondata:
 

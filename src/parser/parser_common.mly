@@ -172,10 +172,16 @@
     "Symbol %s cannot be user-defined. User-defined symbol cannot use ' \
       before a letter. You can only use ' followed by _ or a number."
 
+  let rec has_name t = match t.term_desc with
+    | Tattr (ATstr s, t) -> Ident.is_hyp_name_attr s || has_name t
+    | _ -> false
+
   let name_term id_opt def t =
-    let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
-    let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
-    { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
+    if has_name t then t
+    else
+      let name = Option.fold ~some:(fun id -> id.id_str) ~none:def id_opt in
+      let attr = ATstr (Ident.create_attribute ("hyp_name:" ^ name)) in
+      { term_loc = t.term_loc; term_desc = Tattr (attr, t) }
 
   let re_pat pat d = { pat with pat_desc = d }
 
@@ -368,9 +374,9 @@ See also `plugins/cfg/cfg_parser.mly`
 
 %%
 
-%public module_head_parsing_only:
-| THEORY attrs(uident_nq)  { $2 }
-| MODULE attrs(uident_nq)  { $2 }
+%public module_head_parsing_only(intf):
+| THEORY attrs(uident_nq) intf = intf { $2, intf }
+| MODULE attrs(uident_nq) intf = intf { $2, intf }
 
 %public scope_head_parsing_only:
 | SCOPE boption(IMPORT) attrs(uident_nq)

@@ -34,7 +34,7 @@ let case f = Sattr.mem case_split f.t_attrs
 let compiled = Ident.create_attribute "split_goal: compiled match"
 
 let unstop f =
-  t_attr_set ?loc:f.t_loc (Sattr.remove stop_split f.t_attrs) f
+  t_attr_set ~locs:f.t_locs (Sattr.remove stop_split f.t_attrs) f
 
 (* Represent monoid of formula interpretation for conjonction and disjunction *)
 module M = struct
@@ -388,7 +388,7 @@ let rec split_core (sp:split) (f:term) : split_ret =
               let vs = create_vsymbol (id_fresh "q") (t_type t) in
               let tv = t_var vs in
               let (~-) fb =
-                t_attr_set ?loc:f.t_loc attrs (t_let_close_simp vs t fb) in
+                t_attr_set ~locs:f.t_locs attrs (t_let_close_simp vs t fb) in
               let _, pos, neg, side =
                 List.fold_left (fun (cseen, pos, neg, side) (p, _, sf) ->
                   let cseen, vl, cond = pat_condition kn tv cseen p in

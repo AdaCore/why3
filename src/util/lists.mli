@@ -80,3 +80,5 @@ val split: int -> 'a list -> 'a list * 'a list
 (** [split n l] returns [(prefix n l, chop n l)]. *)
 
 val init : int -> (int -> 'a) -> 'a list
+
+val hd_opt : 'a list -> 'a option

@@ -17,7 +17,12 @@ module MaximumTree
     | Node l _ r -> 1 + size l + size r
   end
 
-  lemma size_nonneg: forall t: tree. size t >= 0
+  let rec lemma size_nonneg (t: tree) 
+    ensures { size t >= 0 }
+  = match t with
+    | Empty -> ()
+    | Node l _ r -> size_nonneg l; size_nonneg r
+    end
 
   predicate mem (x: int) (t: tree) = match t with
     | Empty      -> false

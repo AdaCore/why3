@@ -3,11 +3,12 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="add_list_vc_sp.mlw"/>
 <theory name="AddListRec" proved="true">
  <goal name="sum&#39;vc" expl="VC for sum" proved="true">
- <proof prover="0"><result status="valid" time="0.040000" steps="7328"/></proof>
+ <proof prover="1"><result status="valid" time="0.040000" steps="6282"/></proof>
  </goal>
  <goal name="main&#39;vc" expl="VC for main" proved="true">
  <proof prover="0"><result status="valid" time="0.020000" steps="5580"/></proof>
@@ -15,7 +16,7 @@
 </theory>
 <theory name="AddListImp" proved="true">
  <goal name="sum&#39;vc" expl="VC for sum" proved="true">
- <proof prover="0"><result status="valid" time="0.030000" steps="7842"/></proof>
+ <proof prover="1"><result status="valid" time="0.030000" steps="6162"/></proof>
  </goal>
  <goal name="main&#39;vc" expl="VC for main" proved="true">
  <proof prover="0"><result status="valid" time="0.020000" steps="5803"/></proof>

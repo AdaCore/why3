@@ -57,3 +57,33 @@ Proof.
 apply Fset.pick_def.
 Qed.
 
+(* Why3 goal *)
+Definition t : Type.
+Proof.
+exact unit.
+Defined.
+
+(* Why3 goal *)
+Definition initial : t -> set.
+Proof.
+intro x.
+exact Fset.empty.
+Defined.
+
+(* Why3 goal *)
+Definition visited : t -> set.
+Proof.
+intro x.
+exact Fset.empty.
+Defined.
+
+(* Why3 goal *)
+Lemma t'invariant :
+  forall (self:t),
+  set.Fset.subset (to_fset (visited self)) (to_fset (initial self)).
+Proof.
+intros self.
+unfold Fset.subset, to_fset, visited, initial.
+auto.
+Qed.
+

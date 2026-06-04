@@ -20,42 +20,29 @@ Prover result is: Unknown (unknown + incomplete) (1112 steps).
 The contracts of the following functions/loops are too weak :
   - Function 'g' at "bench/check-ce/func_call1.mlw", line 15, characters 10-15
 , for example during the following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File func_call1.mlw:
   Line 4:
     Constant z initialization
-    (giant-step) execution of unimplemented function with args:
+    (giant-step) execution of unimplemented function with args: []
     result = 0
-    Normal execution of function `ref` with args:
-      contents = 0
-    Normal execution of function `ref'mk` with args:
-      contents = 0
-    z = {contents= 0}
+    Normal execution of function `ref` with args: [ contents = 0 ]
+    Normal execution of function `ref'mk` with args: [ contents = 0 ]
+    z = { contents = 0 }
 Unknown location:
     _ = ()
 File func_call1.mlw:
   Line 13:
     _ = ()
     Execution of main function `f` with env:
-      z = {contents= 0}
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ z = { contents = 0 }, _ = () ]; rsenv = [];
+        idenv = [] }
   Line 15:
-    Giant-step execution of function `g` with args:
-      x = 2
-    z = {contents= 2}
+    Giant-step execution of function `g` with args: [ x = 2 ]
+    z = { contents = 2 }
     result of `g` = 3
-    Normal execution of function `(+)` with args:
-      _ = 3
-      _ = 3
+    Normal execution of function `(+)` with args: [ _ = 3, _ = 3 ]
   Line 16:
-    Property failure at assertion with:
-      z = {contents= 2}
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ z = { contents = 2 }, _ = (), _ = (), w = 6 ];
+        rsenv = []; idenv = [ z = { contents = 2 } ] }
 

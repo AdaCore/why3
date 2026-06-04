@@ -7,24 +7,15 @@ Sub-goal Assertion of goal dummy'vc.
 Prover result is: Unknown (unknown) (7 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 Unknown location:
     _ = ()
 File let_constant.mlw:
   Line 5:
     _ = ()
     Execution of main function `dummy` with env:
-      _ = ()
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
   Line 9:
-    Property failure at assertion with:
-      a = 25
-      b = 65
+    Property failure at assertion with env:
+      { lsenv = []; vsenv = [ _ = (), a = 25, b = 65 ]; rsenv = [];
+        idenv = [ a = 25, b = 65 ] }
 

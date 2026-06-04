@@ -602,21 +602,94 @@ end
 module SetAppInt
 
   use int.Int
-  use export FsetInt
+  use FsetInt as FsetInt
 
   clone export SetApp with type elt = int, val eq = Int.(=), axiom .
 
   val min_elt (s: set) : int
     requires { not (is_empty s) }
-    ensures  { result = min_elt s }
+    ensures  { result = FsetInt.min_elt s }
 
   val max_elt (s: set) : int
     requires { not (is_empty s) }
-    ensures  { result = max_elt s }
+    ensures  { result = FsetInt.max_elt s }
 
   val interval (l r: int) : set
-    ensures  { result = interval l r }
+    ensures  { result = FsetInt.interval l r }
     ensures  { cardinal result = if l <= r then r - l else 0 }
+
+  scope Iter  (* iteration over sets *)
+
+    type t = abstract {
+              initial: set;
+      mutable visited: set;
+    } invariant {
+      subset visited initial
+    }  by {
+      initial = empty ();
+      visited = empty ();
+    }
+
+    val create (s: set) : t
+      ensures { result.initial = s }
+      ensures { is_empty result.visited }
+
+    exception Done
+
+    val next (iter: t) : int
+      writes { iter }
+      raises  { Done ->  iter.initial = (old iter).visited /\
+                         iter.visited = (old iter).visited }
+      returns { r -> mem r iter.initial /\
+                     not (mem r (old iter).visited) /\
+                     iter.visited = add r (old iter).visited }
+
+
+  end
+
+end
+
+
+
+(** {3 Applicative sets of strings} *)
+
+module SetAppString
+
+  use int.Int
+  use Fset as Fset
+
+  use string.OCaml as Str
+
+  clone export SetApp with type elt = string, val eq = Str.(=), axiom .
+
+  scope Iter  (* iteration over sets *)
+
+    type t = abstract {
+              initial: set;
+      mutable visited: set;
+    } invariant {
+      subset visited initial
+    }  by {
+      initial = empty ();
+      visited = empty ();
+    }
+
+    val create (s: set) : t
+      ensures { result.initial = s }
+      ensures { is_empty result.visited }
+
+    exception Done
+
+    val next (iter: t) : string
+      writes { iter }
+      raises  { Done ->  iter.initial = (old iter).visited /\
+                         iter.visited = (old iter).visited }
+      returns { r -> mem r iter.initial /\
+                     not (mem r (old iter).visited) /\
+                     iter.visited = add r (old iter).visited }
+
+
+  end
 
 end
 

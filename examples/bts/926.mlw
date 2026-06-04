@@ -1,0 +1,13 @@
+type ptr1
+type fset
+
+predicate mem ptr1 fset
+
+predicate inv'8 fset
+
+axiom inv_axiom'7 [@rewrite] :
+  forall x:fset. inv'8 x <-> forall e:ptr1 [mem e x]. mem e x
+
+constant x : fset
+
+goal h : inv'8 x

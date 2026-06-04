@@ -67,7 +67,10 @@ theory ieee_float.Float32
   meta "literal:keep" type t
   syntax literal t "(fp #b%s1b #b%e8b #b%m23b)"
 
-  syntax function zeroF     "((_ to_fp 8 24) #x00000000)"
+  syntax constant zeroF          "((_ to_fp 8 24) #x00000000)"
+  syntax constant plus_infinity  "(_ +oo 8 24)"
+  syntax constant minus_infinity "(_ -oo 8 24)"
+  syntax constant not_a_number   "(_ NaN 8 24)"
 
   prelude "(define-fun fp.isFinite32 ((x Float32)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
   prelude "(define-fun fp.isIntegral32 ((x Float32)) Bool (or (fp.isZero x) (and (fp.isNormal x) (= x (fp.roundToIntegral RNE x)))))"
@@ -99,7 +102,10 @@ theory ieee_float.Float64
   meta "literal:keep" type t
   syntax literal t "(fp #b%s1b #b%e11b #b%m52b)"
 
-  syntax function zeroF     "((_ to_fp 11 53) #x0000000000000000)"
+  syntax constant zeroF          "((_ to_fp 11 53) #x0000000000000000)"
+  syntax constant plus_infinity  "(_ +oo 11 53)"
+  syntax constant minus_infinity "(_ -oo 11 53)"
+  syntax constant not_a_number   "(_ NaN 11 53)"
 
   prelude "(define-fun fp.isFinite64 ((x Float64)) Bool (not (or (fp.isInfinite x) (fp.isNaN x))))"
   prelude "(define-fun fp.isIntegral64 ((x Float64)) Bool (or (fp.isZero x) (and (fp.isNormal x) (= x (fp.roundToIntegral RNE x)))))"

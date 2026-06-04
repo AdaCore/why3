@@ -22,6 +22,9 @@ case "$1" in
   "--reduced-mode")
         REGTESTS_MODE="REDUCED"
         ;;
+  "--examples-mode")
+        REGTESTS_MODE="EXAMPLES"
+        ;;
   *)
         echo "$0: Unknown option '$1'"
         exit 2
@@ -101,6 +104,7 @@ echo ""
 echo "Score on Examples and Case Studies: $success/$total"
 echo ""
 
+if [ "$REGTESTS_MODE" != "EXAMPLES" ]; then
 echo "=== Standard Library ==="
 echo ""
 run_dir stdlib ""
@@ -133,6 +137,8 @@ echo "=== MLCFG ==="
 echo ""
 run_dir mlcfg ""
 echo ""
+
+fi
 
 echo "Summary       : $success/$total"
 echo "Sessions size : "`wc -cl $sessions | tail -1`

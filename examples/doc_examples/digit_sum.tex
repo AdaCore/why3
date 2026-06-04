@@ -2,7 +2,7 @@
 \usepackage{fullpage,amsmath} 
 %\usepackage{isolatin1} 
  
-\usepackage[latin1]{inputenc} 
+\usepackage[utf8]{inputenc} 
 \usepackage[T1]{fontenc} 
  
  
@@ -56,7 +56,7 @@ escapeinside={(*@}{@*)}%
 \title{An exercise on proving programs with Why}  
  
  
-\author{Jean-Christophe Filliâtre and Simão Melo de Sousa} 
+\author{Jean-Christophe FilliÃ¢tre and SimÃ£o Melo de Sousa} 
  
 \date{November 2010} 
 \begin{document}  
@@ -67,97 +67,97 @@ escapeinside={(*@}{@*)}%
 \section{Introduction}
 
 Programmer -- bien, c'est concevoir une solution informatique
-adéquate, aussi systématique et efficace que possible à un problème
-soluble concret donné.
+adÃ©quate, aussi systÃ©matique et efficace que possible Ã  un problÃ¨me
+soluble concret donnÃ©.
 
-Or, concevoir une telle solution n'est pas en générale une tache
+Or, concevoir une telle solution n'est pas en gÃ©nÃ©rale une tache
 triviale.  Une approche classique et rigoureuse voudrait que le
 processus de conception soit, dans le cadre de la conception
-d'algorithme, constitué des phases suivantes:
+d'algorithme, constituÃ© des phases suivantes:
 
 %\begin{itemize}
-%\item Analyse du problème et de ces pré-requis
-%\item Modélisation de la solution
+%\item Analyse du problÃ¨me et de ces prÃ©-requis
+%\item ModÃ©lisation de la solution
 %\item Codification de la solution dans un langage de programmation
 %\item Analyse de performance
 %\item Validation de la solution et de son code
 %\end{itemize} 
 %
-%Si nous laissons le cadre général du génie logiciel et nous nous
+%Si nous laissons le cadre gÃ©nÃ©ral du gÃ©nie logiciel et nous nous
 % restreignons au cadre de la conception algorithmique, l'approche
-% précédente peut se réécrire en
+% prÃ©cÃ©dente peut se rÃ©Ã©crire en
 
 \begin{itemize}
-\item Définition du problème et de ces contraintes
+\item DÃ©finition du problÃ¨me et de ces contraintes
 \item Conception algorithmique de la solution
 \item Codification de la solution dans un langage de programmation
-\item Analyse la complexité algorithmique de la solution proposée
-\item Preuve de correction (totale) et de complétude.
+\item Analyse la complexitÃ© algorithmique de la solution proposÃ©e
+\item Preuve de correction (totale) et de complÃ©tude.
 \end{itemize}
 
-La pratique habituelle de la programmation ignore néanmoins ou
-minimise les activités liées aux deux dernière phases, de nature plus
-formelles ou mathématiques, en les remplaçant au mieux par une mesure
-expérimentale de performance et de validation par le biais d'une
-activité de test ou d'exécution contrôlée.
+La pratique habituelle de la programmation ignore nÃ©anmoins ou
+minimise les activitÃ©s liÃ©es aux deux derniÃ¨re phases, de nature plus
+formelles ou mathÃ©matiques, en les remplaÃ§ant au mieux par une mesure
+expÃ©rimentale de performance et de validation par le biais d'une
+activitÃ© de test ou d'exÃ©cution contrÃ´lÃ©e.
 
 
-%%% j'aime pas trop la formulation commentée qui suit, 
-%%% mais l'idée est lá 
+%%% j'aime pas trop la formulation commentÃ©e qui suit, 
+%%% mais l'idÃ©e est lÃ¡ 
 
 %--
 Si la situation semble moins critique sur le premier de ces deux
-derniers points, ce n'est pas encore vraiment le cas pour le deuxième.
+derniers points, ce n'est pas encore vraiment le cas pour le deuxiÃ¨me.
 
-%De fait, la formation en complexité algorithmique est maintenant
-%répandue et l'analyse de la complexité dans le pire des cas est un
+%De fait, la formation en complexitÃ© algorithmique est maintenant
+%rÃ©pandue et l'analyse de la complexitÃ© dans le pire des cas est un
 %bagage standard de tout informaticien. Reconnaitre une solution au
-%comportement exponentielle est accessible à l'informaticien standard.
+%comportement exponentielle est accessible Ã  l'informaticien standard.
 %L'analyse de performance, essentiellement dans le pire des cas,
 %dispose aussi maintenant d'outils automatiques assez performants.
 %--
 
 
 Nous allons ainsi montrer par la pratique qu'il est possible
-d'entreprendre l'approche rigoureuse jusqu'à son terme en s'attaquant
-à la dernière des phases: la vérification de la correction et de la
-complétude.
+d'entreprendre l'approche rigoureuse jusqu'Ã  son terme en s'attaquant
+Ã  la derniÃ¨re des phases: la vÃ©rification de la correction et de la
+complÃ©tude.
 
 
-Si cette tâche est possible, elle n'est, bien entendu, pas forcément
-aisée. La difficulté de cet exercice est clairement liée à la
-complexité ou subtilité de la solution algorithmique/programmatique
-proposée.
+Si cette tÃ¢che est possible, elle n'est, bien entendu, pas forcÃ©ment
+aisÃ©e. La difficultÃ© de cet exercice est clairement liÃ©e Ã  la
+complexitÃ© ou subtilitÃ© de la solution algorithmique/programmatique
+proposÃ©e.
 
-Une solution efficace se distancie en générale d'une solution
+Une solution efficace se distancie en gÃ©nÃ©rale d'une solution
 naturelle souvent simples mais inefficace. Comprendre et accepter sa
-correction peux exiger une certaine réflexion. L'argumenter ne sera
-donc pas forcement une tâche immédiate.
+correction peux exiger une certaine rÃ©flexion. L'argumenter ne sera
+donc pas forcement une tÃ¢che immÃ©diate.
 
 
 
-Tout comme en programmation où il y a un fossé entre la connaissance
-du langage de programmation et la maîtrise de la conception de
+Tout comme en programmation oÃ¹ il y a un fossÃ© entre la connaissance
+du langage de programmation et la maÃ®trise de la conception de
 programmes, si il y a une science de la preuve de programme, il existe
-également tout un art, un savoir-faire, dans la construction d'une
-preuve, surtout si l'on vise une preuve élégante ou aussi automatique
-que possible.  Comprendre quelle spécification rendra la preuve plus
-aisée requiert une certaine expérience.
+Ã©galement tout un art, un savoir-faire, dans la construction d'une
+preuve, surtout si l'on vise une preuve Ã©lÃ©gante ou aussi automatique
+que possible.  Comprendre quelle spÃ©cification rendra la preuve plus
+aisÃ©e requiert une certaine expÃ©rience.
 
 
-Ce document s'attache donc à explorer un exemple de cette catégorie et
-à introduire l'exercice de démonstration de correction et de
-complétude assistée par ordinateur.
+Ce document s'attache donc Ã  explorer un exemple de cette catÃ©gorie et
+Ã  introduire l'exercice de dÃ©monstration de correction et de
+complÃ©tude assistÃ©e par ordinateur.
 
 
 \section{Organisation du document}
 
-\section{Définition du problème}
+\section{DÃ©finition du problÃ¨me}
 
-Le problème considéré ici a été proposé comme défi au concours de
-programmation MIUP'2010 (Maratona Inter-Universitária de Programação,
-épreuve nacional portugaise du circuit de concours ACM-ICPC) qui a eu
-lieu a l'Université d'Évora - Portugal le 16 Octobre 2010.
+Le problÃ¨me considÃ©rÃ© ici a Ã©tÃ© proposÃ© comme dÃ©fi au concours de
+programmation MIUP'2010 (Maratona Inter-UniversitÃ¡ria de ProgramaÃ§Ã£o,
+Ã©preuve nacional portugaise du circuit de concours ACM-ICPC) qui a eu
+lieu a l'UniversitÃ© d'Ã‰vora - Portugal le 16 Octobre 2010.
 
 
 The digit sum $d(x)$ of a natural number $x$ is the sum of its
@@ -172,93 +172,93 @@ integer. The first one is $y$ and the second one is $z$.
 
 The expected output consists in exactly one line and is the number $x$.  
 
-\section{Résolution algorithmique}
+\section{RÃ©solution algorithmique}
 
-\subsection{Quelques considérations initiales}
+\subsection{Quelques considÃ©rations initiales}
 
-Analysons premièrement quelques particularités et faits remarquables
-liés au problème.
+Analysons premiÃ¨rement quelques particularitÃ©s et faits remarquables
+liÃ©s au problÃ¨me.
 
 
-La première remarque que l'on peut faire est que les limites du 
-problème indiquent clairement  la solution à formuler doit être
-efficace pour pouvoir traiter des données du problème  
-en temps raisonnable. Énumérer les entiers plus grand que $z$ jusqu'à 
+La premiÃ¨re remarque que l'on peut faire est que les limites du 
+problÃ¨me indiquent clairement  la solution Ã  formuler doit Ãªtre
+efficace pour pouvoir traiter des donnÃ©es du problÃ¨me  
+en temps raisonnable. Ã‰numÃ©rer les entiers plus grand que $z$ jusqu'Ã  
 trouver le bon candidat n'est simplement pas raisonnable.
 
-Étant donné un entier $a$, le plus petit entier $b$ tel que $d(b)=a$ a
+Ã‰tant donnÃ© un entier $a$, le plus petit entier $b$ tel que $d(b)=a$ a
 comme longueur $\lceil \frac{a}{9}\rceil$ et est $i\overbrace{9 \ldots
-  9}^{\lfloor \frac{a}{9}\rfloor}$ où $i = a\mod 9$.
+  9}^{\lfloor \frac{a}{9}\rfloor}$ oÃ¹ $i = a\mod 9$.
 
 
-Ainsi, dans le cas limite où $y$ est $89999$, le plus petit entier
+Ainsi, dans le cas limite oÃ¹ $y$ est $89999$, le plus petit entier
 ayant cette digit-sum a pour longueur $\lceil \frac{89999}{9}\rceil $,
-soit 10\,000, et est égal à $8\overbrace{9 \ldots 9}^{9\,999}$.
+soit 10\,000, et est Ã©gal Ã  $8\overbrace{9 \ldots 9}^{9\,999}$.
 
-Une autre remarque intéressante est la suivante. S'il est possible de
+Une autre remarque intÃ©ressante est la suivante. S'il est possible de
 trouver un nombre $b$ de taille $c$ dont la digit-sum est $a$, il est
-possible de trouver un nombre de taille $c+1$ ayant la même digit-sum.
-Par exemple, il suffit de rajouter un $0$ à droite de $b$, ou alors de
-baisser d'une unité n'importe quel chiffre non nul de $b$ et
+possible de trouver un nombre de taille $c+1$ ayant la mÃªme digit-sum.
+Par exemple, il suffit de rajouter un $0$ Ã  droite de $b$, ou alors de
+baisser d'une unitÃ© n'importe quel chiffre non nul de $b$ et
 d'intercaler le chiffre $1$ dans n'importe quelle position dans $b$,
 etc.
 
 
-Ainsi, étant donnée les limites du problème, il est clair que aucun
-des nombres à calculer aura plus de $10\,001$ chiffres, vu qu'il est
+Ainsi, Ã©tant donnÃ©e les limites du problÃ¨me, il est clair que aucun
+des nombres Ã  calculer aura plus de $10\,001$ chiffres, vu qu'il est
 possible de trouver un nombre $x$ avec exactement $10\,0001$ chiffres
-tel que $d(x)=y$ quelque soit l'entier non nul $y$ inférieur
-strictement à $90000$.
+tel que $d(x)=y$ quelque soit l'entier non nul $y$ infÃ©rieur
+strictement Ã  $90000$.
 
 Par exemple, si $y= 99$, alors on peut choisir $x=1\overbrace{0\ldots
   0}^{9\,989}\overbrace{9\ldots 9}^{10}8$. En effet $d(x)=y=99$ et $x$
-a $10\,001$ chiffres.  Un autre exemple peut être $y=89\,999$. Alors
+a $10\,001$ chiffres.  Un autre exemple peut Ãªtre $y=89\,999$. Alors
 on peut choisir $x=18\overbrace{9 \ldots 9}^{9\,998}$. Signalons
-néanmoins que si nous devions choisir un entier plus grand que
+nÃ©anmoins que si nous devions choisir un entier plus grand que
 $8\overbrace{9 \ldots 9}^{9\,999}$ nous aurions pu choisir
 $x=98\overbrace{9\ldots 9}^{9\,998}$ et rester dans les limites des
 $10\,000$ chiffres.
 
 
-Ces considérations nous permettent de fixer une borne supérieure
-raisonnable à la taille de l'entier à calculer $x$ connaissant $y$ et
-$z$.  Considérons $u=\lceil \frac{y}{9} \rceil$ le nombre de chiffres
+Ces considÃ©rations nous permettent de fixer une borne supÃ©rieure
+raisonnable Ã  la taille de l'entier Ã  calculer $x$ connaissant $y$ et
+$z$.  ConsidÃ©rons $u=\lceil \frac{y}{9} \rceil$ le nombre de chiffres
 du plus petit entier dont la digit-sum est $y$ et $v$ le nombre de
 chiffre de $z$.
 
 Si $u$ est strictement plus grand que $v$ alors la borne est
-nécessairement $u$ (et dans ce cas on sait même quelle est la valeur
+nÃ©cessairement $u$ (et dans ce cas on sait mÃªme quelle est la valeur
 de $x$), dans le cas contraire la taille de $x$ sera au mieux $v$ et
 au plus $v+1$.  Car on se sait pas a priori s'il existe des nombres de
 taille $v$ plus grand de $z$ qui ont $y$ comme digit-sum, mais
-certainement que l'on arrive à en trouver avec $v+1$ chiffres.
+certainement que l'on arrive Ã  en trouver avec $v+1$ chiffres.
 
  
-\subsection{Représentation des données}
+\subsection{ReprÃ©sentation des donnÃ©es}
 
 
 
 
-Le premier choix à considérer au niveau de la solution est celle de la
-représentation des données que la solution manipulera. Les nombres
-manipulés sont potentiellement très grand, et la solution aura à
+Le premier choix Ã  considÃ©rer au niveau de la solution est celle de la
+reprÃ©sentation des donnÃ©es que la solution manipulera. Les nombres
+manipulÃ©s sont potentiellement trÃ¨s grand, et la solution aura Ã 
 manipuler en particulier les chiffres de ces nombres. Ainsi il est
-assez naturel de choisir représenter les entiers manipulés (ici $x$)
-par la séquence de ces chiffres.  Comme nous allons le voir, la
+assez naturel de choisir reprÃ©senter les entiers manipulÃ©s (ici $x$)
+par la sÃ©quence de ces chiffres.  Comme nous allons le voir, la
 solution choisie devra parcourir le nombre du chiffre de poids le moins
 significatif au chiffre de poids le plus significatif. Pour cela il
-sera plus convenable représenter les chiffre dans l'ordre inverse dans
+sera plus convenable reprÃ©senter les chiffre dans l'ordre inverse dans
 le tableau. Ainsi le parcours se fera ainsi de gauche a droite dans le
 tableau.
 
 
 
 % voir si cette note est utile
-Il pourra être pertinent garantir que la représentation des entiers
-est cohérente. C'est à dire que les éléments du tableau sont des
-entiers entre $0$ et $9$, qu'à gauche du premier chiffre il n'y a, le
-cas échéant, que des $0$ (dans le cas de la représentation des chiffre
-en ordre inverse, à droite du dernier chiffre représentatif il n'y a
+Il pourra Ãªtre pertinent garantir que la reprÃ©sentation des entiers
+est cohÃ©rente. C'est Ã  dire que les Ã©lÃ©ments du tableau sont des
+entiers entre $0$ et $9$, qu'Ã  gauche du premier chiffre il n'y a, le
+cas Ã©chÃ©ant, que des $0$ (dans le cas de la reprÃ©sentation des chiffre
+en ordre inverse, Ã  droite du dernier chiffre reprÃ©sentatif il n'y a
 que des $0$).  Nous reviendrons sur ce point le moment venu.
 
 
@@ -266,16 +266,16 @@ que des $0$).  Nous reviendrons sur ce point le moment venu.
 \subsection{L'algorithme}
 
 
-Considérons que la solution $x$ soit constitué des chiffre $x_m\ldots
-x_1x_0$ et que $z$ soit constitué des chiffres $z_m\ldots z_1z_0$ (les
-chiffres à gauche pouvant être des $0$ si nécessaire).
+ConsidÃ©rons que la solution $x$ soit constituÃ© des chiffre $x_m\ldots
+x_1x_0$ et que $z$ soit constituÃ© des chiffres $z_m\ldots z_1z_0$ (les
+chiffres Ã  gauche pouvant Ãªtre des $0$ si nÃ©cessaire).
 
 Comme $x$ est le premier entier qui suit $z$ (suivant l'ordre
 croissant) et qui a pour digit-sum $y$, remarquons qu'il doit exister
-un indice $d$ tel que qu'à gauche de cet indice $x$ coïncide avec $z$
-($\forall i, d<i\leq m \implies x_i=z_i$) et que ce qui reste de $x$ à
+un indice $d$ tel que qu'Ã  gauche de cet indice $x$ coÃ¯ncide avec $z$
+($\forall i, d<i\leq m \implies x_i=z_i$) et que ce qui reste de $x$ Ã 
 droite (d inclus) soit un nombre plus grand strictement que ce qui
-reste de $z$ à droite de $d$ ($x_d\ldots x_0 > z_d\ldots z_0$).
+reste de $z$ Ã  droite de $d$ ($x_d\ldots x_0 > z_d\ldots z_0$).
  
 Dans ce cas notons aussi que $\Sigma_{i=d+1}^m x_i=\Sigma_{i=d+1}^m z_i$
 (soit $a$ cette valeur).  Soient $b_x=\Sigma_{i=0}^d x_i$ et $b_z =
@@ -283,16 +283,16 @@ Dans ce cas notons aussi que $\Sigma_{i=d+1}^m x_i=\Sigma_{i=d+1}^m z_i$
 $y=a+b_x$ et $d(z)=a+b_z$.
 
 Trouver le plus petit $x$ c'est donc, partant de $z$, trouver un
-indice $d$ plus à droite possible dans $z$ tel qu'il soit possible de
+indice $d$ plus Ã  droite possible dans $z$ tel qu'il soit possible de
 trouver la plus petite augmentation de $z_d$ ($x_d$) qui rende
 possible l'expression d'un nombre $x_{d-1}\ldots x_0$ ayant comme
-digit-sum $y-a-x_d$ (c'est à dire, $\Sigma_{i=0}^{d-1}x_i = y-a-x_d$).
+digit-sum $y-a-x_d$ (c'est Ã  dire, $\Sigma_{i=0}^{d-1}x_i = y-a-x_d$).
 
 
-Pour cela remarquons qu'il nous suffit de parcourir $z$ de $z_0$ à
-$z_m$ et que pour chacun des $z_i$ essayer (dans l'ordre) les différents chiffres qui suivent $z_i$.
-Une tentative réussi si l'on réussi à exprimer avec $i-1$ chiffres le plus petit nombre qui complète la digit-sum.
-Si aucune tentative réussi alors $z_i$ n'est pas le bon chiffre ($i$ n'est pas $d$), il faut tenter $z_{i+1}$. 
+Pour cela remarquons qu'il nous suffit de parcourir $z$ de $z_0$ Ã 
+$z_m$ et que pour chacun des $z_i$ essayer (dans l'ordre) les diffÃ©rents chiffres qui suivent $z_i$.
+Une tentative rÃ©ussi si l'on rÃ©ussi Ã  exprimer avec $i-1$ chiffres le plus petit nombre qui complÃ¨te la digit-sum.
+Si aucune tentative rÃ©ussi alors $z_i$ n'est pas le bon chiffre ($i$ n'est pas $d$), il faut tenter $z_{i+1}$. 
 
 
 
@@ -341,10 +341,10 @@ let () =
   done
 \end{lstlisting}
 
-\section{Considérations sur la complexité de la solution}
-\section{Considérations sur la vérification formelle de la solution}
-\section{Un courte introduction à la preuve de programmes avec l'outils Why}
-\section{Preuve incrémentale de correction et de complétude de la solution}
+\section{ConsidÃ©rations sur la complexitÃ© de la solution}
+\section{ConsidÃ©rations sur la vÃ©rification formelle de la solution}
+\section{Un courte introduction Ã  la preuve de programmes avec l'outils Why}
+\section{Preuve incrÃ©mentale de correction et de complÃ©tude de la solution}
 \section{Conclusion}
 \end{document}  
  

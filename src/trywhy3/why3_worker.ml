@@ -112,17 +112,17 @@ module Task =
 
 
     let premise_kind = function
-      | { Term. t_node = Term.Tnot _; t_loc = None } -> "why3-loc-neg-premise"
+      | { Term. t_node = Term.Tnot _; t_locs = [] } -> "why3-loc-neg-premise"
       | _ -> "why3-loc-premise"
 
     let collect_locs t =
       (* from why 3 ide *)
       let locs = ref [] in
       let rec get_locs kind f =
-        Option.iter (fun loc ->
+        List.iter (fun loc ->
             match mk_loc (Loc.get loc) with
               None -> ()
-            | Some l -> locs := (kind, l) :: !locs) f.Term.t_loc;
+            | Some l -> locs := (kind, l) :: !locs) f.Term.t_locs;
         Term.t_fold (fun () t -> get_locs kind t ) () f
       in
       let rec get_t_locs f =
@@ -339,6 +339,7 @@ let why3_execute_one m rs =
 let why3_execute modules =
   let mods =
     Wstdlib.Mstr.fold (fun _ m acc ->
+        let m = m.Pmodule.mod_intf in
         match Pmodule.ns_find_rs m.Pmodule.mod_export ["main"] with
         | rs -> why3_execute_one m rs :: acc
         | exception Not_found -> acc)

@@ -10,27 +10,19 @@ Goal g1.
 Prover result is: Unknown (unknown + incomplete) (429 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File lists.mlw:
   Line 14:
     l = Nil
     l = Nil
     Execution of main function `g1'goal` with env:
-      l = Nil
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ l = Nil ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File lists.mlw:
   Line 14:
-    Property failure at postcondition of `g1'goal` with:
-      l = Nil
+    Property failure at postcondition of `g1'goal` with env:
+      { lsenv = []; vsenv = [ l = Nil, result = () ]; rsenv = [];
+        idenv = [ l = Nil ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE
@@ -44,27 +36,20 @@ Goal g2.
 Prover result is: Unknown (unknown + incomplete) (598 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File lists.mlw:
   Line 16:
     l = (Cons (- 1) Nil)
     l = (Cons (- 1) Nil)
     Execution of main function `g2'goal` with env:
-      l = (Cons (- 1) Nil)
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ l = (Cons (- 1) Nil) ]; rsenv = [];
+        idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File lists.mlw:
   Line 16:
-    Property failure at postcondition of `g2'goal1` with:
-      l = (Cons (- 1) Nil)
+    Property failure at postcondition of `g2'goal1` with env:
+      { lsenv = []; vsenv = [ l = (Cons (- 1) Nil), result = () ];
+        rsenv = []; idenv = [ l = (Cons (- 1) Nil) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -78,27 +63,19 @@ Goal g1.
 Prover result is: Unknown (unknown + incomplete) (2026 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
-File int.mlw:
-  Line 13:
-    Constant zero initialization
-    zero = 0
-  Line 14:
-    Constant one initialization
-    one = 1
 File lists.mlw:
   Line 25:
     l = Nil1
     l = Nil1
     Execution of main function `g1'goal` with env:
-      l = Nil1
-      zero = 0
-      one = 1
+      { lsenv = []; vsenv = [ l = Nil1 ]; rsenv = []; idenv = [] }
 Unknown location:
-    Normal execution of function `Tuple0` with args:
+    Normal execution of function `Tuple0` with args: []
 File lists.mlw:
   Line 25:
-    Property failure at postcondition of `g1'goal2` with:
-      l = Nil1
+    Property failure at postcondition of `g1'goal2` with env:
+      { lsenv = []; vsenv = [ l = Nil1, result = () ]; rsenv = [];
+        idenv = [ l = Nil1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Checked model 0: BAD_CE

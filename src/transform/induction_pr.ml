@@ -35,7 +35,7 @@ and context_node =
 exception Ind_not_found
 
 let make_context node term =
- { c_node = node; c_attrs = term.t_attrs; c_loc = term.t_loc }
+ { c_node = node; c_attrs = term.t_attrs; c_loc = t_loc term }
 
 
 let make_context_ctx node context =
@@ -172,11 +172,11 @@ let introduce_equalities vsi paraml argl goal =
 let rec zip ctx goal = match ctx.c_node with
   | Hole -> goal
   | Cimplies (t, ctx2)  -> zip ctx2
-      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_implies t goal))
+      (t_attr_set ~locs:(Option.to_list ctx.c_loc) ctx.c_attrs (t_implies t goal))
   | Cforall (vsl, ctx2) -> zip ctx2
-      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_forall_close vsl [] goal))
+      (t_attr_set ~locs:(Option.to_list ctx.c_loc) ctx.c_attrs (t_forall_close vsl [] goal))
   | Clet (vs, t, ctx2)  -> zip ctx2
-      (t_attr_set ?loc:ctx.c_loc ctx.c_attrs (t_let_close vs t goal))
+      (t_attr_set ~locs:(Option.to_list ctx.c_loc) ctx.c_attrs (t_let_close vs t goal))
 
 (* Replace clause by the associated inductive case. *)
 let substitute_clause induct vsi ls argl goal c =

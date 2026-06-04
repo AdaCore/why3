@@ -22,7 +22,7 @@ val mk_record_binder : Gnat_ast.record_binder_id -> Why3.Ptree.field
 val mk_declaration : Gnat_ast.declaration_id -> Why3.Ptree.decl list
 
 val mk_theory_declaration :
-  Gnat_ast.theory_declaration_id -> (Why3.Ptree.ident * Why3.Ptree.decl list) list
+  Gnat_ast.theory_declaration_id -> (Why3.Ptree.ident * Why3.Ptree.qualid option * Why3.Ptree.decl list) list
 
 val mlw_file : Gnat_ast.theory_declaration_id list -> Why3.Ptree.mlw_file
 
