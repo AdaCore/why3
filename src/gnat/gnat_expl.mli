@@ -62,6 +62,7 @@ type check_kind =
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
