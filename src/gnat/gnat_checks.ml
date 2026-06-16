@@ -1092,7 +1092,7 @@ let schedule_goal_with_prover ~callback c g p =
     else
       None
   in
-  run_goal ?proof_script_filename:proof_script_filename ~callback c p g
+  run_goal ?proof_script_filename c p g ~callback
 
 let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
