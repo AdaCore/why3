@@ -72,7 +72,7 @@ let register_goal cont goal_id =
           Gnat_checks.add_to_check c goal_id ~trivially_proved:is_trivial
       end
 
-let interpret_result c pa pas =
+let observe_prover_status c pa pas =
    match pas with
    | Controller_itp.Done r ->
      let session = c.Controller_itp.controller_session in
@@ -94,13 +94,21 @@ let interpret_result c pa pas =
          Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
        | Some _ -> assert false
        | None -> ());
-     Some (goal, answer = Call_provers.Valid)
    | Controller_itp.InternalFailure e ->
        let s = Format.asprintf "Internal Why3 unexpected error during \
                                 elaboration of prover file:\n %a"
            Exn_printer.exn_printer e in
-       Gnat_report.add_warning s;
-       None
+       Gnat_report.add_warning s
+   | _ ->
+       ()
+
+let interpret_result c pa pas =
+   observe_prover_status c pa pas;
+   match pas with
+   | Controller_itp.Done r ->
+     let session = c.Controller_itp.controller_session in
+     let goal = Session_itp.get_proof_attempt_parent session pa in
+     Some (goal, r.Call_provers.pr_answer = Call_provers.Valid)
    | _ ->
        None
 
@@ -148,7 +156,7 @@ and schedule_counterexample c check =
   | None -> assert false
   | Some g ->
       C.schedule_goal_with_prover c ~callback:(fun pa pas ->
-        ignore (interpret_result c pa pas))
+        observe_prover_status c pa pas)
         g prover_ce
 
 let handle_obj c check =
