@@ -72,100 +72,96 @@ let register_goal cont goal_id =
           Gnat_checks.add_to_check c goal_id ~trivially_proved:is_trivial
       end
 
-let rec handle_vc_result c goal result =
-   (* This function is called when the prover has returned from a VC.
-       goal           is the VC that the prover has dealt with
-       result         a boolean, true if the prover has proved the VC
-       prover_result  the actual proof result, to extract statistics
-   *)
-   let check, status = C.register_result c goal result in
-   match status with
-   | Gnat_checks.Proved -> ()
-   | Gnat_checks.Not_Proved -> ()
-   | Gnat_checks.Work_Left ->
-       List.iter (create_manual_or_schedule c check) (Gnat_checks.next check)
-   | Gnat_checks.Counter_Example ->
-     (* In this case, counterexample prover and VC will be never None *)
-     let prover_ce = (Option.get Gnat_config.prover_ce) in
-     match Gnat_checks.ce_goal check with
-     | None -> assert false
-     | Some g ->
-       C.schedule_goal_with_prover c ~callback:(interpret_result c) g prover_ce
-
-and interpret_result c pa pas =
-   (* callback function for the scheduler, here we filter if an interesting
-      goal has been dealt with, and only then pass on to handle_vc_result *)
+let observe_prover_status c pa pas =
    match pas with
    | Controller_itp.Done r ->
      let session = c.Controller_itp.controller_session in
      let goal = Session_itp.get_proof_attempt_parent session pa in
      let answer = r.Call_provers.pr_answer in
-     if Gnat_config.debug_prover_errors &&
-        match answer with
-        | Call_provers.HighFailure _ -> true
-        | _ -> false &&
+     let high_failure =
+       match answer with
+       | Call_provers.HighFailure _ -> true
+       | _ -> false
+     in
+     if Gnat_config.debug_prover_errors && high_failure &&
         not (Gnat_config.is_ce_prover session pa) then
        Gnat_report.add_warning r.Call_provers.pr_output;
      (if answer = Call_provers.Valid then
        match r.Call_provers.pr_cache_source with
-       | Some "file" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.File
-       | Some "memcached" -> Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
+       | Some "file" ->
+         Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.File
+       | Some "memcached" ->
+         Gnat_checks.mark_goal_from_wrapper_cache goal Gnat_report.Memcached
        | Some _ -> assert false
        | None -> ());
-     handle_vc_result c goal (answer = Call_provers.Valid)
    | Controller_itp.InternalFailure e ->
        let s = Format.asprintf "Internal Why3 unexpected error during \
                                 elaboration of prover file:\n %a"
            Exn_printer.exn_printer e in
        Gnat_report.add_warning s
    | _ ->
-         ()
+       ()
 
-and create_manual_or_schedule (c: Controller_itp.controller) _obj goal =
+let interpret_result c pa pas =
+   observe_prover_status c pa pas;
+   match pas with
+   | Controller_itp.Done r ->
+     let session = c.Controller_itp.controller_session in
+     let goal = Session_itp.get_proof_attempt_parent session pa in
+     Some (goal, r.Call_provers.pr_answer = Call_provers.Valid)
+   | _ ->
+       None
+
+let rec discharge_check c check =
+  match Gnat_checks.next check with
+  | None -> ()
+  | Some goal -> discharge_goal c goal
+
+and discharge_goal c goal =
   let s = c.Controller_itp.controller_session in
-  match Gnat_config.manual_prover with
-  | Some _ when C.goal_has_splits s goal &&
-                not (Session_itp.pn_proved c.Controller_itp.controller_session goal) ->
-                  handle_vc_result c goal false
-  | _ -> schedule_goal c goal
+  let proved = Session_itp.pn_proved s goal in
+  if proved then begin
+    if not (Gnat_checks.is_goal_trivially_proved goal) then
+      Gnat_checks.mark_goal_from_session_cache goal;
+    discharge_goal_result c goal true
+  end else
+    match Gnat_config.manual_prover with
+    | Some _ ->
+        if C.goal_has_splits s goal then discharge_goal_result c goal false
+        else schedule_goal_prover c goal
+    | None ->
+        if Gnat_checks.all_provers_tried s goal then
+          discharge_goal_result c goal false
+        else
+          schedule_goal_prover c goal
 
-and schedule_goal (c: Controller_itp.controller) (g : Session_itp.proofNodeID) =
-   (* schedule a goal for proof - the goal may not be scheduled actually,
-      because we detect that it is not necessary. This may have several
-      reasons:
-         * command line given to skip proofs
-         * goal already proved
-         * goal already attempted with identical options
-   *)
-   if (Gnat_config.manual_prover <> None
-       && not (Session_itp.pn_proved c.Controller_itp.controller_session g)) then begin
-       actually_schedule_goal c g
-   (* then implement reproving logic *)
-   end else begin
-     (* Maybe the goal is already proved *)
-      if Session_itp.pn_proved c.Controller_itp.controller_session g then begin
-         if not (Gnat_checks.is_goal_trivially_proved g) then
-           Gnat_checks.mark_goal_from_session_cache g;
-         handle_vc_result c g true
-      (* Maybe there was a previous proof attempt with identical parameters *)
-      end else if Gnat_checks.all_provers_tried c.Controller_itp.controller_session g then begin
-         (* the proof attempt was necessarily false *)
-         handle_vc_result c g false
-      end else begin
-         actually_schedule_goal c g
-      end;
-   end
+and discharge_goal_result c goal result =
+  let check, status = C.register_result c goal result in
+  match status with
+  | Gnat_checks.Proved -> ()
+  | Gnat_checks.Not_Proved -> ()
+  | Gnat_checks.Work_Left -> discharge_check c check
+  | Gnat_checks.Counter_Example -> schedule_counterexample c check
 
-and actually_schedule_goal c g =
-  C.schedule_goal ~callback:(interpret_result c) c g
+and schedule_goal_prover c goal =
+  C.schedule_goal c goal ~callback:(fun pa pas ->
+    match interpret_result c pa pas with
+    | Some (goal, result) -> discharge_goal_result c goal result
+    | None -> ())
+
+and schedule_counterexample c check =
+  (* In this case, counterexample prover and VC will be never None *)
+  let prover_ce = Option.get Gnat_config.prover_ce in
+  match Gnat_checks.ce_goal check with
+  | None -> assert false
+  | Some g ->
+      C.schedule_goal_with_prover c ~callback:(fun pa pas ->
+        observe_prover_status c pa pas)
+        g prover_ce
 
 let handle_obj c check =
-   if Gnat_checks.check_status check <> Gnat_checks.Proved then begin
-     match Gnat_checks.next check with
-      | [] -> ()
-      | l ->
-         List.iter (create_manual_or_schedule c check) l
-   end
+   if Gnat_checks.check_status check <> Gnat_checks.Proved then
+     discharge_check c check
 
 let all_split_subp c subp =
   let s = c.Controller_itp.controller_session in
