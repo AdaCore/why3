@@ -298,8 +298,8 @@ let next check =
    try
      let goal = GoalSet.choose check_rec.to_be_scheduled in
      GoalSet.remove check_rec.to_be_scheduled goal;
-     [goal]
-   with Not_found -> []
+     Some goal
+   with Not_found -> None
 
 let ce_transform = "introduce_premises"
 

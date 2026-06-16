@@ -92,11 +92,10 @@ val get_check_of_goal : goal_id -> Gnat_expl.check
 val get_extra_info   : goal_id -> Gnat_expl.extra_info
 
 (* Scheduling and proof *)
-val next : Gnat_expl.check -> goal_id list
-(* For a check, successive calls of [next] will return all goal_ids
-   associated to the check, by chunks of size Gnat_config.parallel. [] is
-   returned if no goal_ids are left. One can add new goal_ids to a check at any
-   time. *)
+val next : Gnat_expl.check -> goal_id option
+(* For a check, successive calls of [next] will return the goal_ids associated
+   to the check, one at a time. [None] is returned if no goal_ids are left. One
+   can add new goal_ids to a check at any time. *)
 
 
 (* Auxiliary functions *)

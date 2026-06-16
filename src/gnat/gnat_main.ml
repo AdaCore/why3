@@ -83,7 +83,7 @@ let rec handle_vc_result c goal result =
    | Gnat_checks.Proved -> ()
    | Gnat_checks.Not_Proved -> ()
    | Gnat_checks.Work_Left ->
-       List.iter (create_manual_or_schedule c check) (Gnat_checks.next check)
+       Option.iter (create_manual_or_schedule c check) (Gnat_checks.next check)
    | Gnat_checks.Counter_Example ->
      (* In this case, counterexample prover and VC will be never None *)
      let prover_ce = (Option.get Gnat_config.prover_ce) in
@@ -162,9 +162,9 @@ and actually_schedule_goal c g =
 let handle_obj c check =
    if Gnat_checks.check_status check <> Gnat_checks.Proved then begin
      match Gnat_checks.next check with
-      | [] -> ()
-      | l ->
-         List.iter (create_manual_or_schedule c check) l
+      | None -> ()
+      | Some goal ->
+         create_manual_or_schedule c check goal
    end
 
 let all_split_subp c subp =
