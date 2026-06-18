@@ -55,12 +55,14 @@ type check_kind =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
