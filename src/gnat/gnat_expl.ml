@@ -51,12 +51,14 @@ type check_kind =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -123,12 +125,14 @@ let is_warning_kind r =
    | VC_Program_Exit_Post
    | VC_Feasible_Post
    | VC_Inline_Check
+   | VC_Iterable_Check
    | VC_Container_Aggr_Check
    | VC_Reclamation_Check
    | VC_UC_No_Holes
    | VC_UC_Same_Size
    | VC_UC_Align_Overlay
    | VC_UC_Align_UC
+   | VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre
    | VC_Trivial_Weaker_Pre
@@ -244,12 +248,14 @@ let check_kind_from_string s =
    | "VC_PROGRAM_EXIT_POST"         -> VC_Program_Exit_Post
    | "VC_FEASIBLE_POST"             -> VC_Feasible_Post
    | "VC_INLINE_CHECK"              -> VC_Inline_Check
+   | "VC_ITERABLE_CHECK"            -> VC_Iterable_Check
    | "VC_CONTAINER_AGGR_CHECK"      -> VC_Container_Aggr_Check
    | "VC_RECLAMATION_CHECK"         -> VC_Reclamation_Check
    | "VC_UC_NO_HOLES"               -> VC_UC_No_Holes
    | "VC_UC_SAME_SIZE"              -> VC_UC_Same_Size
    | "VC_UC_ALIGN_OVERLAY"          -> VC_UC_Align_Overlay
    | "VC_UC_ALIGN_UC"               -> VC_UC_Align_UC
+   | "VC_MODIFIES"                  -> VC_Modifies
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | "VC_WEAKER_PRE"                -> VC_Weaker_Pre
    | "VC_TRIVIAL_WEAKER_PRE"        -> VC_Trivial_Weaker_Pre
@@ -321,12 +327,14 @@ let check_kind_to_ada kind =
    | VC_Program_Exit_Post         -> "VC_PROGRAM_EXIT_POST"
    | VC_Feasible_Post             -> "VC_FEASIBLE_POST"
    | VC_Inline_Check              -> "VC_INLINE_CHECK"
+   | VC_Iterable_Check            -> "VC_ITERABLE_CHECK"
    | VC_Container_Aggr_Check      -> "VC_CONTAINER_AGGR_CHECK"
    | VC_Reclamation_Check         -> "VC_RECLAMATION_CHECK"
    | VC_UC_No_Holes               -> "VC_UC_NO_HOLES"
    | VC_UC_Same_Size              -> "VC_UC_SAME_SIZE"
    | VC_UC_Align_Overlay          -> "VC_UC_ALIGN_OVERLAY"
    | VC_UC_Align_UC               -> "VC_UC_ALIGN_UC"
+   | VC_Modifies                  -> "VC_MODIFIES"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "VC_WEAKER_PRE"
    | VC_Trivial_Weaker_Pre        -> "VC_TRIVIAL_WEAKER_PRE"
@@ -393,12 +401,14 @@ let check_kind_to_string kind =
    | VC_Program_Exit_Post         -> "program_exit_post"
    | VC_Feasible_Post             -> "feasible_post"
    | VC_Inline_Check              -> "inline_check"
+   | VC_Iterable_Check            -> "iterable_check"
    | VC_Container_Aggr_Check      -> "container_aggr_check"
    | VC_Reclamation_Check         -> "reclamation_check"
    | VC_UC_No_Holes               -> "uc_no_holes"
    | VC_UC_Same_Size              -> "uc_same_size"
    | VC_UC_Align_Overlay          -> "address_alignment_check"
    | VC_UC_Align_UC               -> "alignment_check"
+   | VC_Modifies                  -> "modifies"
    (* VC_LSP_Kind - Liskov Substitution Principle *)
    | VC_Weaker_Pre                -> "weaker_pre"
    | VC_Trivial_Weaker_Pre        -> "trivial_weaker_pre"

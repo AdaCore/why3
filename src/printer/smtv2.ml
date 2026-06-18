@@ -193,7 +193,10 @@ let ident_printer () =
     ]
   in
   let san = sanitizer char_to_alpha char_to_alnumus in
-  create_ident_printer bls ~sanitizer:san
+  (* Strip trailing digits; this is sound for SMT as we don't interface with
+     any external SMT files. Stripping numbers makes output more stable
+     in case Why3 input contained numbered temp variables. *)
+  create_ident_printer bls ~sanitizer:san ~strip_numbers:true
 
 type version = V20 | V26 | V26Par
 

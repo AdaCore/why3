@@ -769,18 +769,20 @@ let get_and_register_global check_model_variable ctx exec_expr id oexp post ity 
     gen_from_post ctx post;
     gen_type_default ~really:true ~posts:post ctx ity; *)
   ] in
-  try
-    let value = get_value' ctx.env.log_uc ctx_desc id.id_loc gens in
-    register_used_value ctx.env id.id_loc id value;
-    if ctx.do_rac then (
-      let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
-      let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
-      check_assume_posts ctx.rac cntr_ctx value post );
-    lazy value
-  with FatalRACError _ | Cannot_evaluate _ | Stuck _ | Cannot_decide _ as e ->
-    (* We should not need to capture these exceptions if this function was not
-       executed on logic constants and logic functions. *)
-    lazy Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
+  lazy begin
+    try
+      let value = get_value' ctx.env.log_uc ctx_desc id.id_loc gens in
+      register_used_value ctx.env id.id_loc id value;
+      if ctx.do_rac then (
+        let desc = asprintf "of global variable `%a`" print_decoded id.id_string in
+        let cntr_ctx = mk_cntr_ctx ctx ~desc Vc.expl_post in
+        check_assume_posts ctx.rac cntr_ctx value post );
+      value
+    with FatalRACError _ | Cannot_evaluate _ | Stuck _ | Cannot_decide _ as e ->
+      (* We should not need to capture these exceptions if this function was not
+         executed on logic constants and logic functions. *)
+      Printexc.(raise_with_backtrace e (get_raw_backtrace ()))
+  end
 
 (******************************************************************************)
 (*                              SIDE EFFECTS                                  *)

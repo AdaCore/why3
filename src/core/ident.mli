@@ -112,8 +112,13 @@ val preid_name : preid -> string
 type ident_printer
 
 val create_ident_printer :
-  ?sanitizer : (string -> string) -> string list -> ident_printer
-(** start a new printer with a sanitizing function and a blacklist *)
+  ?sanitizer : (string -> string) ->
+  ?strip_numbers : bool -> string list -> ident_printer
+(** start a new printer with a sanitizing function and a blacklist.
+    When [strip_numbers] is set (default [false]), trailing digits are dropped
+    from each name before disambiguation, canonicalizing pre-existing
+    numbering.  This loses information and should only be requested where the
+    original numbering is known to be irrelevant. *)
 
 val duplicate_ident_printer: ident_printer -> ident_printer
 (** This is used to avoid editing the current (mutable) printer when raising
