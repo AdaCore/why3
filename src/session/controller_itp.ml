@@ -589,7 +589,8 @@ let run_idle_handler () =
       S.timeout ~ms:default_delay_ms timeout_handler;
     end
 
-let schedule_proof_attempt ?proof_script_filename c id pr ~limits ~callback ~notification =
+let schedule_proof_attempt ?(adjust_limits = true) ?proof_script_filename c id pr
+    ~limits ~callback ~notification =
   let ses = c.controller_session in
   let callback panid s =
     begin
@@ -625,7 +626,12 @@ let schedule_proof_attempt ?proof_script_filename c id pr ~limits ~callback ~not
       let config_pr,_ = Hprover.find c.controller_provers pr in
       let interactive = config_pr.Whyconf.interactive in
       let use_steps = Call_provers.(limits.limit_steps <> empty_limits.limit_steps) in
-      let limits = adapt_limits ~interactive ~use_steps limits a in
+      let limits =
+        if adjust_limits then
+          adapt_limits ~interactive ~use_steps limits a
+        else
+          limits
+      in
       let script =
         if proof_script_filename = None then
           Option.map (fun s ->
