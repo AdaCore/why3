@@ -1059,13 +1059,15 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
         C.schedule_proof_attempt
           ?proof_script_filename:proof_script_filename
           c g prover
-          ~limits:Call_provers.empty_limits ~callback ~notification
+          ~adjust_limits:false ~limits:Call_provers.empty_limits ~callback
+          ~notification
       | Some old_file ->
         let _paid, _file, _ores = C.prepare_edition c ~file:old_file
           g prover ~notification in
         C.schedule_proof_attempt
           c g prover
-          ~limits:Call_provers.empty_limits ~callback ~notification
+          ~adjust_limits:false ~limits:Call_provers.empty_limits ~callback
+          ~notification
     end
   else
     let check = get_check_of_goal g in
@@ -1077,7 +1079,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
     C.schedule_proof_attempt
       ?proof_script_filename:proof_script_filename
       c g prover
-      ~limits ~callback ~notification
+      ~adjust_limits:false ~limits ~callback ~notification
 
 let goal_has_splits session (goal: goal_id) =
   let goal_transformations = Session_itp.get_transformations session goal in
@@ -1361,7 +1363,7 @@ and replay_goal c goal =
           let limits = compute_replay_limit_from_pas pas in
           C.schedule_proof_attempt
             c goal prover
-            ~limits ~callback:(fun _ _ -> ())
+            ~adjust_limits:false ~limits ~callback:(fun _ _ -> ())
             ~notification:(fun _ -> ())) prover
 
 
