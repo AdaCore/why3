@@ -218,6 +218,7 @@ val interrupt_proof_attempts_for_goal : controller -> proofNodeID -> unit
     that are already running *)
 
 val schedule_proof_attempt :
+  ?adjust_limits:bool ->
   ?proof_script_filename:string ->
   controller ->
   proofNodeID ->
@@ -232,6 +233,8 @@ val schedule_proof_attempt :
    time the proof attempt status changes. Typically at Scheduled, then
    Running, then Done. If there is already a proof attempt with [p] it
    is updated.
+   [adjust_limits] increases resource limits from the previous proof attempt
+   when one exists. It defaults to true.
    [proof_script_filename] is used to give a location for the files
    generated for the prover.
    With debug flag keep_vcs, the files are saved at this location.
