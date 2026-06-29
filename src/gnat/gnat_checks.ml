@@ -298,8 +298,8 @@ let next check =
    try
      let goal = GoalSet.choose check_rec.to_be_scheduled in
      GoalSet.remove check_rec.to_be_scheduled goal;
-     [goal]
-   with Not_found -> []
+     Some goal
+   with Not_found -> None
 
 let ce_transform = "introduce_premises"
 
@@ -1092,7 +1092,7 @@ let schedule_goal_with_prover ~callback c g p =
     else
       None
   in
-  run_goal ?proof_script_filename:proof_script_filename ~callback c p g
+  run_goal ?proof_script_filename c p g ~callback
 
 let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
