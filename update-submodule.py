@@ -16,6 +16,14 @@ commit_message = "Automatic submodule commit"
 mr_title = "Automatic submodule commit"
 mr_body = "no-issue-check"
 
+# The user who pushed the why3 change is the natural reviewer of the
+# corresponding submodule bump. GitLab exposes them through these variables,
+# and user ids are instance-global, so the id can be reused directly as a
+# reviewer of the spark2014 merge request. Both may be empty for pipelines not
+# tied to a user, in which case we simply skip the assignment.
+reviewer_id = os.environ.get("GITLAB_USER_ID")
+reviewer_login = os.environ.get("GITLAB_USER_LOGIN")
+
 
 def main():
 
@@ -26,17 +34,27 @@ def main():
     project.update_submodule(
         "why3", mr_branch, target_commit_long, commit_message=commit_message
     )
-    mr = project.mergerequests.create(
-        {
-            "source_branch": mr_branch,
-            "target_branch": target_branch,
-            "title": mr_title,
-            "description": mr_body,
-            "labels": ["skip-ci"]
-        }
-    )
+    mr_data = {
+        "source_branch": mr_branch,
+        "target_branch": target_branch,
+        "title": mr_title,
+        "description": mr_body,
+        "labels": ["skip-ci"],
+    }
+    if reviewer_id:
+        mr_data["reviewer_ids"] = [int(reviewer_id)]
+    mr = project.mergerequests.create(mr_data)
     print(f"Merge request created: {mr.web_url}")
     mr.approve()
+
+    # Ping the reviewer explicitly so they get notified about the request.
+    if reviewer_login:
+        mr.notes.create(
+            {
+                "body": f"@{reviewer_login} please review this automatic "
+                "submodule update, triggered by your why3 change."
+            }
+        )
 
 
 if __name__ == "__main__":
