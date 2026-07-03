@@ -72,6 +72,10 @@ let send_request_string msg =
           write (pointer + written)
       in write 0
 
+let block_timeout : float option ref = ref None
+
+let set_block_timeout t = block_timeout := t
+
 let read_from_client =
   let buf = Bytes.make 1024 ' ' in
   fun blocking ->
@@ -81,8 +85,15 @@ let read_from_client =
         (* we only call read() if we are allowed to block
            or if the socket is ready *)
         let do_read =
-          blocking ||
-          (let l,_,_ = Unix.select [sock] [] [] 0.0 in l <> [])
+          if blocking then
+            match !block_timeout with
+            | None -> true
+            | Some t ->
+                let l,_,_ = Unix.select [sock] [] [] t in
+                l <> []
+          else
+            let l,_,_ = Unix.select [sock] [] [] 0.0 in
+            l <> []
         in
         if do_read then
           let read = Unix.read sock buf 0 1024 in

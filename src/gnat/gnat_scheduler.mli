@@ -9,6 +9,8 @@ module Gnat_scheduler : sig
         called every [ms] milliseconds.
     *)
 
+    val register_timer: float -> (unit -> unit) -> unit
+
     val idle: prio:int -> (unit -> bool) -> unit
     (** [idle prio f] In this particular module the function f is called directly
         (and it should only contains transformations calls).
