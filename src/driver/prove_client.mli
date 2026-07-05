@@ -34,6 +34,8 @@ val disconnect : unit -> unit
 
 val set_max_running_provers : int -> unit
 
+val set_block_timeout : float option -> unit
+
 val send_request :
   libdir:string ->
   id:int ->

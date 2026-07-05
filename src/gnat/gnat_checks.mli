@@ -140,7 +140,12 @@ module GoalSet : sig
    val for_all  : (goal_id -> bool) -> t -> bool
 end
 
-module Make (S: Controller_itp.Scheduler) : sig
+module Make (_: sig
+  include Controller_itp.Scheduler
+  (* GNATWhy3 uses one-shot timer wakeups to stagger initial prover launches;
+     this is not part of the generic Why3 scheduler interface. *)
+  val register_timer : float -> (unit -> unit) -> unit
+end) : sig
 
 val register_result : Controller_itp.controller -> goal_id -> bool -> Gnat_expl.check * status
 (* Register the result of a prover for a given goal_id, and return the updated

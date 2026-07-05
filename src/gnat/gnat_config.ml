@@ -35,6 +35,8 @@ let opt_proof_mode = ref Progressive
 let opt_lazy = ref true
 let opt_filename : string option ref = ref None
 let opt_parallel = ref 1
+let opt_stagger_ms = ref 0
+let opt_stagger_window : int option ref = ref None
 let opt_prover : string option ref = ref None
 let opt_proof_dir : string option ref = ref None
 let opt_ce_mode = ref false
@@ -128,6 +130,20 @@ let set_steps t =
 let set_ce_steps t =
   if t > 0 then opt_ce_steps := Some t
 
+let set_stagger_ms t =
+  if t < 0 then
+    Gnat_util.abort_with_message ~internal:true
+      "argument for option --stagger-ms should be nonnegative."
+  else
+    opt_stagger_ms := t
+
+let set_stagger_window t =
+  if t <= 0 then
+    Gnat_util.abort_with_message ~internal:true
+      "argument for option --stagger-window should be positive."
+  else
+    opt_stagger_window := Some t
+
 let set_socket_name s =
   opt_socket_name := s
 
@@ -191,6 +207,10 @@ let options = Arg.align [
        " Set the steps for counterexamples (default: no steps)";
    "-j", Arg.Set_int opt_parallel,
           " Set the number of parallel processes (default is 1)";
+   "--stagger-ms", Arg.Int set_stagger_ms,
+          " Set milliseconds between staggered prover launches for one goal";
+   "--stagger-window", Arg.Int set_stagger_window,
+          " Set maximum concurrent prover launches for one goal";
    "-f", Arg.Set opt_force,
           " Rerun VC generation and proofs, even when the result is up to date";
    "--force", Arg.Set opt_force,
@@ -671,6 +691,10 @@ let limit_line = !opt_limit_line
 let limit_region = !opt_limit_region
 
 let parallel = !opt_parallel
+
+let stagger_ms = !opt_stagger_ms
+
+let stagger_window = !opt_stagger_window
 
 let unit_name =
   let suffix = ".mlw" in

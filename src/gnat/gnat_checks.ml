@@ -557,7 +557,10 @@ let subsubgoals s (g: goal_id) =
 
 (* Functor that takes a scheduler and provides functions to schedule
    transformations and proof attempts *)
-module Make (S: Controller_itp.Scheduler) = struct
+module Make (S: sig
+  include Controller_itp.Scheduler
+  val register_timer : float -> (unit -> unit) -> unit
+end) = struct
 
 module C = Controller_itp.Make(S)
 
@@ -1096,37 +1099,110 @@ let schedule_goal_with_prover ~callback c g p =
   in
   run_goal ?proof_script_filename c p g ~callback
 
+let schedule_goal_prover_race ~callback c g provers =
+  let s = c.Controller_itp.controller_session in
+  let count = List.length provers in
+  let pending = ref provers in
+  let in_flight = ref 0 in
+  let last_done = ref None in
+  let settled = ref false in
+  let window =
+    match Gnat_config.stagger_window with
+    | None -> count
+    | Some w -> min count w
+  in
+  let initial_stagger_remaining =
+    ref (if Gnat_config.stagger_ms > 0 then window else 0)
+  in
+  let log_status pa pas =
+    if Gnat_config.logging then
+      let prover =
+        (Session_itp.get_proof_attempt_node s pa)
+          .Session_itp.prover.Whyconf.prover_name
+      in
+      Logging.log g prover pas
+  in
+  let rec launch_one () =
+    match !pending with
+    | [] -> ()
+    | p :: rest ->
+        pending := rest;
+        incr in_flight;
+        schedule_goal_with_prover ~callback:handle c g p
+  and launch_if_allowed () =
+    if not !settled && !pending <> [] && !in_flight < window then
+      launch_one ()
+  and launch_all_allowed () =
+    while not !settled && !pending <> [] && !in_flight < window do
+      launch_one ()
+    done
+  and finish_attempt pa pas =
+    (* One prover finished without proving the goal: a non-Valid answer or an
+       internal failure. Free its slot so the per-goal window does not stay
+       starved. After the initial stagger phase, immediately refill the
+       window. *)
+    decr in_flight;
+    if !pending = [] && !in_flight = 0 then begin
+      settled := true;
+      (* Report a real prover result when one was seen, so the goal is recorded
+         as unproved. Only fall back to an internal failure when no prover ever
+         produced an answer. *)
+      match !last_done with
+      | Some (dpa, dpas) -> callback dpa dpas
+      | None -> callback pa pas
+    end else if !initial_stagger_remaining = 0 then
+      launch_if_allowed ()
+  and handle pa pas =
+    log_status pa pas;
+    if not !settled then
+      match pas with
+      | Controller_itp.Done pr ->
+          begin
+            match pr.Call_provers.pr_answer with
+            | Call_provers.Valid ->
+                settled := true;
+                C.interrupt_proof_attempts_for_goal c g;
+                callback pa pas
+            | _ ->
+                last_done := Some (pa, pas);
+                finish_attempt pa pas
+          end
+      | Controller_itp.InternalFailure _ ->
+          finish_attempt pa pas
+      | _ -> ()
+  in
+  if count = 0 then
+    ()
+  else begin
+    if Gnat_config.stagger_ms > 0 then
+      let delay = float Gnat_config.stagger_ms /. 1000. in
+      let rec stagger () =
+        if not !settled && !initial_stagger_remaining > 0 then begin
+          if !pending <> [] && !in_flight < window then
+            launch_one ();
+          decr initial_stagger_remaining;
+          if !initial_stagger_remaining = 0 || !pending = [] then begin
+            initial_stagger_remaining := 0;
+            launch_all_allowed ()
+          end else
+            S.register_timer delay stagger
+        end
+      in
+      stagger ()
+    else
+      launch_all_allowed ()
+  end
+
 let schedule_goal ~callback c g =
    (* actually schedule the goal, ie call the prover. This function returns
       immediately. *)
   let check = get_check_of_goal g in
-  let s = c.Controller_itp.controller_session in
   let warn = Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
   if Gnat_config.parallel > 1 then begin
     let provers =
       if warn then [Option.get (Gnat_config.prover_warn)] else Gnat_config.provers
     in
-    let remaining = ref (List.length provers) in
-    let callback pa pas =
-      let prover =
-        (Session_itp.get_proof_attempt_node s pa).Session_itp.prover.Whyconf.prover_name
-      in
-      if Gnat_config.logging then Logging.log g prover pas;
-      if !remaining = 0 then ()
-      else match pas with
-        | Controller_itp.Done pr ->
-          remaining := !remaining - 1;
-          begin match pr.Call_provers.pr_answer with
-          | Call_provers.Valid ->
-            C.interrupt_proof_attempts_for_goal c g;
-            remaining := 0;
-            callback pa pas
-          | _ ->
-            if !remaining = 0 then callback pa pas else ()
-          end
-        | _ -> ()
-    in
-    List.iter (fun p -> schedule_goal_with_prover ~callback c g p) provers
+    schedule_goal_prover_race ~callback c g provers
   end else begin
     let p = if warn then Option.get (Gnat_config.prover_warn)
       else find_best_untried_prover c.Controller_itp.controller_session g in
@@ -1373,13 +1449,5 @@ let replay_check session check =
 
 let replay session =
   iter (replay_check session)
-
-(* This register an observer that can monitor the number of provers
-   waiting/scheduled/running *)
-let (_: unit) = C.register_observer (fun x y z ->
-  if x = 0 && y = 0 && z = 0 then
-    raise Exit)
-
-
 
 end

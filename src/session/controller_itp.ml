@@ -512,7 +512,13 @@ let timeout_handler () =
     Queue.transfer q prover_tasks_edited;
   end;
   if !need_update then update_observer ();
-  true
+  let active =
+    not (Queue.is_empty scheduled_proof_attempts)
+    || Hashtbl.length prover_tasks_in_progress <> 0
+    || not (Queue.is_empty prover_tasks_edited)
+  in
+  if not active then timeout_handler_running := false;
+  active
 
 let idle_handler () =
 

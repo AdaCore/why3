@@ -105,6 +105,14 @@ val limit_region : Gnat_loc.region option
 val parallel : int
 (* number of parallel processes that can be run in parallel for proving VCs *)
 
+val stagger_ms : int
+(* time in milliseconds between staggered prover launches for one goal; 0
+ * disables time-based staggering *)
+
+val stagger_window : int option
+(* maximum number of provers tried concurrently for one goal; None means no
+ * per-goal window beyond the existing global parallelism *)
+
 val socket_name : string
 (* name of the socket to be used for communication with the server *)
 
