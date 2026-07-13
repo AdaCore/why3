@@ -64,6 +64,12 @@ theory _gnatprove_standard.Array__1
    remove prop get_proj
 end
 
+theory _gnatprove_standard.Int_Power
+  syntax function pow2 "(2 ** %1)"
+
+  remove allprops
+end
+
 (*
 Local Variables:
 mode: why
