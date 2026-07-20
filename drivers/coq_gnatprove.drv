@@ -7,3 +7,9 @@ import "coq.drv"
 theory _gnatprove_standard.Int_Division
    syntax function mod "(ZArith.BinInt.Z.modulo %1 %2)"
 end
+
+theory _gnatprove_standard.Int_Power
+   syntax function pow2 "(int.Power.power 2 %1)"
+
+   remove allprops
+end
