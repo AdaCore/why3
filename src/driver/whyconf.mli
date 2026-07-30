@@ -85,8 +85,6 @@ val get_main : config -> main
 val set_main : config -> main -> config
 (** [set_main config main] replace the main section by the given one *)
 
-val libobjdir: main -> string
-
 val set_stdlib: bool -> config -> config
 (** Set if the standard library should be added to loadpath *)
 
