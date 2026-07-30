@@ -550,8 +550,12 @@ and pp_record_update fmt (n : record_update_id) =
 
 and pp_binding_ref fmt (n : binding_ref_id) =
   let Binding_ref r = n.desc in
+  (* The labels of the binding are attached to the bound identifier *)
+  let pp_bound fmt name =
+    if r.labels = [] then pp_why_node fmt name
+    else Format.fprintf fmt "(%a %a)" pp_symbol_set_label r.labels pp_why_node name in
   Format.fprintf fmt "(let ref %a@ =@ @[<hov2 >%a@]@ in@ %a)"
-    pp_why_node r.name pp_why_node r.def pp_why_node r.context
+    pp_bound r.name pp_why_node r.def pp_why_node r.context
 
 and pp_raise_effect fmt (_ : raise_effect_id) = Format.fprintf fmt "--pp_raise_effect NOT IMPLEMENTED"
 

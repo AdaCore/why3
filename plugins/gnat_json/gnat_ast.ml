@@ -390,7 +390,7 @@ and 'a why_node_desc =
   | Record_aggregate : {associations: field_association_list; typ: type_oid} -> [> record_aggregate_tag] why_node_desc
   | Any_expr : {effects: effects_oid; pre: pred_oid; post: pred_oid; return_type: type_id; labels: symbol_set} -> [> any_expr_tag] why_node_desc
   | Assignment : {name: identifier_id; value: prog_id; typ: type_id; labels: symbol_set} -> [> assignment_tag] why_node_desc
-  | Binding_ref : {name: identifier_id; def: prog_id; context: prog_id; typ: type_id} -> [> binding_ref_tag] why_node_desc
+  | Binding_ref : {name: identifier_id; def: prog_id; context: prog_id; typ: type_id; labels: symbol_set} -> [> binding_ref_tag] why_node_desc
   | Loop : {code_before: prog_id; invariants: pred_olist; variants: variants_olist; code_after: prog_id} -> [> loop_tag] why_node_desc
   | Statement_sequence : {statements: prog_list} -> [> statement_sequence_tag] why_node_desc
   | Abstract_expr : {expr: prog_id; post: pred_id; typ: type_oid} -> [> abstract_expr_tag] why_node_desc
@@ -1883,7 +1883,7 @@ module From_json = struct
         labels = symbol_set_from_json labels;
       } in
       {info; desc}
-    | `List [`String "W_BINDING_REF"; id; domain; name; def; context; typ] ->
+    | `List [`String "W_BINDING_REF"; id; domain; name; def; context; typ; labels] ->
       let info = {
         id = int_from_json id;
         domain = domain_from_json domain;
@@ -1893,6 +1893,7 @@ module From_json = struct
         def = prog_opaque_id_from_json def;
         context = prog_opaque_id_from_json context;
         typ = type_opaque_id_from_json typ;
+        labels = symbol_set_from_json labels;
       } in
       {info; desc}
     | `List [`String "W_LOOP"; id; domain; code_before; invariants; variants; code_after] ->
