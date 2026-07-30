@@ -179,7 +179,6 @@ type main = {
   (* arch-dependent data, say "/usr/local/lib/why3/" *)
   datadir  : string;
   (* arch-independent data, say "/usr/local/share/why3/" *)
-  libobjdir : string;
   loadpath  : string list;
   (* standard library, say "/usr/local/lib/why3/stdlib" *)
   stdlib  : bool;
@@ -201,9 +200,6 @@ type main = {
 let libdir =
   let env_libdir = try Some (Sys.getenv "WHY3LIB") with Not_found -> None in
   fun m -> Option.value ~default:m.libdir env_libdir
-
-let libobjdir m =
-  m.libobjdir
 
 let set_libdir m d = { m with libdir = d}
 
@@ -308,7 +304,6 @@ let empty_main =
   {
     libdir = Config.libdir;
     datadir = Config.datadir;
-    libobjdir = Config.libobjdir;
     loadpath = [];
     stdlib = true;
     load_default_plugins = true;
@@ -497,7 +492,6 @@ module RC_load = struct
       raise WrongMagicNumber;
     { libdir    = get_string ~default:old.libdir section "libdir";
       datadir   = get_string ~default:old.datadir section "datadir";
-      libobjdir = Config.libobjdir;
       loadpath  =
         begin match get_stringl section "loadpath" with
         | [] -> old.loadpath

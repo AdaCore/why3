@@ -453,7 +453,6 @@ let actualcommand ~config command limit file =
     | "m" -> smem
     | "l" -> Whyconf.libdir config
     | "d" -> Whyconf.datadir config
-    | "o" -> Config.libobjdir
     | "S" -> string_of_int limit.limit_steps
     | _ -> failwith "unknown specifier, use %%, %f, %t, %.t, %T, %m, %l, %d or %S"
   in

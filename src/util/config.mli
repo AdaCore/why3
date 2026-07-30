@@ -14,7 +14,6 @@ val libdir : string
 val datadir : string
 val localdir : string option
 
-val libobjdir : string
 val enable_ide : string
 val enable_zip : string
 val enable_coq_libs : string

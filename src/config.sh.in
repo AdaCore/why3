@@ -7,7 +7,6 @@ bindir="\"$BINDIR\""
 libdir="\"$LIBDIR/why3\""
 datadir="\"$DATADIR/why3\""
 localdir="None"
-libobjdir="(Sys.getcwd ())"
 
 if [ "@enable_relocation@" = "yes" ]; then
     libdir='Filename.concat (Filename.concat (Filename.dirname
@@ -29,8 +28,6 @@ let editor    = \"@EDITOR@\"
 let libdir    = $libdir
 let datadir   = $datadir
 let localdir  = $localdir
-
-let libobjdir = $libobjdir
 
 let enable_ide = \"@enable_ide@\"
 let enable_zip = \"@enable_zip@\"
