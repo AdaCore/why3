@@ -13,22 +13,33 @@ open Ast_mapper
 open Asttypes
 open Longident
 
+let is_debug_dprintf txt =
+  try Longident.flatten txt = ["Debug"; "dprintf"]
+  with Misc.Fatal_error -> false
+
+let debug_test_flag =
+  match Longident.unflatten ["Debug"; "test_flag"] with
+  | Some txt -> txt
+  | None -> assert false
+
 let ast_mapper =
   { Ast_mapper.default_mapper with
     expr = fun mapper expr ->
       match expr with
       | { pexp_desc =
           Pexp_apply ({ pexp_desc =
-                        Pexp_ident { txt = Ldot (Lident "Debug", "dprintf")}},
+                        Pexp_ident { txt; _ }},
                       flag :: _args) } as app ->
-         let open Ast_helper in
-         Exp.ifthenelse
-           (Exp.apply
-              (Exp.ident { txt = Ldot (Lident "Debug", "test_flag");
-                           loc = Location.none (*TODO*) })
-              [flag])
-           app
-           None
+         if not (is_debug_dprintf txt) then
+           default_mapper.expr mapper expr
+         else
+           let open Ast_helper in
+           Exp.ifthenelse
+             (Exp.apply
+                (Exp.ident { txt = debug_test_flag; loc = Location.none (*TODO*) })
+                [flag])
+             app
+             None
       | other -> default_mapper.expr mapper other; }
 
 let () =
