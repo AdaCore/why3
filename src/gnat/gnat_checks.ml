@@ -1360,12 +1360,27 @@ let session_find_unproved_goal c check =
   with Found_goal_id p ->
     Some p
 
+let replay_limit_of_steps steps =
+  { Call_provers.empty_limits with
+    Call_provers.limit_steps = steps }
+
 let compute_replay_limit_from_pas pas =
   match pas with
   | { Call_provers.pr_steps = steps } ->
-    let steps = steps + steps / 10 + 1 in
-    { Call_provers.empty_limits with
-      Call_provers.limit_steps = steps }
+    replay_limit_of_steps (steps + steps / 10 + 1)
+
+(* Budget for the second replay attempt of a goal whose first attempt ran out
+   of steps. The same prover can need a substantially different number of steps
+   for the same VC depending on the machine, in both directions and by a factor
+   of several, so running out of steps at the recorded count plus a small
+   margin says nothing about whether the proof still goes through. This budget
+   is only ever consumed by goals that would otherwise be reported unproved. *)
+let replay_retry_factor = 4
+
+let compute_replay_retry_limit_from_pas pas =
+  match pas with
+  | { Call_provers.pr_steps = steps } ->
+    replay_limit_of_steps (replay_retry_factor * (steps + 1))
 
 let pa_has_steps pa =
   match pa.Session_itp.proof_state with
@@ -1456,27 +1471,42 @@ and replay_goal c goal =
           let config_prover =
             fst (Whyconf.Hprover.find c.Controller_itp.controller_provers
                    prover) in
+          let schedule ?(retry=false) limits =
+            (* Replay the recorded proof with the given limits. When these are
+               derived from the recorded steps, they come with a small margin
+               only, so fall back to a much larger budget when that margin
+               turns out to be too tight on this machine. *)
+            let rec attempt ~retry limits =
+              let callback _ status =
+                match status, pa_node.Session_itp.proof_state with
+                | Controller_itp.Done r, Some pas
+                  when retry
+                    && r.Call_provers.pr_answer
+                       = Call_provers.StepLimitExceeded ->
+                    attempt ~retry:false
+                      (compute_replay_retry_limit_from_pas pas)
+                | _ -> () in
+              C.schedule_proof_attempt
+                c goal prover
+                ~adjust_limits:false ~limits ~callback
+                ~notification:(fun _ -> ()) in
+            attempt ~retry limits in
           (* The proof attempt is known to be valid, but it may not carry any
              steps information: interactive provers never report steps, and an
              automatic prover that was killed right after announcing success
              may have been cut off before printing its statistics. In both
              cases we cannot bound the replay by steps, so we fall back on the
              limits a regular proof would use. *)
-          let limits =
-            match pa_node.Session_itp.proof_state with
-            | Some pas when pas.Call_provers.pr_steps > 0 ->
-                compute_replay_limit_from_pas pas
-            | _ when config_prover.Whyconf.interactive ->
-                Call_provers.empty_limits
-            | _ ->
-                let check = get_check_of_goal goal in
-                let warn =
-                  Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
-                Gnat_config.limit ~prover ~warning:warn in
-          C.schedule_proof_attempt
-            c goal prover
-            ~adjust_limits:false ~limits ~callback:(fun _ _ -> ())
-            ~notification:(fun _ -> ())) prover
+          match pa_node.Session_itp.proof_state with
+          | Some pas when pas.Call_provers.pr_steps > 0 ->
+              schedule ~retry:true (compute_replay_limit_from_pas pas)
+          | _ when config_prover.Whyconf.interactive ->
+              schedule Call_provers.empty_limits
+          | _ ->
+              let check = get_check_of_goal goal in
+              let warn =
+                Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
+              schedule (Gnat_config.limit ~prover ~warning:warn)) prover
 
 
 let replay_check session check =
