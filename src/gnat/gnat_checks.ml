@@ -1429,25 +1429,36 @@ and replay_goal c goal =
 
 (* TODO this should be in controller *)
       let proof_attempt_ids = Session_itp.get_proof_attempt_ids session goal in
-      (* Any valid attempt will do, but prefer one that recorded steps, so that
-         the replay can be bounded by them. A goal can carry both kinds at
-         once, as a prover killed after it announced success may have been cut
-         off before printing its statistics. Within each kind, stick to the
-         first attempt encountered, as replaying a different prover than
-         before may well not reproduce the proof. *)
+      (* Any valid attempt will do, but prefer one whose prover is still
+         available, and among those one that recorded steps, so that the
+         replay can be bounded by them. A goal can carry attempts both with
+         and without steps, as a prover killed after it announced success may
+         have been cut off before printing its statistics. Attempts of
+         unavailable provers are kept as a last resort only, so that they
+         still trigger the missing prover warning below when nothing better
+         exists. Within each kind, stick to the first attempt encountered, as
+         replaying a different prover than before may well not reproduce the
+         proof. *)
       let with_steps = ref None in
       let without_steps = ref None in
+      let unavailable = ref None in
       Whyconf.Hprover.iter (fun _ paid ->
         let pa = Session_itp.get_proof_attempt_node session paid in
         if is_valid_pa pa then begin
+          let prover = pa.Session_itp.prover in
+          let available =
+            prover = trivial_prover
+            || List.exists (fun p -> p = prover) Gnat_config.provers in
           let candidate =
-            if pa_has_steps pa then with_steps else without_steps in
+            if not available then unavailable
+            else if pa_has_steps pa then with_steps
+            else without_steps in
           if !candidate = None then candidate := Some paid
         end) proof_attempt_ids;
       let best =
-        match !with_steps with
-        | Some _ as pa -> pa
-        | None -> !without_steps in
+        match !with_steps, !without_steps with
+        | (Some _ as pa), _ | None, (Some _ as pa) -> pa
+        | None, None -> !unavailable in
       Option.iter (fun paid -> raise (PA_Found paid)) best;
       (* we go here only if no such PA was found. We now replay the
          transformations *)
