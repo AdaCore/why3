@@ -1367,6 +1367,11 @@ let compute_replay_limit_from_pas pas =
     { Call_provers.empty_limits with
       Call_provers.limit_steps = steps }
 
+let pa_has_steps pa =
+  match pa.Session_itp.proof_state with
+  | Some { Call_provers.pr_steps = steps } -> steps > 0
+  | None -> false
+
 let for_some_proof_attempt pred map =
   try
     List.iter (fun pa -> if pred pa then raise Exit else ()) map;
@@ -1409,9 +1414,26 @@ and replay_goal c goal =
 
 (* TODO this should be in controller *)
       let proof_attempt_ids = Session_itp.get_proof_attempt_ids session goal in
+      (* Any valid attempt will do, but prefer one that recorded steps, so that
+         the replay can be bounded by them. A goal can carry both kinds at
+         once, as a prover killed after it announced success may have been cut
+         off before printing its statistics. Within each kind, stick to the
+         first attempt encountered, as replaying a different prover than
+         before may well not reproduce the proof. *)
+      let with_steps = ref None in
+      let without_steps = ref None in
       Whyconf.Hprover.iter (fun _ paid ->
         let pa = Session_itp.get_proof_attempt_node session paid in
-        if is_valid_pa pa then raise (PA_Found paid)) proof_attempt_ids;
+        if is_valid_pa pa then begin
+          let candidate =
+            if pa_has_steps pa then with_steps else without_steps in
+          if !candidate = None then candidate := Some paid
+        end) proof_attempt_ids;
+      let best =
+        match !with_steps with
+        | Some _ as pa -> pa
+        | None -> !without_steps in
+      Option.iter (fun paid -> raise (PA_Found paid)) best;
       (* we go here only if no such PA was found. We now replay the
          transformations *)
 
@@ -1431,11 +1453,26 @@ and replay_goal c goal =
           None in
       Option.iter (fun prover ->
           let pa_node = Session_itp.get_proof_attempt_node session pa in
+          let config_prover =
+            fst (Whyconf.Hprover.find c.Controller_itp.controller_provers
+                   prover) in
+          (* The proof attempt is known to be valid, but it may not carry any
+             steps information: interactive provers never report steps, and an
+             automatic prover that was killed right after announcing success
+             may have been cut off before printing its statistics. In both
+             cases we cannot bound the replay by steps, so we fall back on the
+             limits a regular proof would use. *)
           let limits =
             match pa_node.Session_itp.proof_state with
-            | Some pas when pas.Call_provers.pr_answer = Call_provers.Valid ->
+            | Some pas when pas.Call_provers.pr_steps > 0 ->
                 compute_replay_limit_from_pas pas
-            | _ -> assert false in
+            | _ when config_prover.Whyconf.interactive ->
+                Call_provers.empty_limits
+            | _ ->
+                let check = get_check_of_goal goal in
+                let warn =
+                  Gnat_expl.is_warning_kind (Gnat_expl.get_check_kind check) in
+                Gnat_config.limit ~prover ~warning:warn in
           C.schedule_proof_attempt
             c goal prover
             ~adjust_limits:false ~limits ~callback:(fun _ _ -> ())
