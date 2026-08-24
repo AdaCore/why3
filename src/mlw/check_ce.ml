@@ -1271,6 +1271,9 @@ let last_nonempty_model ~(env:Env.env) ~(known_map:Decl.known_map) models =
         | Some m -> Some (add_me_to_file m line me)) file files_map
     | None -> files_map in
   let extract_terms m =
-  List.fold_left add_me_to_files Wstdlib.Mstr.empty (all_elems m)
+    (* [add_me_to_files] prepends elements at the same location, so traverse
+       them backwards to preserve their original order. *)
+    List.fold_left add_me_to_files Wstdlib.Mstr.empty
+      (List.rev (all_elems m))
   in
   Option.map (fun (_,m) -> set_model_files m (extract_terms m)) (List.nth_opt models 0)
