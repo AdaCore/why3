@@ -316,10 +316,10 @@ let () =
 let () =
   let trans =
     Trans.compose_l
-      Split_goal.split_goal_right
-      (Trans.compose_l
-        (Trans.singleton unfold_trans)
-          (Trans.compose_l (Trans.singleton Gnat_rewrite.elim_to_of_array) split_conj))
+      (Trans.compose unfold_trans
+         (Trans.compose Gnat_rewrite.elim_to_of_array
+            Split_goal.split_goal_right))
+      split_conj
   in
   Trans.register_transform_l "split_goal_wp_conj" trans
     ~desc:"split goal followed by conjunction split"
