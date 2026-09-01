@@ -415,7 +415,23 @@ let init_cont () =
       true, Session_itp.empty_session session_dir
     end
   in
-  let c = Controller_itp.create_controller Gnat_config.config Gnat_config.env session in
+  (* Only the drivers of the provers that this run may use are needed; loading
+     the drivers of the other configured provers would be a waste of time. *)
+  let provers =
+    (* The provers selected on the command line, plus the ones used for
+       counterexamples and for warning VCs. *)
+    let l =
+      Gnat_config.provers
+      @ Option.to_list Gnat_config.prover_ce
+      @ Option.to_list Gnat_config.prover_warn
+    in
+    List.fold_left (fun acc p -> Whyconf.Sprover.add p acc)
+      Whyconf.Sprover.empty l
+  in
+  let c =
+    Controller_itp.create_controller ~provers Gnat_config.config
+      Gnat_config.env session
+  in
   if is_new_session || not (has_file session) then begin
     try
       Controller_itp.add_file c Gnat_config.filename
@@ -937,8 +953,7 @@ module Save_VCs = struct
 
   let save_vc c goal (prover: Whyconf.prover) =
     let check = get_check_of_goal goal in
-    let driver =
-      snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
+    let driver = Controller_itp.get_driver c prover in
     (* Reusing a filename to get several prover files with the same name is
        unsafe.
     *)
@@ -1038,7 +1053,7 @@ let run_goal ?proof_script_filename ?limit ~callback c prover g =
      Call_provers.prover_call * Session.goal. The next step of the program
      is now directly in the callback. *)
   let session = c.Controller_itp.controller_session in
-  let config_prover = fst (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
+  let config_prover = Controller_itp.get_config_prover c prover in
   let notification _x = () in
   if config_prover.Whyconf.interactive then
     let old_paid =
@@ -1479,9 +1494,7 @@ and replay_goal c goal =
           None in
       Option.iter (fun prover ->
           let pa_node = Session_itp.get_proof_attempt_node session pa in
-          let config_prover =
-            fst (Whyconf.Hprover.find c.Controller_itp.controller_provers
-                   prover) in
+          let config_prover = Controller_itp.get_config_prover c prover in
           let schedule ?(retry=false) limits =
             (* Replay the recorded proof with the given limits. When these are
                derived from the recorded steps, they come with a small margin
