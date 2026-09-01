@@ -421,7 +421,7 @@ let rec print_term info fmt t =
       | None -> begin match tl with (* for cvc3 wich doesn't accept (toto ) *)
           | [] ->
 
-            let str_ls = sprintf "%a" (print_ident info) ls.ls_name in
+            let str_ls = id_unique info.info_printer ls.ls_name in
             let cur_var = info.info_labels in
             let new_var = update_info_labels str_ls cur_var t ls in
             let () = info.info_labels <- new_var in
@@ -657,7 +657,7 @@ and print_triggers info fmt = function
 let print_type_decl info fmt ts =
   if is_alias_type_def ts.ts_def then () else
   if Mid.mem ts.ts_name info.info_syn then () else
-  let sort_name = sprintf "%a" (print_ident info) ts.ts_name in
+  let sort_name = id_unique info.info_printer ts.ts_name in
   info.type_sorts <- Mstr.add sort_name ts info.type_sorts;
   fprintf fmt "(declare-sort %a %i)@\n@\n"
     (print_ident info) ts.ts_name (List.length ts.ts_args)
@@ -744,7 +744,7 @@ let print_info_model info =
       let model_map =
         S.fold
           (fun ((ls,oloc,attrs) as el) acc ->
-            let s = asprintf "%a" (print_ident info) ls.ls_name in
+            let s = id_unique info.info_printer ls.ls_name in
             try
               (* We keep the location attribute of every equal terms that were
                  collected during printing in order to provide a complete
@@ -856,7 +856,7 @@ let print_prop_decl vc_loc vc_attrs env printing_info info fmt k pr f = match k 
   | Plemma -> assert false
 
 let print_constructor_decl info is_record fmt (ls,args) =
-  let cons_name = sprintf "%a" (print_ident info) ls.ls_name in
+  let cons_name = id_unique info.info_printer ls.ls_name in
   info.constructors <- Mstr.add cons_name ls info.constructors;
   let field_names =
     (match args with
@@ -871,7 +871,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
               | Some pr ->
                   if not is_record then
                     unsupported "smtv2: sum types should not have projections";
-                  let field_name = sprintf "%a" (print_ident info) pr.ls_name in
+                  let field_name = id_unique info.info_printer pr.ls_name in
                   fprintf fmt "(%s" field_name;
                   let field_trace =
                     try
@@ -908,7 +908,7 @@ let print_constructor_decl info is_record fmt (ls,args) =
 
 let print_data_decl info fmt (ts,cl) =
   let is_record = match cl with [_] -> true | _ -> false in
-  let sort_name = sprintf "%a" (print_ident info) ts.ts_name in
+  let sort_name = id_unique info.info_printer ts.ts_name in
   info.type_sorts <- Mstr.add sort_name ts info.type_sorts;
   fprintf fmt "@[(%a@ %a)@]"
     (print_ident info) ts.ts_name
@@ -926,7 +926,7 @@ let print_data_def info fmt (ts,cl) =
       (print_list space (print_constructor_decl info is_record)) cl
 
 let print_sort_decl info fmt (ts,_) =
-  let sort_name = sprintf "%a" (print_ident info) ts.ts_name in
+  let sort_name = id_unique info.info_printer ts.ts_name in
   info.type_sorts <- Mstr.add sort_name ts info.type_sorts;
   fprintf fmt "@[(%a %d)@]"
     (print_ident info) ts.ts_name
