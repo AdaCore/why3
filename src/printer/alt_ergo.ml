@@ -372,7 +372,7 @@ let print_data_decl info d fmt = function
              let field_name = create_vsymbol field_name ty(*dummy*) in
              field_name.vs_name
         in
-        let pj = sprintf "%a" (print_ident info) pj in
+        let pj = id_unique info.info_printer pj in
         pj,ty
       in
       let l = List.map2 field_name_ty pjl cs.ls_args in
@@ -432,7 +432,7 @@ let print_info_model info =
       let model_map =
         S.fold
           (fun ((ls,_,_) as el) acc ->
-            let s = asprintf "%a" (print_ident info) ls.ls_name in
+            let s = id_unique info.info_printer ls.ls_name in
             Mstr.add s el acc)
           info_model
           Mstr.empty in ();
