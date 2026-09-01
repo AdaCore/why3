@@ -293,11 +293,13 @@ let fold env d =
     end
     | _ -> env
 
+let unfolding_env = Trans.fold (fun th env -> fold env th.task_decl) Mls.empty
+
 (* Transformation to unfold marked symbols in the goal. We unfold just one
    level currently. *)
 let unfold_trans = Trans.store (fun task ->
+  let env = Trans.apply unfolding_env task in
   let goal, task = task_separate_goal task in
-  let env = task_fold fold Mls.empty task in
   match goal.td_node with
       | Decl d ->
         begin match d.d_node with
