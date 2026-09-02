@@ -24,6 +24,10 @@ let driver_debug =
   Debug.register_flag "interm_task"
     ~desc:"Print intermediate task generated during processing of a driver"
 
+let debug_no_indent_prover_files =
+  Debug.register_info_flag "no_indent_prover_files"
+    ~desc:"Do@ not@ indent@ the@ generated@ prover@ files."
+
 let meta_get_counterexmp =
   Theory.register_meta_excl "get_counterexmp" []
   ~desc:"Set@ when@ counter-example@ should@ be@ get."
@@ -457,6 +461,11 @@ let prove_task_prepared
       ~command ~config ~limits ?old ?inplace ?interactive drv task =
   let buf = Buffer.create 1024 in
   let fmt = formatter_of_buffer buf in
+  if Debug.test_flag debug_no_indent_prover_files
+     && inplace <> Some true && interactive <> Some true then begin
+    let out = pp_get_formatter_out_functions fmt () in
+    pp_set_formatter_out_functions fmt { out with out_indent = (fun _ -> ()) }
+  end;
   let old_channel = Option.map open_in old in
   let printing_info = print_task_prepared ?old:old_channel drv fmt task in
   pp_print_flush fmt ();

@@ -683,8 +683,12 @@ let debug_prover_errors = !opt_debug_prover_errors
 let debug_keep_vcs = Debug.register_info_flag "keep_vcs" ~desc:"Keep@ intermediate@ prover@ files."
 
 let _ =
+  (* In normal mode, VCs are printed without indentation (and discarded
+     afterwards). In debug mode, we keep the VCs and the indentation. *)
   if debug_save_vcs || debug then
     Debug.set_flag debug_keep_vcs
+  else
+    Debug.set_flag Driver.debug_no_indent_prover_files
 
 let force = !opt_force
 let limit_line = !opt_limit_line

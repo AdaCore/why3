@@ -10,6 +10,10 @@
 
 (** Managing the drivers for external provers *)
 
+val debug_no_indent_prover_files : Debug.flag
+(** When set, the prover files are printed without indentation, which can make
+    them a lot smaller. Files of interactive provers are always indented. *)
+
 (** {2 Create a driver} *)
 
 type driver
