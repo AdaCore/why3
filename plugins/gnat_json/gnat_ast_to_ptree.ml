@@ -768,8 +768,11 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
         expr_only "binding ref"
           (let open E in
            let id =
+             let labels =
+               List.filter_map mk_label r.labels @
+               mk_identifier_labels r.name in
              force_one (conversion_error r.name.info.id "quantified or empty name")
-               (mk_idents_of_identifier ~notation:None (mk_identifier_labels r.name) r.name) in
+               (mk_idents_of_identifier ~notation:None labels r.name) in
            let ref =
              let field =
                let typ =
