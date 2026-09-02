@@ -90,7 +90,10 @@ let meta = Theory.register_meta "inline:no" [Theory.MTlsymbol]
   ~desc:"Disallow@ the@ inlining@ of@ the@ given@ function/predicate@ symbol."
 
 let t ~use_meta ~in_goal ?(only_top_in_goal=in_goal) ~notls ~notdef =
-  Trans.bind (Trans.store Driver.get_counterexmp) (fun for_counterexample ->
+  (* Read the flag with [on_meta_excl], not [bind]: the transformation must be
+     built once, outside any per-task closure, for its memoisation to work. *)
+  Trans.on_meta_excl Driver.meta_get_counterexmp (fun ce_meta ->
+    let for_counterexample = ce_meta <> None in
     let trans notls =
       Trans.fold_map (fold in_goal only_top_in_goal notls notdef) Mls.empty None in
     if use_meta then

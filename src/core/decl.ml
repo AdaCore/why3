@@ -607,14 +607,15 @@ let create_prop_decl k p f =
 
 let get_used_syms_ty ty = syms_ty Sid.empty ty
 
-let get_used_syms_decl d =
+(* Memoised: the same declarations are re-scanned for every goal of a file. *)
+let get_used_syms_decl = Wdecl.memoize 63 (fun d ->
   match d.d_node with
   | Dtype ts -> syms_ty_decl ts
   | Ddata dl -> syms_data_decl dl
   | Dparam ls -> syms_param_decl ls
   | Dlogic ldl -> syms_logic_decl ldl
   | Dind (_, idl) -> syms_ind_decl idl
-  | Dprop (_,_,f) -> syms_prop_decl f
+  | Dprop (_,_,f) -> syms_prop_decl f)
 
 (** Utilities *)
 
