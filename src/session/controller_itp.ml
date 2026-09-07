@@ -75,8 +75,9 @@ type controller =
   { mutable controller_session: Session_itp.session;
     mutable controller_config : Whyconf.config;
     mutable controller_env: Env.env;
-    controller_provers:
-      (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+    controller_provers: Whyconf.config_prover Whyconf.Hprover.t;
+    controller_drivers: Driver.driver Whyconf.Hprover.t;
+    controller_requested_provers: Whyconf.Sprover.t option;
     controller_strategies : (string * string * string * Strategy.instruction array) Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
@@ -111,23 +112,68 @@ let set_session_timelimit c n =
 let set_session_prover_upgrade_policy c p u =
   c.controller_config <- Whyconf.set_prover_upgrade_policy c.controller_config p u
 
+exception Driver_not_loaded of Whyconf.prover
+
+let () = Exn_printer.register (fun fmt e ->
+    match e with
+    | Driver_not_loaded pr ->
+        fprintf fmt "no driver has been loaded for prover %a"
+          Whyconf.print_prover pr
+    | _ -> raise e)
+
 let load_drivers c =
   let env = c.controller_env in
   let config = c.controller_config in
   let provers = Whyconf.get_provers config in
   let main = Whyconf.get_main config in
+  let load_driver pr =
+    match c.controller_requested_provers with
+    | None -> true
+    | Some s -> Whyconf.Sprover.mem pr s
+  in
   Whyconf.Mprover.iter (fun _ p ->
-      let d = Driver.load_driver_for_prover main env p in
-      Whyconf.Hprover.add c.controller_provers p.Whyconf.prover (p,d))
+      let pr = p.Whyconf.prover in
+      Whyconf.Hprover.add c.controller_provers pr p;
+      if load_driver pr then
+        Whyconf.Hprover.add c.controller_drivers pr
+          (Driver.load_driver_for_prover main env p))
     provers
 
-let create_controller config env ses =
+let get_config_prover c pr = Whyconf.Hprover.find c.controller_provers pr
+
+let get_driver c pr =
+  match Whyconf.Hprover.find c.controller_drivers pr with
+  | d -> d
+  | exception Not_found -> raise (Driver_not_loaded pr)
+
+let provers_of_session config ses =
+  let used =
+    let acc = ref Whyconf.Sprover.empty in
+    Session_itp.session_iter_proof_attempt
+      (fun _ pa -> acc := Whyconf.Sprover.add pa.Session_itp.prover !acc)
+      ses;
+    !acc
+  in
+  (* Replaying a session may upgrade a proof attempt to another prover, so the
+     targets of the upgrade policies are needed as well. *)
+  Whyconf.Sprover.fold
+    (fun pr acc ->
+      match Whyconf.get_prover_upgrade_policy config pr with
+      | Whyconf.CPU_upgrade pr' | Whyconf.CPU_duplicate pr' ->
+          Whyconf.Sprover.add pr' acc
+      | Whyconf.CPU_keep | Whyconf.CPU_remove -> acc
+      | exception Not_found -> acc)
+    used used
+
+let create_controller ?provers config env ses =
   let c =
     {
       controller_session = ses;
       controller_config = config;
       controller_env = env;
       controller_provers = Whyconf.Hprover.create 7;
+      controller_drivers = Whyconf.Hprover.create 7;
+      controller_requested_provers = provers;
       controller_strategies = Hstr.create 7;
       controller_running_proof_attempts = Hpan.create 17;
     }
@@ -248,6 +294,7 @@ let reload_files ?(hard_reload=false) ?reparse_file_fun ~ignore_shapes (c : cont
   if hard_reload then begin
     c.controller_env <- Env.create_env (Env.get_loadpath c.controller_env);
     Whyconf.Hprover.reset c.controller_provers;
+    Whyconf.Hprover.reset c.controller_drivers;
     load_drivers c;
   end;
   c.controller_session <- empty_session ~from:old_ses (get_dir old_ses);
@@ -412,7 +459,8 @@ let fuzzy_proof_time nres ores =
 let build_prover_call spa =
   let c = spa.spa_contr in
   let limits = spa.spa_limits in
-  let (config_pr,driver) = Hprover.find c.controller_provers spa.spa_pr in
+  let config_pr = Hprover.find c.controller_provers spa.spa_pr in
+  let driver = get_driver c spa.spa_pr in
   let with_steps =
     Call_provers.(limits.limit_steps > empty_limits.limit_steps) in
   let command =
@@ -629,7 +677,7 @@ let schedule_proof_attempt ?(adjust_limits = true) ?proof_script_filename c id p
       let pa = Hprover.find h pr in
       let a = get_proof_attempt_node ses pa in
       let old_res = a.proof_state in
-      let config_pr,_ = Hprover.find c.controller_provers pr in
+      let config_pr = Hprover.find c.controller_provers pr in
       let interactive = config_pr.Whyconf.interactive in
       let use_steps = Call_provers.(limits.limit_steps <> empty_limits.limit_steps) in
       let limits =
@@ -671,7 +719,7 @@ let schedule_proof_attempt ?(adjust_limits = true) ?proof_script_filename c id p
 (* create the path to a file for saving the external proof script *)
 let create_file_rel_path c pr pn =
   let session = c.controller_session in
-  let driver = snd (Hprover.find c.controller_provers pr) in
+  let driver = get_driver c pr in
   let task = Session_itp.get_task session pn in
   let session_dir = Session_itp.get_dir session in
   let th = get_encapsulating_theory session (APn pn) in
@@ -731,7 +779,7 @@ let prepare_edition c ?file pn pr ~notification =
   let ch = open_out file in
   let fmt = formatter_of_out_channel ch in
   let task = Session_itp.get_task session pn in
-  let driver = snd (Hprover.find c.controller_provers pr) in
+  let driver = get_driver c pr in
   Driver.print_task ?old driver fmt task;
   Option.iter close_in old;
   close_out ch;

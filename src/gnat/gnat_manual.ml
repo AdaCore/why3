@@ -84,7 +84,7 @@ let compute_filename s (contain_dir: string) theory goal expl driver =
 
 let create_prover_file c goal expl prover =
   let s = c.Controller_itp.controller_session in
-  let driver = snd (Whyconf.Hprover.find c.Controller_itp.controller_provers prover) in
+  let driver = Controller_itp.get_driver c prover in
   let th = find_goal_theory s goal in
   let filename =
     compute_filename s (prover_files_dir prover) th goal expl driver in

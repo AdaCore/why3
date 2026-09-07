@@ -37,9 +37,10 @@ let run () =
   Why3session_lib.session_iter_proof_attempt_by_filter session f
    (fun _ pa_node ->
         match Session_itp.get_task session pa_node.parent,
-        Whyconf.Hprover.find controller.Controller_itp.controller_provers pa_node.prover with
+        Controller_itp.get_driver controller pa_node.prover with
         | exception Not_found -> ()
-        | (task,(_,driver)) ->
+        | exception Controller_itp.Driver_not_loaded _ -> ()
+        | (task,driver) ->
         let th = get_encapsulating_theory session (APn pa_node.parent) in
         let th_name = (Session_itp.theory_name th).Ident.id_string in
         let f = get_encapsulating_file session (ATh th) in

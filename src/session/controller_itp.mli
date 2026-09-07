@@ -92,14 +92,49 @@ type controller = private
   { mutable controller_session : Session_itp.session;
     mutable controller_config : Whyconf.config;
     mutable controller_env : Env.env;
-    controller_provers : (Whyconf.config_prover * Driver.driver) Whyconf.Hprover.t;
+    controller_provers : Whyconf.config_prover Whyconf.Hprover.t;
+    (** all the provers of the configuration *)
+    controller_drivers : Driver.driver Whyconf.Hprover.t;
+    (** the drivers that have been loaded, see {!create_controller} *)
+    controller_requested_provers : Whyconf.Sprover.t option;
+    (** the provers whose drivers were requested, [None] meaning all of them *)
     controller_strategies : (string * string * string * Strategy.instruction array) Wstdlib.Hstr.t;
     controller_running_proof_attempts : unit Hpan.t;
   }
 
-val create_controller: Whyconf.config -> Env.env -> Session_itp.session -> controller
+exception Driver_not_loaded of Whyconf.prover
+
+val create_controller:
+  ?provers:Whyconf.Sprover.t -> Whyconf.config -> Env.env ->
+  Session_itp.session -> controller
 (** creates a controller for the given session.
-    The config and env is used to load the drivers for the provers. *)
+    The config and env is used to load the drivers for the provers.
+
+    Loading a driver takes a non-negligible amount of time, and a tool that
+    only runs a few of the configured provers does not need the other drivers.
+    When [provers] is given, only the drivers of these provers are loaded, and
+    {!get_driver} raises {!Driver_not_loaded} for the other ones. The default
+    is to load the drivers of all the configured provers.
+
+    Loading a driver may fail, e.g. because the driver file is missing or
+    ill-formed; such errors are reported by this function. *)
+
+val get_driver: controller -> Whyconf.prover -> Driver.driver
+(** [get_driver c pr] returns the driver of prover [pr].
+    Raises {!Driver_not_loaded} if [pr] is not configured, or if its driver was
+    not loaded because [pr] is not in the [provers] argument of
+    {!create_controller}. *)
+
+val get_config_prover: controller -> Whyconf.prover -> Whyconf.config_prover
+(** [get_config_prover c pr] returns the configuration of prover [pr].
+    Raises [Not_found] if [pr] is not configured. *)
+
+val provers_of_session:
+  Whyconf.config -> Session_itp.session -> Whyconf.Sprover.t
+(** the provers occurring in the proof attempts of the given session, plus the
+    provers these can be upgraded to according to the configuration. This is
+    the set of drivers needed to replay a session, and is meant to be passed as
+    the [provers] argument of {!create_controller}. *)
 
 val set_session_max_tasks : int -> unit
 (** sets the maximum number of proof tasks that can be running at the

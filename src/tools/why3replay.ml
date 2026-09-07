@@ -381,7 +381,10 @@ let () =
   try
     Debug.dprintf debug "Opening session '%s'...@?" dir;
     let ses = S.load_session dir in
-    let cont = Controller_itp.create_controller config env ses in
+    (* Only the drivers of the provers occurring in the session are needed,
+       loading the other ones would be a waste of time. *)
+    let provers = Controller_itp.provers_of_session config ses in
+    let cont = Controller_itp.create_controller ~provers config env ses in
     (* update the session *)
     let found_obs, found_detached =
       try
