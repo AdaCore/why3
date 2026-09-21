@@ -68,21 +68,23 @@ let normalize_hyp_or_goal ?pr_norm ?step_limit engine : Task.task Trans.tlist  =
   let step_limit =
     if step_limit = None then Some !compute_max_steps else step_limit
   in
-  Trans.decl_l (fun d ->
-    match d.d_node with
-    | Dprop (Pgoal, pr, t) when pr_norm = None ->
+  match pr_norm with
+  | None ->
+    Trans.goal_l (fun pr t ->
         let t = normalize ?step_limit ~limit:!compute_max_steps engine Mvs.empty t in
-        begin match t.t_node with
+        match t.t_node with
         | Ttrue -> []
         | _ ->
             let d = Decl.create_prop_decl Pgoal pr t in
-            [[d]]
-        end
-    | Dprop (k, pr, t) when Option.fold ~some:(fun v -> pr_equal pr v) ~none:false pr_norm ->
-      let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine Mvs.empty t in
-      let d = Decl.create_prop_decl k pr t in
-      [[d]]
-    | _ -> [[d]]) None
+            [[d]])
+  | Some pr_norm ->
+    Trans.decl_l (fun d ->
+      match d.d_node with
+      | Dprop (k, pr, t) when pr_equal pr pr_norm ->
+        let t = normalize ?step_limit:step_limit ~limit:!compute_max_steps engine Mvs.empty t in
+        let d = Decl.create_prop_decl k pr t in
+        [[d]]
+      | _ -> [[d]]) None
 
 let craft_engine p env prs task =
   let km = Task.task_known task in
