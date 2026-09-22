@@ -209,7 +209,15 @@ val fold_premises : ('a -> Term.term -> 'a) -> premises -> 'a -> 'a
 
 (** {3 The execution environment} *)
 
-type env = {
+type task_prefix = {
+  tp_task   : Task.task;
+  (** The declarations used and cloned by the module *)
+  tp_local  : Decl.known_map;
+  (** The remaining declarations, to be added with the current value bindings *)
+}
+(** The module-dependent part of task construction in {!Rac}. *)
+
+type env = private {
   why_env  : Env.env;
   pmodule  : Pmodule.pmodule0;
   funenv   : (Expr.cexp * Expr.rec_defn list option) Expr.Mrs.t;
@@ -224,6 +232,9 @@ type env = {
   (** global variables *)
   premises : premises;
   log_uc   : Log.log_uc;
+  prefix   : task_prefix option ref;
+  (** Lazily built task prefix, shared by derived environments, which retain
+      the same module. *)
 }
 (** The parts of the execution environment in {!Pinterp} which are relevant for
    {!Rac}. *)
@@ -233,6 +244,10 @@ val mk_empty_env : Env.env -> Pmodule.pmodule0 -> env
 val get_vs : env -> Term.Mvs.key -> Value.value
 
 val get_pvs : env -> Ity.pvsymbol -> Value.value
+
+val set_vsenv : value Term.Mvs.t -> env -> env
+
+val set_funenv : (Expr.cexp * Expr.rec_defn list option) Expr.Mrs.t -> env -> env
 
 val bind_vs : Term.Mvs.key -> value -> env -> env
 

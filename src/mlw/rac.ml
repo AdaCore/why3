@@ -128,19 +128,10 @@ let bind_fun rs (cexp, _) (task, ls_mv) =
     task, ls_mv
   with Exit -> task, ls_mv
 
-let task_of_term ?(vsenv=[]) metas (env: env) t =
-  let open Task in let open Decl in
-  let free_sls = t_app_fold (fun sls ls _ _ -> Sls.add ls sls) Sls.empty t in
-  let lsenv =
-    let aux rs v mls =
-      match rs.rs_logic with
-      | RLls ls when Sls.mem ls free_sls -> Mls.add ls v mls
-      | _ -> mls in
-    Mrs.fold aux env.rsenv Mls.empty in
-  (* Add to lsenv the logical symbols from env.lsenv that are in free_sls *)
-  let lsenv =
-    let aux ls v mls = if Sls.mem ls free_sls then Mls.add ls v mls else mls in
-    Mls.fold aux env.lsenv lsenv in
+(* Retain the imported declarations and the local declaration map. Local
+   declarations are replayed for each term, since their definitions depend on
+   the current value bindings. *)
+let task_prefix (env: env) =
   let add_used task td =
     let open Theory in
     match td.td_node with
@@ -170,6 +161,31 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
           {inst_df; inst_pr; inst_ty= sm.sm_ty; inst_ts; inst_ls } in
         Task.clone_export task th inst
     | _ -> task in
+  match !(env.prefix) with
+  | Some prefix -> prefix
+  | None ->
+      let th = env.pmodule.Pmodule.mod_theory in
+      let task = List.fold_left add_used None th.Theory.th_decls in
+      let used = Task.used_symbols (Task.used_theories task) in
+      let known_local =
+        Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
+      let prefix = {tp_task= task; tp_local= known_local} in
+      env.prefix := Some prefix;
+      prefix
+
+let task_of_term ?(vsenv=[]) metas (env: env) t =
+  let open Task in let open Decl in
+  let free_sls = t_app_fold (fun sls ls _ _ -> Sls.add ls sls) Sls.empty t in
+  let lsenv =
+    let aux rs v mls =
+      match rs.rs_logic with
+      | RLls ls when Sls.mem ls free_sls -> Mls.add ls v mls
+      | _ -> mls in
+    Mrs.fold aux env.rsenv Mls.empty in
+  (* Add to lsenv the logical symbols from env.lsenv that are in free_sls *)
+  let lsenv =
+    let aux ls v mls = if Sls.mem ls free_sls then Mls.add ls v mls else mls in
+    Mls.fold aux env.lsenv lsenv in
   let add_known _ decl (task, ls_mt, ls_mv) =
     match decl.d_node with
     | Dparam ls when Mls.contains lsenv ls ->
@@ -210,15 +226,10 @@ let task_of_term ?(vsenv=[]) metas (env: env) t =
   let add_premise task t =
     let pr = create_prsymbol (id_fresh "premise") in
     Task.add_prop_decl task Decl.Paxiom pr t in
-  (* building the task from scratch *)
-  let task, ls_mt, ls_mv = None, Mtv.empty, Mvs.empty in
-  (* adds the theories used and cloned from the enclosing module *)
-  let th = env.pmodule.Pmodule.mod_theory in
-  let task = List.fold_left add_used task th.Theory.th_decls in
-  (* adds the local symbols used (??) *)
-  let used = Task.used_symbols (Task.used_theories task) in
-  let known_local = Mid.filter (fun id _ -> not (Mid.mem id used)) th.Theory.th_known in
-  let task, ls_mt, ls_mv = Mid.fold add_known known_local (task, ls_mt, ls_mv) in
+  (* Add local declarations with the current bindings to the retained prefix *)
+  let prefix = task_prefix env in
+  let task, ls_mt, ls_mv =
+    Mid.fold add_known prefix.tp_local (prefix.tp_task, Mtv.empty, Mvs.empty) in
   (* adds the global program variables *)
   let task, ls_mt, ls_mv = Mrs.fold add_prog_const env.rsenv (task, ls_mt, ls_mv) in
   (* adds the logic functions from the model (??) *)
