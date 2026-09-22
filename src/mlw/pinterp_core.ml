@@ -705,6 +705,11 @@ let fold_premises f (premises: premises) init =
   let fold_bunch f bunch init = List.fold_right (fold_terms f) !bunch init in
   List.fold_right (fold_bunch f) !premises init
 
+type task_prefix = {
+  tp_task   : Task.task;
+  tp_local  : Decl.known_map;
+}
+
 type env = {
   why_env  : Env.env;
   pmodule  : Pmodule.pmodule0;
@@ -715,12 +720,14 @@ type env = {
   rsenv    : value Lazy.t Mrs.t; (* global constants *)
   premises : premises;
   log_uc   : Log.log_uc;
+  prefix   : task_prefix option ref;
 }
 
 let mk_empty_env env pmodule =
   {pmodule; funenv= Mrs.empty; tvenv = Mtv.empty;
    vsenv= Mvs.empty; lsenv= Mls.empty; rsenv= Mrs.empty;
-   premises= mk_empty_premises (); why_env= env; log_uc= Log.empty_log_uc ()}
+   premises= mk_empty_premises (); why_env= env; log_uc= Log.empty_log_uc ();
+   prefix= ref None}
 
 let snapshot_env env =
   let snapshot_rs l =
@@ -737,6 +744,10 @@ let get_vs env vs =
 
 let get_pvs env pvs =
   get_vs env pvs.pv_vs
+
+let set_vsenv vsenv ctx = {ctx with vsenv}
+
+let set_funenv funenv ctx = {ctx with funenv}
 
 let bind_vs vs v ctx = {ctx with vsenv= Mvs.add vs v ctx.vsenv}
 
