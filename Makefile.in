@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -1640,7 +1640,6 @@ dist: $(MORE_DIST)
 headers:
 	headache -c misc/headache_config.txt -h misc/header.txt \
 		Makefile.in configure.in \
-		src/*.ml \
 		src/*/*.ml src/*/*.ml[ily] \
 		plugins/*/*.ml plugins/*/*.ml[ily] \
 		lib/coq/*.v lib/coq/*/*.v \

@@ -1,8 +1,8 @@
 # Making a release
 
 * assuming some variables
-  - `VERSION=1.8`
-  - `RELEASE=1.8.1`
+  - `VERSION=1.9`
+  - `RELEASE=1.9.0`
 
 * perform a sanity check
   - check the BTS: there should be no more open issues and MR in the milestone page
@@ -19,10 +19,11 @@
   - run the manual job `trywhy3-extra` to build Alt-Ergo for TryWhy3
     if needed (see below) this is done by opening the pipeline on the
     gitlab site and manually click on the arrow on the right of the
-    job.
+    job. Take note of the job number to be used below as TRYWHY3_JOB
+      -> 8056216 for release 1.9.0
 
 * check/update authors and copyright
-  - update the content of the About dialog in `src/ide/gconfig.ml`
+  - update the content of the `about_dialog` window in `src/ide/gconfig.ml`
     around lines 680-700
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`

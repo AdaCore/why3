@@ -1,7 +1,13 @@
 :x: marks a potential source of incompatibility
 
+Version 1.9.0, October 19, 2026
+-------------------------------
+
 Compilation
   * compatibility with OCaml up to 5.5 and hopefully beyond
+
+  * compilation now requires Dune. Yet, compilation should still be
+    launched using `make` or `make -j`.
 
 API
   * The `module Impl : Intf` feature is now supported at the level of the Ptree
@@ -11,8 +17,9 @@ API
     feature :x:
 
 Provers
-  * support for Z3 4.14 (released Mar 7, 2024)
-  * support for E prover 3.x (released ???)
+  * support for Z3 4.x up to 4.16.0, and 5.x up to 5.3.0
+  * support for E prover 3.x
+  * support for Rocq up to 9.2
 
 Transformations
   * new transformation `compute` with arguments, of the form
@@ -28,14 +35,18 @@ Transformations
     to `compute` with no arguments. (deprecated)
 
 Stdlib
-  * added iterators of sets and maps of unbounded integers, 63-bit
+  * added iterators on sets and maps of unbounded integers, 63-bit
     integers, "Peano" integers and strings, with appropriate
     declarations in the OCaml64 driver
+  * fix missing pre-condition on Seq.get
 
 Drivers
   * extended coverage of the "remove unused" mechanism, including on
     lists and sets. Usually gains some proofs or make them faster, but
     may occasionally lose some :x:
+
+Extraction
+  * Fix OCaml extraction of `if then else` and `let exception`
 
 Tools
   * `why3 replay`: new option `--dont-save`, improved documentation of
