@@ -620,7 +620,10 @@ module Print = struct
                         @;<1 0>@[<hv 2>then@;%a@]\
                         @;<1 0>@[<hv 2>else@;%a@]@]")
           (print_expr ~opr:false info 15) e1
-          (print_expr ~opr:false ~be:true info 15) e2
+          (print_expr ~be:true
+           (* while the 'then' block is closed by 'else', '~opr:false' cannot be used
+              as it might cause a dangling 'else' *)
+           ~opr:true info 15) e2
           (print_expr ~be:true info 15) e3
     | Eblock [] ->
         pp_print_string fmt "()"
