@@ -1132,7 +1132,7 @@ let get_rac_results ~limits ?verb_lvl ?compute_term
                 let body =
                   c_fun cty.cty_args cty.cty_pre cty.cty_post cty.cty_xpost cty.cty_oldies e_void
                 in
-                let env = { env with funenv = Mrs.add rs (body,None) env.funenv } in
+                let env = set_funenv (Mrs.add rs (body,None) env.funenv) env in
                 let rac_execute ~giant_steps rs model =
                   let ctx = Pinterp.mk_ctx env ~do_rac:true ~giant_steps ~rac
                         ~oracle:(oracle_of_model env.pmodule.Pmodule.mod_known model) ~compute_term

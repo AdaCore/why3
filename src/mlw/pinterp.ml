@@ -107,7 +107,7 @@ let mk_ctx env ~limits ?(giant_steps=false)
 let add_local_funs locals rdl ctx =
   let add acc (rs, ce) = Mrs.add rs (ce, rdl) acc in
   let funenv = List.fold_left add ctx.funenv locals in
-  {ctx with funenv}
+  set_funenv funenv ctx
 
 (******************************************************************************)
 (*                                BUILTINS                                    *)
@@ -546,7 +546,7 @@ let
         let vs, t = Decl.open_ls_defn defn in
         let args = List.map (get_pvs ctx.env) pvs in
         let vsenv = List.fold_right2 Mvs.add vs args ctx.env.vsenv in
-        let t = ctx.compute_term {ctx.env with vsenv} t in
+        let t = ctx.compute_term (set_vsenv vsenv ctx.env) t in
         (* TODO A variable x binding the result of exec pure are used as (x = True) in
            subsequent terms, so we map true/false to True/False here. Is this reasonable? *)
         let t = fix_boolean_term t in
@@ -1068,7 +1068,7 @@ and exec_expr' ctx e =
       | r -> r )
     | LDsym (rs, ce) ->
         let funenv = Mrs.add rs (ce, None) ctx.env.funenv in
-        exec_expr {ctx with env= {ctx.env with funenv}} e2
+        exec_expr {ctx with env= set_funenv funenv ctx.env} e2
     | LDrec l ->
         let funenv =
           List.fold_left
@@ -1076,7 +1076,7 @@ and exec_expr' ctx e =
                Mrs.add d.rec_sym (d.rec_fun, Some l)
                  (Mrs.add d.rec_rsym (d.rec_fun, Some l) acc))
             ctx.env.funenv l in
-        exec_expr {ctx with env= {ctx.env with funenv}} e2 )
+        exec_expr {ctx with env= set_funenv funenv ctx.env} e2 )
   | Eif (e1, e2, e3) -> (
     match exec_expr ctx e1 with
     | Normal v ->
@@ -1390,7 +1390,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
   let ctx = {ctx with env= multibind_pvs rs.rs_cty.cty_args arg_vs ctx.env} in
   let ctx =
     let vsenv = snapshot_oldies rs.rs_cty.cty_oldies ctx.env.vsenv in
-    {ctx with env= {ctx.env with vsenv}} in
+    {ctx with env= set_vsenv vsenv ctx.env} in
   let res = with_push_premises ctx.env.premises @@ fun () -> (
   let mode =
     let giant_steps_possible () =
@@ -1449,7 +1449,7 @@ and exec_call ?(main_function=false) ?loc ?attrs (eid:expr_id option) ctx rs arg
             begin match arg_vs with
             | [{v_desc= Vfun (cl, arg, e)}; value] ->
                 let vsenv = Mvs.union (fun _ _ v -> Some v) ctx.env.vsenv cl in
-                let ctx = {ctx with env= bind_vs arg value {ctx.env with vsenv}} in
+                let ctx = {ctx with env= bind_vs arg value (set_vsenv vsenv ctx.env)} in
                 exec_expr ctx e
             | [{v_desc= Vpurefun (_, bindings, default)}; value] ->
                 let v = try Mv.find value bindings with Not_found -> default in
@@ -1623,7 +1623,7 @@ and exec_call_abstract ?snapshot ?loc ?attrs ?rs (eid:expr_id option) ctx cty ar
   let ctx = match snapshot with
     | Some oldies ->
         let vsenv = snapshot_oldies oldies ctx.env.vsenv in
-        {ctx with env= {ctx.env with vsenv}}
+        {ctx with env= set_vsenv vsenv ctx.env}
     | None -> ctx in
   let res = with_push_premises ctx.env.premises @@ fun () -> (
   (* assert1 is already done above *)
