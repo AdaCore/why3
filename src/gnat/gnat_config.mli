@@ -8,6 +8,9 @@ val env : Env.env
 val provers : Whyconf.prover list
 (* the provers, either the default prover, or as given by --prover *)
 
+val benchmark_export_provers : Whyconf.prover list
+(* Additional drivers for saved benchmark tasks *)
+
 val session_dir : string
 val session_file : string
 (* the directory in which the session file is stored, and the session file itself *)
