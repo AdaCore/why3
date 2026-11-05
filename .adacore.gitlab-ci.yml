@@ -2,6 +2,8 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/check-issue@~latest
     inputs:
       stage: check
+  - project: eng/gitlab-templates
+    file: /ci-templates-shared/insteadOf.yml
 
 workflow:
   rules:
@@ -23,6 +25,34 @@ variables:
   WHY3_PACKAGE_BASE_NAME: why3.tar.gz
   WHY3_PACKAGE_ABSOLUTE_NAME: $CI_PROJECT_DIR/$WHY3_PACKAGE_BASE_NAME
   WHY3_PACKAGE_EXPORT: /tmp/why3-export
+
+commit-level-checks:
+  stage: check
+  interruptible: true
+  needs: []
+  services:
+    - image:pe-base
+  variables:
+    GIT_DEPTH: "0"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
+  script:
+    - !reference [.insteadOfPython]
+    - |
+      set -eu
+      support_dir="$(mktemp -d)"
+      trap 'rm -rf "$support_dir"' EXIT
+      git clone --depth 1 --branch v1.3.0 git-adacore:eng/spark/support "$support_dir/support"
+
+      base="${CI_MERGE_REQUEST_DIFF_BASE_SHA:?CI_MERGE_REQUEST_DIFF_BASE_SHA is not set}"
+      head="${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-${CI_COMMIT_SHA:?CI_COMMIT_SHA is not set}}"
+      commits="$(git rev-list --reverse "${base}..${head}")"
+      for commit in $commits; do
+        echo "Checking commit message for $commit"
+        git log -1 --format=%B "$commit" > "$support_dir/commit_msg"
+        python "$support_dir/support/support/check_issue_trailer.py" "$support_dir/commit_msg"
+      done
 
 .common_test:
   stage: build
