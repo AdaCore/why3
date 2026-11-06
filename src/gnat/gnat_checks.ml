@@ -422,6 +422,7 @@ let init_cont () =
        counterexamples and for warning VCs. *)
     let l =
       Gnat_config.provers
+      @ Gnat_config.benchmark_export_provers
       @ Option.to_list Gnat_config.prover_ce
       @ Option.to_list Gnat_config.prover_warn
     in
@@ -1112,6 +1113,34 @@ let schedule_goal_with_prover ~callback c g p =
     else
       None
   in
+  (match proof_script_filename with
+   | None -> ()
+   | Some filename ->
+     List.iter (fun (extra: Whyconf.prover) ->
+       let mkdir path =
+         try Unix.mkdir path 0o755 with
+         | Unix.Unix_error (Unix.EEXIST, _, _) when Sys.is_directory path -> ()
+       in
+       let root = "benchmark-export" in
+       mkdir root;
+       let dir = Filename.concat root extra.Whyconf.prover_name in
+       mkdir dir;
+       let driver = Controller_itp.get_driver c extra in
+       let stem = Filename.chop_extension (Filename.basename filename) in
+       let dest = Filename.concat dir (stem ^ Driver.get_extension driver) in
+       let out = open_out_gen [Open_wronly; Open_creat; Open_excl; Open_binary]
+           0o666 dest in
+       (try
+          Fun.protect ~finally:(fun () -> close_out out) (fun () ->
+            let fmt = Format.formatter_of_out_channel out in
+            let task = Session_itp.get_task c.Controller_itp.controller_session g in
+            Driver.print_task driver fmt task;
+            Format.pp_print_flush fmt ())
+        with exn ->
+          (try Sys.remove dest with Sys_error _ -> ());
+          failwith (Printf.sprintf "benchmark export of %s to %s failed: %s"
+            filename extra.Whyconf.prover_name (Printexc.to_string exn))))
+       Gnat_config.benchmark_export_provers);
   run_goal ?proof_script_filename c p g ~callback
 
 let schedule_goal_prover_race ~callback c g provers =

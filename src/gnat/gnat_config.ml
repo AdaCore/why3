@@ -29,6 +29,7 @@ let opt_steps : int option ref = ref None
 let opt_ce_steps : int option ref = ref None
 let opt_debug = ref false
 let opt_debug_save_vcs = ref false
+let opt_benchmark_export = ref None
 let opt_debug_prover_errors = ref false
 let opt_force = ref false
 let opt_proof_mode = ref Progressive
@@ -259,6 +260,8 @@ let options = Arg.align [
           " Enable debug mode; and gives stack_trace on any exception raised";
    "--debug-save-vcs", Arg.Set opt_debug_save_vcs,
           " Save VCs files when running provers";
+   "--benchmark-export", Arg.String (fun s -> opt_benchmark_export := Some s),
+          " Export saved benchmark tasks for the comma-separated provers";
    "--standalone", Arg.Set opt_standalone,
           " spawn its own VC server";
    "--proof-dir", Arg.String set_proof_dir,
@@ -427,6 +430,22 @@ let provers, prover_ce, prover_warn, config, env =
     Option.map (fun conf_prover -> conf_prover.prover) base_prover_warn
   in
   provers, prover_ce, prover_warn, config, env
+
+let benchmark_export_provers =
+  match !opt_benchmark_export with
+  | Some names ->
+      if not (!opt_debug_save_vcs || !opt_debug) then
+        Gnat_util.abort_with_message ~internal:true
+          "--benchmark-export requires --debug-save-vcs";
+      let names = String.split_on_char ',' names in
+      if List.exists (fun name -> name = "") names ||
+         List.length (List.sort_uniq String.compare names) <> List.length names
+      then Gnat_util.abort_with_message ~internal:true
+          "--benchmark-export requires distinct, nonempty prover names";
+      List.map (fun name ->
+        (filter_one_prover config (mk_filter_prover name)).prover)
+        names
+  | None -> []
 
 (* function to build manual elements *)
 (* pass proof dir and prover as args *)
