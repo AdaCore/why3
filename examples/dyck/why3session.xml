@@ -2,79 +2,81 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="dyck.mlw"/>
 <theory name="Dyck" proved="true">
  <goal name="dyck_word_first" proved="true">
- <proof prover="1"><result status="valid" time="0.000000" steps="63"/></proof>
+ <proof prover="4"><result status="valid" time="0.013051" steps="12896"/></proof>
  </goal>
 </theory>
 <theory name="Check" proved="true">
  <goal name="same_prefix&#39;vc" expl="VC for same_prefix" proved="true">
- <proof prover="1"><result status="valid" time="0.020000" steps="232"/></proof>
+ <proof prover="4"><result status="valid" time="0.012365" steps="17285"/></proof>
  </goal>
  <goal name="is_dyck_rec&#39;vc" expl="VC for is_dyck_rec" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="is_dyck_rec&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.000000" steps="11"/></proof>
+  <proof prover="3"><result status="valid" time="0.035109" steps="3197"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="1.299493" steps="19146"/></proof>
+  <proof prover="4"><result status="valid" time="0.017020" steps="57175"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.2" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="122"/></proof>
+  <proof prover="0"><result status="valid" time="0.062959" steps="122"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.3" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="is_dyck_rec&#39;vc.3.0" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="1"><result status="valid" time="4.211201" steps="46730"/></proof>
+   <proof prover="4"><result status="valid" time="0.025109" steps="24982"/></proof>
    </goal>
    <goal name="is_dyck_rec&#39;vc.3.1" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="1"><result status="valid" time="0.010000" steps="33"/></proof>
+   <proof prover="4"><result status="valid" time="0.010249" steps="19865"/></proof>
    </goal>
    <goal name="is_dyck_rec&#39;vc.3.2" expl="VC for is_dyck_rec" proved="true">
    <transf name="inline_all" proved="true" >
     <goal name="is_dyck_rec&#39;vc.3.2.0" expl="VC for is_dyck_rec" proved="true">
-    <proof prover="3"><result status="valid" time="0.240000" steps="30482"/></proof>
+    <proof prover="3"><result status="valid" time="0.119143" steps="12335"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="is_dyck_rec&#39;vc.3.3" expl="VC for is_dyck_rec" proved="true">
-   <proof prover="1"><result status="valid" time="0.010000" steps="39"/></proof>
+   <proof prover="4"><result status="valid" time="0.010802" steps="21119"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="is_dyck_rec&#39;vc.4" expl="exceptional postcondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.080000" steps="16735"/></proof>
+  <proof prover="1"><result status="valid" time="0.221462" steps="20502"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.5" expl="exceptional postcondition" proved="true">
   <transf name="inline_all" proved="true" >
    <goal name="is_dyck_rec&#39;vc.5.0" expl="exceptional postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.520000" steps="62925"/></proof>
+   <proof prover="1"><result status="valid" time="0.846648" steps="69868"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="is_dyck_rec&#39;vc.6" expl="exceptional postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.411608" steps="5764"/></proof>
+  <proof prover="1"><result status="valid" time="0.048784" steps="15053"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.018593" steps="194"/></proof>
+  <proof prover="3"><result status="valid" time="0.035705" steps="4406"/></proof>
   </goal>
   <goal name="is_dyck_rec&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010328" steps="62"/></proof>
+  <proof prover="3"><result status="valid" time="0.037448" steps="3577"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="is_dyck&#39;vc" expl="VC for is_dyck" proved="true">
- <transf name="split_goal_right" proved="true" >
+ <transf name="split_vc" proved="true" >
   <goal name="is_dyck&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000"/></proof>
+  <proof prover="3" timelimit="1"><result status="valid" time="0.958634" steps="106627"/></proof>
   </goal>
   <goal name="is_dyck&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.010000"/></proof>
+  <proof prover="2"><result status="valid" time="0.054472"/></proof>
   </goal>
  </transf>
  </goal>

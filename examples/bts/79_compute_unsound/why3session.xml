@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="79_compute_unsound.mlw"/>
 <theory name="Soundness">
  <goal name="A" proved="true">
- <proof prover="0"><result status="valid" time="0.050000" steps="10748"/></proof>
+ <proof prover="1"><result status="valid" time="0.050000" steps="12253"/></proof>
  </goal>
  <goal name="Fail">
- <transf name="compute_specified" >
+ <transf name="compute" arg1="nodef">
+  <goal name="Fail.0">
+  </goal>
+ </transf>
+ <transf name="compute" >
   <goal name="Fail.0">
   </goal>
  </transf>
  </goal>
  <goal name="Absurd" proved="true">
- <proof prover="0"><result status="valid" time="0.020000" steps="861"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="762"/></proof>
  </goal>
 </theory>
 </file>

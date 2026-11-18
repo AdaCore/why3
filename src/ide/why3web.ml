@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -161,4 +161,4 @@ let () =
 
 end
 
-let () = Whyconf.register_command "web" (module Main)
+let () = Whyconf.register_command "webserver" (module Main)

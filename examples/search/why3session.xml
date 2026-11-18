@@ -2,92 +2,92 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC5" version="1.0.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC5" version="1.2.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="search.mlw"/>
 <theory name="Path" proved="true">
  <goal name="path_inversion&#39;vc" expl="VC for path_inversion" proved="true">
  <transf name="induction_pr" proved="true" >
   <goal name="path_inversion&#39;vc.0" expl="VC for path_inversion" proved="true">
-  <proof prover="3"><result status="valid" time="0.032249" steps="5422"/></proof>
+  <proof prover="6"><result status="valid" time="0.032249" steps="5154"/></proof>
   </goal>
   <goal name="path_inversion&#39;vc.1" expl="VC for path_inversion" proved="true">
-  <proof prover="3"><result status="valid" time="0.044416" steps="6373"/></proof>
+  <proof prover="6"><result status="valid" time="0.044416" steps="5993"/></proof>
   </goal>
   <goal name="path_inversion&#39;vc.2" expl="VC for path_inversion" proved="true">
-  <proof prover="2"><result status="valid" time="0.047658" steps="4123"/></proof>
+  <proof prover="5"><result status="valid" time="0.047658" steps="28487"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="path_length&#39;vc" expl="VC for path_length" proved="true">
- <proof prover="3"><result status="valid" time="0.122809" steps="6435"/></proof>
+ <proof prover="6"><result status="valid" time="0.122809" steps="6181"/></proof>
  </goal>
  <goal name="path_first&#39;vc" expl="VC for path_first" proved="true">
- <proof prover="3"><result status="valid" time="0.038741" steps="12893"/></proof>
+ <proof prover="6"><result status="valid" time="0.038741" steps="12135"/></proof>
  </goal>
  <goal name="path_inversion_right&#39;vc" expl="VC for path_inversion_right" proved="true">
- <proof prover="3"><result status="valid" time="0.071913" steps="20300"/></proof>
+ <proof prover="6"><result status="valid" time="0.071913" steps="19108"/></proof>
  </goal>
  <goal name="path_last&#39;vc" expl="VC for path_last" proved="true">
- <proof prover="3"><result status="valid" time="0.058092" steps="66391"/></proof>
+ <proof prover="6"><result status="valid" time="0.058092" steps="62376"/></proof>
  </goal>
  <goal name="shorter_path&#39;vc" expl="VC for shorter_path" proved="true">
- <proof prover="3"><result status="valid" time="0.051951" steps="27474"/></proof>
+ <proof prover="6"><result status="valid" time="0.051951" steps="25643"/></proof>
  </goal>
 </theory>
 <theory name="Bfs" proved="true">
  <goal name="bfs&#39;vc" expl="VC for bfs" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="bfs&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.023619" steps="3311"/></proof>
+  <proof prover="6"><result status="valid" time="0.023619" steps="3311"/></proof>
   </goal>
   <goal name="bfs&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.046315" steps="39198"/></proof>
+  <proof prover="6"><result status="valid" time="0.046315" steps="37433"/></proof>
   </goal>
   <goal name="bfs&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.047521" steps="40529"/></proof>
+  <proof prover="6"><result status="valid" time="0.047521" steps="38674"/></proof>
   </goal>
   <goal name="bfs&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.044162" steps="40247"/></proof>
+  <proof prover="6"><result status="valid" time="0.044162" steps="38475"/></proof>
   </goal>
   <goal name="bfs&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.038739" steps="6301"/></proof>
+  <proof prover="6"><result status="valid" time="0.038739" steps="6301"/></proof>
   </goal>
   <goal name="bfs&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.020112" steps="3595"/></proof>
+  <proof prover="6"><result status="valid" time="0.020112" steps="3595"/></proof>
   </goal>
   <goal name="bfs&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.021397" steps="3634"/></proof>
+  <proof prover="6"><result status="valid" time="0.021397" steps="3634"/></proof>
   </goal>
   <goal name="bfs&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.046254" steps="42917"/></proof>
+  <proof prover="6"><result status="valid" time="0.046254" steps="41001"/></proof>
   </goal>
   <goal name="bfs&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.060226" steps="53465"/></proof>
+  <proof prover="6"><result status="valid" time="0.060226" steps="51131"/></proof>
   </goal>
   <goal name="bfs&#39;vc.9" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.041998" steps="57925"/></proof>
+  <proof prover="6"><result status="valid" time="0.041998" steps="55293"/></proof>
   </goal>
   <goal name="bfs&#39;vc.10" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.040037" steps="53168"/></proof>
+  <proof prover="6"><result status="valid" time="0.040037" steps="51000"/></proof>
   </goal>
   <goal name="bfs&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.045103" steps="47740"/></proof>
+  <proof prover="6"><result status="valid" time="0.045103" steps="45830"/></proof>
   </goal>
   <goal name="bfs&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.043727" steps="50795"/></proof>
+  <proof prover="6"><result status="valid" time="0.043727" steps="48600"/></proof>
   </goal>
   <goal name="bfs&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.055946" steps="61833"/></proof>
+  <proof prover="6"><result status="valid" time="0.055946" steps="58823"/></proof>
   </goal>
   <goal name="bfs&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.040194" steps="50571"/></proof>
+  <proof prover="6"><result status="valid" time="0.040194" steps="48477"/></proof>
   </goal>
   <goal name="bfs&#39;vc.15" expl="out of loop bounds" proved="true">
-  <proof prover="3"><result status="valid" time="0.029725" steps="47983"/></proof>
+  <proof prover="6"><result status="valid" time="0.029725" steps="46119"/></proof>
   </goal>
   <goal name="bfs&#39;vc.16" expl="postcondition" proved="true">
   <transf name="case" proved="true" arg1="(path start t n)">
@@ -96,26 +96,26 @@
     <goal name="bfs&#39;vc.16.0.0" expl="asserted formula" proved="true">
     <transf name="apply" proved="true" arg1="shorter_path" arg2="with" arg3="t,n">
      <goal name="bfs&#39;vc.16.0.0.0" expl="apply premises" proved="true">
+     <proof prover="0"><result status="valid" time="0.012880" steps="12"/></proof>
      <proof prover="1"><result status="valid" time="0.091121" steps="9185"/></proof>
-     <proof prover="2"><result status="valid" time="0.110920" steps="5900"/></proof>
-     <proof prover="3"><result status="valid" time="0.017973" steps="3463"/></proof>
-     <proof prover="4"><result status="valid" time="0.012880" steps="12"/></proof>
+     <proof prover="5"><result status="valid" time="0.110920" steps="4510"/></proof>
+     <proof prover="6"><result status="valid" time="0.017973" steps="3463"/></proof>
      </goal>
      <goal name="bfs&#39;vc.16.0.0.1" expl="apply premises" proved="true">
+     <proof prover="0"><result status="valid" time="0.015100" steps="14"/></proof>
      <proof prover="1"><result status="valid" time="0.109160" steps="10088"/></proof>
-     <proof prover="2"><result status="valid" time="0.129142" steps="6592"/></proof>
-     <proof prover="3"><result status="valid" time="0.039671" steps="40889"/></proof>
-     <proof prover="4"><result status="valid" time="0.015100" steps="14"/></proof>
+     <proof prover="5"><result status="valid" time="0.129142" steps="5121"/></proof>
+     <proof prover="6"><result status="valid" time="0.039671" steps="39087"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="bfs&#39;vc.16.0.1" expl="true case (postcondition)" proved="true">
-    <proof prover="3"><result status="valid" time="0.039363" steps="44721"/></proof>
+    <proof prover="6"><result status="valid" time="0.039363" steps="42821"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="bfs&#39;vc.16.1" expl="false case (postcondition)" proved="true">
-   <proof prover="3"><result status="valid" time="0.022479" steps="3469"/></proof>
+   <proof prover="6"><result status="valid" time="0.022479" steps="3469"/></proof>
    </goal>
   </transf>
   </goal>
@@ -126,36 +126,36 @@
  <goal name="dfs&#39;vc" expl="VC for dfs" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="dfs&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.077800" steps="11261"/></proof>
+  <proof prover="6"><result status="valid" time="0.077800" steps="10865"/></proof>
   </goal>
   <goal name="dfs&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.048443" steps="10873"/></proof>
+  <proof prover="6"><result status="valid" time="0.048443" steps="10475"/></proof>
   </goal>
   <goal name="dfs&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.027507" steps="902"/></proof>
+  <proof prover="6"><result status="valid" time="0.027507" steps="902"/></proof>
   </goal>
   <goal name="dfs&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.041510" steps="4950"/></proof>
+  <proof prover="6"><result status="valid" time="0.041510" steps="4520"/></proof>
   </goal>
   <goal name="dfs&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051158" steps="10890"/></proof>
+  <proof prover="6"><result status="valid" time="0.051158" steps="10468"/></proof>
   </goal>
   <goal name="dfs&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.056966" steps="12462"/></proof>
+  <proof prover="6"><result status="valid" time="0.056966" steps="12022"/></proof>
   </goal>
   <goal name="dfs&#39;vc.6" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.017269" steps="12681"/></proof>
+  <proof prover="6"><result status="valid" time="0.017269" steps="12207"/></proof>
   </goal>
   <goal name="dfs&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.059360" steps="14616"/></proof>
+  <proof prover="6"><result status="valid" time="0.059360" steps="13990"/></proof>
   </goal>
   <goal name="dfs&#39;vc.8" expl="VC for dfs" proved="true">
-  <proof prover="3"><result status="valid" time="0.052279" steps="11574"/></proof>
+  <proof prover="6"><result status="valid" time="0.052279" steps="11150"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="dfs_max&#39;vc" expl="VC for dfs_max" proved="true">
- <proof prover="3"><result status="valid" time="0.045978" steps="12293"/></proof>
+ <proof prover="6"><result status="valid" time="0.045978" steps="11727"/></proof>
  </goal>
 </theory>
 </file>

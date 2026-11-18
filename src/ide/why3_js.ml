@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -16,11 +16,11 @@ module Js = Js_of_ocaml.Js
 module JSU = Js_of_ocaml.Js.Unsafe
 module Dom = Js_of_ocaml.Dom
 module Form = Js_of_ocaml.Form
-module Firebug = Js_of_ocaml.Firebug
+module Console = Js_of_ocaml.Console
 module Dom_html = Js_of_ocaml.Dom_html
 module XmlHttpRequest = Js_of_ocaml.XmlHttpRequest
 
-let log s = ignore (Firebug.console ## log (Js.string s))
+let log s = ignore (Console.console ## log (Js.string s))
 
 let get_opt o = Js.Option.get o (fun () -> assert false)
 
@@ -378,17 +378,19 @@ module Panel =
       main_panel ##. onmouseup := Dom.handler (fun _ -> mouse_down := false; Js._false);
       main_panel ##. onmousemove :=
 	Dom.handler (fun e ->
-		     if !mouse_down then begin
-			 let offset =
-			   (e ##. clientX) - (main_panel ##. offsetLeft)
-			 in
-			 let offset = Js.string ((string_of_int offset) ^ "px") in
-			 let edit_style = task_list_container ##. style in
-			 JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
-			     JSU.(set edit_style (Js.string "flexBasis") offset);
-			     Js._false
-		       end
-		     else Js._true)
+	    if !mouse_down then
+              begin
+                let offset =
+                  Int32.to_int (Js.to_int32 (e ##. clientX)) -
+                  main_panel ##. offsetLeft
+	        in
+                let offset = Js.string ((string_of_int offset) ^ "px") in
+                let edit_style = task_list_container ##. style in
+                JSU.(set edit_style (Js.string "flexGrow") (Js.string "0"));
+                JSU.(set edit_style (Js.string "flexBasis") offset);
+                Js._false
+              end
+            else Js._true)
   end
 
 
@@ -498,8 +500,8 @@ let onclick_do_something id =
         with Not_found -> (sendRequest (Get_task id); "")
       in
       select_task id span pretty;
-      let x = max 0 ((e ##.clientX) - 2) in
-      let y = max 0 ((e ##.clientY) - 2) in
+      let x = max 0 (Int32.to_int (Js.to_int32 (e ##.clientX)) - 2) in
+      let y = max 0 (Int32.to_int (Js.to_int32 (e ##.clientY)) - 2) in
       ContextMenu.show_at x y)
 
 let update_status st id =

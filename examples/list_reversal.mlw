@@ -1,0 +1,403 @@
+
+(** {1 List Reversal using Separation Arithmetic}
+
+    This is a companion file to
+    {h <a href="https://hal.science/hal-05132556v2">this paper</a>}:
+
+     When Separation Arithmetic is Enough
+     Jean-Christophe Filliâtre, Andrei Paskevich, Olivier Danvy
+     iFM 2025
+*)
+
+(** {2 Memory model for mutable lists} *)
+
+module Mlist
+
+  use int.Int
+  use map.Map
+
+  type lst
+
+  val eq_lst (l1 l2: lst) : bool
+    ensures { result <-> l1 = l2 }
+
+  val constant nil : lst
+
+  type elt
+
+  type mem = {
+    mutable mcar: lst -> elt;
+    mutable mcdr: lst -> lst;
+  }
+
+  val mem: mem
+
+  val car (p: lst) : elt
+    requires { p <> nil }
+    ensures  { result = mem.mcar p }
+
+  val set_car (p: lst) (v: elt) : unit
+    requires { p <> nil }
+    writes   { mem.mcar }
+    ensures  { mem.mcar = (old mem.mcar)[p <- v] }
+
+  val cdr (p: lst) : lst
+    requires { p <> nil }
+    ensures  { result = mem.mcdr p }
+
+  val set_cdr (p: lst) (v: lst) : unit
+    requires { p <> nil }
+    writes   { mem.mcdr }
+    ensures  { mem.mcdr = (old mem.mcdr)[p <- v] }
+
+  type list_shape = {
+    cell : int -> lst;
+    size : int;
+  }
+  invariant { 0 <= size }
+  invariant { forall i. 0 <= i <  size -> cell i <> nil }
+  invariant { forall i. 0 <= i <  size ->
+              forall j. 0 <= j <= size -> i <> j -> cell i <> cell j }
+
+  (* A linked-list with `size` cells:
+
+             0           1                size-1       size
+         +---+---+   +---+---+           +---+---+
+     cell|   | o---->|   | o----> ... -->|   | o---->   q
+         +---+---+   +---+---+           +---+---+
+
+     The last cell (at position `size-1`) has a `cdr` field
+     with value `cell[size]`, which may or may not be `nil`.
+
+     This way, we can accomodate a nil-terminated list or list
+     segments with the same definitions.
+  *)
+
+  (* left-to-right list from `lo` inclusive to `hi` inclusive *)
+  predicate listLR (ls: list_shape) (m: mem) (p: lst) (lo hi: int) (q: lst) =
+    0 <= lo <= hi <= ls.size /\ p = ls.cell lo /\ q = ls.cell hi /\
+    forall i. lo <= i < hi -> m.mcdr (ls.cell i) = ls.cell (i+1)
+
+  (* right-to-left list from `k` excluded to `0` inclusive *)
+  predicate listRL (ls: list_shape) (m: mem) (p: lst) (k: int) =
+    (k = 0 /\ p = nil) \/
+    (0 < k <= ls.size /\ p = ls.cell (k-1) /\ m.mcdr (ls.cell 0) = nil /\
+      forall i. 0 < i < k -> m.mcdr (ls.cell i) = ls.cell (i-1))
+
+  predicate frame (ls: list_shape) (m1 m2: mem) =
+    forall p. (forall i. 0 <= i < ls.size -> p <> ls.cell i) ->
+      m1.mcar p = m2.mcar p && m1.mcdr p = m2.mcdr p
+
+end
+
+(** {2 Traditional list reversal} *)
+
+module ListReversal
+
+  use int.Int
+  use Mlist
+
+  (* with a while loop *)
+  let list_reversal_loop (ghost ls: list_shape) (p: lst) : (r: lst)
+    requires { listLR ls mem p 0 ls.size nil }
+    writes   { mem.mcdr }
+    ensures  { listRL ls mem r   ls.size     }
+    ensures  { frame ls mem (old mem) }
+  = let ref l = p in
+    let ghost ref i = 0 in
+    let ref r = nil in
+    while not eq_lst l nil do
+      invariant { listLR ls mem l i ls.size nil }
+      invariant { listRL ls mem r i             }
+      invariant { frame ls mem (old mem) }
+      variant   { ls.size - i }
+      let tmp = l in
+      l <- cdr l;
+      ghost (i <- i + 1);
+      set_cdr tmp r;
+      r <- tmp
+    done;
+    return r
+
+  (* with a recursive function *)
+  let rec aux (ghost ls: list_shape) (ghost i) (r: lst) (l: lst) : lst
+    requires { listLR ls mem l i ls.size nil }
+    requires { listRL ls mem r i             }
+    writes   { mem.mcdr }
+    ensures  { listRL ls mem result ls.size  }
+    ensures  { frame ls mem (old mem) }
+    variant  { ls.size - i }
+  = if eq_lst l nil then r else let n = cdr l in set_cdr l r; aux ls (i+1) l n
+
+  predicate is_list (mem: mem) (p: lst) (ls: list_shape) =
+    listLR ls mem p 0 ls.size nil
+
+  function reverse (size: int) (m: int -> 'a) : int -> 'a =
+    fun i -> m (if 0 <= i < size then size-1-i else i)
+
+  let ghost function reverse_shape (ls: list_shape) : list_shape =
+    { ls with cell = reverse ls.size ls.cell }
+
+  let list_reversal (p: lst) (ghost ls: list_shape) : (r: lst)
+    requires { is_list mem p ls }
+    writes   { mem.mcdr }
+    ensures  { is_list mem r (reverse_shape ls) }
+    ensures  { frame ls mem (old mem) }
+  = aux (ghost ls) (ghost 0) nil p
+
+end
+
+(** {2 Traditional specification using logical algebraic lists}
+
+  Here we show the equivalence between the specifcation above using
+  separation arithmetic and a traditional specifcation using an algebraic
+  data type for lists + a recursive predicate `linked_list`.
+*)
+
+module ListSpec
+
+  use int.Int
+  use Mlist
+  use list.List
+  use list.Length
+
+  function footprint (l: list lst) : lst -> bool
+  = match l with
+    | Nil      ->
+        (fun _ -> false)
+    | Cons h t ->
+        let ft = footprint t in
+        (fun p -> p = h || ft p)
+    end
+
+  predicate linked_list (mem: mem) (p: lst) (l: list lst) (q: lst)
+  = match l with
+    | Nil ->
+        p = q
+    | Cons h t ->
+        p <> nil /\
+        p = h /\
+        not (footprint t p) /\
+        p <> q /\
+        linked_list mem (mem.mcdr p) t q
+    end
+
+  let rec ghost shape_of_list (p: lst) (l: list lst) (q: lst) : (ls: list_shape)
+    requires { linked_list mem p l q }
+    variant  { l }
+    ensures  { ls.size = length l }
+    ensures  { listLR ls mem p 0 ls.size q }
+    ensures  { forall x. footprint l x <->
+                 exists i. 0 <= i < ls.size /\ x = ls.cell i }
+  = match l with
+    | Nil ->
+        { cell = (fun _ -> p); size = 0; }
+    | Cons _ t ->
+        let n = cdr p in
+        let ls = shape_of_list n t q in
+        { cell = (fun i -> if i = 0 then p else ls.cell (i - 1));
+          size = ls.size + 1 }
+    end
+
+  predicate list_frame (l: list lst) (m1 m2: mem) =
+    forall p. not footprint l p ->
+      m1.mcar p = m2.mcar p && m1.mcdr p = m2.mcdr p
+
+  use list.Length
+  use list.Reverse
+  use list.Append
+
+  let rec lemma footprint_append (l1 l2: list lst)
+    ensures { forall x. footprint (l1++l2) x
+                <-> (footprint l1 x || footprint l2 x) }
+    variant { l1 }
+  = match l1 with
+    | Nil       -> ()
+    | Cons _ t1 -> footprint_append t1 l2
+    end
+
+  let rec lemma footprint_reverse (l: list lst)
+    ensures { forall x. footprint l x <-> footprint (reverse l) x }
+    variant { l }
+  = match l with
+    | Nil      -> ()
+    | Cons _ t -> footprint_reverse t
+    end
+
+  let rec lemma linked_list_append (mem: mem) (p q r: lst) (l1 l2: list lst)
+    requires { forall x. footprint l1 x -> x <> r }
+    requires { forall x. footprint l1 x -> footprint l2 x -> false }
+    requires { linked_list mem p l1         q }
+    requires { linked_list mem q l2         r }
+    variant  { l1 }
+    ensures  { linked_list mem p (l1 ++ l2) r }
+  = match l1 with
+    | Nil       -> ()
+    | Cons _ t1 -> linked_list_append mem (mem.mcdr p) q r t1 l2
+    end
+
+  let lemma reverse_list_of_shape (mem1 mem2: mem)
+    (ls: list_shape) (p r: lst) (l: list lst)
+    requires { ls.size = length l }
+    requires { linked_list mem1 p l nil }
+    requires { listLR ls mem1 p 0 ls.size nil }
+    requires { listRL ls mem2 r   ls.size     }
+    requires { forall x. footprint l x <->
+                 exists i. 0 <= i < ls.size /\ x = ls.cell i }
+    ensures  { linked_list mem2 r (reverse l) nil }
+  = let rec rev (i: int) (l: list lst) : unit
+      requires { 0 <= i <= ls.size } requires { ls.size - i = length l }
+      requires { linked_list mem1 (ls.cell i) l nil }
+      requires { listLR ls mem1 (ls.cell i) i ls.size nil }
+      variant  { l }
+      ensures  { linked_list mem2 r (reverse l)
+                   (if i = 0 then nil else ls.cell (i-1)) }
+      ensures  { forall x. footprint (reverse l) x <->
+                   exists j. i <= j < ls.size /\ x = ls.cell j }
+    = match l with
+      | Nil -> ()
+      | Cons x t ->
+          assert { x = ls.cell i };
+          assert { linked_list mem2 x (Cons x Nil)
+                     (if i = 0 then nil else ls.cell (i-1)) };
+          rev (i+1) t;
+          linked_list_append mem2 r x (if i = 0 then nil else ls.cell (i-1))
+            (reverse t) (Cons x Nil)
+      end
+    in
+    rev 0 l
+
+  use ListReversal as LR
+
+  let list_reversal_good_spec (ghost l: list lst) (p: lst) : (r: lst)
+    requires { linked_list mem p l           nil }
+    ensures  { linked_list mem r (reverse l) nil }
+    ensures  { list_frame l mem (old mem) }
+  = let mem0 = pure {mem} in
+    let ghost ls = shape_of_list p l nil in
+    let r = LR.aux (ghost ls) (ghost 0) nil p in
+    reverse_list_of_shape mem0 mem ls p r l;
+    r
+
+end
+
+(** {2 Reversing values in a singly linked list}
+
+  Instead of inversing the `cdr` fields, one can reverse a list by
+  swapping the content of the `car` fields (the first one with the last one,
+  the second one with the last but one, etc.), as follows:
+
+  - Traverse the list at speed 1 and 2 (tortoise and hare), while reversing
+    the first half in the process.
+
+  - When the hare reaches the end of the list, the tortoise is located
+    in the middle of the list, and we can traverse both halves,
+    towards both ends, swapping the `car` fields and restoring the
+    first half.
+
+  See the paper for more details.
+*)
+
+module ValueReversal
+
+  use int.Int
+  use Mlist
+
+  (** the contents of the `car` fields in ls[k..size-k[ have been swapped *)
+  predicate reversal (ls: list_shape) (m1 m2: mem) (k: int) =
+    forall i. 0 <= i < ls.size ->
+      (i < k \/ ls.size - k <= i ->
+        m1.mcar (ls.cell i) = m2.mcar (ls.cell i)) /\
+      (k <= i < ls.size - k ->
+        m1.mcar (ls.cell i) = m2.mcar (ls.cell (ls.size - 1 - i)))
+
+  scope LinearSpace
+
+    let rec tortoise_hare_and_back_again
+      (ghost ls: list_shape) (ghost k: int) (sp fp qp: lst) : lst
+      requires { listLR ls mem sp k ls.size qp }
+      requires { 0 <= k <= 2*k <= ls.size      }
+      requires { ls.cell (2*k) = fp }
+      variant  { ls.size - k }
+      ensures  { ls.cell (ls.size - k) = result }
+      ensures  { reversal ls mem (old mem) k }
+      ensures  { frame ls mem (old mem) }
+    =
+      if eq_lst fp qp then
+        sp
+      else if eq_lst fp.cdr qp then
+        sp.cdr
+      else begin
+        let np = tortoise_hare_and_back_again ls (k+1) sp.cdr fp.cdr.cdr qp in
+        let tmp = sp.car in set_car sp np.car; set_car np tmp;
+        np.cdr
+      end
+
+    let value_reverse (ghost ls: list_shape) (sp qp: lst) : unit
+      requires { listLR ls mem sp 0 ls.size qp }
+      writes   { mem.mcar }
+      ensures  { listLR ls mem sp 0 ls.size qp }
+      ensures  { forall i. 0 <= i < ls.size ->
+                 mem.mcar (ls.cell i) = old mem.mcar (ls.cell (ls.size-1-i)) /\
+                 mem.mcdr (ls.cell i) = old mem.mcdr (ls.cell i) }
+      ensures  { frame ls mem (old mem) }
+    =
+      let _ = tortoise_hare_and_back_again ls 0 sp sp qp in ()
+
+  end
+
+  scope ConstantSpace
+
+    let rec back_again (ghost ls: list_shape)
+      (ghost omem: {mem}) (ghost k: int) (bp sp np: lst) : unit
+      requires { listLR ls mem sp k ls.size (ls.cell ls.size) }
+      requires { listRL ls mem bp k }
+      requires { k <= ls.size - k }
+      requires { ls.cell (ls.size - k) = np }
+      requires { reversal ls mem omem k }
+      variant  { k }
+      ensures  { listLR ls mem (ls.cell 0) 0 ls.size (ls.cell ls.size) }
+      ensures  { reversal ls mem omem 0 }
+      ensures  { frame ls mem (old mem) }
+    =
+      if not eq_lst bp nil then begin
+        let tmp = bp.car in set_car bp np.car; set_car np tmp;
+        let nbp = bp.cdr in set_cdr bp sp;
+        back_again ls omem (k-1) nbp bp np.cdr
+      end
+
+    let rec tortoise_hare (ghost ls: list_shape)
+      (ghost k: int) (bp sp fp qp: lst) : unit
+      requires { listLR ls mem sp k ls.size qp }
+      requires { listRL ls mem bp k }
+      requires { 2*k <= ls.size }
+      requires { ls.cell (2*k) = fp }
+      variant  { ls.size - k }
+      ensures  { listLR ls mem (ls.cell 0) 0 ls.size qp }
+      ensures  { reversal ls mem (old mem) 0 }
+      ensures  { frame ls mem (old mem) }
+    =
+      if eq_lst fp qp then
+        back_again ls (pure {mem}) k bp sp sp
+      else if eq_lst fp.cdr qp then
+        back_again ls (pure {mem}) k bp sp sp.cdr
+      else begin
+        let nfp = fp.cdr.cdr in
+        let nsp = sp.cdr in set_cdr sp bp;
+        tortoise_hare ls (k+1) sp nsp nfp qp
+      end
+
+    let value_reverse (ghost ls: list_shape) (sp qp: lst) : unit
+      requires { listLR ls mem sp 0 ls.size qp }
+      writes   { mem }
+      ensures  { listLR ls mem sp 0 ls.size qp }
+      ensures  { forall i. 0 <= i < ls.size ->
+                 mem.mcar (ls.cell i) = old mem.mcar (ls.cell (ls.size-1-i)) /\
+                 mem.mcdr (ls.cell i) = old mem.mcdr (ls.cell i) }
+      ensures  { frame ls mem (old mem) }
+    =
+      tortoise_hare ls 0 nil sp sp qp
+
+  end
+
+end

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,11 +24,11 @@ let lift kind =
     | Teps fb ->
         let fv = Mvs.keys (t_vars t) in
         let x, f = t_open_bound fb in
-        let acc, f = form acc f in
+        let (cache,decls), f = form acc f in
         let tys = List.map (fun x -> x.vs_ty) fv in
         let xs = Ident.id_derive "epsilon" x.vs_name in
         let xl = create_fsymbol xs tys x.vs_ty in
-        let acc = add_decl acc (Decl.create_param_decl xl) in
+        let decls = add_decl decls (Decl.create_param_decl xl) in
         let axs =
           Decl.create_prsymbol (Ident.id_derive ("epsilon_def") x.vs_name) in
         let xlapp = t_app xl (List.map t_var fv) t.t_ty in
@@ -41,19 +41,19 @@ let lift kind =
                    (t_subst_single x xlapp f))
           | _ -> t_subst_single x xlapp f
         in
-        let acc = add_decl acc (Decl.create_prop_decl Decl.Paxiom axs f) in
-        acc, xlapp
+        let decls = add_decl decls (Decl.create_prop_decl Decl.Paxiom axs f) in
+        (cache,decls), xlapp
     | _ -> TermTF.t_map_fold term form acc t
   and form acc f = TermTF.t_map_fold term form acc f in
   fun th acc ->
     let th = th.task_decl in
     match th.td_node with
     | Decl d ->
-        let acc, d = Decl.DeclTF.decl_map_fold term form acc d in
-        add_decl acc d
-    | _ -> add_tdecl acc th
+        let (cache,decls), d = Decl.DeclTF.decl_map_fold term form acc d in
+        (cache,add_decl decls d)
+    | _ -> let cache,decls = acc in (cache,add_tdecl decls th)
 
-let lift_epsilon kind = Trans.fold (lift kind) None
+let lift_epsilon kind = Trans.fold (lift kind) (Mterm_strict.empty,None)
 
 let meta_epsilon = Theory.register_meta_excl "lift_epsilon" [MTstring]
   ~desc:"Specify@ whether@ the@ existence@ of@ a@ witness@ for@ the@ \
@@ -71,7 +71,8 @@ let lift_epsilon = Trans.on_meta_excl meta_epsilon
       | Some [MAstr "implied"] | None -> Implied
       | _ -> failwith "lift_epsilon accepts only 'implicit' and 'implied'"
     in
-    lift_epsilon kind)
+    Trans.bind (lift_epsilon kind)
+    (fun (_,decls) -> Trans.return decls))
 
 let () = Trans.register_transform "lift_epsilon" lift_epsilon
   ~desc:"Move@ epsilon-terms@ into@ separate@ function@ definitions."

@@ -1,0 +1,6 @@
+(ocamllex driver_lexer sexp)
+
+(menhir
+ (modules driver_parser)
+ (infer false)
+ (flags --table --strict --explain))

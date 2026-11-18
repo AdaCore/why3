@@ -362,8 +362,8 @@ First let us add formula 1 above as a goal:
 
 .. literalinclude:: ../examples/use_api/logic.ml
    :language: ocaml
-   :start-after: BEGIN{buildth1}
-   :end-before: END{buildth1}
+   :start-after: BEGIN{buildth2}
+   :end-before: END{buildth2}
 
 Note that we reused the goal identifier
 ``goal_id1`` that we already defined to create task 1 above.

@@ -1,14 +1,14 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
 #  on linking described in file LICENSE.                           #
 ####################################################################
 
-AC_INIT([Why3], [1.8.2+git])
+AC_INIT([Why3], [1.9.0])
 
 # verbosemake
 
@@ -312,14 +312,23 @@ if test "$OCAMLDOC" != true ; then
     fi
 fi
 
+AC_CHECK_PROG(DUNE,dune,dune,no)
+if test "$DUNE" = no ; then
+   AC_MSG_ERROR([cannor find dune.])
+fi
+
+DUNEVERSION=`$DUNE --version`
+AX_VERSION_GE([$DUNEVERSION], 2.9.0, [],
+  [AC_MSG_ERROR([You need Dune 2.9.0 or higher.])])
+
 AC_CHECK_PROG(MENHIR,menhir,menhir,no)
 if test "$MENHIR" = no ; then
    AC_MSG_ERROR([cannot find menhir.])
 fi
 
 MENHIRVERSION=`$MENHIR --version | sed -n -e 's,.*version *\(.*\)$,\1,p'`
-AX_VERSION_GE([$MENHIRVERSION], 20170418, [],
-  [AC_MSG_ERROR([You need Menhir 20170418 or higher.])])
+AX_VERSION_GE([$MENHIRVERSION], 20200211, [],
+  [AC_MSG_ERROR([You need Menhir 20200211 or higher.])])
 
 found_ocamlfind=no
 if test "$enable_ocamlfind" != no; then
@@ -384,12 +393,20 @@ else
 fi
 
 # ppx
+DEBUGOPTIMPPX="(no_preprocessing)"
 if test "$enable_ocamlfind" = yes; then
   AC_MSG_CHECKING([for ppxlib using ocamlfind])
   PPXLIB=$($OCAMLFIND query ppxlib 2> /dev/null | tr -d '\r')
   if test -n "$PPXLIB"; then
-    AC_MSG_RESULT([yes])
-    enable_ppx=yes
+    PPXLIBVERSION=$($OCAMLFIND query -format "%v" ppxlib 2> /dev/null | tr -d '\r')
+    AX_VERSION_GE([$PPXLIBVERSION], 0.33.0, [
+      AC_MSG_RESULT([yes])
+      DEBUGOPTIMPPX="(pps ppx_debug_optim)"
+      enable_ppx=yes
+    ], [
+      AC_MSG_RESULT([no (version $PPXLIBVERSION is too old)])
+      enable_ppx=no
+      reason_ppx=" (ppxlib >= 0.33 not found)"])
   else
     AC_MSG_RESULT([no])
     enable_ppx=no
@@ -466,6 +483,8 @@ if test "$enable_bddinfer" = yes; then
       echo "ocamlfind found apron in $INFERINCLUDE"
       INFERLIB="apron"
       INFERPKG="zarith apron apron.polkaMPQ"
+      INFERLIBDUNE="apron apron.polkaMPQ"
+      BDDINFER="bddinfer"
    else
       enable_bddinfer=no
       reason_bddinfer=" (apron not found)"
@@ -539,9 +558,11 @@ fi
 
 if test "$enable_zip" != no; then
    ZIPLIB=zip
+   ZIPLIBDUNE=camlzip
    enable_zip=yes
 else
    ZIPLIB=
+   ZIPLIBDUNE=
    ZIPINCLUDE=
 fi
 
@@ -887,6 +908,7 @@ if test "$enable_statmemprof" = yes; then
 fi
 
 # ppx_sexp_conv (only with ocamlfind)
+SEXPLIBPPXDUNE="(no_preprocessing)"
 SEXPLIBPPX=
 SEXPLIB=
 if test "$enable_sexp" = no; then
@@ -913,6 +935,7 @@ else
         done
     fi
     if test "$enable_sexp" = yes; then
+        SEXPLIBPPXDUNE="(pps ppx_sexp_conv)"
         SEXPLIBPPX="ppx_sexp_conv"
         SEXPLIB="sexplib"
     fi
@@ -922,6 +945,7 @@ fi
 
 enable_coq_support=yes
 enable_coq_fp_libs=yes
+enable_coq_interval=yes
 
 coq_compat_version=
 
@@ -955,8 +979,8 @@ if test "$enable_coq_support" = yes; then
       if test "$COQNUMVERSION" -ge 817; then
          COQFLAGS="-w deprecated-instance-without-locality,deprecated-hint-without-locality"
       fi
-      if test "$COQNUMVERSION" -gt 820; then
-         AC_MSG_WARN([unrecognized Coq version, assuming Coq 8.20])
+      if test "$COQNUMVERSION" -gt 901; then
+         AC_MSG_WARN([unrecognized Coq version, assuming Rocq 9.1])
          COQNUMVERSION=820
       fi
       coq_compat_version="COQ$COQNUMVERSION"
@@ -980,6 +1004,7 @@ fi
 if test "$enable_coq_support" = no; then
    enable_coq_libs=no
    enable_coq_fp_libs=no
+   enable_coq_interval=no
    COQVERSION=
 else
    enable_coq_libs=yes
@@ -995,6 +1020,18 @@ if test "$enable_coq_fp_libs" = yes; then
      [ AC_MSG_RESULT(no)
        enable_coq_fp_libs=no
        reason_coq_fp_libs=" (Flocq >= 3.4 not found)" ])
+   rm -f conftest.v conftest.vo conftest.err
+fi
+
+if test "$enable_coq_interval" = yes; then
+   AC_MSG_CHECKING([for Coq-interval])
+   AS_IF(
+     [ echo "Require Import Interval.Tactic." > conftest.v
+       "$COQC" conftest.v > conftest.err ],
+     [ AC_MSG_RESULT(yes) ],
+     [ AC_MSG_RESULT(no)
+       enable_coq_interval=no
+       reason_coq_interval=" (Coq-interval not found)" ])
    rm -f conftest.v conftest.vo conftest.err
 fi
 
@@ -1189,6 +1226,8 @@ AC_SUBST(enable_ppx)
 AC_SUBST(enable_sexp)
 AC_SUBST(SEXPLIB)
 AC_SUBST(SEXPLIBPPX)
+AC_SUBST(SEXPLIBPPXDUNE)
+AC_SUBST(DEBUGOPTIMPPX)
 
 AC_SUBST(MLMPFR)
 AC_SUBST(enable_mpfr)
@@ -1201,10 +1240,13 @@ AC_SUBST(enable_bddinfer)
 AC_SUBST(INFERINCLUDE)
 AC_SUBST(INFERLIB)
 AC_SUBST(INFERPKG)
+AC_SUBST(INFERLIBDUNE)
+AC_SUBST(BDDINFER)
 
 AC_SUBST(enable_zip)
 AC_SUBST(ZIPINCLUDE)
 AC_SUBST(ZIPLIB)
+AC_SUBST(ZIPLIBDUNE)
 
 AC_SUBST(MENHIRINCLUDE)
 
@@ -1214,6 +1256,7 @@ AC_SUBST(RELIB)
 
 AC_SUBST(enable_coq_libs)
 AC_SUBST(enable_coq_fp_libs)
+AC_SUBST(enable_coq_interval)
 AC_SUBST(coq_compat_version)
 
 AC_SUBST(COQC)
@@ -1265,20 +1308,28 @@ AC_SUBST(JAVA)
 # Finally create the Makefile from Makefile.in
 AC_CONFIG_FILES(Makefile)
 AC_CONFIG_FILES(src/config.sh)
-AC_CONFIG_FILES(lib/why3/META)
-AC_CONFIG_FILES(.merlin)
+AC_CONFIG_FILES(src/dune)
+AC_CONFIG_FILES(src/util/dune)
+AC_CONFIG_FILES(src/why3deps/dune)
 AC_CONFIG_FILES(src/jessie/Makefile)
 AC_CONFIG_FILES(src/jessie/.merlin)
+AC_CONFIG_FILES(bin/dune)
+AC_CONFIG_FILES(lib/plugins/dune)
+AC_CONFIG_FILES(plugins/cfg/dune)
 AC_CONFIG_FILES(lib/coq/version lib/pvs/version)
 AC_CONFIG_FILES(bench/java/Makefile)
 AC_CONFIG_FILES(doc/javaexamples/Makefile)
 AC_CONFIG_COMMANDS([chmod],
 chmod a-w Makefile src/jessie/Makefile;
 chmod a-w src/config.sh;
-chmod a-w lib/why3/META;
-chmod a-w .merlin;
+chmod a-w src/dune;
+chmod a-w src/util/dune;
+chmod a-w src/why3deps/dune;
 chmod a-w src/jessie/Makefile;
 chmod a-w src/jessie/.merlin;
+chmod a-w bin/dune;
+chmod a-w lib/plugins/dune;
+chmod a-w plugins/cfg/dune;
 chmod a-w lib/coq/version lib/pvs/version;
 chmod u+x src/config.sh)
 
@@ -1333,6 +1384,7 @@ if test "$enable_coq_support" = yes ; then
    echo "        Realization support : $enable_coq_libs$reason_coq_libs"
    if test "$enable_coq_libs" = yes ; then
       echo "            FP arithmetic   : $enable_coq_fp_libs$reason_coq_fp_libs"
+      echo "            Interval arith. : $enable_coq_interval$reason_coq_interval"
    fi
 fi
 echo "    PVS                     : $enable_pvs_support$reason_pvs_support"

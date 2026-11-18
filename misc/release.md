@@ -1,8 +1,8 @@
 # Making a release
 
 * assuming some variables
-  - `VERSION=1.8`
-  - `RELEASE=1.8.1`
+  - `VERSION=1.9`
+  - `RELEASE=1.9.0`
 
 * perform a sanity check
   - check the BTS: there should be no more open issues and MR in the milestone page
@@ -14,16 +14,16 @@
   - run `make update-doc-png` and check if some pictures need to be updated
   - run `make doc/latex/manual.pdf` and check the manual
   - run `make dist` and check the content of `distrib/why3-X.X.X.tar.gz`
-  - check `lib/why3/META.in` (in particular against `EXTPKGS` in `Makefile.in`)
   - update `opam/why3{,-ide,-coq}.opam` with correct dependencies on external packages
   - check the gallery, especially the new examples (see below)
   - run the manual job `trywhy3-extra` to build Alt-Ergo for TryWhy3
     if needed (see below) this is done by opening the pipeline on the
     gitlab site and manually click on the arrow on the right of the
-    job.
+    job. Take note of the job number to be used below as TRYWHY3_JOB
+      -> 8056216 for release 1.9.0
 
 * check/update authors and copyright
-  - update the content of the About dialog in `src/ide/gconfig.ml`
+  - update the content of the `about_dialog` window in `src/ide/gconfig.ml`
     around lines 680-700
   - update the `copyright` field in `doc/conf.py` around line 50
   - update `doc/foreword.rst`
@@ -36,6 +36,7 @@
   - or just move to it, `git checkout bugfix/v$VERSION`
   - update the first line of `configure.in` using `$RELEASE`
   - update the `version` and `release` fields in `doc/conf.py` around line 60
+  - update the `version` field in `dune-project`
   - add the release date to `CHANGES.md`
   - update the date in `doc/index.rst`
   - make a last commit

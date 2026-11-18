@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,7 +24,7 @@ type proof_attempt_status =
   | Detached (** parent goal has no task, is detached *)
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
-  | UpgradeProver of Whyconf.prover (** prover is upgraded *)
+  | UpgradeProver of Whyconf.prover * Whyconf.prover (** prover is upgraded *)
   | Removed of Whyconf.prover (** prover has been removed or upgraded *)
 
 val print_status : Format.formatter -> proof_attempt_status -> unit
@@ -388,6 +388,9 @@ val replay_print:
       (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list ->
         unit
 
+val set_time_factor : float -> unit
+(** factor applied to the time limits when replaying. Default is 2.0 *)
+
 val replay:
     valid_only:bool ->
     obsolete_only:bool ->
@@ -397,7 +400,7 @@ val replay:
     callback:(proofAttemptID -> proof_attempt_status -> unit) ->
     notification:notifier ->
     final_callback:
-      (bool ->
+      (proof_attempt_status list ->
        (proofNodeID * Whyconf.prover * Call_provers.resource_limits * report) list
        -> unit) -> any: Session_itp.any option ->
     unit

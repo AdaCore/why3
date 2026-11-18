@@ -1,0 +1,11 @@
+(ocamllex tptp_lexer)
+
+(menhir
+ (modules tptp_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(library
+ (name tptp)
+ (modules_without_implementation tptp_ast)
+ (libraries why3 menhirLib))

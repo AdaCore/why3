@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.3" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Eprover" version="2.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="specs.mlw"/>
 <theory name="VM_instr_spec" proved="true">
@@ -18,7 +18,7 @@
     <goal name="ifunf&#39;vc.0.0.0" expl="precondition" proved="true">
     <transf name="split_all_full" proved="true" >
      <goal name="ifunf&#39;vc.0.0.0.0" expl="precondition" proved="true">
-     <proof prover="2"><result status="valid" time="0.170000"/></proof>
+     <proof prover="6"><result status="valid" time="0.170000"/></proof>
      </goal>
     </transf>
     </goal>
@@ -27,13 +27,13 @@
   </transf>
   </goal>
   <goal name="ifunf&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="14"/></proof>
   </goal>
   <goal name="ifunf&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="14"/></proof>
   </goal>
   <goal name="ifunf&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="14"/></proof>
   </goal>
  </transf>
  </goal>
@@ -43,16 +43,16 @@
   <proof prover="3"><result status="valid" time="0.210000" steps="26534"/></proof>
   </goal>
   <goal name="iconstf&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="145"/></proof>
+  <proof prover="1"><result status="valid" time="0.080000" steps="145"/></proof>
   </goal>
   <goal name="iconstf&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="24"/></proof>
   </goal>
   <goal name="iconstf&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="24"/></proof>
   </goal>
   <goal name="iconstf&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="50"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
@@ -62,40 +62,40 @@
   <proof prover="3"><result status="valid" time="0.240000" steps="26434"/></proof>
   </goal>
   <goal name="ivarf&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.070000" steps="161"/></proof>
+  <proof prover="1"><result status="valid" time="0.070000" steps="161"/></proof>
   </goal>
   <goal name="ivarf&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="26"/></proof>
   </goal>
   <goal name="ivarf&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="26"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="26"/></proof>
   </goal>
   <goal name="ivarf&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="51"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="51"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="create_binop&#39;vc" expl="VC for create_binop" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="create_binop&#39;vc.0" expl="precondition" proved="true">
-  <transf name="compute_specified" proved="true" >
+  <transf name="compute" proved="true" arg1="nodef">
    <goal name="create_binop&#39;vc.0.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="create_binop&#39;vc.0.0.0" expl="precondition" proved="true">
-    <proof prover="4"><result status="valid" time="0.040000" steps="118"/></proof>
+    <proof prover="1"><result status="valid" time="0.040000" steps="118"/></proof>
     </goal>
    </transf>
    </goal>
   </transf>
   </goal>
   <goal name="create_binop&#39;vc.1" expl="precondition" proved="true">
-  <transf name="compute_specified" proved="true" >
+  <transf name="compute" proved="true" arg1="nodef">
    <goal name="create_binop&#39;vc.1.0" expl="precondition" proved="true">
    <transf name="introduce_premises" proved="true" >
     <goal name="create_binop&#39;vc.1.0.0" expl="precondition" proved="true">
-    <transf name="compute_specified" proved="true" >
+    <transf name="compute" proved="true" arg1="nodef">
      <goal name="create_binop&#39;vc.1.0.0.0" expl="precondition" proved="true">
-     <proof prover="4"><result status="valid" time="0.050000" steps="136"/></proof>
+     <proof prover="1"><result status="valid" time="0.050000" steps="136"/></proof>
      </goal>
     </transf>
     </goal>
@@ -104,40 +104,40 @@
   </transf>
   </goal>
   <goal name="create_binop&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.060000" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.060000" steps="28"/></proof>
   </goal>
   <goal name="create_binop&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="28"/></proof>
   </goal>
   <goal name="create_binop&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="28"/></proof>
+  <proof prover="1"><result status="valid" time="0.050000" steps="28"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="iaddf&#39;vc" expl="VC for iaddf" proved="true">
- <proof prover="4"><result status="valid" time="0.040000" steps="120"/></proof>
+ <proof prover="1"><result status="valid" time="0.040000" steps="120"/></proof>
  </goal>
  <goal name="isubf&#39;vc" expl="VC for isubf" proved="true">
- <proof prover="4"><result status="valid" time="0.070000" steps="120"/></proof>
+ <proof prover="1"><result status="valid" time="0.070000" steps="120"/></proof>
  </goal>
  <goal name="imulf&#39;vc" expl="VC for imulf" proved="true">
- <proof prover="4"><result status="valid" time="0.070000" steps="201"/></proof>
+ <proof prover="1"><result status="valid" time="0.070000" steps="278"/></proof>
  </goal>
  <goal name="inil&#39;vc" expl="VC for inil" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="inil&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.080000"/></proof>
+  <proof prover="5"><result status="valid" time="0.229258" steps="17169"/></proof>
   </goal>
   <goal name="inil&#39;vc.1" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.030000" steps="11"/></proof>
+  <proof prover="1"><result status="valid" time="0.030000" steps="11"/></proof>
   </goal>
   <goal name="inil&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="11"/></proof>
+  <proof prover="1"><result status="valid" time="0.020000" steps="11"/></proof>
   </goal>
   <goal name="inil&#39;vc.3" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="inil&#39;vc.3.0" expl="postcondition" proved="true">
-   <proof prover="4"><result status="valid" time="0.040000" steps="23"/></proof>
+   <proof prover="1"><result status="valid" time="0.040000" steps="23"/></proof>
    </goal>
   </transf>
   </goal>
@@ -146,39 +146,39 @@
  <goal name="ibranchf&#39;vc" expl="VC for ibranchf" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="ibranchf&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="3.410000"/></proof>
+  <proof prover="3" timelimit="5"><result status="valid" time="0.167236" steps="27131"/></proof>
   </goal>
   <goal name="ibranchf&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.080000" steps="136"/></proof>
+  <proof prover="1"><result status="valid" time="0.080000" steps="136"/></proof>
   </goal>
   <goal name="ibranchf&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.060000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.060000" steps="24"/></proof>
   </goal>
   <goal name="ibranchf&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.060000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.060000" steps="24"/></proof>
   </goal>
   <goal name="ibranchf&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="50"/></proof>
+  <proof prover="1"><result status="valid" time="0.040000" steps="50"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="create_cjump&#39;vc" expl="VC for create_cjump" proved="true">
- <proof prover="4"><result status="valid" time="0.130000" steps="722"/></proof>
+ <proof prover="1"><result status="valid" time="0.130000" steps="722"/></proof>
  </goal>
  <goal name="ibeqf&#39;vc" expl="VC for ibeqf" proved="true">
- <proof prover="4"><result status="valid" time="0.090000" steps="171"/></proof>
+ <proof prover="1"><result status="valid" time="0.090000" steps="171"/></proof>
  </goal>
  <goal name="ibnef&#39;vc" expl="VC for ibnef" proved="true">
- <proof prover="4"><result status="valid" time="0.080000" steps="189"/></proof>
+ <proof prover="1"><result status="valid" time="0.080000" steps="189"/></proof>
  </goal>
  <goal name="iblef&#39;vc" expl="VC for iblef" proved="true">
- <proof prover="4"><result status="valid" time="0.070000" steps="159"/></proof>
+ <proof prover="1"><result status="valid" time="0.070000" steps="159"/></proof>
  </goal>
  <goal name="ibgtf&#39;vc" expl="VC for ibgtf" proved="true">
- <proof prover="4"><result status="valid" time="0.090000" steps="166"/></proof>
+ <proof prover="1"><result status="valid" time="0.090000" steps="167"/></proof>
  </goal>
  <goal name="isetvarf&#39;vc" expl="VC for isetvarf" proved="true">
- <proof prover="4"><result status="valid" time="0.160000" steps="529"/></proof>
+ <proof prover="1"><result status="valid" time="0.160000" steps="529"/></proof>
  </goal>
 </theory>
 </file>

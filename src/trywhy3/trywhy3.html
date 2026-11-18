@@ -128,17 +128,16 @@
 						    why3-icon"></span> Split (alt-space)</li>
 	<li id="why3-prove-menu-entry"><span class="fas fa-magic
 						    why3-icon"></span>
-						    Prove (default) </li>
+	  Prove level 0 (2000 steps) </li>
 	<li id="why3-prove1-menu-entry"><span class="fas fa-magic
 						    why3-icon"></span>
-						    Prove (100
-	  steps) </li>
+	  Prove level 1 (4000 steps) </li>
 	<li id="why3-prove2-menu-entry"><span class="fas fa-magic
 							why3-icon"></span>
-	  Prove (1000 steps) </li>
+	  Prove level 2 (8000 steps) </li>
 	<li id="why3-prove3-menu-entry"><span class="fas fa-magic
 							why3-icon"></span>
-	  Prove (5000 steps) </li>
+	  Prove level 3 (16000 steps) </li>
 	<li id="why3-clean-menu-entry"><span class="fas fa-unlink why3-icon"></span>
 	  Clean </li>
       </ul>
@@ -165,24 +164,24 @@
               <label for="why3-input-num-threads">Number of threads for Alt-Ergo</label>
             </li>
             <li>
-              <input id="why3-input-min-steps" type="number" min="0" max="10000" value="10" />
+              <input id="why3-input-min-steps" type="number" min="10" max="16000" value="1000" />
               <label for="why3-input-min-steps">First-attempt step limit</label>
             </li>
             <li>
-              <input id="why3-input-num-steps" type="number" min="1" max="10000" value="100" />
-              <label for="why3-input-num-steps">Default step limit</label>
+              <input id="why3-input-num-steps" type="number" min="10" max="16000" value="2000" />
+              <label for="why3-input-num-steps">Step limit for level 0</label>
             </li>
             <li>
-              <input id="why3-input-context-steps1" type="number" min="1" max="10000" value="100" />
-              <label for="why3-input-context-steps1">Right-click menu step limit 1</label>
+              <input id="why3-input-context-steps1" type="number" min="10" max="16000" value="4000" />
+              <label for="why3-input-context-steps1">Step limit for level 1</label>
             </li>
             <li>
-              <input id="why3-input-context-steps2" type="number" min="1" max="10000" value="1000" />
-              <label for="why3-input-context-steps2">Right-click menu step limit 2</label>
+              <input id="why3-input-context-steps2" type="number" min="10" max="16000" value="8000" />
+              <label for="why3-input-context-steps2">Step limit for level 2</label>
             </li>
             <li>
-              <input id="why3-input-context-steps3" type="number" min="1" max="10000" value="5000" />
-              <label for="why3-input-context-steps3">Right-click menu step limit 3</label>
+              <input id="why3-input-context-steps3" type="number" min="10" max="16000" value="16000" />
+              <label for="why3-input-context-steps3">Step limit for level 3</label>
             </li>
 
 	  </ul>
@@ -192,7 +191,7 @@
 	  <p>TryWhy3 is a Javascript based version of
 	    the <a href="https://www.why3.org/" target="_blank">Why3
 	    Verification Platform</a></p>
-	  <p>© 2010-2025, Inria - CNRS - Paris-Saclay University<br/>
+	  <p>© 2010-2026, Inria - CNRS - Paris-Saclay University<br/>
 	    This software is distributed under the terms of the GNU Lesser
 	    General Public License version 2.1, with the special exception
 	    on linking described in the

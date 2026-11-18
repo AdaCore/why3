@@ -3,7 +3,7 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -43,7 +43,7 @@
   <proof prover="0"><result status="valid" time="0.025742" steps="17"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.046850" steps="35033"/></proof>
+  <proof prover="1"><result status="valid" time="0.046850" steps="35033"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.3" expl="loop invariant init" proved="true">
   <proof prover="0"><result status="valid" time="0.025146" steps="10"/></proof>
@@ -61,7 +61,7 @@
   <proof prover="0"><result status="valid" time="0.030955" steps="29"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.8" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.037001" steps="48345"/></proof>
+  <proof prover="1"><result status="valid" time="0.037001" steps="48345"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.9" expl="loop invariant preservation" proved="true">
   <proof prover="0"><result status="valid" time="0.050134" steps="41"/></proof>
@@ -91,17 +91,17 @@
   <proof prover="0"><result status="valid" time="0.040127" steps="20"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.18" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.023987" steps="37837"/></proof>
+  <proof prover="1"><result status="valid" time="0.023987" steps="37837"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.19" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="binary_sort&#39;vc.19.0" expl="assertion" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="binary_sort&#39;vc.19.0.0" expl="assertion" proved="true">
-    <proof prover="2"><result status="valid" time="0.032866" steps="62424"/></proof>
+    <proof prover="1"><result status="valid" time="0.032866" steps="62428"/></proof>
     </goal>
     <goal name="binary_sort&#39;vc.19.0.1" expl="assertion" proved="true">
-    <proof prover="0"><result status="valid" time="0.748672" steps="3743"/></proof>
+    <proof prover="0"><result status="valid" time="0.572313" steps="3743"/></proof>
     </goal>
     <goal name="binary_sort&#39;vc.19.0.2" expl="assertion" proved="true">
     <proof prover="0"><result status="valid" time="0.020000" steps="120"/></proof>
@@ -126,7 +126,7 @@
   <proof prover="5"><result status="valid" time="0.037815" steps="5975"/></proof>
   </goal>
   <goal name="binary_sort&#39;vc.25" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.023521" steps="35963"/></proof>
+  <proof prover="1"><result status="valid" time="0.023521" steps="35968"/></proof>
   </goal>
  </transf>
  </goal>

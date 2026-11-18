@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -24,8 +24,12 @@ let set_output_dir d = output_dir := d
 
 let dir_sep = Re.Str.regexp_string Filename.dir_sep
 
+let chop_extension fname =
+  try Filename.chop_extension fname
+  with Invalid_argument _ -> fname
+
 let output_file fname =
-  let fname = Filename.chop_extension fname in
+  let fname = chop_extension fname in
   let base = match !output_dir with
     | None -> fname
     | Some dir ->
@@ -59,7 +63,7 @@ let pp_tag ~kind fmt s l =
     Format.fprintf fmt "%a_%d" pp_tag_escape s l
 
 let local_files = Hashtbl.create 17
-let add_local_file fn = Hashtbl.add local_files (Filename.chop_extension fn) ()
+let add_local_file fn = Hashtbl.add local_files (chop_extension fn) ()
 let is_local_file = Hashtbl.mem local_files
 
 let pp_url fmt lp =

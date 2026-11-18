@@ -3,22 +3,22 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Eprover" version="1.8-001" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Eprover" version="2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2017_tree_buffer.mlw"/>
 <theory name="Spec" proved="true">
  <goal name="take_lemma&#39;vc" expl="VC for take_lemma" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="take_lemma&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="11740"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="5203"/></proof>
   <proof prover="4"><result status="valid" time="0.010000" steps="43"/></proof>
   </goal>
   <goal name="take_lemma&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="11924"/></proof>
-  <proof prover="4"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="5312"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="23"/></proof>
   </goal>
   <goal name="take_lemma&#39;vc.2" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
@@ -122,7 +122,7 @@
    </goal>
    <goal name="rt_add&#39;vc.0.3" expl="VC for rt_add" proved="true">
    <proof prover="0"><result status="timeout" time="5.000000"/></proof>
-   <proof prover="1"><result status="valid" time="0.130000" steps="14520"/></proof>
+   <proof prover="5"><result status="valid" time="0.130000" steps="14400"/></proof>
    </goal>
   </transf>
   </goal>
@@ -130,7 +130,7 @@
   <proof prover="4"><result status="valid" time="0.010000" steps="14"/></proof>
   </goal>
   <goal name="rt_add&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.030000" steps="188"/></proof>
+  <proof prover="4"><result status="valid" time="0.030000" steps="189"/></proof>
   </goal>
   <goal name="rt_add&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="4"><result status="valid" time="0.010000" steps="11"/></proof>

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -113,6 +113,13 @@ val wrap_l : ('a, task list) trans_typ -> 'a -> Trans.trans_with_args_l
 val wrap   : ('a, task) trans_typ -> 'a -> Trans.trans_with_args
 
 val wrap_and_register : desc:Pp.formatted -> string -> ('a, 'b) trans_typ -> 'a -> unit
+
+(** [Pack t] hides the type parameters of a [trans_typ] *)
+type packed_trans_typ = Pack : ('a, 'b) trans_typ -> packed_trans_typ
+
+(** [get_trans_typ name] is the [trans_typ] with which the transformation
+    [name] was registered by [wrap_and_register], if any. *)
+val get_trans_typ : string -> packed_trans_typ option
 
 val parse_and_type_list : lang:string -> as_fmla:bool -> string -> Trans.naming_table -> Term.term list
 

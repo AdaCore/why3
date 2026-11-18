@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -44,7 +44,7 @@ let t_and_asym_simp f1 f2 = t_and_simp (t_attr_add asym_split f1) f2
 
 let t_implies_simp f1 f2 = match f1.t_node, f2.t_node with
   | Ttrue, _  | _, Ttrue  -> f2
-  | Tfalse, _ | _, Tfalse -> t_not_simp f1
+  | Tfalse, _ | _, Tfalse -> t_attr_copy f2 (t_not_simp f1)
   | _, _ -> t_implies f1 f2
 
 let t_if_simp f1 f2 f3 = match f1.t_node, f2.t_node, f3.t_node with
@@ -103,7 +103,7 @@ let rec t_neg f =
     | Tnot g -> tac g
     | Tbinop (Tand,g,h) when Sattr.mem asym_split g.t_attrs ->
                               tac @@ t_implies g (t_neg h)
-    | Tbinop (Tand,g,h) -> tac @@ t_or (t_neg g) (t_neg h)
+    | Tbinop (Tand,g,h) -> tac @@ add_case_split @@ t_or (t_neg g) (t_neg h)
     | Tbinop (Tor,g,h) -> tac @@ t_and (t_neg g) (t_neg h)
     | Tbinop (Timplies,g,h) ->    tac @@ t_and g (t_neg h)
     | Tquant (q,b) ->

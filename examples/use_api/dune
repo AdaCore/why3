@@ -1,0 +1,11 @@
+(executables
+ (names clone counterexample create_session logic mlw_expr mlw_tree transform)
+ (flags (:standard -w -32 -linkall))
+ (libraries why3)
+ (modules :standard \ epsilon))
+
+(executable
+ (name epsilon)
+ (flags (:standard -w -32 -linkall))
+ (libraries why3)
+ (modules epsilon))

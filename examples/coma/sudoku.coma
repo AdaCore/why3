@@ -1,0 +1,90 @@
+(** Sudoku solver
+
+      Author: Paul Patault (Université Paris-Saclay)
+*)
+
+use int.Int
+use seq.Seq
+use int.EuclideanDivision
+use coma.Std
+
+type sudoku = seq int
+
+function row (c: int) : int = div c 9
+function col (c: int) : int = mod c 9
+function grp (c: int) : int = 3 * (div (row c) 3) + div (col c) 3
+
+predicate same_zone (c1 c2: int) =
+  row c1 = row c2 ||
+  col c1 = col c2 ||
+  grp c1 = grp c2
+
+predicate bounds (c: int) = 0 <= c < 81
+predicate filled (v: int) = 1 <= v <= 9
+
+predicate compatible (g: sudoku) (i1 i2: int) =
+  i1 <> i2 /\ same_zone i1 i2 -> g[i1] <> g[i2]
+
+predicate correct (g: sudoku) (p: int) =
+  bounds p /\
+  filled g[p] /\
+  forall c. bounds c -> compatible g c p
+
+predicate wf (g: sudoku) =
+  length g = 81 /\
+  (forall i. bounds i -> 0 <= g[i] <= 9) /\
+  (forall i. bounds i -> filled g[i] -> correct g i)
+
+predicate solution (g: sudoku) =
+  forall i. bounds i -> correct g i
+
+predicate filled_upto (g: sudoku) (c: int) =
+  forall i. 0 <= i < c -> filled g[i]
+
+predicate extends (g1 g2: sudoku) =
+  forall i. bounds i -> filled g1[i] -> g2[i] = g1[i]
+
+predicate impossible (g: sudoku) =
+  forall g'. extends g g' -> solution g' -> False
+
+lemma propagation_wf :
+  forall g. wf g ->
+  forall i. bounds i ->
+  forall v. filled v -> correct g[i<-v] i ->
+  wf g[i<-v]
+
+let iteri (lo hi: int) (seen: int -> bool)
+       (a (i: int) { lo <= i < hi } { forall j. lo <= j < i -> seen j }
+          (aout { seen i }))
+       (ret)
+= loop {lo}
+  [ loop (i: int) { lo <= i } { forall j. lo <= j < i -> seen j } {..}
+    = if {i < hi}
+         (-> (! a {i} . (-> loop {i+1})))
+         (-> ret) ]
+
+let check (g: sudoku) (c: int)
+          (ok {correct g c})
+          (ko {not (correct g c)})
+= iteri {0} {81} {fun (i:int) -> compatible g c i}
+    (fun (n: int) (continue) -> if {compatible g c n} continue ko)
+    ok
+
+let rec solve (g: sudoku) (c: int)
+              {wf g} {0 <= c <= 81} {filled_upto g c}
+              (ok (g': sudoku) {extends g g'} {solution g'})
+              (ko {impossible g})
+= if {c = 81}    (-> ok {g}) .
+  if {g[c] <> 0} (-> solve {g} {c+1} ok ko) .
+  iteri {1} {10} {fun (v:int) -> impossible g[c<-v]}
+    (fun (v: int) (next) ->
+      check {g} {c}
+         (-> solve {g} {c+1} ok next)
+         (-> next)
+      [ g: sudoku = g[c<-v] ])
+    (-> ko)
+
+let solve_main (g: sudoku) {wf g}
+              (ok (g': sudoku) {extends g g'} {solution g'})
+              (ko {impossible g})
+= solve {g} {0} ok ko

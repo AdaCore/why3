@@ -1,0 +1,469 @@
+
+(** {1 Traversing a binary tree in place}
+
+  Below is a verified implementation of Morris's algorithm for traversing
+  binary trees in linear time and constant space, as described in this paper:
+  {h<pre>
+    Joseph M. Morris
+    Traversing binary trees simply and cheaply
+    Information Processing Letters 9(5), 1979
+  </pre>}
+
+  The proof technique used here is "Separation Arithmetic". More
+  details about this technique, and the proof below, are given in this paper:
+  {h<pre>
+    When Separation Arithmetic is Enough
+    Jean-Christophe Filliâtre, Andrei Paskevich, Olivier Danvy
+    iFM 2025, Nov 2025, Paris, France
+  </pre>}
+  ({h <a href="https://usr.lmf.cnrs.fr/~jcf/sep-arith/">here</a>}
+  and {h <a href="https://hal.science/hal-05132556v2">here</a>})
+
+  Authors: Andrei Paskevich (Université Paris-Saclay)
+       and Jean-Christophe Filliâtre (CNRS)
+*)
+
+(** {2 Mutable binary trees} *)
+
+module MBTree
+  use map.Map
+
+  type loc
+
+  val eq_loc (l1 l2: loc) : bool
+    ensures { result <-> l1 = l2 }
+
+  val constant null : loc
+
+  type elt
+
+  type mem = abstract {
+    mutable mdat: loc -> elt;
+    mutable mlst: loc -> loc;
+    mutable mrst: loc -> loc;
+  }
+
+  val mem: mem
+
+  val dat (p: loc) : elt
+    requires { p <> null }
+    ensures  { result = mem.mdat p }
+
+  val set_dat (p: loc) (v: elt) : unit
+    requires { p <> null }
+    writes   { mem.mdat }
+    ensures  { mem.mdat = (old mem.mdat)[p <- v] }
+
+  val lst (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = mem.mlst p }
+
+  val set_lst (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { mem.mlst }
+    ensures  { mem.mlst = (old mem.mlst)[p <- v] }
+
+  val rst (p: loc) : loc
+    requires { p <> null }
+    ensures  { result = mem.mrst p }
+
+  val set_rst (p: loc) (v: loc) : unit
+    requires { p <> null }
+    writes   { mem.mrst }
+    ensures  { mem.mrst = (old mem.mrst)[p <- v] }
+end
+
+(** {2 Morris's algorithm} *)
+
+module MorrisTraversal
+
+  use int.Int
+  use map.Map
+  use MBTree
+
+  type tree_shape = {
+    cell : int -> loc;  (* location *)
+    clmd : int -> int;  (* left-most descendant *)
+    clst : int -> int;  (* left subtree *)
+    crst : int -> int;  (* right subtree *)
+    crmd : int -> int;  (* right-most descendant *)
+    size : int;
+  }
+  invariant { 0 <= size }
+  invariant {
+    forall i. 0 <= i < size -> cell i <> null }
+  invariant {
+    forall i. 0 <= i < size ->
+      forall j. 0 <= j < size -> i <> j -> cell i <> cell j }
+  invariant {
+    forall i. 0 <= i < size ->
+      0 <= clmd i = clmd (clst i) <= clst i <=
+        i <= crst i <= crmd (crst i) = crmd i < size }
+  invariant {
+    forall i. 0 <= i < size -> clst i = i -> clmd i = i }
+  invariant {
+    forall i. 0 <= i < size -> crst i = i -> crmd i = i }
+  invariant {
+    forall i. 0 <= i < size -> clst i < i -> crmd (clst i) = i-1 }
+  invariant {
+    forall i. 0 <= i < size -> crst i > i -> clmd (crst i) = i+1 }
+
+  predicate wf_lst (t: tree_shape) (m: mem) (lo hi: int) =
+    forall i. 0 <= lo <= i < hi <= t.size ->
+      (t.clmd i = t.clst i = i             /\ m.mlst (t.cell i) = null) \/
+      (t.clst i <= t.crmd (t.clst i) = i-1 /\ m.mlst (t.cell i) = t.cell (t.clst i))
+
+  predicate wf_rst (t: tree_shape) (m: mem) (lo hi: int) =
+    forall i. 0 <= lo <= i < hi <= t.size ->
+      (i = t.crst i = t.crmd i             /\ m.mrst (t.cell i) = null) \/
+      (i+1 = t.clmd (t.crst i) <= t.crst i /\ m.mrst (t.cell i) = t.cell (t.crst i))
+
+  predicate warped_rst (t: tree_shape) (m: mem) (lo hi: int) =
+    forall i. 0 <= lo <= i < hi <= t.size ->
+      (i = t.crst i = t.crmd i /\
+        ((i < t.size-1 /\ t.clmd (i+1) <= lo /\ m.mrst (t.cell i) = t.cell (i+1)) \/
+         (i < t.size-1 /\ lo < t.clmd (i+1)  /\ m.mrst (t.cell i) = null) \/
+         (i = t.size-1 /\                       m.mrst (t.cell i) = null))) \/
+      (i+1 = t.clmd (t.crst i) <= t.crst i   /\ m.mrst (t.cell i) = t.cell (t.crst i))
+
+  predicate frame (t: tree_shape) (m1 m2: mem) =
+    forall p. (forall i. 0 <= i < t.size -> p <> t.cell i) ->
+      m1.mdat p = m2.mdat p /\ m1.mlst p = m2.mlst p /\ m1.mrst p = m2.mrst p
+
+  let lemma cover (t: tree_shape) (r : int)
+    requires { 0 = t.clmd r <= r <= t.crmd r = t.size-1 }
+    ensures  { forall i j . 0 <= i < j < t.size ->
+                 i < t.clmd j <= t.crmd j <= t.crmd i \/
+                 t.crmd i + 1 < t.clmd j \/
+                 t.clmd j <= t.clmd i <= t.crmd i < j }
+  = let rec lemma subtree (k i: int)
+      requires { 0 <= k < t.size }
+      requires { t.clmd k <= i <= t.crmd k }
+      variant  { t.crmd k - t.clmd k }
+      ensures  { t.clmd k <= t.clmd i <= i <= t.crmd i <= t.crmd (t.clst k) = k-1 \/
+                 i = k \/
+                 k+1 = t.clmd (t.crst k) <= t.clmd i <= i <= t.crmd i <= t.crmd k }
+    = if i < k then subtree (t.clst k) i else
+      if k < i then subtree (t.crst k) i in
+    let rec lemma subcover (k i j: int)
+      requires { 0 <= k < t.size }
+      requires { t.clmd k <= i < j <= t.crmd k }
+      variant  { t.crmd k - t.clmd k }
+      ensures  { i < t.clmd j <= t.crmd j <= t.crmd i \/
+                 t.crmd i + 1 < t.clmd j \/
+                 t.clmd j <= t.clmd i <= t.crmd i < j }
+    = if j < k then subcover (t.clst k) i j else
+      if k < i then subcover (t.crst k) i j in ()
+
+  use seq.Seq
+
+  val ref trace : seq loc
+
+  let rec morris (ghost t: tree_shape) (ghost r: int) (ghost c: int) (ghost k: int) (p: loc) : unit
+    requires { 0 = t.clmd r <= r <= t.crmd r = t.size-1 }
+    requires { 0 <= c = trace.length <= k < t.size }
+    requires { p = t.cell k }
+    requires { wf_lst t mem 0 t.size }
+    requires { forall i. 0 <= i < c -> trace[i] = t.cell i }
+    requires { c < k -> c = t.clmd k /\ wf_rst t mem 0 k }
+    requires { c = k /\ t.clst k < k -> wf_rst t mem 0 (k-1) /\
+                                          mem.mrst (t.cell (k-1)) = p }
+    requires { c = k /\ t.clst k = k -> wf_rst t mem 0 k }
+    requires { warped_rst t mem k t.size }
+    variant  { t.size-c, k }
+    ensures  { wf_rst t mem 0 t.size }
+    ensures  { trace.length = t.size }
+    ensures  { forall i. 0 <= i < t.size -> trace[i] = t.cell i }
+    ensures  { frame t mem (old mem) }
+  =
+    let rec warp (ghost j: int) (q: loc) : bool
+      requires { 0 <= j < k }
+      requires { q = t.cell j }
+      requires { t.crmd j = k-1 }
+      requires { c < k -> wf_rst t mem 0 k }
+      requires { c = k -> wf_rst t mem 0 (k-1) /\
+                          mem.mrst (t.cell (k-1)) = p }
+      variant  { k-j }
+      ensures  { result <-> c <> k }
+      ensures  { c = k -> mem.mrst = Map.(old mem.mrst[t.cell (k-1) <- null]) }
+      ensures  { c < k -> mem.mrst = Map.(old mem.mrst[t.cell (k-1) <- p]) }
+      ensures  { c < k -> warped_rst t mem (t.clst k) k }
+      ensures  { frame t mem (old mem) }
+    = if eq_loc q.rst null then begin
+        set_rst q p; true
+      end else if eq_loc q.rst p then begin
+        set_rst q null; false
+      end else
+        warp (t.crst j) q.rst
+    in
+    if not eq_loc p.lst null && warp (t.clst k) p.lst then
+      morris t r c (t.clst k) p.lst
+    else begin
+      trace <- snoc trace p;
+      if not eq_loc p.rst null then begin
+        ghost cover t r;
+        morris t r (c+1) (if t.crst k = k then k+1 else t.crst k) p.rst
+      end
+    end
+
+  let traversal (ghost t: tree_shape) (ghost k: int) (p: loc) : unit
+    requires { trace.length = 0 }
+    requires { 0 <= k <= t.size }
+    requires { if t.size = 0 then p = null
+               else k < t.size /\ t.cell k = p /\ t.clmd k = 0 /\ t.crmd k = t.size-1 }
+    requires { wf_lst t mem 0 t.size }
+    requires { wf_rst t mem 0 t.size }
+    writes   { mem.mrst, trace }
+    ensures  { forall q. mem.mrst q = old mem.mrst q }
+    ensures  { trace.length = t.size }
+    ensures  { forall i. 0 <= i < t.size -> trace[i] = t.cell i }
+  =
+    if not eq_loc p null then morris t k 0 k p
+
+end
+
+(** {2 Equivalence of specifications}
+
+    If wanted, we can reconcile the separation arithmetic specification above
+    (the ghost `tree_shape`) with a more traditional specification using
+    a recursive predicate (`rooted_tree` below). *)
+
+module MorrisSpec
+
+  use int.Int
+  use map.Map
+  use bintree.Tree
+  use bintree.Size as BS
+  use MBTree
+  use MorrisTraversal
+
+  function footprint (m: mem) (p: loc) (t: tree elt) : loc -> bool
+  = match t with
+    | Empty      ->
+        (fun _ -> false)
+    | Node l _ r ->
+        let lftp = footprint m (m.mlst p) l in
+        let rftp = footprint m (m.mrst p) r in
+        (fun q -> q = p || lftp q || rftp q)
+    end
+
+  predicate rooted_tree (m: mem) (p: loc) (t: tree elt)
+  = match t with
+    | Empty      ->
+        p = null
+    | Node l _ r ->
+        p <> null &&
+        rooted_tree m (m.mlst p) l &&
+        rooted_tree m (m.mrst p) r &&
+        let lftp = footprint m (m.mlst p) l in
+        let rftp = footprint m (m.mrst p) r in
+        not (lftp p) && not (rftp p) &&
+        forall q. lftp q -> rftp q -> false
+    end
+
+  let append_cells (lcell: int -> loc) (lsz: int)
+                   (p: loc)
+                   (rcell: int -> loc) (rsz: int) : int -> loc
+    requires { forall i. 0 <= i < lsz -> forall j. 0 <= j < lsz ->
+               i <> j -> lcell i <> lcell j }
+    requires { forall i. 0 <= i < lsz -> lcell i <> p }
+    requires { forall i. 0 <= i < rsz -> forall j. 0 <= j < rsz ->
+               i <> j -> rcell i <> rcell j }
+    requires { forall j. 0 <= j < rsz -> rcell j <> p }
+    requires { forall i. 0 <= i < lsz ->
+               forall j. 0 <= j < rsz -> lcell i <> rcell j }
+    ensures { forall i. 0 <= i < lsz -> result i = lcell i }
+    ensures { result lsz = p }
+    ensures { forall i. lsz < i -> result i = rcell (i - lsz - 1) }
+    ensures { forall i. 0 <= i < lsz + 1 + rsz ->
+              forall j. 0 <= j < lsz + 1 + rsz ->
+              i <> j -> result i <> result j }
+  = (fun i -> if i < lsz then lcell i else
+              if i = lsz then p else
+              rcell (i - lsz - 1))
+
+  let append_fun (lf: int -> int)
+                 (k: int) (v: int)
+                 (rf: int -> int) : int -> int
+    ensures { forall i. 0 <= i < k -> result i = lf i }
+    ensures { result k = v }
+    ensures { forall i. k < i -> result i = k + 1 + rf (i - k - 1) }
+  = (fun i -> if i < k then lf i else
+              if i = k then v else
+              k + 1 + rf (i - k - 1))
+
+  let rec ghost shape_of_tree (p: loc) (t: tree elt) : (ts: tree_shape, k: int)
+    requires { rooted_tree mem p t }
+    variant  { t }
+    ensures  { ts.size = BS.size t }
+    (* preconditions of `traversal` *)
+    ensures  { 0 <= k <= ts.size }
+    ensures  { 0 = ts.size -> p = null }
+    ensures  { 0 < ts.size -> k < ts.size /\ ts.cell k = p /\ ts.clmd k = 0 /\ ts.crmd k = ts.size-1 }
+    ensures  { wf_lst ts mem 0 ts.size }
+    ensures  { wf_rst ts mem 0 ts.size }
+    ensures  { forall q. footprint mem p t q <->
+                 exists i. 0 <= i < ts.size /\ q = ts.cell i }
+  = match t with
+    | Empty ->
+        { cell = (fun _ -> null);
+          clmd = (fun _ -> 0   );
+          clst = (fun _ -> 0   );
+          crst = (fun _ -> 0   );
+          crmd = (fun _ -> 0   );
+          size = 0 },
+        0
+    | Node l _ r ->
+        let lts, kl = shape_of_tree p.lst l in
+        let k = lts.size in
+        let rts, kr = shape_of_tree p.rst r in
+        let kr = if rts.size = 0 then k else k + 1 + kr in
+        let n = lts.size + 1 + rts.size in
+        { cell = append_cells lts.cell k p     rts.cell rts.size;
+          clmd = append_fun   lts.clmd k 0     rts.clmd;
+          clst = append_fun   lts.clst k kl    rts.clst;
+          crst = append_fun   lts.crst k kr    rts.crst;
+          crmd = append_fun   lts.crmd k (n-1) rts.crmd;
+          size = n;
+        },
+        k
+    end
+
+end
+
+(** {2 Equivalence of specifications (alternative)}
+
+  An alternative recursive specification, and its equivalence with
+ `tree_shape`. *)
+
+module MorrisSpecBis
+
+  use int.Int
+  use map.Map
+  use bintree.Tree
+  use seq.Seq
+  use seq.Distinct
+  use MBTree
+  use MorrisTraversal
+
+  function inorder (t: tree loc) : seq loc
+  = match t with
+    | Empty      ->
+        empty
+    | Node l p r ->
+        inorder l ++ cons p (inorder r)
+    end
+
+  predicate rooted_tree (m: mem) (p: loc) (t: tree loc)
+  = match t with
+    | Empty      ->
+        p = null
+    | Node l x r ->
+        p = x &&
+        rooted_tree m (m.mlst p) l &&
+        rooted_tree m (m.mrst p) r
+    end
+
+  lemma distinct_left:
+    forall s1 s2: seq loc. distinct (s1 ++ s2) -> distinct s1
+  lemma distinct_right:
+    forall s1 s2: seq loc. distinct (s1 ++ s2) -> distinct s2
+  lemma distinct_cons1:
+    forall x: loc, s: seq loc. distinct (cons x s) -> distinct s
+  lemma distinct_cons2:
+    forall x: loc, s: seq loc. distinct (cons x s) ->
+    forall i. 0 <= i < length s -> x <> s[i]
+
+  predicate not_null (s: seq loc)
+  = forall i. 0 <= i < length s -> s[i] <> null
+
+  lemma not_null_left:
+    forall s1 s2: seq loc. not_null (s1 ++ s2) -> not_null s1
+  lemma not_null_right:
+    forall s1 s2: seq loc. not_null (s1 ++ s2) -> not_null s2
+  lemma not_null_cons1:
+    forall x: loc, s: seq loc. not_null (cons x s) -> x <> null
+  lemma not_null_cons2:
+    forall x: loc, s: seq loc. not_null (cons x s) -> not_null s
+
+  let append_cells (lcell: int -> loc) (lsz: int)
+                   (p: loc)
+                   (rcell: int -> loc) (rsz: int) : int -> loc
+    requires { forall i. 0 <= i < lsz -> forall j. 0 <= j < lsz ->
+               i <> j -> lcell i <> lcell j }
+    requires { forall i. 0 <= i < lsz -> lcell i <> p }
+    requires { forall i. 0 <= i < rsz -> forall j. 0 <= j < rsz ->
+               i <> j -> rcell i <> rcell j }
+    requires { forall j. 0 <= j < rsz -> rcell j <> p }
+    requires { forall i. 0 <= i < lsz ->
+               forall j. 0 <= j < rsz -> lcell i <> rcell j }
+    ensures { forall i. 0 <= i < lsz -> result i = lcell i }
+    ensures { result lsz = p }
+    ensures { forall i. lsz < i -> result i = rcell (i - lsz - 1) }
+    ensures { forall i. 0 <= i < lsz + 1 + rsz ->
+              forall j. 0 <= j < lsz + 1 + rsz ->
+              i <> j -> result i <> result j }
+  = (fun i -> if i < lsz then lcell i else
+              if i = lsz then p else
+              rcell (i - lsz - 1))
+
+  let append_fun (lf: int -> int)
+                 (k: int) (v: int)
+                 (rf: int -> int) : int -> int
+    ensures { forall i. 0 <= i < k -> result i = lf i }
+    ensures { result k = v }
+    ensures { forall i. k < i -> result i = k + 1 + rf (i - k - 1) }
+  = (fun i -> if i < k then lf i else
+              if i = k then v else
+              k + 1 + rf (i - k - 1))
+
+  let rec ghost shape_of_tree (p: loc) (t: tree loc) : (ts: tree_shape, k: int)
+    requires { rooted_tree mem p t }
+    requires { distinct (inorder t) }
+    requires { not_null (inorder t) }
+    variant  { t }
+    (* preconditions of `traversal` *)
+    ensures  { 0 <= k <= ts.size }
+    ensures  { 0 = ts.size -> p = null }
+    ensures  { 0 < ts.size -> k < ts.size /\ ts.cell k = p /\ ts.clmd k = 0 /\ ts.crmd k = ts.size-1 }
+    ensures  { wf_lst ts mem 0 ts.size }
+    ensures  { wf_rst ts mem 0 ts.size }
+    ensures  { create ts.size ts.cell == inorder t }
+  = match t with
+    | Empty ->
+        { cell = (fun _ -> null);
+          clmd = (fun _ -> 0   );
+          clst = (fun _ -> 0   );
+          crst = (fun _ -> 0   );
+          crmd = (fun _ -> 0   );
+          size = 0 },
+        0
+    | Node l _ r ->
+        let lts, kl = shape_of_tree p.lst l in
+        let k = lts.size in
+        let rts, kr = shape_of_tree p.rst r in
+        let kr = if rts.size = 0 then k else k + 1 + kr in
+        let n = lts.size + 1 + rts.size in
+        let cells = append_cells lts.cell k p     rts.cell rts.size in
+        let s = create n cells in
+        assert { p = s[k] };
+        { cell = cells;
+          clmd = append_fun   lts.clmd k 0     rts.clmd;
+          clst = append_fun   lts.clst k kl    rts.clst;
+          crst = append_fun   lts.crst k kr    rts.crst;
+          crmd = append_fun   lts.crmd k (n-1) rts.crmd;
+          size = n;
+        },
+        k
+    end
+
+  let morris_traversal (ghost t: tree loc) (p: loc) : unit
+    requires { rooted_tree mem p t }
+    requires { distinct (inorder t) }
+    requires { not_null (inorder t) }
+    requires { trace.length = 0 }
+    ensures  { trace == inorder t }
+  = let ts, k = shape_of_tree p t in
+    traversal ts k p
+
+end

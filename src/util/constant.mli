@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -23,11 +23,23 @@ val compare_const : ?structural:bool -> constant -> constant -> int
    values are compared *)
 
 val int_const : ?il_kind:int_literal_kind -> BigInt.t -> constant
+
 val int_const_of_int : int -> constant
-val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> BigInt.t -> constant
+
+val real_const : ?pow2:BigInt.t -> ?pow5:BigInt.t -> is_neg:bool -> BigInt.t -> constant
+(** [real_const ~pow2 ~pow5 ~is_neg m] builds the real constant [m]
+    times 2 to [pow2] times 5 to [pow5]. [m] is assumed non-negative,
+    [is_neg] provides the sign (true when negative) *)
+
 val real_const_from_string :
   radix:int -> neg:bool -> int:string -> frac:string -> exp:string option -> constant
+(** [real_const_from_string builds a real constant by parsing the
+    given strings. [radix] is the base, that must be either 10
+    (allowing digits between `0` and `9`) or 16 (digits among `0`..`9`
+    and `A`..`F` and `a`..`f`).  *)
+
 val string_const : string -> constant
+(** building a string constant *)
 
 (** Pretty-printing *)
 

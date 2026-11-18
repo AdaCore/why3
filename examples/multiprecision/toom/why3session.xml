@@ -2,18 +2,20 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Eprover" version="1.9.1-001" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="0" name="colibri2" version="0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.5.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="5" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="9" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Z3" version="4.8.17" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="11" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="12" name="Spass" version="3.9" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="13" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="14" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="toom.mlw"/>
 <theory name="Toom" proved="true">
@@ -100,7 +102,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.12" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.038313" steps="105"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="1735"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.13" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="3646"/></proof>
@@ -109,7 +110,7 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="45235"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.16" expl="integer overflow" proved="true">
   <proof prover="2"><result status="valid" time="0.256973" steps="23045"/></proof>
@@ -167,7 +168,7 @@
   <proof prover="2"><result status="valid" time="0.060000" steps="13975"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.140000"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.33" expl="precondition" proved="true">
   <proof prover="9"><result status="valid" time="0.223841" steps="3376"/></proof>
@@ -325,7 +326,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.69" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.430778" steps="186"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8526"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.70" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.180000" steps="32354"/></proof>
@@ -428,7 +428,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.91" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.553573" steps="208"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="11160"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.92" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
@@ -557,15 +556,12 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.118" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.724173" steps="237"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8115"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.119" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.471463" steps="220"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8166"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.120" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.469096" steps="229"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8218"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.121" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.060000" steps="20669"/></proof>
@@ -609,11 +605,9 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.133" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.728517" steps="247"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8727"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.134" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.722668" steps="252"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="9506"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.135" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -638,7 +632,6 @@
      </goal>
      <goal name="wmpn_toom22_mul&#39;vc.135.0.0.5" expl="precondition" proved="true">
      <proof prover="5"><result status="valid" time="0.641745" steps="163"/></proof>
-     <proof prover="9"><result status="timeout" time="5.000000" steps="9507"/></proof>
      </goal>
     </transf>
     </goal>
@@ -724,7 +717,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.150" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="1.235007" steps="297"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="12247"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.151" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.100000" steps="15396"/></proof>
@@ -733,22 +725,21 @@
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.152.0" expl="precondition" proved="true">
    <proof prover="5"><result status="valid" time="1.422759" steps="276"/></proof>
-   <proof prover="9"><result status="timeout" time="5.000000" steps="13050"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.153" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.154" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.155" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.220000"/></proof>
+  <proof prover="7"><result status="valid" time="0.220000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.156" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.130000"/></proof>
+  <proof prover="7"><result status="valid" time="0.130000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.157" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.100000" steps="25321"/></proof>
@@ -770,7 +761,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.163" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.583586" steps="216"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="10639"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.164" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -886,7 +876,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.188" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.863161" steps="308"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="8712"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.189" expl="assertion" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="4418"/></proof>
@@ -938,7 +927,6 @@
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.205" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="1.328283" steps="303"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="10136"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.206" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="76698"/></proof>
@@ -1128,7 +1116,7 @@
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.650000" steps="58770"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.261" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.262" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.050000" steps="5014"/></proof>
@@ -1153,7 +1141,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.268" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.269" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="5094"/></proof>
@@ -1180,7 +1168,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.273" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.274" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.140000" steps="24040"/></proof>
@@ -1342,7 +1330,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.304" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.304.0" expl="assertion" proved="true">
-   <proof prover="0" memlimit="1000"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7" memlimit="1000"><result status="valid" time="0.050000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.304.1" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.260000"/></proof>
@@ -1403,7 +1391,7 @@
   <proof prover="7"><result status="valid" time="0.070000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.313" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000"/></proof>
+  <proof prover="7"><result status="valid" time="0.050000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.314" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.160000" steps="28816"/></proof>
@@ -1480,7 +1468,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.322" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="1.040146"/></proof>
+  <proof prover="7"><result status="valid" time="1.040146"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.323" expl="integer overflow" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.540000" steps="44369"/></proof>
@@ -1511,7 +1499,7 @@
   <proof prover="6"><result status="valid" time="0.130000" steps="29978"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.326" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.327" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.040000" steps="60976"/></proof>
@@ -1534,11 +1522,8 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.331" expl="assertion" proved="true">
-  <transf name="split_vc" proved="true" >
-   <goal name="wmpn_toom22_mul&#39;vc.331.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="1.094979"/></proof>
-   </goal>
-  </transf>
+  <proof prover="0"><result status="valid" time="1.534725" steps="7467"/></proof>
+  <proof prover="4" memlimit="1000"><result status="valid" time="0.186137"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.332" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1711,12 +1696,12 @@
   <goal name="wmpn_toom22_mul&#39;vc.352" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.352.0" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.353" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.060000"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.354" expl="integer overflow" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.330000" steps="31054"/></proof>
@@ -1748,7 +1733,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.358" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.358.0" expl="assertion" proved="true">
-   <proof prover="0" memlimit="1000"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7" memlimit="1000"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.358.1" expl="assertion" proved="true">
    <transf name="assert" proved="true" arg1="(0 &lt; m)">
@@ -1802,7 +1787,11 @@
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.160000" steps="27220"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.360.5" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="7"><result status="valid" time="0.420000"/></proof>
+   <transf name="remove" proved="true" arg1="zero,one,(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,compare_int,identical,toom22_threshold,r&#39;unused5,scratch&#39;unused5,(/)&#39;result&#39;unused,(-)&#39;result&#39;unused6,(-)&#39;result&#39;unused5,x0&#39;unused,incr&#39;result&#39;unused1,y0&#39;unused,incr&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused12,a0,value&#39;result&#39;unused9,int32&#39;int&#39;result&#39;unused11,a1,value&#39;result&#39;unused8,int32&#39;int&#39;result&#39;unused10,b0,value&#39;result&#39;unused7,int32&#39;int&#39;result&#39;unused9,b1,value&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused8,m,power&#39;result&#39;unused,p&#39;unused7,decr_split&#39;result&#39;unused1,(+)&#39;result&#39;unused22,p&#39;unused6,incr_split&#39;result&#39;unused5,p&#39;unused5,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused21,p&#39;unused4,incr_split&#39;result&#39;unused4,(+)&#39;result&#39;unused20,p&#39;unused3,incr_split&#39;result&#39;unused3,scratch&#39;unused4,r&#39;unused4,xsm1&#39;unused3,p&#39;unused2,xsm1&#39;unused2,incr_split&#39;result&#39;unused2,vm1_neg&#39;unused3,ref&#39;result&#39;unused1,scratch&#39;unused3,vm1_neg&#39;unused2,xsm1&#39;unused1,vm1_neg&#39;unused1,xsm1&#39;unused,r&#39;unused3,scratch&#39;unused2,vm1_neg&#39;unused,int32&#39;int&#39;result&#39;unused7,asm1_abs,value&#39;result&#39;unused5,int32&#39;int&#39;result&#39;unused6,bsm1_abs,value&#39;result&#39;unused4,(-)&#39;result&#39;unused4,s_out&#39;unused1,scratch&#39;unused1,p1&#39;unused3,p2&#39;unused3,v0&#39;unused2,r&#39;unused2,vinf&#39;unused2,s_out&#39;unused,scratch&#39;unused,v0&#39;unused1,(+)&#39;result&#39;unused19,(+)&#39;result&#39;unused18,p&#39;unused1,v0&#39;unused,incr_split&#39;result&#39;unused1,p&#39;unused,incr_split&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused5,lv0,value&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused4,hv0,value&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused3,lvinf,value&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused,(+)&#39;result&#39;unused17,(-)&#39;result&#39;unused3,hvinf,value&#39;result&#39;unused,x&#39;unused1,wmpn_add_n_in_place&#39;result&#39;unused,cy3,ref&#39;result&#39;unused,r&#39;unused1,wmpn_add_n&#39;result&#39;unused,(!)&#39;result&#39;unused1,(+)&#39;result&#39;unused16,cy&#39;unused3,vinf&#39;unused1,(+)&#39;result&#39;unused15,(-)&#39;result&#39;unused2,x&#39;unused,wmpn_add_in_place&#39;result&#39;unused,(!)&#39;result&#39;unused,(+)&#39;result&#39;unused14,cy&#39;unused2,v0n&#39;unused2,vinf&#39;unused,v0nj&#39;unused1,vinfj&#39;unused,p1&#39;unused2,p2&#39;unused2,p2i&#39;result&#39;unused11,(+)&#39;result&#39;unused13,pelts&#39;result&#39;unused13,pelts&#39;result&#39;unused12,p2i&#39;result&#39;unused10,(+)&#39;result&#39;unused12,pelts&#39;result&#39;unused11,pelts&#39;result&#39;unused10,(+)&#39;result&#39;unused11,cy&#39;unused1,v0n&#39;unused1,cy&#39;unused,vinfn&#39;unused,v0n&#39;unused,rj&#39;unused,v0nj&#39;unused,vinfnj&#39;unused,p1&#39;unused1,p2&#39;unused1,p2i&#39;result&#39;unused9,(+)&#39;result&#39;unused10,pelts&#39;result&#39;unused9,pelts&#39;result&#39;unused8,( * )&#39;result&#39;unused6,p2i&#39;result&#39;unused8,( * )&#39;result&#39;unused5,(+)&#39;result&#39;unused9,p2i&#39;result&#39;unused7,(+)&#39;result&#39;unused8,pelts&#39;result&#39;unused7,pelts&#39;result&#39;unused6,r&#39;unused,rh&#39;unused,p1&#39;unused,p2&#39;unused,p2i&#39;result&#39;unused6,( * )&#39;result&#39;unused4,(+)&#39;result&#39;unused7,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,p2i&#39;result&#39;unused5,(+)&#39;result&#39;unused6,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,(+)&#39;result&#39;unused5,(-)&#39;result&#39;unused1,( * )&#39;result&#39;unused3,(+)&#39;result&#39;unused4,( * )&#39;result&#39;unused2,p2i&#39;result&#39;unused4,p2i&#39;result&#39;unused3,p2i&#39;result&#39;unused2,p2i&#39;result&#39;unused1,( * )&#39;result&#39;unused1,(+)&#39;result&#39;unused3,(+)&#39;result&#39;unused2,(+)&#39;result&#39;unused1,(-)&#39;result&#39;unused,p2i&#39;result&#39;unused,( * )&#39;result&#39;unused,(+)&#39;result&#39;unused,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm2,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires7,Requires6,Requires5,Requires4,H152,H151,Requires3,Requires2,H150,H149,Requires1,H148,H147,H146,Requires,Ensures173,Ensures172,Ensures171,Assert19,Ensures170,Ensures169,Ensures168,Ensures167,Ensures166,Ensures165,Ensures164,Ensures163,Ensures162,Ensures161,Ensures160,Ensures159,Ensures158,Ensures157,Ensures156,Ensures155,Ensures154,Ensures153,Assert18,Assert17,H141,H140,H139,H138,Ensures152,Ensures151,Ensures150,Ensures149,Ensures148,Ensures147,Ensures146,Ensures145,Ensures144,Ensures143,Ensures142,H137,H136,H135,H134,Ensures141,Ensures140,Ensures139,Ensures138,Ensures137,Ensures136,Ensures135,Ensures134,Ensures133,Ensures132,H133,H132,H131,H130,Ensures131,Ensures130,Ensures129,Ensures128,Ensures127,Ensures126,Ensures125,Ensures124,Ensures123,Ensures122,Ensures121,H127,H126,H125,H124,Ensures120,Ensures119,Ensures118,Ensures117,Ensures116,Ensures115,Ensures114,Ensures113,Ensures112,Ensures111,Ensures110,H123,H122,H121,H120,Ensures109,Ensures108,Ensures107,Ensures106,Ensures105,Ensures104,Ensures103,Ensures102,Ensures101,Ensures100,H119,H118,H117,H116,H115,H114,H113,H112,Ensures99,Ensures98,Ensures97,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,H111,H110,H109,H108,H107,H106,H105,H104,H103,H102,H101,H100,Ensures89,H99,H98,H97,H96,H95,H94,Ensures88,H93,H92,H91,H90,H89,H88,Ensures87,Ensures86,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Assert16,H87,H86,H85,H84,H83,Ensures78,Ensures77,Ensures76,Ensures75,Assert15,Assert14,Assert13,Assert12,Assert11,Assert10,Assert9,H82,H81,H80,H79,H78,H77,H76,H75,H74,H73,H72,H71,Ensures74,Ensures73,Ensures72,Ensures71,Ensures70,Ensures69,Ensures68,Ensures67,Ensures66,Ensures65,Ensures64,Ensures63,Ensures62,Ensures61,Ensures60,H70,H69,H68,H67,H66,H65,H64,H63,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,Ensures52,Ensures51,Ensures50,H62,H61,H60,H59,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,Assert8,Assert7,H58,H57,H56,H55,H54,H53,H52,H51,Ensures39,Ensures38,Assert6,H50,H49,H48,H47,H46,H45,H44,H43,Ensures37,Ensures36,Ensures35,H42,Ensures34,Ensures33,H41,H40,H39,H38,H37,H36,Ensures32,H35,H34,Ensures31,Ensures30,H33,Assert5,H32,H31,H30,H29,H28,H27,H26,H25,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,Assert4,Ensures24,Assert3,Ensures23,Ensures22,H24,H23,H22,H21,H20,H19,H18,Ensures21,H17,H16,H15,H14,H13,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,H10,H9,H8,H7,H6,H5,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,Assert2,Ensures7,Assert1,Ensures6,Ensures5,Ensures4,Ensures3,Ensures2,Ensures1,Assert,H145,H144,H143,H142,H129,H128,H12,H11,H3,H2,H1,H">
+    <goal name="wmpn_toom22_mul&#39;vc.360.5.0" expl="VC for wmpn_toom22_mul" proved="true">
+    <proof prover="14"><result status="valid" time="0.011064" steps="5345"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.360.6" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="4"><result status="valid" time="0.270000"/></proof>
@@ -1820,7 +1809,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.362" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.363" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1931,7 +1920,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.367" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.368" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -1959,7 +1948,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.372" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.372.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="4.130000"/></proof>
+   <proof prover="7"><result status="valid" time="4.130000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2469,7 +2458,7 @@
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.110000" steps="28403"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.378.1" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.960000"/></proof>
+   <proof prover="14"><result status="valid" time="0.060062" steps="180428"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.378.2" expl="assertion" proved="true">
    <transf name="rewrite" proved="true" arg1="Power_sum">
@@ -2692,7 +2681,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.380" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.060000"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.381" expl="postcondition" proved="true">
   <transf name="introduce_premises" proved="true" >
@@ -2715,7 +2704,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.383" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.383.0" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.060000"/></proof>
+   <proof prover="7"><result status="valid" time="0.060000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2790,10 +2779,10 @@
     <goal name="wmpn_toom22_mul&#39;vc.393.0.0" expl="integer overflow" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="wmpn_toom22_mul&#39;vc.393.0.0.0" expl="integer overflow" proved="true">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.060000"/></proof>
+     <proof prover="7" memlimit="1000"><result status="valid" time="0.060000"/></proof>
      </goal>
      <goal name="wmpn_toom22_mul&#39;vc.393.0.0.1" expl="integer overflow" proved="true">
-     <proof prover="0"><result status="valid" time="0.060000"/></proof>
+     <proof prover="7"><result status="valid" time="0.060000"/></proof>
      </goal>
     </transf>
     </goal>
@@ -2841,7 +2830,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.398" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.140000"/></proof>
+  <proof prover="7"><result status="valid" time="0.140000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.399" expl="precondition" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.940000" steps="61823"/></proof>
@@ -2849,7 +2838,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.400" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.400.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.400.1" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="2.350000" steps="4853879"/></proof>
@@ -2858,7 +2847,7 @@
    <proof prover="3" memlimit="2000"><result status="valid" time="0.020000" steps="6494"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.400.3" expl="VC for wmpn_toom22_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.060000"/></proof>
+   <proof prover="7"><result status="valid" time="0.060000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.400.4" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="6"><result status="valid" time="0.190000" steps="29272"/></proof>
@@ -2888,7 +2877,7 @@
   <proof prover="6"><result status="valid" time="0.300000" steps="34858"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.403" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.404" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.250000" steps="34788"/></proof>
@@ -2912,7 +2901,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.409" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.409.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.409.1" expl="VC for wmpn_toom22_mul" proved="true">
    <proof prover="3"><result status="valid" time="3.450000" steps="4940861"/></proof>
@@ -2991,7 +2980,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.414" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.414.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.020000"/></proof>
+   <proof prover="7"><result status="valid" time="0.020000"/></proof>
    </goal>
    <goal name="wmpn_toom22_mul&#39;vc.414.1" expl="assertion" proved="true">
    <proof prover="2"><result status="valid" time="0.140000" steps="22109"/></proof>
@@ -3019,7 +3008,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.417" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.417.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3076,19 +3065,19 @@
   <goal name="wmpn_toom22_mul&#39;vc.425" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.425.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.060000"/></proof>
+   <proof prover="7"><result status="valid" time="0.060000"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.426" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.150000"/></proof>
+  <proof prover="7"><result status="valid" time="0.150000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.427" expl="precondition" proved="true">
   <transf name="introduce_premises" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.427.0" expl="precondition" proved="true">
    <transf name="inline_goal" proved="true" >
     <goal name="wmpn_toom22_mul&#39;vc.427.0.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.140000"/></proof>
+    <proof prover="7"><result status="valid" time="0.140000"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3123,7 +3112,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.429" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.430" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3143,7 +3132,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.432" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.060000"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.433" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.040000" steps="79556"/></proof>
@@ -3175,7 +3164,7 @@
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.160000" steps="70290"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.437" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.060000"/></proof>
+  <proof prover="7"><result status="valid" time="0.060000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.438" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.020000" steps="80371"/></proof>
@@ -3203,13 +3192,13 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="82331"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.445" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.446" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.447" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.448" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3221,7 +3210,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.449" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.449.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.300000"/></proof>
+   <proof prover="7"><result status="valid" time="0.300000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3241,7 +3230,7 @@
   <goal name="wmpn_toom22_mul&#39;vc.452" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom22_mul&#39;vc.452.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.210000"/></proof>
+   <proof prover="7"><result status="valid" time="0.210000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3277,7 +3266,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.454" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.455" expl="integer overflow" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.060000" steps="66086"/></proof>
@@ -3361,7 +3350,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.468" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.469" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.220000" steps="36605"/></proof>
@@ -3381,7 +3370,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.471" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom22_mul&#39;vc.472" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -3416,7 +3405,7 @@
     <goal name="wmpn_toom22_mul&#39;vc.476.0.0" expl="assertion" proved="true">
     <transf name="split_vc" proved="true" >
      <goal name="wmpn_toom22_mul&#39;vc.476.0.0.0" expl="assertion" proved="true">
-     <proof prover="0" memlimit="1000"><result status="valid" time="0.060000"/></proof>
+     <proof prover="7" memlimit="1000"><result status="valid" time="0.060000"/></proof>
      </goal>
     </transf>
     </goal>
@@ -3852,12 +3841,11 @@
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.23" expl="assertion" proved="true">
   <proof prover="5"><result status="valid" time="0.603436" steps="147"/></proof>
-  <proof prover="9"><result status="timeout" time="5.000000" steps="5717"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.24" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.24.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.24.1" expl="precondition" proved="true">
    <proof prover="2" timelimit="1"><result status="valid" time="0.110000" steps="13276"/></proof>
@@ -3883,7 +3871,7 @@
   <proof prover="2"><result status="valid" time="0.080000" steps="13603"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.32" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.328928" steps="27589"/></proof>
@@ -4029,7 +4017,7 @@
    <proof prover="2"><result status="valid" time="0.130000" steps="18280"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.69.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.020000"/></proof>
+   <proof prover="7"><result status="valid" time="0.020000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4308,7 +4296,7 @@
   <proof prover="2"><result status="valid" time="0.523443" steps="39811"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.135" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.136" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.150000" steps="18937"/></proof>
@@ -4333,7 +4321,7 @@
   <proof prover="2"><result status="valid" time="0.140000" steps="19530"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.140" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.141" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.180000" steps="17868"/></proof>
@@ -4416,7 +4404,7 @@
   <proof prover="2"><result status="valid" time="1.140918" steps="92389"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.157" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.158" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.120000" steps="17778"/></proof>
@@ -4425,7 +4413,7 @@
   <proof prover="2"><result status="valid" time="0.130000" steps="17808"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.160" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="2.926331"/></proof>
+  <proof prover="7"><result status="valid" time="2.926331"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.161" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.410075" steps="35012"/></proof>
@@ -4482,16 +4470,16 @@
   <goal name="wmpn_toom32_mul&#39;vc.177" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.177.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.090000"/></proof>
+   <proof prover="7"><result status="valid" time="0.090000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.2" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.080000"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.3" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.4" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="2"><result status="valid" time="0.060000" steps="16999"/></proof>
@@ -4503,13 +4491,13 @@
    <proof prover="7"><result status="valid" time="0.020000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.7" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="0.120000"/></proof>
+   <proof prover="7"><result status="valid" time="0.120000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.8" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="2"><result status="valid" time="0.060000" steps="17016"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.9" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="0"><result status="valid" time="1.330000"/></proof>
+   <proof prover="7"><result status="valid" time="1.330000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.177.10" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="7"><result status="valid" time="0.030000"/></proof>
@@ -4547,7 +4535,7 @@
   <proof prover="2"><result status="valid" time="0.120000" steps="16363"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.187" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.188" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
@@ -4649,8 +4637,8 @@
   <goal name="wmpn_toom32_mul&#39;vc.196" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.196.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
    <proof prover="4"><result status="valid" time="2.270000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.196.1" expl="postcondition" proved="true">
    <proof prover="4"><result status="valid" time="0.190000"/></proof>
@@ -4669,7 +4657,7 @@
    <proof prover="2"><result status="valid" time="0.090000" steps="16279"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.199.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4750,6 +4738,11 @@
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.216.7" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="7"><result status="valid" time="1.200000"/></proof>
+   <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,p2i,value,compare_int,identical,toom22_threshold,scratch&#39;unused1,r&#39;unused,( * )&#39;result&#39;unused4,( * )&#39;result&#39;unused3,(&gt;=)&#39;result&#39;unused,(+)&#39;result&#39;unused8,( * )&#39;result&#39;unused2,(-)&#39;result&#39;unused3,(-)&#39;result&#39;unused2,x0&#39;unused,incr&#39;result&#39;unused3,incr&#39;result&#39;unused2,y0&#39;unused,incr&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused7,a0,value&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused6,a1,value&#39;result&#39;unused5,int32&#39;int&#39;result&#39;unused5,a2,value&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused4,b0,value&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused3,b1,value&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused2,m,power&#39;result&#39;unused,(-)&#39;result&#39;unused1,p&#39;unused6,decr_split&#39;result&#39;unused1,(+)&#39;result&#39;unused7,p&#39;unused5,incr_split&#39;result&#39;unused4,p&#39;unused4,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused6,(+)&#39;result&#39;unused5,p&#39;unused3,incr_split&#39;result&#39;unused3,xp1&#39;unused2,p&#39;unused2,xp1&#39;unused1,incr_split&#39;result&#39;unused2,p&#39;unused1,incr_split&#39;result&#39;unused1,p&#39;unused,incr_split&#39;result&#39;unused,v1&#39;unused2,vm1&#39;unused1,xp1_hi&#39;unused1,ref&#39;result&#39;unused4,yp1_hi&#39;unused1,ref&#39;result&#39;unused3,hi&#39;unused1,ref&#39;result&#39;unused2,vm1_neg&#39;unused3,ref&#39;result&#39;unused1,xp1_hi&#39;unused,hi&#39;unused,vm1_neg&#39;unused2,vm1&#39;unused,xp1&#39;unused,vm1_neg&#39;unused1,yp1_hi&#39;unused,vm1_neg&#39;unused,(!)&#39;result&#39;unused4,uint64&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused1,value&#39;result&#39;unused1,am1_abs,(+)&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused,bm1_abs,value&#39;result&#39;unused,(-)&#39;result&#39;unused,sor&#39;unused,v1&#39;unused1,v1&#39;unused,cy&#39;unused3,ref&#39;result&#39;unused,cy&#39;unused2,(!)&#39;result&#39;unused3,(=)&#39;result&#39;unused,sa&#39;unused,incr&#39;result&#39;unused,sn&#39;unused,cy&#39;unused1,scratch&#39;unused,(+)&#39;result&#39;unused3,x&#39;unused,wmpn_add_n_in_place&#39;result&#39;unused,(+)&#39;result&#39;unused2,p2i&#39;result&#39;unused,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,(!)&#39;result&#39;unused2,(!)&#39;result&#39;unused1,(!)&#39;result&#39;unused,( * )&#39;result&#39;unused,(+)&#39;result&#39;unused1,(+)&#39;result&#39;unused,cy&#39;unused,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Mul_distr_l,Unitary,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Mod_bound,Div_unique,Div_bound,Mod_1,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires7,Requires6,Requires5,H124,H123,Requires4,H122,H121,Requires3,Requires2,Requires1,H120,H119,Requires,Ensures140,Ensures139,H118,Ensures138,Ensures137,Ensures136,Ensures135,Assert7,Ensures134,Ensures133,Ensures132,Ensures131,Ensures130,Ensures129,Ensures128,Ensures127,Ensures126,Ensures125,Ensures124,Ensures123,Ensures122,Ensures121,Ensures120,Ensures119,Ensures118,Ensures117,Ensures116,Ensures115,Ensures114,Ensures113,Ensures112,Ensures111,Ensures110,Ensures109,Ensures108,Ensures107,Assert6,Assert5,H113,H112,H111,H110,Ensures106,Ensures105,Ensures104,Ensures103,Ensures102,Ensures101,Ensures100,Ensures99,Ensures98,Ensures97,Ensures96,H109,H108,H107,H106,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Ensures89,Ensures88,Ensures87,Ensures86,H105,H104,H103,H102,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Ensures75,Ensures74,H101,H100,H99,H98,Ensures73,Ensures72,Ensures71,Ensures70,Ensures69,Ensures68,Ensures67,Ensures66,Ensures65,Ensures64,H97,H96,H95,H94,H93,H92,H91,H90,Ensures63,Ensures62,Ensures61,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,H89,H88,H87,H86,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,H85,H84,H83,H82,Ensures43,Ensures42,Ensures41,Ensures40,Ensures39,Ensures38,Ensures37,Ensures36,Ensures35,Ensures34,H81,H80,H79,H78,H77,H76,H75,H74,H73,H72,H71,H70,H69,H68,H67,H66,H65,H64,H63,H62,H61,H60,H59,H58,Ensures33,Ensures32,H57,H56,H55,H54,H53,H52,H51,H50,H49,H48,H47,H46,H45,H44,H43,H42,Ensures31,Ensures30,H41,H40,H39,H38,H37,H36,H35,H34,H33,H32,H31,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,Assert4,H30,H29,H28,H27,H26,H25,Ensures20,H24,H23,Ensures19,Ensures18,H22,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,Assert3,H21,H20,H19,H18,H17,H16,H15,H14,H13,H12,H11,H10,H9,H8,H7,Ensures7,Ensures6,Ensures5,Ensures4,Assert2,Ensures3,Assert1,Assert,H117,H116,H115,H114,H6,H5,H4,H3,H2,H1,H">
+    <goal name="wmpn_toom32_mul&#39;vc.216.7.0" expl="VC for wmpn_toom32_mul" proved="true">
+    <proof prover="7" timelimit="0.080676"><result status="valid" time="0.083529"/></proof>
+    </goal>
+   </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.216.8" expl="VC for wmpn_toom32_mul" proved="true">
    <proof prover="6"><result status="valid" time="0.120000" steps="24180"/></proof>
@@ -4847,7 +4840,7 @@
    <proof prover="2"><result status="valid" time="0.217729" steps="19621"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.235.1" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -4855,7 +4848,7 @@
   <proof prover="2"><result status="valid" time="0.230000" steps="19743"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.237" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.160000"/></proof>
+  <proof prover="7"><result status="valid" time="0.160000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.238" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.190000" steps="19902"/></proof>
@@ -4891,7 +4884,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.246" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.246.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.246.1" expl="precondition" proved="true">
    <proof prover="2"><result status="valid" time="0.060000" steps="17644"/></proof>
@@ -5164,7 +5157,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.270" expl="integer overflow" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.270.0" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -5285,7 +5278,7 @@
    <proof prover="2"><result status="valid" time="0.200000" steps="20564"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.279.1" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -5312,8 +5305,8 @@
   <goal name="wmpn_toom32_mul&#39;vc.283" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.283.0" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
-   <proof prover="2" memlimit="2000"><result status="valid" time="0.200000" steps="20885"/></proof>
+   <proof prover="2" memlimit="2000"><result status="valid" time="0.200000" steps="20792"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.283.1" expl="integer overflow" proved="true">
    <proof prover="4"><result status="valid" time="0.300000"/></proof>
@@ -5321,35 +5314,35 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.284" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.120000" steps="20811"/></proof>
+  <proof prover="2"><result status="valid" time="0.170000" steps="20713"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.285" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.285.0" expl="assertion" proved="true">
    <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
     <goal name="wmpn_toom32_mul&#39;vc.285.0.0" expl="assertion" proved="true">
-    <proof prover="7"><result status="valid" time="0.030000"/></proof>
+    <proof prover="7"><result status="valid" time="0.040000"/></proof>
     </goal>
     <goal name="wmpn_toom32_mul&#39;vc.285.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.500000" steps="44781"/></proof>
+    <proof prover="6"><result status="valid" time="0.510000" steps="44692"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.285.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="29307"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="29249"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.286" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="18333"/></proof>
+  <proof prover="2"><result status="valid" time="0.070000" steps="18322"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.287" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.287.0" expl="postcondition" proved="true">
-   <proof prover="2"><result status="valid" time="0.100000" steps="18317"/></proof>
+   <proof prover="2"><result status="valid" time="0.100000" steps="18306"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.287.1" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -5518,45 +5511,45 @@
    <proof prover="4"><result status="valid" time="0.320000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.300.1" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.020000"/></proof>
+   <proof prover="7"><result status="valid" time="0.020000"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.301" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.301.0" expl="assertion" proved="true">
-   <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="0.440000" steps="935970"/></proof>
+   <proof prover="11" timelimit="5" memlimit="2000"><result status="valid" time="0.440000" steps="1032531"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.302" expl="integer overflow" proved="true">
-  <proof prover="2"><result status="valid" time="0.160000" steps="20985"/></proof>
+  <proof prover="2"><result status="valid" time="0.160000" steps="20887"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.303" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.170000" steps="20815"/></proof>
+  <proof prover="2"><result status="valid" time="0.253143" steps="20717"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.304" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.304.0" expl="assertion" proved="true">
    <transf name="replace" proved="true" arg1="(m*m)" arg2="(power radix (2*n))">
     <goal name="wmpn_toom32_mul&#39;vc.304.0.0" expl="assertion" proved="true">
-    <proof prover="7"><result status="valid" time="0.040000"/></proof>
+    <proof prover="7"><result status="valid" time="0.030000"/></proof>
     </goal>
     <goal name="wmpn_toom32_mul&#39;vc.304.0.1" expl="equality hypothesis" proved="true">
-    <proof prover="6"><result status="valid" time="0.510000" steps="44789"/></proof>
+    <proof prover="6"><result status="valid" time="0.500000" steps="44700"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.304.1" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.220000" steps="29315"/></proof>
+   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.130000" steps="29257"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.305" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="18336"/></proof>
+  <proof prover="2"><result status="valid" time="0.060000" steps="18325"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.306" expl="postcondition" proved="true">
-  <proof prover="2" memlimit="2000"><result status="valid" time="0.120000" steps="18375"/></proof>
+  <proof prover="2" memlimit="2000"><result status="valid" time="0.120000" steps="18364"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.307" expl="integer overflow" proved="true">
   <transf name="inline_goal" proved="true" >
@@ -5952,12 +5945,12 @@
   <goal name="wmpn_toom32_mul&#39;vc.381" expl="assertion" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.381.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.140000"/></proof>
+   <proof prover="7"><result status="valid" time="0.140000"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.382" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.080000"/></proof>
+  <proof prover="7"><result status="valid" time="0.080000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.383" expl="precondition" proved="true">
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.690000" steps="122947"/></proof>
@@ -5972,7 +5965,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.385" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.385.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.385.1" expl="precondition" proved="true">
    <proof prover="2"><result status="valid" time="0.170000" steps="19692"/></proof>
@@ -6069,7 +6062,7 @@
   <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="1.930000" steps="134458"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.397" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.510000"/></proof>
+  <proof prover="7"><result status="valid" time="0.510000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.398" expl="precondition" proved="true">
   <proof prover="7"><result status="valid" time="0.060000"/></proof>
@@ -6078,7 +6071,7 @@
   <proof prover="2"><result status="valid" time="0.080000" steps="20515"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.400" expl="assertion" proved="true">
-  <proof prover="7"><result status="valid" time="0.697160"/></proof>
+  <proof prover="13"><result status="valid" time="1.106632" steps="28985"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.401" expl="postcondition" proved="true">
   <proof prover="12"><result status="valid" time="0.400000"/></proof>
@@ -6152,7 +6145,7 @@
    <proof prover="11"><result status="valid" time="0.580000" steps="1151010"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.419.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6330,7 +6323,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.447" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.447.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.447.1" expl="precondition" proved="true">
    <proof prover="2"><result status="valid" time="0.230000" steps="22123"/></proof>
@@ -6382,7 +6375,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.455" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.455.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.180000"/></proof>
+   <proof prover="7"><result status="valid" time="0.180000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6397,7 +6390,7 @@
   <proof prover="2" memlimit="2000"><result status="valid" time="1.080065" steps="55102"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.459" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.280000"/></proof>
+  <proof prover="7"><result status="valid" time="0.280000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.460" expl="integer overflow" proved="true">
   <transf name="split_vc" proved="true" >
@@ -6423,17 +6416,21 @@
     <goal name="wmpn_toom32_mul&#39;vc.462.0.0" expl="assertion" proved="true">
     <transf name="replace" proved="true" arg1="lvx3" arg2="(value r3n1 n)">
      <goal name="wmpn_toom32_mul&#39;vc.462.0.0.0" expl="assertion" proved="true">
-     <proof prover="7"><result status="valid" time="0.070000"/></proof>
+     <transf name="remove" proved="true" arg1="zero,one,(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,even,odd,prime,map_eq_sub_shift,l2i,p2i,compare_int,identical,toom22_threshold,scratch&#39;unused,r&#39;unused2,( * )&#39;result&#39;unused11,( * )&#39;result&#39;unused10,(&gt;=)&#39;result&#39;unused,(+)&#39;result&#39;unused19,( * )&#39;result&#39;unused9,(-)&#39;result&#39;unused7,(-)&#39;result&#39;unused6,x0&#39;unused,incr&#39;result&#39;unused2,incr&#39;result&#39;unused1,y0&#39;unused,incr&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused22,a0,value&#39;result&#39;unused12,int32&#39;int&#39;result&#39;unused21,a1,value&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused20,a2,value&#39;result&#39;unused10,int32&#39;int&#39;result&#39;unused19,b0,value&#39;result&#39;unused9,int32&#39;int&#39;result&#39;unused18,b1,value&#39;result&#39;unused8,int32&#39;int&#39;result&#39;unused17,power&#39;result&#39;unused,(-)&#39;result&#39;unused5,p&#39;unused10,decr_split&#39;result&#39;unused1,(+)&#39;result&#39;unused18,p&#39;unused9,incr_split&#39;result&#39;unused8,p&#39;unused8,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused17,(+)&#39;result&#39;unused16,p&#39;unused7,incr_split&#39;result&#39;unused7,xp1&#39;unused2,p&#39;unused6,xp1&#39;unused1,incr_split&#39;result&#39;unused6,p&#39;unused5,incr_split&#39;result&#39;unused5,p&#39;unused4,incr_split&#39;result&#39;unused4,v1&#39;unused2,vm1&#39;unused5,xp1_hi&#39;unused1,ref&#39;result&#39;unused4,yp1_hi&#39;unused1,ref&#39;result&#39;unused3,hi&#39;unused2,ref&#39;result&#39;unused2,vm1_neg&#39;unused3,ref&#39;result&#39;unused1,xp1_hi&#39;unused,hi&#39;unused1,vm1_neg&#39;unused2,vm1&#39;unused4,xp1&#39;unused,vm1_neg&#39;unused1,yp1_hi&#39;unused,vm1_neg&#39;unused,(!)&#39;result&#39;unused,uint64&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused8,int32&#39;int&#39;result&#39;unused16,value&#39;result&#39;unused7,am1_abs,(+)&#39;result&#39;unused15,int32&#39;int&#39;result&#39;unused15,bm1_abs,value&#39;result&#39;unused6,(-)&#39;result&#39;unused4,sor&#39;unused2,v1&#39;unused1,v1&#39;unused,cy&#39;unused1,ref&#39;result&#39;unused,cy&#39;unused,p1&#39;unused1,p2&#39;unused1,vm1&#39;unused3,(-)&#39;result&#39;unused3,sor&#39;unused1,vm1&#39;unused2,vm1&#39;unused1,r&#39;unused1,hi&#39;unused,vm1&#39;unused,vx0,( * )&#39;result&#39;unused7,( * )&#39;result&#39;unused6,( * )&#39;result&#39;unused5,vx1,(+)&#39;result&#39;unused14,( * )&#39;result&#39;unused4,( * )&#39;result&#39;unused3,vx2,(+)&#39;result&#39;unused13,vx3,( * )&#39;result&#39;unused2,(+)&#39;result&#39;unused12,( * )&#39;result&#39;unused1,(+)&#39;result&#39;unused11,vy,(+)&#39;result&#39;unused10,p1&#39;unused,p2&#39;unused,( * )&#39;result&#39;unused,(+)&#39;result&#39;unused9,vy0&#39;unused2,int32&#39;int&#39;result&#39;unused14,l02,value&#39;result&#39;unused5,vy1&#39;unused2,p&#39;unused3,vy0&#39;unused1,incr_split&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused13,h02,value&#39;result&#39;unused4,t02,get_ofs&#39;result&#39;unused,vy1&#39;unused1,vy0&#39;unused,ovy1&#39;unused,(-)&#39;result&#39;unused2,sor&#39;unused,r&#39;unused,p&#39;unused2,vy1&#39;unused,incr_split&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused12,(+)&#39;result&#39;unused8,pelts&#39;result&#39;unused9,pelts&#39;result&#39;unused8,r3n&#39;unused,or&#39;unused,p&#39;unused1,incr_split&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused11,(+)&#39;result&#39;unused7,pelts&#39;result&#39;unused7,pelts&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused10,(+)&#39;result&#39;unused6,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused9,lvx0,value&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused8,hvx0,value&#39;result&#39;unused2,(+)&#39;result&#39;unused5,or3n&#39;unused,p&#39;unused,incr_split&#39;result&#39;unused,r2n&#39;unused,int32&#39;int&#39;result&#39;unused7,(+)&#39;result&#39;unused4,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused5,int32&#39;int&#39;result&#39;unused4,(+)&#39;result&#39;unused3,(+)&#39;result&#39;unused2,(-)&#39;result&#39;unused1,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused3,lvx3,value&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused,(+)&#39;result&#39;unused1,(-)&#39;result&#39;unused,value&#39;result&#39;unused,(+)&#39;result&#39;unused,Unit_def_l,Unit_def_r,Inv_def_l,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Mod_bound,Div_unique,Div_bound,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Euclid,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires7,Requires6,Requires5,H210,H209,Requires4,H208,H207,Requires3,Requires2,Requires1,H206,H205,Requires,Ensures207,Ensures206,H204,Ensures205,Ensures204,Ensures203,Ensures202,Assert11,Assert10,Assert9,Ensures201,Ensures200,Ensures199,Ensures198,Ensures197,Ensures196,Ensures195,Ensures194,Ensures193,Ensures192,Ensures191,Ensures190,Ensures189,Ensures188,Ensures187,Ensures186,Ensures185,Ensures184,Ensures183,Ensures182,Ensures181,Ensures180,Ensures179,Ensures178,Ensures177,Ensures176,Ensures175,Ensures174,Assert8,Assert7,H203,H202,H201,H200,Ensures173,Ensures172,Ensures171,Ensures170,Ensures169,Ensures168,Ensures167,Ensures166,Ensures165,Ensures164,Ensures163,H199,H198,H197,H196,Ensures162,Ensures161,Ensures160,Ensures159,Ensures158,Ensures157,Ensures156,Ensures155,Ensures154,Ensures153,H195,H194,H193,H192,Ensures152,Ensures151,Ensures150,Ensures149,Ensures148,Ensures147,Ensures146,Ensures145,Ensures144,Ensures143,Ensures142,Ensures141,H191,H190,H189,H188,Ensures140,Ensures139,Ensures138,Ensures137,Ensures136,Ensures135,Ensures134,Ensures133,Ensures132,Ensures131,H187,H186,H185,H184,H183,H182,H181,H180,Ensures130,Ensures129,Ensures128,Ensures127,Ensures126,Ensures125,Ensures124,Ensures123,Ensures122,Ensures121,H179,H178,H177,H176,Ensures120,Ensures119,Ensures118,Ensures117,Ensures116,Ensures115,Ensures114,Ensures113,Ensures112,Ensures111,H175,H174,H173,H172,Ensures110,Ensures109,Ensures108,Ensures107,Ensures106,Ensures105,Ensures104,Ensures103,Ensures102,Ensures101,H171,H170,H169,H168,H167,H166,H165,H164,H163,H162,H161,H160,H159,H158,H157,H156,H155,H154,H153,H152,H151,H150,H149,H148,Ensures100,Ensures99,H147,H146,H145,H144,H143,H142,H141,H140,H139,H138,H137,H136,H135,H134,H133,H132,Ensures98,Ensures97,H131,H130,H129,H128,H127,H126,H125,H124,H123,H122,H121,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Ensures89,Ensures88,H120,H119,H118,H117,H116,H115,Ensures87,H114,H113,H112,H111,H110,H109,H108,H107,H106,H105,Ensures86,Ensures85,Ensures84,Ensures83,H104,H103,H102,H101,H100,H99,H98,H97,H96,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Ensures75,Ensures74,H95,H94,H93,H92,H91,H90,H89,H88,Ensures73,Ensures72,Ensures71,Ensures70,H87,H86,H85,H84,H83,H82,Assert6,Assert5,H81,H80,H79,H78,H77,H76,H75,Ensures69,Ensures68,Assert4,H74,H73,H72,H71,H70,Ensures67,Ensures66,Ensures65,Ensures64,Ensures63,Ensures62,Assert3,H69,H68,H67,H66,H65,H64,H63,H62,Ensures61,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,Ensures52,H61,H60,H59,H58,H57,H56,H55,H54,H53,H52,H51,H50,H49,H48,H47,H46,H45,H44,H43,H42,H41,H40,H39,H38,H37,H36,H35,H34,H33,H32,Ensures51,Ensures50,H31,H30,H29,H28,H27,H26,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,H25,H24,H23,H22,H21,H20,H19,H18,Ensures40,Ensures39,Ensures38,Ensures37,Ensures36,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Assert2,H17,H16,H15,H14,Ensures29,H13,H12,Ensures28,Assert1,H11,H10,H9,H8,H7,H6,H5,H4,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Assert,H2,H1,H,Ensures13,Ensures11,Ensures10,Ensures9,Ensures8,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Ensures">
+      <goal name="wmpn_toom32_mul&#39;vc.462.0.0.0.0" expl="assertion" proved="true">
+      <proof prover="14"><result status="valid" time="0.009142" steps="6939"/></proof>
+      </goal>
+     </transf>
      </goal>
      <goal name="wmpn_toom32_mul&#39;vc.462.0.0.1" expl="equality hypothesis" proved="true">
-     <proof prover="7"><result status="valid" time="0.020000"/></proof>
+     <proof prover="13"><result status="valid" time="1.695302" steps="82972"/></proof>
      </goal>
     </transf>
     </goal>
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.462.1" expl="equality hypothesis" proved="true">
-   <proof prover="7" memlimit="1000"><result status="valid" time="0.050000"/></proof>
+   <proof prover="13"><result status="valid" time="1.155391" steps="25091"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6443,7 +6440,7 @@
    <proof prover="11"><result status="valid" time="0.040000" steps="31352"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.463.1" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6560,7 +6557,7 @@
    <proof prover="2" timelimit="1"><result status="valid" time="0.180000" steps="21240"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.481.1" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6634,7 +6631,7 @@
   <proof prover="2"><result status="valid" time="0.273023" steps="25227"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.498" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.499" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.170000" steps="22449"/></proof>
@@ -6664,7 +6661,7 @@
    <goal name="wmpn_toom32_mul&#39;vc.503.0" expl="precondition" proved="true">
    <transf name="split_vc" proved="true" >
     <goal name="wmpn_toom32_mul&#39;vc.503.0.0" expl="precondition" proved="true">
-    <proof prover="0"><result status="valid" time="0.100000"/></proof>
+    <proof prover="7"><result status="valid" time="0.100000"/></proof>
     </goal>
     <goal name="wmpn_toom32_mul&#39;vc.503.0.1" expl="precondition" proved="true">
     <proof prover="2" timelimit="1"><result status="valid" time="0.268277" steps="26030"/></proof>
@@ -6819,7 +6816,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.524" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.525" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
@@ -6827,7 +6824,7 @@
    <proof prover="2" memlimit="2000"><result status="valid" time="0.312574" steps="27360"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.525.1" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -6931,7 +6928,7 @@
   <proof prover="2"><result status="valid" time="2.329996" steps="53824"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.537" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.538" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.323424" steps="28319"/></proof>
@@ -6963,7 +6960,7 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.543" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000"/></proof>
+  <proof prover="7"><result status="valid" time="0.050000"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.544" expl="integer overflow" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.324352" steps="28549"/></proof>
@@ -7233,10 +7230,10 @@
   <goal name="wmpn_toom32_mul&#39;vc.565" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.565.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.220000"/></proof>
+   <proof prover="7"><result status="valid" time="0.220000"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.565.1" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.230000"/></proof>
+   <proof prover="7"><result status="valid" time="0.230000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -7244,7 +7241,11 @@
   <proof prover="2" memlimit="2000"><result status="valid" time="0.180000" steps="25746"/></proof>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.567" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.210000"/></proof>
+  <transf name="remove" proved="true" arg1="zero,one,(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,p2i,value,compare_int,identical,toom22_threshold,scratch&#39;unused,r&#39;unused4,( * )&#39;result&#39;unused27,( * )&#39;result&#39;unused26,(&gt;=)&#39;result&#39;unused,(+)&#39;result&#39;unused39,( * )&#39;result&#39;unused25,(-)&#39;result&#39;unused10,(-)&#39;result&#39;unused9,x0&#39;unused,incr&#39;result&#39;unused3,incr&#39;result&#39;unused2,y0&#39;unused,incr&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused37,a0,value&#39;result&#39;unused15,int32&#39;int&#39;result&#39;unused36,a1,value&#39;result&#39;unused14,int32&#39;int&#39;result&#39;unused35,a2,value&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused34,b0,value&#39;result&#39;unused12,int32&#39;int&#39;result&#39;unused33,b1,value&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused32,m,power&#39;result&#39;unused,(-)&#39;result&#39;unused8,p&#39;unused10,decr_split&#39;result&#39;unused1,(+)&#39;result&#39;unused38,p&#39;unused9,incr_split&#39;result&#39;unused8,p&#39;unused8,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused37,(+)&#39;result&#39;unused36,p&#39;unused7,incr_split&#39;result&#39;unused7,xp1&#39;unused2,p&#39;unused6,xp1&#39;unused1,incr_split&#39;result&#39;unused6,p&#39;unused5,incr_split&#39;result&#39;unused5,p&#39;unused4,incr_split&#39;result&#39;unused4,v1&#39;unused2,vm1&#39;unused5,xp1_hi&#39;unused1,ref&#39;result&#39;unused6,yp1_hi&#39;unused1,ref&#39;result&#39;unused5,hi&#39;unused2,ref&#39;result&#39;unused4,vm1_neg&#39;unused3,ref&#39;result&#39;unused3,xp1_hi&#39;unused,hi&#39;unused1,vm1_neg&#39;unused2,vm1&#39;unused4,xp1&#39;unused,vm1_neg&#39;unused1,yp1_hi&#39;unused,vm1_neg&#39;unused,(!)&#39;result&#39;unused8,uint64&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused24,int32&#39;int&#39;result&#39;unused31,value&#39;result&#39;unused10,am1_abs,(+)&#39;result&#39;unused35,int32&#39;int&#39;result&#39;unused30,bm1_abs,value&#39;result&#39;unused9,(-)&#39;result&#39;unused7,sor&#39;unused2,v1&#39;unused1,v1&#39;unused,cy&#39;unused1,ref&#39;result&#39;unused2,cy&#39;unused,p1&#39;unused4,p2&#39;unused4,vm1&#39;unused3,(-)&#39;result&#39;unused6,sor&#39;unused1,vm1&#39;unused2,vm1&#39;unused1,r&#39;unused3,hi&#39;unused,vm1&#39;unused,vx0,( * )&#39;result&#39;unused23,( * )&#39;result&#39;unused22,( * )&#39;result&#39;unused21,vx1,(+)&#39;result&#39;unused34,( * )&#39;result&#39;unused20,( * )&#39;result&#39;unused19,vx2,(+)&#39;result&#39;unused33,vx3,( * )&#39;result&#39;unused18,(+)&#39;result&#39;unused32,( * )&#39;result&#39;unused17,(+)&#39;result&#39;unused31,vy,(+)&#39;result&#39;unused30,p1&#39;unused3,p2&#39;unused3,( * )&#39;result&#39;unused16,(+)&#39;result&#39;unused29,vy0&#39;unused2,int32&#39;int&#39;result&#39;unused29,l02,value&#39;result&#39;unused8,vy1&#39;unused2,p&#39;unused3,vy0&#39;unused1,incr_split&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused28,h02,value&#39;result&#39;unused7,t02,get_ofs&#39;result&#39;unused1,vy1&#39;unused1,vy0&#39;unused,ovy1&#39;unused,(-)&#39;result&#39;unused5,sor&#39;unused,r&#39;unused2,p&#39;unused2,vy1&#39;unused,incr_split&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused27,(+)&#39;result&#39;unused28,pelts&#39;result&#39;unused22,pelts&#39;result&#39;unused21,r3n&#39;unused1,or&#39;unused2,p&#39;unused1,incr_split&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused26,(+)&#39;result&#39;unused27,pelts&#39;result&#39;unused20,pelts&#39;result&#39;unused19,int32&#39;int&#39;result&#39;unused25,(+)&#39;result&#39;unused26,pelts&#39;result&#39;unused18,pelts&#39;result&#39;unused17,int32&#39;int&#39;result&#39;unused24,lvx0,value&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused23,hvx0,value&#39;result&#39;unused5,(+)&#39;result&#39;unused25,or3n&#39;unused1,p&#39;unused,incr_split&#39;result&#39;unused,r2n&#39;unused2,int32&#39;int&#39;result&#39;unused22,(+)&#39;result&#39;unused24,pelts&#39;result&#39;unused16,pelts&#39;result&#39;unused15,int32&#39;int&#39;result&#39;unused21,int32&#39;int&#39;result&#39;unused20,int32&#39;int&#39;result&#39;unused19,(+)&#39;result&#39;unused23,(+)&#39;result&#39;unused22,(-)&#39;result&#39;unused4,pelts&#39;result&#39;unused14,pelts&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused18,lvx3,value&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused17,int32&#39;int&#39;result&#39;unused16,int32&#39;int&#39;result&#39;unused15,(+)&#39;result&#39;unused21,(-)&#39;result&#39;unused3,hvx3,value&#39;result&#39;unused3,(+)&#39;result&#39;unused20,int32&#39;int&#39;result&#39;unused14,vvy0,value&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused13,vvy1,value&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused12,(+)&#39;result&#39;unused19,vvy2,value&#39;result&#39;unused,x&#39;unused6,wmpn_sub_n_in_place&#39;result&#39;unused1,bo4,ref&#39;result&#39;unused1,ly2,get_ofs&#39;result&#39;unused,(+)&#39;result&#39;unused18,to_int64&#39;result&#39;unused3,h&#39;unused5,ref&#39;result&#39;unused,bo&#39;unused3,x&#39;unused5,wmpn_sub_n_in_place&#39;result&#39;unused,(!)&#39;result&#39;unused7,x&#39;unused4,wmpn_sub_1_in_place&#39;result&#39;unused1,(+)&#39;result&#39;unused17,bo&#39;unused2,bo&#39;unused1,r&#39;unused1,wmpn_sub_n&#39;result&#39;unused,(!)&#39;result&#39;unused6,x&#39;unused3,wmpn_sub_1_in_place&#39;result&#39;unused,(+)&#39;result&#39;unused16,bo&#39;unused,(!)&#39;result&#39;unused5,to_int64&#39;result&#39;unused2,(!)&#39;result&#39;unused4,(-)&#39;result&#39;unused2,h&#39;unused4,r2n&#39;unused1,r1n&#39;unused2,r3n&#39;unused,or1n&#39;unused1,or2n&#39;unused,or3n&#39;unused,p1&#39;unused2,p2&#39;unused2,(+)&#39;result&#39;unused15,p1&#39;unused1,p2&#39;unused1,int32&#39;int&#39;result&#39;unused11,(+)&#39;result&#39;unused14,pelts&#39;result&#39;unused12,pelts&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused10,( * )&#39;result&#39;unused15,(+)&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused9,(+)&#39;result&#39;unused12,pelts&#39;result&#39;unused10,pelts&#39;result&#39;unused9,int32&#39;int&#39;result&#39;unused8,( * )&#39;result&#39;unused14,(+)&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused7,( * )&#39;result&#39;unused13,(+)&#39;result&#39;unused10,pelts&#39;result&#39;unused8,pelts&#39;result&#39;unused7,( * )&#39;result&#39;unused12,( * )&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused6,(+)&#39;result&#39;unused9,( * )&#39;result&#39;unused10,int32&#39;int&#39;result&#39;unused5,(+)&#39;result&#39;unused8,int32&#39;int&#39;result&#39;unused4,(+)&#39;result&#39;unused7,pelts&#39;result&#39;unused6,h&#39;unused3,r1n&#39;unused1,( * )&#39;result&#39;unused9,x&#39;unused2,wmpn_add_in_place&#39;result&#39;unused,to_int64&#39;result&#39;unused1,(!)&#39;result&#39;unused3,(+)&#39;result&#39;unused6,h&#39;unused2,r1n&#39;unused,or&#39;unused1,or1n&#39;unused,p1&#39;unused,p2&#39;unused,int32&#39;int&#39;result&#39;unused3,(+)&#39;result&#39;unused5,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused2,( * )&#39;result&#39;unused8,(+)&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused1,(+)&#39;result&#39;unused3,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,( * )&#39;result&#39;unused7,(+)&#39;result&#39;unused2,(-)&#39;result&#39;unused1,(+)&#39;result&#39;unused1,(&gt;)&#39;result&#39;unused,( * )&#39;result&#39;unused6,incr&#39;result&#39;unused,r2n&#39;unused,h&#39;unused1,r&#39;unused,( * )&#39;result&#39;unused5,( * )&#39;result&#39;unused4,or&#39;unused,( * )&#39;result&#39;unused3,x&#39;unused1,wmpn_sub_in_place&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused2,(+)&#39;result&#39;unused,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,( * )&#39;result&#39;unused1,( * )&#39;result&#39;unused,to_int64&#39;result&#39;unused,(!)&#39;result&#39;unused2,(-)&#39;result&#39;unused,h&#39;unused,(!)&#39;result&#39;unused1,(&lt;)&#39;result&#39;unused,(!)&#39;result&#39;unused,(-_)&#39;result&#39;unused,of_int64&#39;result&#39;unused,x&#39;unused,Unit_def_l,Inv_def_l,Assoc1,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires7,Requires6,Requires5,H309,H308,Requires4,H307,H306,Requires3,Requires2,Requires1,H305,H304,Requires,Ensures283,Ensures282,H303,Ensures281,Ensures280,Ensures279,Ensures278,Assert24,Assert23,Assert22,Ensures277,Ensures276,Ensures275,Ensures274,Ensures273,Ensures272,Ensures271,Ensures270,Ensures269,Ensures268,Ensures267,Ensures266,Ensures265,Ensures264,Ensures263,Ensures262,Ensures261,Ensures260,Ensures259,Ensures258,Ensures257,Ensures256,Ensures255,Ensures254,Ensures253,Ensures252,Ensures251,Ensures250,Assert21,Assert20,H302,H301,H300,H299,Ensures249,Ensures248,Ensures247,Ensures246,Ensures245,Ensures244,Ensures243,Ensures242,Ensures241,Ensures240,Ensures239,H298,H297,H296,H295,Ensures238,Ensures237,Ensures236,Ensures235,Ensures234,Ensures233,Ensures232,Ensures231,Ensures230,Ensures229,H294,H293,H292,H291,Ensures228,Ensures227,Ensures226,Ensures225,Ensures224,Ensures223,Ensures222,Ensures221,Ensures220,Ensures219,Ensures218,Ensures217,H290,H289,H288,H287,Ensures216,Ensures215,Ensures214,Ensures213,Ensures212,Ensures211,Ensures210,Ensures209,Ensures208,Ensures207,H286,H285,H284,H283,H282,H281,H280,H279,Ensures206,Ensures205,Ensures204,Ensures203,Ensures202,Ensures201,Ensures200,Ensures199,Ensures198,Ensures197,H278,H277,H276,H275,Ensures196,Ensures195,Ensures194,Ensures193,Ensures192,Ensures191,Ensures190,Ensures189,Ensures188,Ensures187,H274,H273,H272,H271,Ensures186,Ensures185,Ensures184,Ensures183,Ensures182,Ensures181,Ensures180,Ensures179,Ensures178,Ensures177,H270,H269,H268,H267,H266,H265,H264,H263,H262,H261,H260,H259,H258,H257,H256,H255,H254,H253,H252,H251,H250,H249,H248,H247,Ensures176,Ensures175,H246,H245,H244,H243,H242,H241,H240,H239,H238,H237,H236,H235,H234,H233,H232,H231,Ensures174,Ensures173,H230,H229,H228,H227,H226,H225,H224,H223,H222,H221,H220,Ensures172,Ensures171,Ensures170,Ensures169,Ensures168,Ensures167,Ensures166,Ensures165,Ensures164,H219,H218,H217,H216,H215,H214,Ensures163,H213,H212,H211,H210,H209,H208,H207,H206,H205,H204,Ensures162,Ensures161,Ensures160,Ensures159,H203,H202,H201,H200,H199,H198,H197,H196,H195,Ensures158,Ensures157,Ensures156,Ensures155,Ensures154,Ensures153,Ensures152,Ensures151,Ensures150,H194,H193,H192,H191,H190,H189,H188,H187,Ensures149,Ensures148,Ensures147,Ensures146,H186,H185,H184,H183,H182,H181,Assert19,Assert18,H180,H179,H178,H177,H176,H175,H174,Ensures145,Ensures144,Assert17,H173,H172,H171,H170,H169,Ensures143,Ensures142,Ensures141,Ensures140,Ensures139,Ensures138,Assert16,H168,H167,H166,H165,H164,H163,H162,H161,Ensures137,Ensures136,Ensures135,Ensures134,Ensures133,Ensures132,Ensures131,Ensures130,Ensures129,Ensures128,H160,H159,H158,H157,H156,H155,H154,H153,H152,H151,H150,H149,H148,H147,H146,H145,H144,H143,H142,H141,H140,H139,H138,H137,H136,H135,H134,H133,H132,H131,Ensures127,Ensures126,H130,H129,H128,H127,H126,H125,Ensures125,Ensures124,Ensures123,Ensures122,Ensures121,Ensures120,Ensures119,Ensures118,Ensures117,H124,H123,H122,H121,H120,H119,H118,H117,Ensures116,Ensures115,Ensures114,Ensures113,Ensures112,Ensures111,Ensures110,Ensures109,Ensures108,Ensures107,Ensures106,Assert15,H116,H115,H114,H113,Ensures105,H112,H111,Ensures104,Assert14,H110,H109,H108,H107,H106,H105,H104,H103,Ensures103,Ensures102,Ensures101,Ensures100,Ensures99,Ensures98,Ensures97,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Assert13,H102,H101,H100,H99,Ensures89,Ensures88,Ensures87,Ensures86,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Assert12,Assert11,Assert10,H98,H97,H96,H95,H94,H93,Ensures75,H92,H91,Ensures74,Assert9,Ensures73,H90,H89,Ensures72,Ensures71,H88,H87,H86,H85,H84,H83,Ensures70,H82,H81,Ensures69,H80,H79,H78,H77,H76,H75,Ensures68,H74,H73,Ensures67,Ensures66,Assert8,Assert7,H72,H71,H70,H69,H68,H67,H66,H65,Ensures65,Ensures64,H64,H63,H62,H61,H60,H59,Ensures63,H58,H57,Ensures62,Ensures61,Assert6,Assert5,Ensures60,Ensures59,H56,H55,H54,H53,H52,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,H51,H50,H49,H48,H47,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,H46,H45,Ensures40,H44,H43,H42,H41,H40,H39,Ensures39,H38,H37,Ensures38,Ensures37,Ensures36,Assert4,H36,H35,H34,H33,H32,H31,H30,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,H29,H28,Assert3,Ensures27,Ensures26,Ensures25,H27,Ensures24,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,H26,Assert2,Ensures12,H25,H24,H23,H22,H21,H20,H19,H18,H17,H16,H15,H14,H13,Ensures11,H12,H11,Ensures10,Ensures9,Assert1,Ensures8,Ensures7,Ensures6,H10,Ensures5,Ensures4,H9,Assert,H7,H6,H5,H4,H3,H2,H1,H,Ensures">
+   <goal name="wmpn_toom32_mul&#39;vc.567.0" expl="postcondition" proved="true">
+   <proof prover="14"><result status="valid" time="0.007029" steps="6168"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.568" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -7367,7 +7368,11 @@
   </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.574" expl="postcondition" proved="true">
-  <proof prover="7"><result status="valid" time="0.050000"/></proof>
+  <transf name="remove" proved="true" arg1="zero,one,(-),(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,pelts,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,p2i,value,compare_int,identical,toom22_threshold,scratch&#39;unused,r&#39;unused4,( * )&#39;result&#39;unused27,( * )&#39;result&#39;unused26,(&gt;=)&#39;result&#39;unused,(+)&#39;result&#39;unused39,( * )&#39;result&#39;unused25,(-)&#39;result&#39;unused10,(-)&#39;result&#39;unused9,x0&#39;unused,incr&#39;result&#39;unused3,incr&#39;result&#39;unused2,y0&#39;unused,incr&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused37,a0,value&#39;result&#39;unused15,int32&#39;int&#39;result&#39;unused36,a1,value&#39;result&#39;unused14,int32&#39;int&#39;result&#39;unused35,a2,value&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused34,b0,value&#39;result&#39;unused12,int32&#39;int&#39;result&#39;unused33,b1,value&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused32,m,power&#39;result&#39;unused,(-)&#39;result&#39;unused8,p&#39;unused10,decr_split&#39;result&#39;unused1,(+)&#39;result&#39;unused38,p&#39;unused9,incr_split&#39;result&#39;unused8,p&#39;unused8,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused37,(+)&#39;result&#39;unused36,p&#39;unused7,incr_split&#39;result&#39;unused7,xp1&#39;unused2,p&#39;unused6,xp1&#39;unused1,incr_split&#39;result&#39;unused6,p&#39;unused5,incr_split&#39;result&#39;unused5,p&#39;unused4,incr_split&#39;result&#39;unused4,v1&#39;unused2,vm1&#39;unused5,xp1_hi&#39;unused1,ref&#39;result&#39;unused6,yp1_hi&#39;unused1,ref&#39;result&#39;unused5,hi&#39;unused2,ref&#39;result&#39;unused4,vm1_neg&#39;unused3,ref&#39;result&#39;unused3,xp1_hi&#39;unused,hi&#39;unused1,vm1_neg&#39;unused2,vm1&#39;unused4,xp1&#39;unused,vm1_neg&#39;unused1,yp1_hi&#39;unused,vm1_neg&#39;unused,(!)&#39;result&#39;unused8,uint64&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused24,int32&#39;int&#39;result&#39;unused31,value&#39;result&#39;unused10,am1_abs,(+)&#39;result&#39;unused35,int32&#39;int&#39;result&#39;unused30,bm1_abs,value&#39;result&#39;unused9,(-)&#39;result&#39;unused7,sor&#39;unused2,v1&#39;unused1,v1&#39;unused,cy&#39;unused1,ref&#39;result&#39;unused2,cy&#39;unused,p1&#39;unused4,p2&#39;unused4,vm1&#39;unused3,(-)&#39;result&#39;unused6,sor&#39;unused1,vm1&#39;unused2,vm1&#39;unused1,r&#39;unused3,hi&#39;unused,vm1&#39;unused,vx0,( * )&#39;result&#39;unused23,( * )&#39;result&#39;unused22,( * )&#39;result&#39;unused21,vx1,(+)&#39;result&#39;unused34,( * )&#39;result&#39;unused20,( * )&#39;result&#39;unused19,vx2,(+)&#39;result&#39;unused33,vx3,( * )&#39;result&#39;unused18,(+)&#39;result&#39;unused32,( * )&#39;result&#39;unused17,(+)&#39;result&#39;unused31,vy,(+)&#39;result&#39;unused30,p1&#39;unused3,p2&#39;unused3,( * )&#39;result&#39;unused16,(+)&#39;result&#39;unused29,vy0&#39;unused2,int32&#39;int&#39;result&#39;unused29,l02,value&#39;result&#39;unused8,vy1&#39;unused2,p&#39;unused3,vy0&#39;unused1,incr_split&#39;result&#39;unused3,int32&#39;int&#39;result&#39;unused28,h02,value&#39;result&#39;unused7,t02,get_ofs&#39;result&#39;unused1,vy1&#39;unused1,vy0&#39;unused,ovy1&#39;unused,(-)&#39;result&#39;unused5,sor&#39;unused,r&#39;unused2,p&#39;unused2,vy1&#39;unused,incr_split&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused27,(+)&#39;result&#39;unused28,pelts&#39;result&#39;unused22,pelts&#39;result&#39;unused21,r3n&#39;unused1,or&#39;unused2,p&#39;unused1,incr_split&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused26,(+)&#39;result&#39;unused27,pelts&#39;result&#39;unused20,pelts&#39;result&#39;unused19,int32&#39;int&#39;result&#39;unused25,(+)&#39;result&#39;unused26,pelts&#39;result&#39;unused18,pelts&#39;result&#39;unused17,int32&#39;int&#39;result&#39;unused24,lvx0,value&#39;result&#39;unused6,int32&#39;int&#39;result&#39;unused23,hvx0,value&#39;result&#39;unused5,(+)&#39;result&#39;unused25,or3n&#39;unused1,p&#39;unused,incr_split&#39;result&#39;unused,r2n&#39;unused2,int32&#39;int&#39;result&#39;unused22,(+)&#39;result&#39;unused24,pelts&#39;result&#39;unused16,pelts&#39;result&#39;unused15,int32&#39;int&#39;result&#39;unused21,int32&#39;int&#39;result&#39;unused20,int32&#39;int&#39;result&#39;unused19,(+)&#39;result&#39;unused23,(+)&#39;result&#39;unused22,(-)&#39;result&#39;unused4,pelts&#39;result&#39;unused14,pelts&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused18,lvx3,value&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused17,int32&#39;int&#39;result&#39;unused16,int32&#39;int&#39;result&#39;unused15,(+)&#39;result&#39;unused21,(-)&#39;result&#39;unused3,hvx3,value&#39;result&#39;unused3,(+)&#39;result&#39;unused20,int32&#39;int&#39;result&#39;unused14,vvy0,value&#39;result&#39;unused2,int32&#39;int&#39;result&#39;unused13,vvy1,value&#39;result&#39;unused1,int32&#39;int&#39;result&#39;unused12,(+)&#39;result&#39;unused19,vvy2,value&#39;result&#39;unused,x&#39;unused6,wmpn_sub_n_in_place&#39;result&#39;unused1,bo4,ref&#39;result&#39;unused1,ly2,get_ofs&#39;result&#39;unused,(+)&#39;result&#39;unused18,to_int64&#39;result&#39;unused3,h&#39;unused5,ref&#39;result&#39;unused,bo&#39;unused3,x&#39;unused5,wmpn_sub_n_in_place&#39;result&#39;unused,(!)&#39;result&#39;unused7,x&#39;unused4,wmpn_sub_1_in_place&#39;result&#39;unused1,(+)&#39;result&#39;unused17,bo&#39;unused2,bo&#39;unused1,r&#39;unused1,wmpn_sub_n&#39;result&#39;unused,(!)&#39;result&#39;unused6,x&#39;unused3,wmpn_sub_1_in_place&#39;result&#39;unused,(+)&#39;result&#39;unused16,bo&#39;unused,(!)&#39;result&#39;unused5,to_int64&#39;result&#39;unused2,(!)&#39;result&#39;unused4,(-)&#39;result&#39;unused2,h&#39;unused4,r2n&#39;unused1,r1n&#39;unused2,r3n&#39;unused,or1n&#39;unused1,or2n&#39;unused,or3n&#39;unused,p1&#39;unused2,p2&#39;unused2,(+)&#39;result&#39;unused15,p1&#39;unused1,p2&#39;unused1,int32&#39;int&#39;result&#39;unused11,(+)&#39;result&#39;unused14,pelts&#39;result&#39;unused12,pelts&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused10,( * )&#39;result&#39;unused15,(+)&#39;result&#39;unused13,int32&#39;int&#39;result&#39;unused9,(+)&#39;result&#39;unused12,pelts&#39;result&#39;unused10,pelts&#39;result&#39;unused9,int32&#39;int&#39;result&#39;unused8,( * )&#39;result&#39;unused14,(+)&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused7,( * )&#39;result&#39;unused13,(+)&#39;result&#39;unused10,pelts&#39;result&#39;unused8,pelts&#39;result&#39;unused7,( * )&#39;result&#39;unused12,( * )&#39;result&#39;unused11,int32&#39;int&#39;result&#39;unused6,(+)&#39;result&#39;unused9,( * )&#39;result&#39;unused10,int32&#39;int&#39;result&#39;unused5,(+)&#39;result&#39;unused8,int32&#39;int&#39;result&#39;unused4,(+)&#39;result&#39;unused7,pelts&#39;result&#39;unused6,h&#39;unused3,r1n&#39;unused1,( * )&#39;result&#39;unused9,x&#39;unused2,wmpn_add_in_place&#39;result&#39;unused,to_int64&#39;result&#39;unused1,(!)&#39;result&#39;unused3,(+)&#39;result&#39;unused6,h&#39;unused2,r1n&#39;unused,or&#39;unused1,or1n&#39;unused,p1&#39;unused,p2&#39;unused,int32&#39;int&#39;result&#39;unused3,(+)&#39;result&#39;unused5,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused2,( * )&#39;result&#39;unused8,(+)&#39;result&#39;unused4,int32&#39;int&#39;result&#39;unused1,(+)&#39;result&#39;unused3,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,( * )&#39;result&#39;unused7,(+)&#39;result&#39;unused2,(-)&#39;result&#39;unused1,(+)&#39;result&#39;unused1,(&gt;)&#39;result&#39;unused,( * )&#39;result&#39;unused6,incr&#39;result&#39;unused,r2n&#39;unused,h&#39;unused1,r&#39;unused,( * )&#39;result&#39;unused5,( * )&#39;result&#39;unused4,or&#39;unused,( * )&#39;result&#39;unused3,x&#39;unused1,wmpn_sub_in_place&#39;result&#39;unused,int32&#39;int&#39;result&#39;unused,( * )&#39;result&#39;unused2,(+)&#39;result&#39;unused,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,( * )&#39;result&#39;unused1,( * )&#39;result&#39;unused,to_int64&#39;result&#39;unused,(!)&#39;result&#39;unused2,(-)&#39;result&#39;unused,h&#39;unused,(!)&#39;result&#39;unused1,(&lt;)&#39;result&#39;unused,(!)&#39;result&#39;unused,of_int64&#39;result&#39;unused,x&#39;unused,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Assoc1,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires7,Requires6,Requires5,H309,H308,Requires4,H307,H306,Requires3,Requires2,Requires1,H305,H304,Requires,Ensures282,Ensures281,H303,Ensures280,Ensures279,Ensures278,Ensures277,Assert24,Assert23,Assert22,Ensures276,Ensures275,Ensures274,Ensures273,Ensures272,Ensures271,Ensures270,Ensures269,Ensures268,Ensures267,Ensures266,Ensures265,Ensures264,Ensures263,Ensures262,Ensures261,Ensures260,Ensures259,Ensures258,Ensures257,Ensures256,Ensures255,Ensures254,Ensures253,Ensures252,Ensures251,Ensures250,Ensures249,Assert21,Assert20,H302,H301,H300,H299,Ensures248,Ensures247,Ensures246,Ensures245,Ensures244,Ensures243,Ensures242,Ensures241,Ensures240,Ensures239,Ensures238,H298,H297,H296,H295,Ensures237,Ensures236,Ensures235,Ensures234,Ensures233,Ensures232,Ensures231,Ensures230,Ensures229,Ensures228,H294,H293,H292,H291,Ensures227,Ensures226,Ensures225,Ensures224,Ensures223,Ensures222,Ensures221,Ensures220,Ensures219,Ensures218,Ensures217,Ensures216,H290,H289,H288,H287,Ensures215,Ensures214,Ensures213,Ensures212,Ensures211,Ensures210,Ensures209,Ensures208,Ensures207,Ensures206,H286,H285,H284,H283,H282,H281,H280,H279,Ensures205,Ensures204,Ensures203,Ensures202,Ensures201,Ensures200,Ensures199,Ensures198,Ensures197,Ensures196,H278,H277,H276,H275,Ensures195,Ensures194,Ensures193,Ensures192,Ensures191,Ensures190,Ensures189,Ensures188,Ensures187,Ensures186,H274,H273,H272,H271,Ensures185,Ensures184,Ensures183,Ensures182,Ensures181,Ensures180,Ensures179,Ensures178,Ensures177,Ensures176,H270,H269,H268,H267,H266,H265,H264,H263,H262,H261,H260,H259,H258,H257,H256,H255,H254,H253,H252,H251,H250,H249,H248,H247,Ensures175,Ensures174,H246,H245,H244,H243,H242,H241,H240,H239,H238,H237,H236,H235,H234,H233,H232,H231,Ensures173,Ensures172,H230,H229,H228,H227,H226,H225,H224,H223,H222,H221,H220,Ensures171,Ensures170,Ensures169,Ensures168,Ensures167,Ensures166,Ensures165,Ensures164,Ensures163,H219,H218,H217,H216,H215,H214,Ensures162,H213,H212,H211,H210,H209,H208,H207,H206,H205,H204,Ensures161,Ensures160,Ensures159,Ensures158,H203,H202,H201,H200,H199,H198,H197,H196,H195,Ensures157,Ensures156,Ensures155,Ensures154,Ensures153,Ensures152,Ensures151,Ensures150,Ensures149,H194,H193,H192,H191,H190,H189,H188,H187,Ensures148,Ensures147,Ensures146,Ensures145,H186,H185,H184,H183,H182,H181,Assert19,Assert18,H180,H179,H178,H177,H176,H175,H174,Ensures144,Ensures143,Assert17,H173,H172,H171,H170,H169,Ensures142,Ensures141,Ensures140,Ensures139,Ensures138,Ensures137,Assert16,H168,H167,H166,H165,H164,H163,H162,H161,Ensures136,Ensures135,Ensures134,Ensures133,Ensures132,Ensures131,Ensures130,Ensures129,Ensures128,Ensures127,H160,H159,H158,H157,H156,H155,H154,H153,H152,H151,H150,H149,H148,H147,H146,H145,H144,H143,H142,H141,H140,H139,H138,H137,H136,H135,H134,H133,H132,H131,Ensures126,Ensures125,H130,H129,H128,H127,H126,H125,Ensures124,Ensures123,Ensures122,Ensures121,Ensures120,Ensures119,Ensures118,Ensures117,Ensures116,H124,H123,H122,H121,H120,H119,H118,H117,Ensures115,Ensures114,Ensures113,Ensures112,Ensures111,Ensures110,Ensures109,Ensures108,Ensures107,Ensures106,Ensures105,Assert15,H116,H115,H114,H113,Ensures104,H112,H111,Ensures103,Assert14,H110,H109,H108,H107,H106,H105,H104,H103,Ensures102,Ensures101,Ensures100,Ensures99,Ensures98,Ensures97,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Ensures89,Assert13,H102,H101,H100,H99,Ensures88,Ensures87,Ensures86,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Ensures75,Assert12,Assert11,Assert10,H98,H97,H96,H95,H94,H93,Ensures74,H92,H91,Ensures73,Assert9,Ensures72,H90,H89,Ensures71,Ensures70,H88,H87,H86,H85,H84,H83,Ensures69,H82,H81,Ensures68,H80,H79,H78,H77,H76,H75,Ensures67,H74,H73,Ensures66,Ensures65,Assert8,Assert7,H72,H71,H70,H69,H68,H67,H66,H65,Ensures64,Ensures63,H64,H63,H62,H61,H60,H59,Ensures62,H58,H57,Ensures61,Ensures60,Assert6,Assert5,Ensures59,Ensures58,H56,H55,H54,H53,H52,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,Ensures52,H51,H50,H49,H48,H47,Ensures51,Ensures50,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,H46,H45,Ensures39,H44,H43,H42,H41,H40,H39,Ensures38,H38,H37,Ensures37,Ensures36,Ensures35,Assert4,H36,H35,H34,H33,H32,H31,H30,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,H29,H28,Assert3,Ensures26,Ensures25,Ensures24,H27,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,H26,Assert2,Ensures11,H25,H24,H23,H22,H21,H20,H19,H18,H17,H16,H15,H14,H13,Ensures10,H12,H11,Ensures9,Ensures8,Assert1,Ensures7,Ensures6,Ensures5,H10,Ensures4,Ensures3,H9,Assert,H7,H6,H5,H4,H3,H2,H1,H,Ensures">
+   <goal name="wmpn_toom32_mul&#39;vc.574.0" expl="postcondition" proved="true">
+   <proof prover="14"><result status="valid" time="0.012510" steps="5624"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpn_toom32_mul&#39;vc.575" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -7437,7 +7442,7 @@
    </transf>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.575.10" expl="VC for wmpn_toom32_mul" proved="true">
-   <proof prover="7"><result status="valid" time="0.259663"/></proof>
+   <proof prover="14" timelimit="5"><result status="valid" time="0.078591" steps="224379"/></proof>
    </goal>
    <goal name="wmpn_toom32_mul&#39;vc.575.11" expl="VC for wmpn_toom32_mul" proved="true">
    <transf name="cut" proved="true" arg1="(power radix sy * value x sx &lt; power radix sy * power radix sx)">
@@ -7544,7 +7549,7 @@
   <goal name="wmpn_toom32_mul&#39;vc.582" expl="integer overflow" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_toom32_mul&#39;vc.582.0" expl="integer overflow" proved="true">
-   <proof prover="0"><result status="valid" time="0.080000"/></proof>
+   <proof prover="7"><result status="valid" time="0.080000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -7903,7 +7908,7 @@
   <goal name="wmpn_mul&#39;vc.59" expl="loop invariant init" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_mul&#39;vc.59.0" expl="loop invariant init" proved="true">
-   <proof prover="0"><result status="valid" time="0.110000"/></proof>
+   <proof prover="7"><result status="valid" time="0.110000"/></proof>
    </goal>
    <goal name="wmpn_mul&#39;vc.59.1" expl="loop invariant init" proved="true">
    <proof prover="2" timelimit="1"><result status="valid" time="0.070000" steps="14092"/></proof>
@@ -8006,7 +8011,7 @@
   <proof prover="11"><result status="valid" time="0.060000" steps="142480"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.89" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000"/></proof>
+  <proof prover="7"><result status="valid" time="0.030000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.90" expl="precondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.170000" steps="18087"/></proof>
@@ -8053,7 +8058,6 @@
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_mul&#39;vc.96.0" expl="precondition" proved="true">
    <proof prover="5"><result status="valid" time="1.703907" steps="269"/></proof>
-   <proof prover="9"><result status="timeout" time="5.000000" steps="17217"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8094,7 +8098,11 @@
    <proof prover="6" timelimit="5" memlimit="2000"><result status="valid" time="0.200000" steps="27061"/></proof>
    </goal>
    <goal name="wmpn_mul&#39;vc.105.1" expl="assertion" proved="true">
-   <proof prover="7"><result status="valid" time="0.292093"/></proof>
+   <transf name="remove" proved="true" arg1="zero,one,(&gt;),(&lt;=),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,p2i,compare_int,identical,toom22_threshold,r&#39;unused2,(&lt;=)&#39;result&#39;unused,( * )&#39;result&#39;unused5,(+)&#39;result&#39;unused6,of_int32&#39;result&#39;unused1,salloc&#39;result&#39;unused1,p&#39;unused1,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused5,p&#39;unused,incr_split&#39;result&#39;unused,( * )&#39;result&#39;unused4,( * )&#39;result&#39;unused3,(&gt;=)&#39;result&#39;unused1,un&#39;unused2,ref&#39;result&#39;unused4,( * )&#39;result&#39;unused2,(/)&#39;result&#39;unused,(+)&#39;result&#39;unused4,( * )&#39;result&#39;unused1,of_int32&#39;result&#39;unused,salloc&#39;result&#39;unused,scratch&#39;unused1,r&#39;unused1,(!)&#39;result&#39;unused13,(-)&#39;result&#39;unused,un&#39;unused1,incr&#39;result&#39;unused3,up&#39;unused1,ref&#39;result&#39;unused3,incr&#39;result&#39;unused2,rp&#39;unused4,ref&#39;result&#39;unused2,ou&#39;unused,ref&#39;result&#39;unused1,or&#39;unused,ref&#39;result&#39;unused,un,up&#39;unused,rp&#39;unused3,ou,or,un&#39;unused,( * )&#39;result&#39;unused,(!)&#39;result&#39;unused12,(&gt;=)&#39;result&#39;unused,o_r&#39;unused,rrp&#39;unused,(!)&#39;result&#39;unused11,o_rp&#39;unused,(!)&#39;result&#39;unused10,(!)&#39;result&#39;unused9,(!)&#39;result&#39;unused8,scratch&#39;unused,ws&#39;unused,(!)&#39;result&#39;unused7,x&#39;unused,rp&#39;unused2,wmpn_add_n_in_place&#39;result&#39;unused,(!)&#39;result&#39;unused6,p2i&#39;result&#39;unused2,(+)&#39;result&#39;unused3,pelts&#39;result&#39;unused7,pelts&#39;result&#39;unused6,(!)&#39;result&#39;unused5,incr&#39;result&#39;unused1,incr&#39;result&#39;unused,orp&#39;unused,rp&#39;unused1,r&#39;unused,rp&#39;unused,int32&#39;int&#39;result&#39;unused,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,(!)&#39;result&#39;unused4,p2i&#39;result&#39;unused1,(+)&#39;result&#39;unused2,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,p2i&#39;result&#39;unused,(!)&#39;result&#39;unused3,(+)&#39;result&#39;unused1,(!)&#39;result&#39;unused2,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,(!)&#39;result&#39;unused1,(+)&#39;result&#39;unused,(!)&#39;result&#39;unused,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm2,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires5,Requires4,Requires3,Requires2,H95,H94,Requires1,Requires,H93,H92,H91,Ensures104,Ensures103,Ensures102,Ensures101,Ensures100,Ensures99,Ensures98,Ensures97,H90,H89,H88,H87,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Ensures89,Ensures88,Ensures87,Ensures86,H86,H85,H84,H83,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Ensures75,Ensures74,H82,Ensures73,Ensures72,Assert6,Ensures71,Ensures70,Ensures69,Ensures68,Ensures67,Ensures66,Ensures65,Ensures64,H81,H80,H79,H78,H77,H76,Ensures63,Ensures62,Ensures61,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,Ensures39,Ensures38,H75,H74,H73,H72,H71,H70,H69,H68,H67,H66,H65,H64,H63,H62,LoopInvariant12,LoopInvariant11,H61,H60,LoopInvariant10,LoopInvariant9,LoopInvariant8,LoopInvariant6,H59,H58,LoopInvariant5,H57,H56,LoopInvariant4,LoopInvariant3,H55,H54,H53,H52,H51,LoopInvariant2,LoopInvariant1,LoopInvariant,Ensures37,H50,Ensures36,Assert5,H49,H48,H47,H46,H45,H44,Ensures35,Ensures34,Ensures33,Ensures32,Ensures31,Ensures30,Ensures29,Ensures28,Ensures27,H43,H42,H41,H40,H39,H38,H37,H36,H35,H33,H32,H31,H30,H29,H27,H26,H25,H24,H23,H22,Ensures26,Ensures25,Ensures24,Assert4,Assert3,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Ensures10,Ensures9,Ensures8,H21,H20,H19,H18,H17,H16,H15,H13,H11,H10,H9,H8,H7,H5,H4,H3,H2,Ensures7,Ensures6,Ensures5,Ensures4,Ensures3,Assert2,Assert1,Assert,Ensures2,H1,H">
+    <goal name="wmpn_mul&#39;vc.105.1.0" expl="assertion" proved="true">
+    <proof prover="9" timelimit="1"><result status="valid" time="0.032309" steps="225"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -8385,7 +8393,7 @@
   <goal name="wmpn_mul&#39;vc.141" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_mul&#39;vc.141.0" expl="loop invariant preservation" proved="true">
-   <proof prover="0"><result status="valid" time="0.030000"/></proof>
+   <proof prover="7"><result status="valid" time="0.030000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8420,7 +8428,7 @@
   <proof prover="9" memlimit="2000"><result status="valid" time="0.180208" steps="4771"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.152" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.050000"/></proof>
+  <proof prover="7"><result status="valid" time="0.050000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.153" expl="integer overflow" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.240000" steps="28522"/></proof>
@@ -8470,7 +8478,7 @@
   <goal name="wmpn_mul&#39;vc.168" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_mul&#39;vc.168.0" expl="postcondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.050000"/></proof>
+   <proof prover="7"><result status="valid" time="0.050000"/></proof>
    </goal>
    <goal name="wmpn_mul&#39;vc.168.1" expl="postcondition" proved="true">
    <proof prover="2" timelimit="1"><result status="valid" time="0.100000" steps="15223"/></proof>
@@ -8552,7 +8560,7 @@
   <goal name="wmpn_mul&#39;vc.188" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_mul&#39;vc.188.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.040000"/></proof>
+   <proof prover="7"><result status="valid" time="0.040000"/></proof>
    </goal>
   </transf>
   </goal>
@@ -8834,7 +8842,11 @@
   <goal name="wmpn_mul&#39;vc.234" expl="precondition" proved="true">
   <transf name="inline_goal" proved="true" >
    <goal name="wmpn_mul&#39;vc.234.0" expl="precondition" proved="true">
-   <proof prover="7"><result status="valid" time="0.590000"/></proof>
+   <transf name="remove" proved="true" arg1="one,(&gt;),(&gt;=),abs,get,set,([]&#39;),([&lt;-]&#39;),const,map_eq_sub,min_unsigned3,in_bounds6,int32&#39;maxInt,int32&#39;minInt,int32&#39;eq,min_int32,max_int32,to_int3,in_bounds5,uint32&#39;maxInt,uint32&#39;minInt,uint32&#39;eq,max_uint32,length1,radix1,to_int2,min_unsigned1,in_bounds1,min_unsigned2,in_bounds4,(!),int64&#39;maxInt,int64&#39;minInt,int64&#39;eq,min_int64,max_int64,to_int1,in_bounds2,uint64&#39;maxInt,uint64&#39;minInt,uint64&#39;eq,max_uint64,length,radix,to_int,min_unsigned,in_bounds,([]),in_us_bounds,in_bounds3,plength,valid_ptr_shift,valid,even,odd,divides,prime,coprime,map_eq_sub_shift,l2i,value,compare_int,identical,toom22_threshold,r&#39;unused3,(&lt;=)&#39;result&#39;unused,( * )&#39;result&#39;unused5,(+)&#39;result&#39;unused10,of_int32&#39;result&#39;unused1,salloc&#39;result&#39;unused1,p&#39;unused1,decr_split&#39;result&#39;unused,(+)&#39;result&#39;unused9,p&#39;unused,incr_split&#39;result&#39;unused,( * )&#39;result&#39;unused4,( * )&#39;result&#39;unused3,(&gt;=)&#39;result&#39;unused1,un&#39;unused3,ref&#39;result&#39;unused4,( * )&#39;result&#39;unused2,(/)&#39;result&#39;unused,(+)&#39;result&#39;unused8,( * )&#39;result&#39;unused1,of_int32&#39;result&#39;unused,salloc&#39;result&#39;unused,scratch&#39;unused1,r&#39;unused2,(!)&#39;result&#39;unused23,(-)&#39;result&#39;unused,un&#39;unused2,incr&#39;result&#39;unused3,up&#39;unused1,ref&#39;result&#39;unused3,incr&#39;result&#39;unused2,rp&#39;unused4,ref&#39;result&#39;unused2,ou&#39;unused1,ref&#39;result&#39;unused1,or&#39;unused1,ref&#39;result&#39;unused,un,up&#39;unused,rp&#39;unused3,ou,or,un&#39;unused1,( * )&#39;result&#39;unused,(!)&#39;result&#39;unused22,(&gt;=)&#39;result&#39;unused,(!)&#39;result&#39;unused21,(!)&#39;result&#39;unused20,o_r&#39;unused,rrp&#39;unused,(!)&#39;result&#39;unused19,o_rp&#39;unused,scratch&#39;unused,ws&#39;unused,(!)&#39;result&#39;unused18,x&#39;unused1,rp&#39;unused2,wmpn_add_n_in_place&#39;result&#39;unused,(!)&#39;result&#39;unused17,p2i&#39;result&#39;unused3,(+)&#39;result&#39;unused7,pelts&#39;result&#39;unused9,pelts&#39;result&#39;unused8,(!)&#39;result&#39;unused16,incr&#39;result&#39;unused1,incr&#39;result&#39;unused,orp&#39;unused1,rp&#39;unused1,(!)&#39;result&#39;unused15,r&#39;unused1,rp&#39;unused,(!)&#39;result&#39;unused14,int32&#39;int&#39;result&#39;unused,pelts&#39;result&#39;unused7,pelts&#39;result&#39;unused6,(!)&#39;result&#39;unused13,p2i&#39;result&#39;unused2,(+)&#39;result&#39;unused6,pelts&#39;result&#39;unused5,pelts&#39;result&#39;unused4,p2i&#39;result&#39;unused1,(!)&#39;result&#39;unused12,(+)&#39;result&#39;unused5,(!)&#39;result&#39;unused11,pelts&#39;result&#39;unused3,pelts&#39;result&#39;unused2,(!)&#39;result&#39;unused10,(+)&#39;result&#39;unused4,(!)&#39;result&#39;unused9,(+)&#39;result&#39;unused3,(!)&#39;result&#39;unused8,(!)&#39;result&#39;unused7,(!)&#39;result&#39;unused6,(!)&#39;result&#39;unused5,(+)&#39;result&#39;unused2,(!)&#39;result&#39;unused4,(!)&#39;result&#39;unused3,(+)&#39;result&#39;unused1,(!)&#39;result&#39;unused2,orp&#39;unused,rpn&#39;unused,or&#39;unused,ou&#39;unused,un&#39;unused,r&#39;unused,(!)&#39;result&#39;unused1,x&#39;unused,(!)&#39;result&#39;unused,p2i&#39;result&#39;unused,(+)&#39;result&#39;unused,pelts&#39;result&#39;unused1,pelts&#39;result&#39;unused,Unit_def_r,Inv_def_l,Inv_def_r,Comm2,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Abs_le,Abs_pos,Div_mod,Mod_bound,Div_unique,Div_bound,Mod_1,Div_1,Div_inf,Div_inf_neg,Mod_0,Div_1_left,Div_minus1_left,Mod_1_left,Mod_minus1_left,Div_mult,Mod_mult,Div_mod1,Div_bound1,Mod_bound1,Div_sign_pos,Div_sign_neg,Mod_sign_pos,Mod_sign_neg,Rounds_toward_zero,Div_11,Mod_11,Div_inf1,Mod_inf,Div_mult1,Mod_mult1,Power_0,Power_s,Power_s_alt,Power_1,Power_sum,Power_mult,Power_comm1,Power_comm2,Power_non_neg,Power_pos,Power_monotonic,to_int_in_bounds5,extensionality5,zero_unsigned_is_zero3,radix_def,int32&#39;inj,to_int_in_bounds4,extensionality4,uint32&#39;inj,to_int_in_bounds1,extensionality1,zero_unsigned_is_zero1,to_int_in_bounds3,extensionality3,zero_unsigned_is_zero2,is_msb_set&#39;spec1,int64&#39;inj,to_int_in_bounds2,extensionality2,uint64&#39;inj,to_int_in_bounds,extensionality,zero_unsigned_is_zero,uint64_max&#39;def,is_msb_set&#39;spec,array&#39;invariant,([&lt;-])&#39;spec,([&lt;-])&#39;spec&#39;0,make_spec,is_not_null&#39;spec,valid_itv_to_shift,even_or_odd,even_not_odd,odd_not_even,even_odd,odd_even,even_even,odd_odd,even_2k,odd_2k1,even_mod2,divides&#39;spec,divides_refl,divides_1_n,divides_0,divides_left,divides_right,divides_oppr,divides_oppl,divides_oppr_rev,divides_oppl_rev,divides_plusr,divides_minusr,divides_multl,divides_multr,divides_factorl,divides_factorr,divides_n_1,divides_antisym,divides_trans,divides_bounds,mod_divides_euclidean,divides_mod_euclidean,mod_divides_computer,divides_mod_computer,even_divides,odd_divides,gcd_nonneg,gcd_def1,gcd_def2,gcd_def3,gcd_unique,Assoc,Comm,gcd_0_pos,gcd_0_neg,gcd_opp,gcd_euclid,Gcd_computer_mod,Gcd_euclidean_mod,gcd_mult,not_prime_1,prime_2,prime_3,prime_divisors,small_divisors,even_prime,odd_prime,prime_coprime,Gauss,Euclid,gcd_coprime,valuation&#39;spec,valuation&#39;spec&#39;0,valuation&#39;def,valuation_mul,power_ge_1,valuation_times_pow,valuation_split,valuation_lower_bound,valuation_pow,valuation_monotonous,valuation_nondiv,valuation_zero_prod,valuation_times_nondiv,valuation_prod,valuation_mod,valuation_decomp,map_eq_shift,map_eq_shift_zero,limb_max_bound,prod_compat_strict_r,prod_compat_r,prod_compat_strict_lr,prod_compat_lr,simp_compat_strict_l,value_sub&#39;def,value_sub_frame,value_sub_frame_shift,value_sub_tail,value_sub_concat,value_sub_head,value_sub_update,value_zero,value_sub_update_no_change,value_sub_shift_no_change,value_sub_lower_bound,value_sub_upper_bound,value_sub_lower_bound_tight,value_sub_upper_bound_tight,value_tail,value_concat,value_sub_eq,pow2_64,mod_mult,no_borrow,no_borrow_ptr,Requires5,Requires4,Requires3,Requires2,H114,H113,Requires1,Requires,H112,H111,H110,Ensures104,Ensures103,Ensures102,Ensures101,Ensures100,Ensures99,Ensures98,Ensures97,H109,H108,H107,H106,Ensures96,Ensures95,Ensures94,Ensures93,Ensures92,Ensures91,Ensures90,Ensures89,Ensures88,Ensures87,Ensures86,H105,H104,H103,H102,Ensures85,Ensures84,Ensures83,Ensures82,Ensures81,Ensures80,Ensures79,Ensures78,Ensures77,Ensures76,Ensures75,Ensures74,H101,Ensures73,Ensures72,Assert12,Ensures71,Ensures70,Ensures69,Ensures68,Ensures67,Ensures66,Ensures65,Ensures64,H100,H99,H98,H97,H96,H95,Ensures63,Ensures62,Ensures61,Ensures60,Ensures59,Ensures58,Ensures57,Ensures56,Ensures55,Ensures54,Ensures53,Ensures52,Ensures51,Ensures50,Ensures49,Ensures48,Ensures47,Ensures46,Ensures45,Ensures44,Ensures43,Ensures42,Ensures41,Ensures40,Ensures39,Ensures38,H94,H93,H92,H91,H90,H89,H88,H87,H86,H85,H84,H83,H82,H81,LoopInvariant12,H80,H79,LoopInvariant10,LoopInvariant9,LoopInvariant8,LoopInvariant6,H78,H77,LoopInvariant5,H76,H75,LoopInvariant4,LoopInvariant3,H74,H73,H72,H71,H70,LoopInvariant2,LoopInvariant1,LoopInvariant,Ensures37,H69,Ensures36,Assert11,H68,H67,H66,H65,H64,H63,Ensures35,H62,H61,H60,H59,H58,H57,H56,H55,H54,H53,H52,H51,H50,H49,H48,H46,H45,H44,H43,H42,H40,H39,H38,H37,H36,H35,Ensures34,Ensures33,Ensures32,Assert10,Assert9,Assert8,Ensures30,Ensures29,Ensures28,Ensures27,Ensures26,Ensures25,Ensures24,Ensures23,Ensures22,Ensures21,Ensures20,Ensures19,Ensures18,Ensures17,Ensures16,H34,H33,H31,H30,H29,H28,H27,H26,H25,H24,H23,H22,H21,H20,H18,H17,H16,H15,Ensures15,Ensures14,Ensures13,Ensures12,Ensures11,Assert7,Assert6,Assert5,Ensures10,Ensures9,Assert4,Ensures8,Ensures7,Assert3,Ensures6,Assert2,Ensures5,Ensures4,Assert1,H14,Ensures3,Ensures2,Assert,H13,H11,H9,H8,H7,H6,H5,H3,H2,H1,H,Ensures1">
+    <goal name="wmpn_mul&#39;vc.234.0.0" expl="precondition" proved="true">
+    <proof prover="9" timelimit="1"><result status="valid" time="0.035093" steps="46"/></proof>
+    </goal>
+   </transf>
    </goal>
   </transf>
   </goal>
@@ -8965,7 +8977,7 @@
   <proof prover="6"><result status="valid" time="0.350000" steps="49571"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.260" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.261" expl="postcondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.160000" steps="20444"/></proof>
@@ -9021,7 +9033,7 @@
   <proof prover="6"><result status="valid" time="0.260000" steps="33465"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.276" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.277" expl="precondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.110000" steps="12895"/></proof>
@@ -9039,7 +9051,7 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.110000" steps="13534"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.282" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.283" expl="precondition" proved="true">
   <proof prover="2" timelimit="1"><result status="valid" time="0.100000" steps="13257"/></proof>
@@ -9056,7 +9068,7 @@
   </transf>
   </goal>
   <goal name="wmpn_mul&#39;vc.286" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.287" expl="precondition" proved="true">
   <proof prover="9" memlimit="2000"><result status="valid" time="0.319219" steps="3429"/></proof>
@@ -9198,7 +9210,7 @@
   <proof prover="2" timelimit="1"><result status="valid" time="0.070000" steps="16040"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.333" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.040000"/></proof>
+  <proof prover="7"><result status="valid" time="0.040000"/></proof>
   </goal>
   <goal name="wmpn_mul&#39;vc.334" expl="postcondition" proved="true">
   <proof prover="9" timelimit="1"><result status="valid" time="0.110000" steps="417"/></proof>

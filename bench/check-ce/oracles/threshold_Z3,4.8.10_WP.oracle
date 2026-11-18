@@ -109,43 +109,92 @@ File threshold.mlw:
             max = epsilon x:int32. int32'int x = 0,
             result = epsilon x:int32. int32'int x = 1 ] }
 
-Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
   - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
-- Checked model 1: BAD_CE
-  - Concrete RAC: NORMAL
-  - Abstract RAC: NORMAL
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/threshold.mlw", line 30, characters 11-24)
 File "bench/check-ce/threshold.mlw", line 30, characters 11-24:
-Sub-goal Arithmetic overflow of goal f'vc.
-Prover result is: Step limit exceeded (500058 steps).
+Sub-goal Unsigned addition overflow of goal f'vc.
+Prover result is: Unknown (sat) (2896 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File threshold.mlw:
   Line 26:
     n = (0:t)
-    min = (2147745792:t)
-    max = (2147745792:t)
+    min = (2147483648:t)
+    max = (2147483648:t)
     n = (0:t)
-    min = (2147745792:t)
-    max = (2147745792:t)
+    min = (2147483648:t)
+    max = (2147483648:t)
     Execution of main function `f` with env:
       { lsenv = [];
-        vsenv = [ n = (0:t), min = (2147745792:t), max = (2147745792:t) ];
+        vsenv = [ n = (0:t), min = (2147483648:t), max = (2147483648:t) ];
         rsenv = []; idenv = [] }
   Line 30:
     (giant-step) execution of unimplemented function `u_add` with args:
-      [ a = (2147745792:t), b = (2147745792:t) ]
+      [ a = (2147483648:t), b = (2147483648:t) ]
     Property failure at precondition of `u_add` with env:
       { lsenv = [];
         vsenv =
-          [ a = (2147745792:t), b = (2147745792:t), n = (0:t),
-            min = (2147745792:t), max = (2147745792:t) ]; rsenv = [];
-        idenv = [ a = (2147745792:t), b = (2147745792:t) ] }
+          [ a = (2147483648:t), b = (2147483648:t), n = (0:t),
+            min = (2147483648:t), max = (2147483648:t) ]; rsenv = [];
+        idenv = [ a = (2147483648:t), b = (2147483648:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
 
 Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -156,7 +205,7 @@ Warning: Error while interpreting to_int1: No lsymbol found for qualified identi
   - Abstract RAC: NORMAL
 File "bench/check-ce/threshold.mlw", line 27, characters 13-45:
 Sub-goal Postcondition of goal f'vc.
-Prover result is: Step limit exceeded (500098 steps).
+Prover result is: Step limit exceeded (500095 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File threshold.mlw:

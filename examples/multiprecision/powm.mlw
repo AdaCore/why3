@@ -98,7 +98,8 @@ module Powm
     requires { 0 < n }
     requires { odd m }
     ensures  { mod u1 m = mod u2 m }
-  = let rec lemma mod_pow (a b k m:int)
+  = if m = 1 then () else
+    let rec lemma mod_pow (a b k m:int)
       requires { mod a m = mod b m }
       requires { 0 < k }
       requires { 0 < m }
@@ -664,7 +665,8 @@ module Powm
                                     + power 2 (bi - nbits) * result }
     ensures  { bi < nbits -> valueb p bi = result }
     ensures  { 0 <= result < power 2 nbits }
-    ensures  { result = mod (div (value p pn) (power 2 (bi - nbits)))
+    ensures  { nbits <= bi -> 
+               result = mod (div (value p pn) (power 2 (bi - nbits)))
                                                       (power 2 nbits)  }
   =
     if bi < nbits

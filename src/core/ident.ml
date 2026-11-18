@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -37,9 +37,6 @@ let create_attribute s = Hsattr.hashcons {
   attr_string = s;
   attr_tag    = -1
 }
-
-let sexp_of_attribute a = Mysexplib.Std.sexp_of_string a.attr_string
-let attribute_of_sexp s = create_attribute (Mysexplib.Std.string_of_sexp s)
 
 let list_attributes () =
   let acc = ref [] in

@@ -1,0 +1,66 @@
+
+(** {1 Binomial coefficients}
+
+    Using dynamic programming.
+
+    See also binomial.mlw.
+
+    Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+use int.Int
+use int.MinMax
+use array.Array
+
+(** specification *)
+let rec function comb (n k: int) : int
+  requires { 0 <= k <= n }
+  variant  { n }
+  ensures  { result >= 1 }
+= if k = 0 || k = n then 1 else comb (n-1) k + comb (n-1) (k-1)
+
+(** simple implementation with an array of size `n+1` *)
+let compute0 (n k: int) : (r: int)
+  requires { 0 <= k <= n }
+  ensures  { r = comb n k }
+= let a = Array.make (n+1) 1 in
+  for i = 0 to n-1 do
+    invariant { forall j. 0 <= j <= i -> a[j] = comb i j }
+    invariant { forall j. i <  j <= n -> a[j] = 1        }
+    for j = i downto 1 do
+      invariant { forall j'. 0  <= j' <= j   -> a[j'] = comb i     j' }
+      invariant { forall j'. j   < j' <= i+1 -> a[j'] = comb (i+1) j' }
+      invariant { forall j'. i+1 < j' <= n   -> a[j'] = 1             }
+      a[j] <- a[j] + a[j-1]
+    done
+  done;
+  return a[k]
+
+(** less naive implementation with an array of size `k+1` *)
+let compute1 (n k: int) : (r: int)
+  requires { 0 <= k <= n }
+  ensures  { r = comb n k }
+= let a = Array.make (k+1) 1 in
+  for i = 0 to n-1 do
+    invariant { forall j. 0 <= j <= min i k -> a[j] = comb i j }
+    invariant { forall j. i <  j <= k       -> a[j] = 1        }
+    for j = min i k downto 1 do
+      invariant { forall j'. 0  <= j' <= j           -> a[j'] = comb i     j' }
+      invariant { forall j'. j   < j' <= min (i+1) k -> a[j'] = comb (i+1) j' }
+      invariant { forall j'. i+1 < j' <= k           -> a[j'] = 1             }
+      a[j] <- a[j] + a[j-1]
+    done
+  done;
+  return a[k]
+
+let rec lemma symmetry (n k: int)
+  requires { 0 <= k <= n }
+  ensures  { comb n (n - k) = comb n k }
+  variant  { n }
+= if 0 < k < n then (symmetry (n-1) k; symmetry (n-1) (k-1))
+
+(** even less naive using symmetry *)
+let compute2 (n k: int) : (r: int)
+  requires { 0 <= k <= n }
+  ensures  { r = comb n k }
+= compute1 n (min k (n-k))

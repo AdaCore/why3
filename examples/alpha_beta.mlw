@@ -17,7 +17,7 @@ type position
 val constant inf: int
   ensures { 0 < result }
 
-val function f (p: position) : int
+val function f (_: position) : int
   ensures { -inf <= result <= inf }
 
 (** A game tree is either a leaf with a position or some internal node with

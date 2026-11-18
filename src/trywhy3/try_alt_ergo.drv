@@ -1,80 +1,81 @@
-(* Driver for Alt-Ergo, specific variant for Try Why3 *)
+(* Driver for Alt-Ergo with SMT input format, specific variant for Try Why3 *)
 
-prelude "(* this is the prelude for Alt-Ergo, version for Try Why3 *)"
+prelude ";; this is the prelude for Alt-Ergo, Dolmen frontend, version for Try Why3"
 
-filename "%f-%t-%g.ae"
+prelude "(set-logic ALL)"
+prelude "(set-info :smt-lib-version 2.6)"
 
+filename "%f-%t-%g.psmt2"
+printer "smtv2.6par"
+
+unknown "^\\(unknown\\|sat\\|Fail\\)$" "\\1"
+unknown "^(:reason-unknown \\([^)]*\\))$" "\\1"
+time "why3cpulimit time : %s s"
+valid "^unsat$"
+valid "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Valid"
+unknown "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?I don't know" ""
+steplimitexceeded "^\\[Error\\]; Fatal Error: Steps limit reached"
+unknown "^unsupported$" "unsupported"
+
+steps "^; File \".*\", line [0-9]+, characters [0-9]+-[0-9]+:.*(\\([0-9]+.?[0-9]*\\) steps)" 1
+steps "^\\[Error\\]; Fatal Error: Steps limit reached: \\([0-9]+.?[0-9]*\\)" 1
+steps "^Fatal error: exception AltErgoLib.Util.Step_limit_reached(\\([0-9]+.?[0-9]*\\))" 1
+
+(* Performed introductions depending on whether counterexamples are
+   requested, as said by the meta "get_counterexmp". When this meta
+   set, this transformation introduces the model variables that are
+   still embedded in the goal. When it is not set, it removes all
+   these unused-ce-related variables, even in the context.  *)
+transformation "counterexamples_dependent_intros"
+
+transformation "monomorphise_goal"
+transformation "extensionality_goal"
 transformation "inline_trivial"
-
 transformation "eliminate_builtin"
+transformation "remove_unused_keep_constants"
 transformation "eliminate_recursion"
 transformation "eliminate_inductive"
+transformation "eliminate_epsilon"
 transformation "eliminate_algebraic"
 transformation "eliminate_literal"
-transformation "eliminate_epsilon"
-(* transformation "eliminate_if" *)
-transformation "eliminate_let_term"
 transformation "split_premise_right"
 transformation "simplify_formula"
 
 
-(* Why drivers for Alt-Ergo: common part *)
-
-printer "alt-ergo"
-
-(********
-  valid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Valid"
-  invalid "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Invalid"
-  unknown "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?I don't know" ""
-  timeout "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Timeout"
-  timeout "^Timeout$"
-  steplimitexceeded "^File \".*\", line [0-9]+, characters [0-9]+-[0-9]+: ?Steps limit reached"
-  steplimitexceeded "^Steps limit reached"
-  steplimitexceeded "^\\[Error\\]Fatal Error: Steps limit reached"
-  outofmemory "Fatal error: out of memory"
-  outofmemory "Fatal error: exception Stack_overflow"
-  fail "typing error:\\(.*\\)$" "Failure : File generation error : \\1"
-  time "Valid (%s)"
-  time "Valid (%s)"
-  steps "Valid (\\([0-9]+.?[0-9]*\\)) (\\([0-9]+.?[0-9]*\\))" 2
-  steps "Valid (\\([0-9]+.?[0-9]*\\)) (\\([0-9]+.?[0-9]*\\) steps)" 2
-  steps "^Steps limit reached: \\([0-9]+.?[0-9]*\\)" 1
-  steps "^[Error]Fatal Error: Steps limit reached: \\([0-9]+.?[0-9]*\\)" 1
-  time "why3cpulimit time : %s s"
-**********)
-
 theory BuiltIn
-  syntax type int   "int"
-  syntax type real  "real"
-
-  syntax predicate (=)  "(%1 = %2)"
 
   meta "eliminate_algebraic" "keep_enums"
   meta "eliminate_algebraic" "keep_recs"
 
+  syntax type int   "Int"
+  syntax type real  "Real"
+  syntax predicate (=)  "(= %1 %2)"
+
+  meta "encoding:kept" type int
+  meta "encoding:ignore_polymorphism_ls" predicate (=)
+end
+
+theory Ignore
+  syntax predicate ignore'term  "true"
+  meta "encoding:ignore_polymorphism_ls" predicate ignore'term
 end
 
 theory int.Int
 
-  prelude "(* this is a prelude for Alt-Ergo integer arithmetic *)"
+  prelude ";;; SMT-LIB2: integer arithmetic"
 
   syntax function zero "0"
   syntax function one  "1"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (-_) "(-%1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (-_) "(- %1)"
 
-  meta "invalid trigger" predicate (<=)
-  meta "invalid trigger" predicate (<)
-  meta "invalid trigger" predicate (>=)
-  meta "invalid trigger" predicate (>)
-
-  syntax predicate (<=) "(%1 <= %2)"
-  syntax predicate (<)  "(%1 <  %2)"
-  syntax predicate (>=) "(%1 >= %2)"
-  syntax predicate (>)  "(%1 >  %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop MulComm.Comm
   remove prop MulAssoc.Assoc
@@ -89,51 +90,32 @@ theory int.Int
   remove prop Unitary
   remove prop Refl
   remove prop Trans
-  remove prop Total
   remove prop Antisymm
+  remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
 end
 
-theory int.EuclideanDivision
-
-  syntax function div "(%1 / %2)"
-  syntax function mod "(%1 % %2)"
-
-end
-
-theory int.ComputerDivision
-
-  use for_drivers.ComputerOfEuclideanDivision
-
-end
-
-
 theory real.Real
 
-  prelude "(* this is a prelude for Alt-Ergo real arithmetic *)"
+  prelude ";;; SMT-LIB2: real arithmetic"
 
   syntax function zero "0.0"
   syntax function one  "1.0"
 
-  syntax function (+)  "(%1 + %2)"
-  syntax function (-)  "(%1 - %2)"
-  syntax function (*)  "(%1 * %2)"
-  syntax function (/)  "(%1 / %2)"
-  syntax function (-_) "(-%1)"
-  syntax function inv  "(1.0 / %1)"
+  syntax function (+)  "(+ %1 %2)"
+  syntax function (-)  "(- %1 %2)"
+  syntax function (*)  "(* %1 %2)"
+  syntax function (/)  "(/ %1 %2)"
+  syntax function (-_) "(- %1)"
+  syntax function inv  "(/ 1.0 %1)"
 
-  meta "invalid trigger" predicate (<=)
-  meta "invalid trigger" predicate (<)
-  meta "invalid trigger" predicate (>=)
-  meta "invalid trigger" predicate (>)
-
-  syntax predicate (<=) "(%1 <= %2)"
-  syntax predicate (<)  "(%1 <  %2)"
-  syntax predicate (>=) "(%1 >= %2)"
-  syntax predicate (>)  "(%1 >  %2)"
+  syntax predicate (<=) "(<= %1 %2)"
+  syntax predicate (<)  "(< %1 %2)"
+  syntax predicate (>=) "(>= %1 %2)"
+  syntax predicate (>)  "(> %1 %2)"
 
   remove prop MulComm.Comm
   remove prop MulAssoc.Assoc
@@ -146,71 +128,103 @@ theory real.Real
   remove prop Mul_distr_r
   remove prop Comm
   remove prop Unitary
+  remove prop Inverse
   remove prop Refl
   remove prop Trans
-  remove prop Total
   remove prop Antisymm
-  remove prop Inverse
+  remove prop Total
   remove prop NonTrivialRing
   remove prop CompatOrderAdd
   remove prop ZeroLessOne
 
+  meta "encoding:kept" type real
+
 end
 
-theory real.RealInfix
+theory real.Abs
+  syntax function abs "(ite (>= %1 0.0) %1 (- %1))"
 
-  syntax function (+.)  "(%1 + %2)"
-  syntax function (-.)  "(%1 - %2)"
-  syntax function ( *.) "(%1 * %2)"
-  syntax function (/.)  "(%1 / %2)"
-  syntax function (-._) "(-%1)"
+  remove allprops
+end
 
-  meta "invalid trigger" predicate (<=.)
-  meta "invalid trigger" predicate (<.)
-  meta "invalid trigger" predicate (>=.)
-  meta "invalid trigger" predicate (>.)
+theory real.MinMax
 
-  syntax predicate (<=.) "(%1 <= %2)"
-  syntax predicate (<.)  "(%1 <  %2)"
-  syntax predicate (>=.) "(%1 >= %2)"
-  syntax predicate (>.)  "(%1 >  %2)"
+  remove allprops
+end
 
+theory real.FromInt
+  syntax function from_int "(to_real %1)"
+
+  remove allprops
+end
+
+theory real.Truncate
+  syntax function truncate "(ite (>= %1 0.0) \
+                                 (to_int %1) \
+                                 (- (to_int (- %1))))"
+  syntax function floor "(to_int %1)"
+  syntax function ceil "(- (to_int (- %1)))"
+
+  remove allprops
 end
 
 theory Bool
-  syntax type     bool  "bool"
+  syntax type     bool  "Bool"
   syntax function True  "true"
   syntax function False "false"
+
+  meta "algebraic:kept" type bool
 end
 
-theory Tuple0
-  syntax type     tuple0 "unit"
-  syntax function Tuple0 "void"
+theory bool.Bool
+  syntax function andb  "(and %1 %2)"
+  syntax function orb   "(or %1 %2)"
+  syntax function xorb  "(xor %1 %2)"
+  syntax function notb  "(not %1)"
+  syntax function implb "(=> %1 %2)"
 end
 
-theory algebra.AC
-  meta AC function op
-  remove prop Comm
-  remove prop Assoc
+theory bool.Ite
+  syntax function ite "(ite %1 %2 %3)"
+  meta "encoding:lskept" function ite
+  meta "encoding:ignore_polymorphism_ls" function ite
 end
 
 theory HighOrd
-  syntax type     (->) "(%1,%2) farray"
-  syntax function (@)  "(%1[%2])"
+  syntax type     (->) "(Array %1 %2)"
+  syntax function (@)  "(select %1 %2)"
+
+  meta "encoding:lskept" function (@)
+  meta "encoding:ignore_polymorphism_ts" type (->)
+  meta "encoding:ignore_polymorphism_ls" function (@)
 end
 
-theory map.Map
-  syntax function get  "(%1[%2])"
-  syntax function set  "(%1[%2 <- %3])"
-end
-
-(* Why3 driver for noBV alternatives on bit-vector theories *)
 
 theory bv.BV_Gen
-  remove prop nth_bv_def
-  remove prop eq_sub_bv_def
 
-  remove prop to_uint_add
-  remove prop to_uint_sub
-  remove prop to_uint_mul
+  (* removing well-founded properties, they cannot be useful
+     for SMT solvers, and they imply polymorphism *)
+  remove prop ult_wf
+  remove prop ugt_wf
+  remove prop slt_wf
+  remove prop sgt_wf
+
+end
+
+
+theory map.Map
+  syntax function get "(select %1 %2)"
+  syntax function set "(store %1 %2 %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
+  meta "encoding:ignore_polymorphism_ls" function get
+  meta "encoding:ignore_polymorphism_ls" function ([])
+  meta "encoding:ignore_polymorphism_ls" function set
+  meta "encoding:ignore_polymorphism_ls" function ([<-])
+end
+
+theory map.Const
+  meta "encoding:lskept" function const
+(*  syntax function const "(const[%t0] %1)" *)
 end

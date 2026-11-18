@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -47,7 +47,6 @@ Lemma choose'spec :
   set.Fset.mem (choose s) (to_fset s).
 Proof.
 intros s h1.
-destruct h1. unfold to_fset, Fset.is_empty, Fset.mem, set.Set.mem.
-intuition.
+destruct h1. easy.
 Qed.
 

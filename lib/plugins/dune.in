@@ -1,0 +1,113 @@
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/cfg/cfg.cma cfg.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/cfg/cfg.cmxs cfg.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/coma/coma.cma coma.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/coma/coma.cmxs coma.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/microc/microc.cma microc.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/microc/microc.cmxs microc.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/parser/dimacs.cma dimacs.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/parser/dimacs.cmxs dimacs.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/parser/genequlin.cma genequlin.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/parser/genequlin.cmxs genequlin.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/python/python.cma python.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/python/python.cmxs python.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/strategies/forward_propagation.cma forward_propagation.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/strategies/forward_propagation.cmxs forward_propagation.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/tptp/tptp.cma tptp.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/tptp/tptp.cmxs tptp.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (enabled_if (= @enable_hypothesis_selection@ yes))
+ (action (copy ../../plugins/transform/hypothesis_selection.cma hypothesis_selection.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (enabled_if (= @enable_hypothesis_selection@ yes))
+ (action (copy ../../plugins/transform/hypothesis_selection.cmxs hypothesis_selection.cmxs)))
+
+;; SPARK input plugins
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/gnat_json/gnat_json.cmxs gnat_json.cmxs)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/ada_terms/ada_terms.cmxs ada_terms.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/gnat_json/gnat_json.cma gnat_json.cma)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../../plugins/ada_terms/ada_terms.cma ada_terms.cma)))

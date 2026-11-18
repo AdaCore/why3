@@ -218,6 +218,7 @@ module Bits
   =
     let ghost n = min_elt a.mdl in
     let ghost n_bv = of_int n in
+    assert {forall i. ule i n_bv -> nth_bv zeros i = False };
     assert {bits_interval_is_zeros_bv a.bv zeros n_bv};
     assert {nth_bv a.bv n_bv};
     assert {nth_bv (neg a.bv) n_bv};

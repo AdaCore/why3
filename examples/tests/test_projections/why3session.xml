@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
-"http://why3.lri.fr/why3session.dtd">
+"https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="test_projections.mlw"/>
-<theory name="Top">
- <goal name="g">
- <proof prover="0"><path name="test_projections-Top-g_1.smt2"/><result status="failure" time="0.00"/></proof>
+<theory name="Top" proved="true">
+ <goal name="g" proved="true">
+ <proof prover="0"><result status="valid" time="0.038566" steps="123"/></proof>
+ <proof prover="1"><result status="valid" time="0.039906" steps="0"/></proof>
+ <proof prover="2"><result status="valid" time="0.036848" steps="171"/></proof>
+ <proof prover="3"><result status="valid" time="0.008579" steps="74"/></proof>
  </goal>
- <goal name="L">
- <proof prover="0"><path name="test_projections-Top-L_1.smt2"/><result status="failure" time="0.00"/></proof>
+ <goal name="L" proved="true">
+ <proof prover="0"><result status="valid" time="0.021845" steps="85"/></proof>
+ <proof prover="1"><result status="valid" time="0.036900" steps="5"/></proof>
+ <proof prover="2"><result status="valid" time="0.023918" steps="62"/></proof>
+ <proof prover="3"><result status="valid" time="0.005076" steps="34"/></proof>
  </goal>
 </theory>
 </file>

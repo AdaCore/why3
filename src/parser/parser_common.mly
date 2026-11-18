@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -185,7 +185,7 @@
 
   let re_pat pat d = { pat with pat_desc = d }
 
-  let rec simplify_let_pattern ?loc kind d pat e =
+  let simplify_let_pattern ?loc kind d pat e =
     let cast e ty = { e with expr_desc = Ecast (e,ty) } in
     let rec unfold gh d p = match p.pat_desc with
       | Pparen p | Pscope (_,p) -> unfold gh d p

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -687,12 +687,19 @@ let wrap_any : type a b. (a, b) trans_typ -> a -> string list -> Env.env ->
 let format_from_string s fmt =
   Scanf.sscanf_format (Printf.sprintf "%S" s) fmt (fun s -> s)
 
+type packed_trans_typ = Pack : ('a, 'b) trans_typ -> packed_trans_typ
+
+let registered_trans_typ : (string, packed_trans_typ) Hashtbl.t = Hashtbl.create 63
+
+let get_trans_typ name = Hashtbl.find_opt registered_trans_typ name
+
 let wrap_and_register : type a b. desc:Pp.formatted -> string -> (a, b) trans_typ -> a -> unit =
   fun ~desc name t f  ->
     (* "%@\n" is escaped on purpose *)
     let type_desc = Format.asprintf "type: %a%@\n" print_type t in
     let type_desc = format_from_string type_desc Pp.empty_formatted in
     let desc = type_desc ^^ desc in
+    Hashtbl.replace registered_trans_typ name (Pack t);
     let trans = wrap_any t f in
     match is_trans_typ_l t with
     | Yes -> Trans.register_transform_with_args_l ~desc name trans

@@ -84,7 +84,9 @@ DO_EXTRACTION= \
   module=$$(basename $< .mlw).$$(basename $@ .java); \
   expected_err=$$(echo $@ | sed -e s/generated/expected/g)-err; \
   echo "EXTRACT $${module} from $<"; \
-  ${WHY3_EXTRACT_JAVA} -o generated $${module} 2> $@-err ; \
+  ${WHY3_EXTRACT_JAVA} -o generated $${module} 2> $@-err0 ; \
+  sed -e "s|$$(pwd)|CWD|g" $@-err0 > $@-err ; \
+  rm $@-err0 ; \
   if test -s $@-err -a ! -f $${expected_err}; then cat $@-err; echo; exit 1; fi
 
 all : extract non-regression compile run
@@ -211,11 +213,11 @@ non-regression : extract ${JAVA_GENERATED_FILES:%=%-nr} ${ERROR_FILES:%=%-nr}
 generated/%-nr : generated/%
 	@ echo -n DIFF $< ...
 	@ E="$<"; R="$(<:generated/%=expected/%)"; \
-    if cmp -s $$E $$R; then \
+    if cmp -s $$R $$E; then \
       echo "ok" ; \
     else \
       echo "fail"; \
-      diff -u $$E $$R; \
+      diff -u $$R $$E; \
       exit 1; \
     fi
 

@@ -1,18 +1,20 @@
 
 (** {1 Set theories}
 
-  - polymorphic sets to be used in specification/ghost only
+  * polymorphic sets to be used in specification/ghost only
     (no executable functions)
 
     - `Set`, `Cardinal`: possibly infinite sets
+
     - `Fset`, `FsetInt`, `FsetInduction`, `FsetSum`: finite sets
 
-  - monomorphic finite sets to be used in programs only (no logical functions)
+  * monomorphic finite sets to be used in programs only (no logical functions)
 
     a program function `eq` deciding equality on the element type must be
     provided when cloned
 
-    - `SetApp`, `SetAppInt`: immutable sets
+    - `SetApp`, `SetAppInt`, `SetAppInt63`, `SetAppString` : immutable sets
+
     - `SetImp`, `SetImpInt`: mutable sets
 
 *)
@@ -77,13 +79,16 @@ module Set
   function remove (x: 'a) (s: set 'a): set 'a = s[x <- false]
 
   lemma add_remove:
-    forall x: 'a, s: set 'a. mem x s -> add x (remove x s) = s
+    forall x: 'a, s: set 'a [add x (remove x s)]. mem x s -> add x (remove x s) = s
+  meta "remove_unused:dependency" lemma add_remove, function remove
 
   lemma remove_add:
     forall x: 'a, s: set 'a. remove x (add x s) = remove x s
+  meta "remove_unused:dependency" lemma remove_add, function remove
 
   lemma subset_remove:
     forall x: 'a, s: set 'a. subset (remove x s) s
+  meta "remove_unused:dependency" lemma subset_remove, function remove
 
   (** union *)
   function union (s1 s2: set 'a): set 'a
@@ -100,8 +105,11 @@ module Set
 
   lemma subset_inter_1:
     forall s1 s2: set 'a. subset (inter s1 s2) s1
+  meta "remove_unused:dependency" lemma subset_inter_1, function inter
+
   lemma subset_inter_2:
     forall s1 s2: set 'a. subset (inter s1 s2) s2
+  meta "remove_unused:dependency" lemma subset_inter_2, function inter
 
   (** difference *)
   function diff (s1 s2: set 'a): set 'a
@@ -109,6 +117,7 @@ module Set
 
   lemma subset_diff:
     forall s1 s2: set 'a. subset (diff s1 s2) s1
+  meta "remove_unused:dependency" lemma subset_diff, function diff
 
   (** complement *)
   function complement (s: set 'a): set 'a
@@ -118,6 +127,7 @@ module Set
   function pick (s: set 'a): 'a
 
   axiom pick_def: forall s: set 'a. not (is_empty s) -> mem (pick s) s
+  meta "remove_unused:dependency" axiom pick_def, function pick
 
   (** disjoint sets *)
   predicate disjoint (s1 s2: set 'a) =
@@ -125,26 +135,32 @@ module Set
 
   lemma disjoint_inter_empty:
     forall s1 s2: set 'a. disjoint s1 s2 <-> is_empty (inter s1 s2)
+  meta "remove_unused:dependency" lemma disjoint_inter_empty, function inter
 
   lemma disjoint_diff_eq:
     forall s1 s2: set 'a. disjoint s1 s2 <-> diff s1 s2 = s1
+  meta "remove_unused:dependency" lemma disjoint_diff_eq, function diff
 
   lemma disjoint_diff_s2:
     forall s1 s2: set 'a. disjoint (diff s1 s2) s2
+  meta "remove_unused:dependency" lemma disjoint_diff_s2, function diff
 
   (** `{ (x, y) | x in s1 /\ y in s2 }` *)
   function product (s1: set 'a) (s2: set 'b) : set ('a, 'b)
   axiom product_def:
     forall s1: set 'a, s2: set 'b, x : 'a, y : 'b.
     mem (x, y) (product s1 s2) <-> mem x s1 /\ mem y s2
+  meta "remove_unused:dependency" axiom product_def, function product
 
   (** `{ x | x in s /\ p x }` *)
   function filter (s: set 'a) (p: 'a -> bool) : set 'a
   axiom filter_def:
     forall s: set 'a, p: 'a -> bool, x: 'a. mem x (filter s p) <-> mem x s /\ p x
+  meta "remove_unused:dependency" axiom filter_def, function filter
 
   lemma subset_filter:
     forall s: set 'a, p: 'a -> bool. subset (filter s p) s
+  meta "remove_unused:dependency" lemma subset_filter, function filter
 
   (** `{ f x | x in U }` *)
   function map (f: 'a -> 'b) (u: set 'a) : set 'b =
@@ -153,6 +169,7 @@ module Set
   lemma mem_map:
     forall f: 'a -> 'b, u: set 'a.
     forall x: 'a. mem x u -> mem (f x) (map f u)
+  meta "remove_unused:dependency" lemma mem_map, function map
 
 end
 
@@ -190,11 +207,15 @@ module Cardinal
 
   axiom is_finite_inter_left:
     forall s1 s2: set 'a. is_finite s1 -> is_finite (inter s1 s2)
+  meta "remove_unused:dependency" axiom is_finite_inter_left, function inter
+
   axiom is_finite_inter_right:
     forall s1 s2: set 'a. is_finite s2 -> is_finite (inter s1 s2)
+  meta "remove_unused:dependency" axiom is_finite_inter_right, function inter
 
   axiom is_finite_diff:
     forall s1 s2: set 'a. is_finite s1 -> is_finite (diff s1 s2)
+  meta "remove_unused:dependency" axiom is_finite_diff, function diff
 
   lemma is_finite_map:
     forall f: 'a -> 'b, s: set 'a. is_finite s -> is_finite (map f s)
@@ -203,7 +224,7 @@ module Cardinal
     forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
            is_finite (product s1 s2)
 
-  (** `cardinal` function *)
+  (** {3 The `cardinal` function} *)
 
   use int.Int
 
@@ -224,6 +245,7 @@ module Cardinal
     forall x: 'a. forall s: set 'a. is_finite s ->
     if mem x s then cardinal (remove x s) = cardinal s - 1
                else cardinal (remove x s) = cardinal s
+  meta "remove_unused:dependency" axiom cardinal_remove, function remove
 
   axiom cardinal_subset:
     forall s1 s2: set 'a. is_finite s2 ->
@@ -236,25 +258,32 @@ module Cardinal
   lemma cardinal1:
     forall s: set 'a. cardinal s = 1 ->
     forall x: 'a. mem x s -> x = pick s
+  meta "remove_unused:dependency" lemma cardinal1, function pick
 
   axiom cardinal_union:
     forall s1 s2: set 'a. is_finite s1 -> is_finite s2 ->
     cardinal (union s1 s2) = cardinal s1 + cardinal s2 - cardinal (inter s1 s2)
+  meta "remove_unused:dependency" axiom cardinal_union, function union
 
   lemma cardinal_inter_disjoint:
     forall s1 s2: set 'a. disjoint s1 s2 -> cardinal (inter s1 s2) = 0
+  meta "remove_unused:dependency" lemma cardinal_inter_disjoint, function inter
 
   axiom cardinal_diff:
     forall s1 s2: set 'a. is_finite s1 ->
     cardinal (diff s1 s2) = cardinal s1 - cardinal (inter s1 s2)
+  meta "remove_unused:dependency" axiom cardinal_union, function diff
 
   lemma cardinal_map:
     forall f: 'a -> 'b, s: set 'a. is_finite s ->
     cardinal (map f s) <= cardinal s
+  meta "remove_unused:dependency" lemma cardinal_map, function map
 
   lemma cardinal_product:
     forall s1: set 'a, s2 : set 'b. is_finite s1 -> is_finite s2 ->
     cardinal (product s1 s2) = cardinal s1 * cardinal s2
+  meta "remove_unused:dependency" lemma cardinal_product, function product
+
 end
 
 (** {2 Finite sets} *)
@@ -301,58 +330,75 @@ module Fset
   function add (x: 'a) (s: fset 'a) : fset 'a
   axiom add_def:
     forall x: 'a, s: fset 'a, y: 'a. mem y (add x s) <-> (mem y s \/ y = x)
+  meta "remove_unused:dependency" axiom add_def, function add
 
   function singleton (x: 'a): fset 'a = add x empty
 
   lemma mem_singleton:
     forall x, y: 'a. mem y (singleton x) -> y = x
+  meta "remove_unused:dependency" lemma mem_singleton, function singleton
 
   (** removal *)
   function remove (x: 'a) (s: fset 'a) : fset 'a
   axiom remove_def:
     forall x: 'a, s: fset 'a, y: 'a. mem y (remove x s) <-> (mem y s /\ y <> x)
+  meta "remove_unused:dependency" axiom remove_def, function remove
 
   lemma add_remove:
     forall x: 'a, s: fset 'a. mem x s -> add x (remove x s) = s
+  meta "remove_unused:dependency" lemma add_remove, function remove
 
   lemma remove_add:
     forall x: 'a, s: fset 'a. remove x (add x s) = remove x s
+  meta "remove_unused:dependency" lemma remove_add, function remove
 
   lemma subset_remove:
     forall x: 'a, s: fset 'a. subset (remove x s) s
+  meta "remove_unused:dependency" lemma subset_remove, function remove
 
   (** union *)
   function union (s1 s2: fset 'a): fset 'a
   axiom union_def:
     forall s1 s2: fset 'a, x: 'a. mem x (union s1 s2) <-> mem x s1 \/ mem x s2
+  meta "remove_unused:dependency" axiom union_def, function union
 
   lemma subset_union_1:
     forall s1 s2: fset 'a. subset s1 (union s1 s2)
+  meta "remove_unused:dependency" lemma subset_union_1, function union
+
   lemma subset_union_2:
     forall s1 s2: fset 'a. subset s2 (union s1 s2)
+  meta "remove_unused:dependency" lemma subset_union_2, function union
 
   (** intersection *)
   function inter (s1 s2: fset 'a): fset 'a
   axiom inter_def:
     forall s1 s2: fset 'a, x: 'a. mem x (inter s1 s2) <-> mem x s1 /\ mem x s2
+  meta "remove_unused:dependency" axiom inter_def, function inter
 
   lemma subset_inter_1:
     forall s1 s2: fset 'a. subset (inter s1 s2) s1
+  meta "remove_unused:dependency" lemma subset_inter_1, function inter
+
   lemma subset_inter_2:
     forall s1 s2: fset 'a. subset (inter s1 s2) s2
+  meta "remove_unused:dependency" lemma subset_inter_2, function inter
 
   (** difference *)
   function diff (s1 s2: fset 'a): fset 'a
   axiom diff_def:
     forall s1 s2: fset 'a, x: 'a. mem x (diff s1 s2) <-> mem x s1 /\ not (mem x s2)
+  meta "remove_unused:dependency" axiom diff_def, function diff
 
   lemma subset_diff:
     forall s1 s2: fset 'a. subset (diff s1 s2) s1
+  meta "remove_unused:dependency" lemma subset_diff, function diff
 
   (** arbitrary element *)
   function pick (s: fset 'a): 'a
 
   axiom pick_def: forall s: fset 'a. not (is_empty s) -> mem (pick s) s
+  meta "remove_unused:dependency" axiom pick_def, function pick
 
   (** disjoint sets *)
   predicate disjoint (s1 s2: fset 'a) =
@@ -360,32 +406,39 @@ module Fset
 
   lemma disjoint_inter_empty:
     forall s1 s2: fset 'a. disjoint s1 s2 <-> is_empty (inter s1 s2)
+  meta "remove_unused:dependency" lemma disjoint_inter_empty, function inter
 
   lemma disjoint_diff_eq:
     forall s1 s2: fset 'a. disjoint s1 s2 <-> diff s1 s2 = s1
+  meta "remove_unused:dependency" lemma disjoint_diff_eq, function diff
 
   lemma disjoint_diff_s2:
     forall s1 s2: fset 'a. disjoint (diff s1 s2) s2
+  meta "remove_unused:dependency" lemma disjoint_diff_s2, function diff
 
   (** `{ x | x in s /\ p x }` *)
   function filter (s: fset 'a) (p: 'a -> bool) : fset 'a
   axiom filter_def:
     forall s: fset 'a, p: 'a -> bool, x: 'a. mem x (filter s p) <-> mem x s /\ p x
+  meta "remove_unused:dependency" axiom filter_def, function filter
 
   lemma subset_filter:
     forall s: fset 'a, p: 'a -> bool. subset (filter s p) s
+  meta "remove_unused:dependency" lemma subset_filter, function filter
 
   (** `{ f x | x in U }` *)
   function map (f: 'a -> 'b) (u: fset 'a) : fset 'b
   axiom map_def:
     forall f: 'a -> 'b, u: fset 'a, y: 'b.
     mem y (map f u) <-> exists x: 'a. mem x u /\ y = f x
+  meta "remove_unused:dependency" axiom map_def, function map
 
   lemma mem_map:
     forall f: 'a -> 'b, u: fset 'a.
     forall x: 'a. mem x u -> mem (f x) (map f u)
+  meta "remove_unused:dependency" lemma mem_map, function map
 
-  (** cardinal *)
+  (** {3 cardinal} *)
 
   use int.Int
 
@@ -406,6 +459,7 @@ module Fset
     forall x: 'a. forall s: fset 'a.
     if mem x s then cardinal (remove x s) = cardinal s - 1
                else cardinal (remove x s) = cardinal s
+  meta "remove_unused:dependency" axiom cardinal_remove, function remove
 
   axiom cardinal_subset:
     forall s1 s2: fset 'a.
@@ -418,25 +472,31 @@ module Fset
   lemma cardinal1:
     forall s: fset 'a. cardinal s = 1 ->
     forall x: 'a. mem x s -> x = pick s
+  meta "remove_unused:dependency" lemma cardinal1, function pick
 
   axiom cardinal_union:
     forall s1 s2: fset 'a.
     cardinal (union s1 s2) = cardinal s1 + cardinal s2 - cardinal (inter s1 s2)
+  meta "remove_unused:dependency" axiom cardinal_union, function union
 
   lemma cardinal_inter_disjoint:
     forall s1 s2: fset 'a. disjoint s1 s2 -> cardinal (inter s1 s2) = 0
+  meta "remove_unused:dependency" lemma cardinal_inter_disjoint, function inter
 
   axiom cardinal_diff:
     forall s1 s2: fset 'a.
     cardinal (diff s1 s2) = cardinal s1 - cardinal (inter s1 s2)
+  meta "remove_unused:dependency" axiom cardinal_diff, function diff
 
   lemma cardinal_filter:
     forall s: fset 'a, p: 'a -> bool.
     cardinal (filter s p) <= cardinal s
+  meta "remove_unused:dependency" lemma cardinal_filter, function filter
 
   lemma cardinal_map:
     forall f: 'a -> 'b, s: fset 'a.
     cardinal (map f s) <= cardinal s
+  meta "remove_unused:dependency" lemma cardinal_map, function map
 
 end
 
@@ -469,19 +529,23 @@ module FsetInt
   axiom min_elt_def:
     forall s: fset int. not (is_empty s) ->
     mem (min_elt s) s /\ forall x. mem x s -> min_elt s <= x
+  meta "remove_unused:dependency" axiom min_elt_def, function min_elt
 
   function max_elt (s: fset int) : int
 
   axiom max_elt_def:
     forall s: fset int. not (is_empty s) ->
     mem (max_elt s) s /\ forall x. mem x s -> x <= max_elt s
+  meta "remove_unused:dependency" axiom max_elt_def, function max_elt
 
   function interval (l r: int) : fset int
   axiom interval_def:
     forall l r x. mem x (interval l r) <-> l <= x < r
+  meta "remove_unused:dependency" axiom interval_def, function interval
 
   lemma cardinal_interval:
     forall l r. cardinal (interval l r) = if l <= r then r - l else 0
+  meta "remove_unused:dependency" lemma cardinal_interval, function interval
 
 end
 
@@ -532,11 +596,14 @@ module SetApp
   use int.Int
   use export Fset
 
+  (** abstract type for elements of the sets *)
   type elt
 
+  (** equality on elements *)
   val eq (x y: elt) : bool
     ensures { result <-> x = y }
 
+  (** type of sets, abstractly modeled by logic finite sets *)
   type set = abstract {
     to_fset: fset elt;
   }
@@ -545,45 +612,47 @@ module SetApp
   val ghost function mk (s: fset elt) : set
     ensures { result.to_fset = s }
 
+  (** membership, equivalent to membership in the model *)
   val mem (x: elt) (s: set) : bool
-    ensures { result <-> mem x s }
+    ensures { result <-> mem x s.to_fset }
 
+  (** program equality on sets, that decides whether two sets have the same model *)
   val (==) (s1 s2: set) : bool
-    ensures { result <-> s1 == s2 }
+    ensures { result <-> s1.to_fset == s2.to_fset }
 
   val subset (s1 s2: set) : bool
-    ensures { result <-> subset s1 s2 }
+    ensures { result <-> subset s1.to_fset s2.to_fset }
 
   val empty () : set
     ensures { result.to_fset = empty }
-    ensures { cardinal result = 0 }
+    ensures { cardinal result.to_fset = 0 }
 
   val is_empty (s: set) : bool
-    ensures { result <-> is_empty s }
+    ensures { result <-> is_empty s.to_fset }
 
   val add (x: elt) (s: set) : set
-    ensures { result = add x s }
+    ensures { result.to_fset = add x s }
     ensures { if mem x s then cardinal result = cardinal s
                          else cardinal result = cardinal s + 1 }
 
   let singleton (x: elt) : set
-    ensures { result = singleton x }
+    ensures { result.to_fset = singleton x }
     ensures { cardinal result = 1 }
   = add x (empty ())
 
   val remove (x: elt) (s: set): set
-    ensures { result = remove x s }
+    ensures { result.to_fset = remove x s }
     ensures { if mem x s then cardinal result = cardinal s - 1
                          else cardinal result = cardinal s }
 
   val union (s1 s2: set): set
-    ensures { result = union s1 s2 }
+    ensures { result.to_fset = union s1 s2 }
 
   val inter (s1 s2: set) : set
-    ensures { result = inter s1 s2 }
+    ensures { result.to_fset = inter s1 s2 }
 
   val diff (s1 s2: set) : set
-    ensures { result = diff s1 s2 }
+    ensures { result.to_fset = diff s1 s2 }
 
   val function choose (s: set) : elt
     requires { not (is_empty s) }
@@ -594,6 +663,37 @@ module SetApp
 
   val cardinal (s: set) : int (* Peano.t *)
     ensures { result = cardinal s }
+
+  (** {3 iteration over applicative sets} *)
+
+  scope Iter
+
+    type t = abstract {
+              initial: fset elt;
+      mutable visited: fset elt;
+    } invariant {
+      subset visited initial
+    }  by {
+      initial = pure { (empty : fset elt) };
+      visited = pure { (empty : fset elt) };
+    }
+
+    val create (s: set) : t
+      ensures { result.initial = s.to_fset }
+      ensures { is_empty result.visited }
+
+    exception Done
+
+    val next (iter: t) : elt
+      writes { iter }
+      raises  { Done -> iter.initial = (old iter).visited /\
+                        iter.visited = (old iter).visited }
+      returns { r -> mem r iter.initial /\
+                     not (mem r (old iter).visited) /\
+                     iter.visited = add r (old iter).visited }
+
+
+  end
 
 end
 
@@ -615,37 +715,18 @@ module SetAppInt
     ensures  { result = FsetInt.max_elt s }
 
   val interval (l r: int) : set
-    ensures  { result = FsetInt.interval l r }
+    ensures  { result.to_fset = FsetInt.interval l r }
     ensures  { cardinal result = if l <= r then r - l else 0 }
 
-  scope Iter  (* iteration over sets *)
+end
 
-    type t = abstract {
-              initial: set;
-      mutable visited: set;
-    } invariant {
-      subset visited initial
-    }  by {
-      initial = empty ();
-      visited = empty ();
-    }
+(** {3 Applicative sets of 63-bit integers} *)
 
-    val create (s: set) : t
-      ensures { result.initial = s }
-      ensures { is_empty result.visited }
+module SetAppInt63
 
-    exception Done
+  use mach.int.Int63
 
-    val next (iter: t) : int
-      writes { iter }
-      raises  { Done ->  iter.initial = (old iter).visited /\
-                         iter.visited = (old iter).visited }
-      returns { r -> mem r iter.initial /\
-                     not (mem r (old iter).visited) /\
-                     iter.visited = add r (old iter).visited }
-
-
-  end
+  clone export SetApp with type elt = int63, val eq = Int63.(=)
 
 end
 
@@ -661,35 +742,6 @@ module SetAppString
   use string.OCaml as Str
 
   clone export SetApp with type elt = string, val eq = Str.(=), axiom .
-
-  scope Iter  (* iteration over sets *)
-
-    type t = abstract {
-              initial: set;
-      mutable visited: set;
-    } invariant {
-      subset visited initial
-    }  by {
-      initial = empty ();
-      visited = empty ();
-    }
-
-    val create (s: set) : t
-      ensures { result.initial = s }
-      ensures { is_empty result.visited }
-
-    exception Done
-
-    val next (iter: t) : string
-      writes { iter }
-      raises  { Done ->  iter.initial = (old iter).visited /\
-                         iter.visited = (old iter).visited }
-      returns { r -> mem r iter.initial /\
-                     not (mem r (old iter).visited) /\
-                     iter.visited = add r (old iter).visited }
-
-
-  end
 
 end
 

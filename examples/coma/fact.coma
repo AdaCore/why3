@@ -13,6 +13,6 @@ module Fact
                     (-> return {r}) )]
 
   let test (n: int) {} (o (m: int) { m = fact n })
-  = if {n >= 0 } (-> factorial {n} o)
-                 (-> halt)
+  = if {n >= 0} (-> factorial {n} o)
+                (-> halt)
 end

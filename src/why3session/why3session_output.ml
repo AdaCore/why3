@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -25,6 +25,21 @@ let spec =
   ]
   @ Why3session_lib.filter_spec
 
+let filename_sanitizer =
+  let no_slash_quote = function
+    | '/' | '\\' |'"' | '\''-> "__"
+    | c -> String.make 1 c
+  in
+  let ident_printer = Ident.create_ident_printer ~sanitizer:(Ident.sanitizer no_slash_quote no_slash_quote)
+  [] in
+  fun file->
+    let file_ext = Filename.extension file in
+    let file_no_ext = Filename.remove_extension file in
+    let file = (Ident.string_unique ident_printer file_no_ext) ^ file_ext in
+    file
+
+
+
 let run () =
   let config, env = Whyconf.Args.complete_initialization () in
   iter_session_files (fun fname ->
@@ -45,9 +60,11 @@ let run () =
         let th_name = (Session_itp.theory_name th).Ident.id_string in
         let f = get_encapsulating_file session (ATh th) in
         let fn = Filename.chop_extension (Sysutil.basename (file_path f)) in
-        let file = Driver.file_of_task driver fn th_name task in
-        let file = Sysutil.concat !output_dir file in
-        Sysutil.write_unique_file_fmt file (fun fmt -> Driver.print_task driver fmt task)
+        let node_name = (Session_itp.get_proof_name session pa_node.parent).Ident.id_string in
+        let file = Driver.get_filename driver ~input_file:fn ~theory_name:th_name ~goal_name:node_name
+          ~sanitize:(fun x -> x) in
+        let file = Sysutil.concat !output_dir (filename_sanitizer file) in
+        Sysutil.write_file_fmt file (fun fmt -> Driver.print_task driver fmt task)
       )
 )
 

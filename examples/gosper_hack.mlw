@@ -1,0 +1,462 @@
+
+(** {1 Gosper's Hack}
+
+   Iterates over all `n`-bit words with `k` bits set, in lexicographic
+   order and in linear time, with O(1) cheap operations to move from
+   one word to the next.
+
+   Said otherwise, iterates over all subsets of `{0,1,...,n-1}` of
+   size `k`, where each subset is represented as a bit vector.
+  {h<pre>
+   Principle: Identify the rightmost segment of 1 bits,
+                                  i
+         x = ?????????000000111111100000
+                            <- m ->
+
+   Isolate its rightmost bit, at position i, with x&-x:
+                                  i
+         c = 000000000000000000000100000
+
+   Add it to x, to get the following:
+                                  i
+         r = ?????????000001000000000000
+                            <- m ->
+
+   XOR r and x, to get the following:
+                                  i
+       r^x = 000000000000001111111100000
+                           <  m+1 >
+
+   Shift this to the right i+2 times (using shift and division by c):
+                                  i
+             00000000000000000000111111
+                                 < m-1>
+
+   Finally, OR this with r to get the expected word:
+
+             ?????????00000100000111111
+                                 < m-1>
+  </pre>}
+
+   Works for 0 <= k <= n <= Sys.int_size.
+
+   Gosper's Hack is explained in Hacker's Delight (Henri Warren,
+   Addison-Wesley, 2013); see pages 14--15.
+
+   Author: Jean-Christophe Filliâtre (CNRS)
+*)
+
+(** {2 Bit vectors} *)
+
+module BV
+
+  use int.Int
+
+  val constant word_size: int
+    ensures { 0 < result }
+
+  type bv = abstract {
+    bits: int -> bool;
+  }
+  meta coercion function bits
+
+  predicate (==) (x y: bv)
+  = forall i. 0 <= i < word_size -> x i = y i
+
+  val (=) (x y: bv) : bool
+    ensures { result <-> x == y }
+
+end
+
+(** {2 Specification Predicates}
+
+    The predicates of interest are `valid`, `lt`, and `is_next`. *)
+
+module Spec
+
+  use int.Int
+  use int.NumOf
+  use seq.Seq
+  use BV
+
+  function pop (x: bv) : int
+  = numof x 0 word_size
+
+  predicate zeros (x: bv) (lo hi: int)
+  = forall i. lo <= i < hi -> not x i
+
+  (** a valid bit vector has exactly `k` bits set in the range
+      `0..n` and no bit set beyond *)
+  predicate valid (n k: int) (x: bv)
+  = 0 <= k <= n <= word_size /\
+    pop x = k /\
+    zeros x n word_size
+
+  predicate ones (x: bv) (lo hi: int)
+  = forall i. lo <= i < hi -> x i
+
+  predicate same (x y: bv) (lo hi: int)
+  = forall i. lo <= i < hi -> x i = y i
+
+  predicate is_first (n k: int) (x: bv)
+  = ones x 0 k /\ zeros x k n
+
+  predicate is_last (n k: int) (x: bv)
+  = zeros x 0 (n-k) /\ ones x (n-k) n
+
+  (** bit vectors are ordered lexicographically *)
+  predicate lt (x y: bv)
+  = exists i. 0 <= i < word_size /\
+    not x i /\ y i /\ same x y (i+1) word_size
+
+  predicate le (x y: bv)
+  = x = y \/ lt x y
+
+  let lemma lt_trans (x y z: bv)
+    requires { lt x y } requires { lt y z } ensures { lt x z }
+  = ()
+
+  let lemma first_is_first (n k: int) (x f: bv)
+    requires { 0 <= k <= n <= word_size }
+    requires { valid n k f }
+    requires { is_first n k f }
+    requires { valid n k x }
+    ensures  { not lt x f }
+  = ()
+
+  let lemma last_is_last (n k: int) (l x: bv)
+    requires { 0 <= k <= n <= word_size }
+    requires { valid n k l }
+    requires { is_last n k l }
+    requires { valid n k x }
+    ensures  { not lt l x }
+  = ()
+
+  (** `y` follows `x` in the lexicographic order *)
+  predicate is_next (n k: int) (x y: bv)
+  = lt x y /\ valid n k y /\
+    forall z. valid n k z -> not (lt x z /\ lt z y)
+
+end
+
+(** {2 Program Interface}
+
+    The following three functions respectively give the first bit vector,
+    the last bit vector, and the next bit vector. *)
+
+module Intf
+
+  use int.Int
+  use seq.Seq
+  use BV
+  use Spec
+
+  val first (n k: int) : (x: bv)
+    requires { 0 <= k <= n <= word_size }
+    ensures  { valid n k x }
+    ensures  { is_first n k x }
+
+  val last (n k: int) : (x: bv)
+    requires { 0 <= k <= n <= word_size }
+    ensures  { valid n k x }
+    ensures  { is_last n k x }
+
+  val next (ghost n k: int) (x: bv) : (y: bv)
+    requires { 0 <= k <= n <= word_size }
+    requires { valid n k x }
+    requires { not is_last n k x }
+    ensures  { is_next n k x y }
+
+end
+
+(** {2 Iteration}
+
+    The interface above is all we need to iterate over all the subsets.
+    Below we show that each bit set is visted exactly once, and that no
+    one is omitted. *)
+
+module Iter
+
+  use int.Int
+  use seq.Seq
+  use BV
+  use Spec
+  use Intf
+
+  type visited = seq bv
+
+  (** a good sequence contains subsets from `first`, in order,
+      without omission (but not necessarily up to `last`) *)
+  predicate good_sequence (n k: int) (v: visited)
+  = let len = length v in
+    len >= 1 /\
+    (forall i. 0 <= i < len -> valid n k v[i]) /\
+    is_first n k v[0] /\
+    forall i. 0 <= i < len-1 -> is_next n k v[i] v[i+1]
+
+  let lemma good_sequence_is_sorted (n k: int) (v: visited)
+    requires { good_sequence n k v }
+    ensures  { forall i j. 0 <= i < j < length v -> lt v[i] v[j] }
+  = let len = length v in
+    for i = 0 to len-1 do
+      invariant { forall i'. 0 <= i' < i ->
+                  forall j'. i' < j' < len -> lt v[i'] v[j'] }
+      for j = i+1 to len-1 do
+        invariant { forall j'. i < j' < j -> lt v[i] v[j'] }
+        ()
+      done
+    done
+
+  let iter (n k: int) : (r: unit, ghost v: visited)
+    requires { 0 <= k <= n <= word_size }
+    ensures  { good_sequence n k v }
+    ensures  { is_last n k v[length v - 1] }
+    diverges
+  = let ref w = first n k in
+    let last = last n k in
+    (* visit w *)
+    let ghost ref v = singleton w in
+    while not w = last do
+      invariant { good_sequence n k v }
+      invariant { length v >= 1 && v[length v - 1] = w }
+      w <- next n k w;
+      (* visit w *)
+      v <- snoc v w
+    done;
+    return (), v
+
+  (* note: the code would be nicer with `do while` loop *)
+
+end
+
+(** {2 More operations on bit vectors}
+
+    Here we introduce the arithmetic operations (seen as operating over
+    bit vectors) that are needed to implement Gosper's hack.
+
+    Note that these operations are purposely under-specified. For instance,
+    function `minus1` is requiring its parameter to be either 0 or a power
+    of two.
+*)
+
+module MoreBV
+
+  use int.Int
+  use export BV
+  use Spec
+
+  val constant zero: bv
+    ensures { zeros result 0 word_size }
+
+  val constant one: bv
+    ensures { result 0 }
+    ensures { zeros result 1 word_size }
+
+  val lsl (x: bv) (n: int) : (r: bv)
+    requires { 0 <= n <= word_size }
+    ensures  { zeros r 0 n }
+    ensures  { forall i. n <= i < word_size -> r i = x (i - n) }
+
+  val minus1 (x: bv) (ghost i: int) : (r: bv)
+    requires { 0 <= i <= word_size }
+    (* x = 2^i *)
+    requires { zeros x 0 i }
+    requires { i < word_size -> x i }
+    requires { zeros x (i+1) word_size }
+    ensures  { ones r 0 i }
+    ensures  { zeros r i word_size }
+    ensures  { pop r = i }
+
+  predicate pow2 (x: bv) (i: int)
+  = 0 <= i < word_size /\
+    zeros x 0 i /\ x i /\ zeros x (i+1) word_size
+
+  (*                          i
+       x =          <xxxxxxxx>100000000
+      ~x =          <negation>011111111
+      -x = ~x + 1 = <negation>100000000
+  *)
+  val neg (x: bv) (ghost i: int) : (r: bv)
+    requires { 0 <= i < word_size }
+    requires { zeros x 0 i }
+    requires { x i }
+    ensures  { zeros r 0 i }
+    ensures  { r i }
+    ensures  { forall j. i < j < word_size -> r j = not x j }
+
+  val land (x y: bv) : (z: bv)
+    ensures  { forall i. 0 <= i < word_size -> (z i <-> (x i /\ y i)) }
+
+  (* = x & -x *)
+  let rightmost_one_bit (x: bv) : (c: bv, ghost i: int)
+    requires { not x == zero }
+    ensures  { 0 <= i < word_size }
+    ensures  { x i }
+    ensures  { zeros x 0 i }
+    ensures  { pow2 c i }
+  = let ghost ref i = 0 in
+    while pure {not x i} do variant { word_size - i }
+      invariant { 0 <= i } invariant { zeros x 0 i } i <- i+1 done;
+    let c = land x (neg x i) in
+    return c, i
+
+  val add_pow2 (x c: bv) (ghost n i m: int) : (r: bv)
+    requires { 0 <= i < i+m < n <= word_size }
+    requires { zeros x 0 i }
+    requires { ones  x i (i+m) }
+    requires { not x (i+m) }
+    requires { pow2 c i }
+    ensures  { zeros r 0 (i+m) }
+    ensures  { r (i+m) }
+    ensures  { same r x (i+m+1) word_size }
+
+  val xor (x y: bv) : (z: bv)
+    ensures  { forall i. 0 <= i < word_size -> (z i <-> x i <> y i) }
+
+  val lor (x y: bv) : (z: bv)
+    ensures  { forall i. 0 <= i < word_size -> (z i <-> (x i \/ y i)) }
+
+  predicate shift_right (x: bv) (n: int) (y: bv)
+  = 0 <= n <= word_size /\
+    zeros y (word_size - n) word_size /\
+    forall i. 0 <= i < word_size - n -> y i = x (i+n)
+
+  val lsr (x: bv) (n: int) : (y: bv)
+    requires { 0 <= n <= word_size }
+    ensures  { shift_right x n y }
+
+  val shift_by_division (u c: bv) (ghost i: int) : (r: bv)
+    requires { 0 <= i < word_size - 1 }
+    requires { pow2 c i }
+    ensures  { shift_right u i r }
+
+end
+
+(** {2 Gosper's Hack Implementation} *)
+
+module Impl: Intf
+
+  use int.Int
+  use int.NumOf
+  use MoreBV
+  use Spec
+
+  let first (n k: int) : (x: bv)
+    requires { 0 <= k <= n <= word_size }
+    ensures  { valid n k x }
+    ensures  { is_first n k x }
+    ensures  { zeros x k word_size }
+  = minus1 (lsl one k) (ghost k)
+
+  let lemma numof_ones (x: bv) (i j: int)
+    requires { 0 <= i <= j <= word_size }
+    requires { ones x i j }
+    ensures  { numof x i j = j - i }
+  = ()
+
+  let lemma numof_zeros (x: bv) (i j: int)
+    requires { 0 <= i <= j <= word_size }
+    requires { zeros x i j }
+    ensures  { numof x i j = 0 }
+  = ()
+
+  let last (n k: int) : (x: bv)
+    requires { 0 <= k <= n <= word_size }
+    ensures  { valid n k x }
+    ensures  { is_last n k x }
+  = let f = first n k in
+    let l = lsl f (n - k) in
+    numof_zeros l 0 (n-k);
+    numof_ones  l (n-k) n;
+    numof_zeros l n word_size;
+    return l
+
+  let lemma gap_if_not_last (n k: int) (x: bv) (i: int)
+    requires { valid n k x }
+    requires { not is_last n k x }
+    requires { 0 <= i < n }
+    requires { zeros x 0 i }
+    requires { x i }
+    ensures  { not ones x i n }
+  = ()
+
+  let lemma first_diff (x y: bv) : (i: int)
+    requires { lt x y }
+    ensures  { 0 <= i < word_size }
+    ensures  { not x i } ensures { y i }
+    ensures  { same x y (i+1) word_size }
+  = any int ensures { 0 <= result < word_size /\ not x result /\ y result /\
+                      same x y (result+1) word_size }
+
+  let lemma main_lemma (n k: int) (x v: bv) (i m: int)
+    requires { 0 <= i < i+m < n <= word_size }
+    requires { valid n k x }
+    requires { zeros x 0 i /\ ones x i (i+m) /\ not x (i+m) }
+    requires { valid n k v }
+    requires { ones v 0 (m-1) }
+    requires { zeros v (m-1) (i+m) }
+    requires { v (i+m) }
+    requires { same v x (i+m+1) word_size }
+    requires { lt x v }
+    ensures  { forall z. valid n k z -> not (lt x z /\ lt z v) }
+  = let lemma no_middle_element (z: bv)
+      requires { valid n k z } requires { lt x z } requires { lt z v }
+      ensures  { false }
+      = let _i = first_diff x z in
+        let _j = first_diff z v in
+        ()
+    in ()
+
+  let next (ghost n k: int) (x: bv) : (y: bv)
+    requires { 0 <= k <= n <= word_size }
+    requires { valid n k x }
+    requires { not is_last n k x }
+    ensures  { is_next n k x y }
+  = (*                            i
+         x = ?????????000000111111100000
+                            <- m ->        *)
+    let c, i = rightmost_one_bit x in
+    (*                            i
+         c = 000000000000000000000100000   *)
+    let ghost ref m = 1 in
+    (ghost while pure {x (i+m)} do variant { n-i-m }
+            invariant { 1 <= m /\ i+m < n /\ ones x i (i+m) } m <- m+1 done);
+    let r = add_pow2 x c n i m in
+    (*                            i
+         r = ?????????000001000000000000
+                            <- m ->        *)
+    assert { zeros r (m-1) (i+m) };
+    let y = xor r x in
+    (*                            i
+         y = 000000000000001111111100000
+                           <  m+1 >        *)
+    assert { zeros y 0 i };
+    assert { ones  y i (i+m+1) };
+    assert { zeros y (i+m+1) word_size };
+    let u = lsr y 2 in
+    let u = shift_by_division u c i in
+    (*                            i
+         u = 00000000000000000000111111
+                                 < m-1>   *)
+    assert { ones u 0 (m-1) };
+    assert { zeros u (m-1) word_size };
+    assert { zeros u (m-1) (i+m) };
+    let v = lor r u in
+    (*                    i+m
+         v = ?????????00000100000111111
+                                 < m-1>   *)
+    assert { ones v 0 (m-1) };
+    assert { zeros v (m-1) (i+m) };
+    assert { v (i+m) };
+    assert { same v x (i+m+1) word_size };
+    assert { numof x 0 (i+m+1) = m };
+    assert { numof v 0 (i+m+1) = m };
+    assert { numof x (i+m+1) word_size
+           = numof v (i+m+1) word_size };
+    main_lemma n k x v i m;
+    return v
+
+end
+
+(* TODO: ensure the consistency of all `val` over bit vectors,
+   at least on 32-bit integers *)

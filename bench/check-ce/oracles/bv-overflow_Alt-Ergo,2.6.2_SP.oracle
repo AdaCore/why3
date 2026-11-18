@@ -1,0 +1,1004 @@
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (unknown) (23 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol y))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (unknown) (22 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (unknown) (31 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (unknown) (50 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Unknown (unknown) (29 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 15:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_div` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_div` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral3))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (23 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 17:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_rem` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 18:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_rem` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (unknown) (23 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol y))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (unknown) (22 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (unknown) (31 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (unknown) (50 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 33, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Unknown (unknown) (29 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 34:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_div1` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_div1` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral3))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (23 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 36:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem1` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_rem1` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 37:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem1` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_rem1` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (unknown) (23 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol y))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (unknown) (22 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (unknown) (40 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (unknown) (31 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (unknown) (50 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 53, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Unknown (unknown) (29 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 54:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_div2` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_div2` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral3))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (23 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 56:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem2` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_rem2` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (unknown) (19 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 57:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem2` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_rem2` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (unknown) (56 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (unknown) (73 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol y))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (unknown) (55 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (unknown) (73 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (unknown) (64 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (unknown) (84 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 73, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Unknown (unknown) (63 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (unknown) (53 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 74:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_div3` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_div3` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (53 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral6))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral3))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (unknown) (56 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (unknown) (53 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 76:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem3` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `u_rem3` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+
+Warning: Error while interpreting tqtint1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral4))
+
+Warning: Error while interpreting tqtint: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral))
+
+Warning: Error while interpreting is_signed_positive1: No variable in bound_vars matching qualified identifier (Qident (Isymbol rliteral1))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (unknown) (53 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 77:
+    x = 0
+    y = 0
+    x = 0
+    y = 0
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = 0, y = 0 ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem3` with args:
+      [ a = 0, b = 0 ]
+    Property failure at precondition of `s_rem3` with env:
+      { lsenv = []; vsenv = [ a = 0, b = 0, x = 0, y = 0 ]; rsenv = [];
+        idenv = [ b = 0 ] }
+

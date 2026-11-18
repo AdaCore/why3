@@ -62,12 +62,15 @@ module Fmap
 
   axiom add_contents_k:
     forall k v, m: fmap 'k 'v. (add k v m)[k] = v
+  meta "remove_unused:dependency" axiom add_contents_k, function add
 
   axiom add_contents_other:
     forall k v, m: fmap 'k 'v, k1. mem k1 m -> k1 <> k -> (add k v m)[k1] = m[k1]
+  meta "remove_unused:dependency" axiom add_contents_other, function add
 
   axiom add_domain:
     forall k v, m: fmap 'k 'v. (add k v m).domain = S.add k m.domain
+  meta "remove_unused:dependency" axiom add_domain, function add
 
   (*** FIXME? find_opt (k: 'k) (m: fmap 'k 'v) : option 'v *)
 
@@ -75,14 +78,17 @@ module Fmap
 
   axiom find_def:
     forall k, m: fmap 'k 'v. mem k m -> find k m = m[k]
+  meta "remove_unused:dependency" axiom find_def, function find
 
   function remove (k: 'k) (m: fmap 'k 'v) : fmap 'k 'v
 
   axiom remove_contents:
     forall k, m: fmap 'k 'v, k1. mem k1 m -> k1 <> k -> (remove k m)[k1] = m[k1]
+  meta "remove_unused:dependency" axiom remove_contents, function remove
 
   axiom remove_domain:
     forall k, m: fmap 'k 'v. (remove k m).domain = S.remove k m.domain
+  meta "remove_unused:dependency" axiom remove_domain, function remove
 
   function size (m: fmap 'k 'v) : int =
     S.cardinal m.domain
@@ -267,15 +273,124 @@ module MapApp
 
 end
 
-(** {3 Applicative maps of integers} *)
+(** {3 Applicative maps indexed by integers and strings} *)
 
 module MapAppInt
 
   use int.Int
+  use set.Fset as S
 
   clone export MapApp with type key = int, val eq = Int.(=)
 
+  val mapi (f: int -> 'v -> 'w) (m: t 'v) : t 'w
+    ensures {forall i. S.mem i m.domain -> result i = f i (m i)}
+
+  scope Iter  (* iteration over maps *)
+
+    type iter 'v = abstract {
+              initial: fmap int 'v;
+      mutable visited: S.fset int;
+    } invariant {
+      S.subset visited initial.domain
+    }  by {
+      initial = empty;
+      visited = S.empty;
+    }
+
+    val create (m: t 'v) : iter 'v
+      ensures { result.initial = m.to_fmap }
+      ensures { S.is_empty result.visited }
+
+    exception Done
+
+    val next (it: iter 'v) : (int, 'v)
+      writes { it }
+      raises  { Done -> it.visited = (old it).visited = it.initial.domain}
+      returns { (r,v) -> S.mem r it.initial.domain /\ it.initial r = v /\
+                     not (S.mem r (old it).visited) /\
+                     it.visited = S.add r (old it).visited }
+
+  end
+
 end
+
+
+module MapAppInt63
+
+  use mach.int.Int63
+  clone export MapApp with type key = int63, val eq = Int63.(=)
+
+  val mapi (f: int63 -> 'v -> 'w) (m: t 'v) : t 'w
+    ensures {forall i. S.mem i m.domain -> result i = f i (m i)}
+
+  scope Iter  (* iteration over maps *)
+
+    type iter 'v = abstract {
+              initial: fmap int63 'v;
+      mutable visited: S.fset int63;
+    } invariant {
+      S.subset visited initial.domain
+    }  by {
+      initial = empty;
+      visited = S.empty;
+    }
+
+    val create (m: t 'v) : iter 'v
+      ensures { result.initial = m.to_fmap }
+      ensures { S.is_empty result.visited }
+
+    exception Done
+
+    val next (it: iter 'v) : (int63, 'v)
+      writes { it }
+      raises  { Done -> it.visited = (old it).visited = it.initial.domain}
+      returns { (r,v) -> S.mem r it.initial.domain /\ it.initial r = v /\
+                     not (S.mem r (old it).visited) /\
+                     it.visited = S.add r (old it).visited }
+
+  end
+
+end
+
+
+module MapAppString
+
+  use set.Fset as S
+  use string.OCaml as Str
+  clone export MapApp with type key = string, val eq = Str.(=)
+  val mapi (f: string -> 'v -> 'w) (m: t 'v) : t 'w
+    ensures {forall i. S.mem i m.domain -> result i = f i (m i)}
+
+  scope Iter  (* iteration over maps *)
+
+    type iter 'v = abstract {
+              initial: fmap string 'v;
+      mutable visited: S.fset string;
+    } invariant {
+      S.subset visited initial.domain
+    }  by {
+      initial = empty;
+      visited = S.empty;
+    }
+
+    val create (m: t 'v) : iter 'v
+      ensures { result.initial = m.to_fmap }
+      ensures { S.is_empty result.visited }
+
+    exception Done
+
+    val next (it: iter 'v) : (string, 'v)
+      writes { it }
+      raises  { Done -> it.visited = (old it).visited = it.initial.domain}
+      returns { (r,v) -> S.mem r it.initial.domain /\ it.initial r = v /\
+                     not (S.mem r (old it).visited) /\
+                     it.visited = S.add r (old it).visited }
+
+  end
+
+
+end
+
 
 (** {3 Imperative maps} *)
 

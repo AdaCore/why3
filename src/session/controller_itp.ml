@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -28,7 +28,7 @@ type proof_attempt_status =
   | Detached (** parent goal has no task, is detached *)
   | InternalFailure of exn (** external proof aborted by internal error *)
   | Uninstalled of Whyconf.prover (** prover is uninstalled *)
-  | UpgradeProver of Whyconf.prover (** prover is upgraded *)
+  | UpgradeProver of Whyconf.prover * Whyconf.prover (** prover is upgraded *)
   | Removed of Whyconf.prover (** prover has been removed or upgraded *)
 
 let print_status fmt st =
@@ -44,8 +44,8 @@ let print_status fmt st =
       fprintf fmt "InternalFailure(%a)" Exn_printer.exn_printer e
   | Uninstalled pr    ->
       fprintf fmt "Prover %a is uninstalled" Whyconf.print_prover pr
-  | UpgradeProver pr    ->
-      fprintf fmt "Prover upgrade to %a" Whyconf.print_prover pr
+  | UpgradeProver (p1,p2)  ->
+      fprintf fmt "Prover upgrade from %a to %a" Whyconf.print_prover p1 Whyconf.print_prover p2
   | Removed pr    ->
       fprintf fmt "Prover %a removed" Whyconf.print_prover pr
 
@@ -391,6 +391,10 @@ module Hprover = Whyconf.Hprover
    to the time or mem limits, we adapt these limits when we replay a
    proof *)
 
+let time_factor = ref 2.0
+
+let set_time_factor f = time_factor := max 1.0 f
+
 let adapt_limits ~interactive ~use_steps limits a =
   let t, m, s =
     let timelimit = limits.Call_provers.limit_time in
@@ -400,12 +404,12 @@ let adapt_limits ~interactive ~use_steps limits a =
     | Some { Call_provers.pr_answer = r;
              Call_provers.pr_time = t;
              Call_provers.pr_steps = s } ->
-       (* increased time limit is 1 + twice the previous running time,
-       but enforced to remain inside the interval [l,2l] where l is
+       (* increased time limit is 1 + `time_factor` times the previous running time,
+       but enforced to remain inside the interval [l, `time_factor` l] where l is
        the previous time limit *)
-       let t = (1. +. 2.0 *. t) in
+       let t = (1. +. !time_factor *. t) in
        let increased_time = if interactive then 0.
-                            else max timelimit (min t (2. *. timelimit)) in
+                            else max timelimit (min t (!time_factor *. timelimit)) in
        (* increased mem limit is just 1.5 times the previous mem limit *)
        let increased_mem = if interactive then 0 else 3 * memlimit / 2 in
        begin
@@ -1253,7 +1257,7 @@ let replay_proof_attempt c pr limits (parid: proofNodeID) id ~callback ~notifica
       remove_proof_attempt c.controller_session parid pr
   | `Found pr' ->
      try
-       if pr' <> pr then callback id (UpgradeProver pr');
+       if pr' <> pr then callback id (UpgradeProver (pr, pr'));
        let _ = get_task c.controller_session parid in
        schedule_proof_attempt c parid pr' ~limits ~callback ~notification
      with Not_found ->
@@ -1304,14 +1308,16 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
   let session = c.controller_session in
   let count = ref 0 in
   let report = ref [] in
-  let found_upgraded_prover = ref false in
-
+  let modified_provers = ref [] in
+  let add_modified_provers s =
+      if not (List.mem s !modified_provers) then
+        modified_provers := s :: !modified_provers
+  in
   let craft_report s id limits pa =
     let pr = pa.Session_itp.prover in
     match s with
-    | UpgradeProver _ -> found_upgraded_prover := true
-    | Removed _ ->
-       found_upgraded_prover := true;
+    | UpgradeProver _ -> add_modified_provers s
+    | Removed _ -> add_modified_provers s;
        decr count
     | Scheduled | Running -> ()
     | Undone | Interrupted ->
@@ -1380,11 +1386,11 @@ let replay ~valid_only ~obsolete_only ?(use_steps=false) ?(filter=fun _ -> true)
                                         craft_report s parid limits pa;
                                         callback id s;
                                         if !count = 0 then
-                                          final_callback !found_upgraded_prover !report)
+                                          final_callback !modified_provers !report)
                              ~notification
       end in
 
-  if !count = 0 then final_callback !found_upgraded_prover !report else
+  if !count = 0 then final_callback !modified_provers !report else
   (* Calling replay on all the proof_attempts of the session *)
   match any with
   | None -> Session_itp.session_iter_proof_attempt replay_pa session

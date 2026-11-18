@@ -1,0 +1,13 @@
+(library
+ (public_name why3)
+ (modules_without_implementation driver_ast protocol)
+ (flags :standard -open Why3deps -linkall)
+ (preprocess
+  (per_module
+   (@DEBUGOPTIMPPX@ reflection mlinterp)
+   (@SEXPLIBPPXDUNE@ ptree dterm ident decl expr ity loc constant number bigInt)))
+ (libraries why3deps str dynlink unix zarith menhirLib @INFERLIBDUNE@ @SEXPLIB@))
+
+(dirs (:standard \ infer bddinfer) @BDDINFER@)
+
+(include_subdirs unqualified)

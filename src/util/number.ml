@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -29,7 +29,8 @@ type int_constant = {
 [@@deriving sexp]
 
 type real_value = {
-  rv_sig  : BigInt.t;
+  rv_is_neg : bool;
+  rv_mantissa  : BigInt.t;
   rv_pow2 : BigInt.t;
   rv_pow5 : BigInt.t;
 }
@@ -45,35 +46,39 @@ type real_constant = {
 }
 [@@deriving sexp]
 
-let compare_real ?(structural=true) { rv_sig = s1; rv_pow2 = p21; rv_pow5 = p51 }
-                                    { rv_sig = s2; rv_pow2 = p22; rv_pow5 = p52 } =
+let compare_real ?(structural=true) { rv_is_neg = in1; rv_mantissa = m1 ; rv_pow2 = p21; rv_pow5 = p51 }
+                                    { rv_is_neg = in2; rv_mantissa = m2 ; rv_pow2 = p22; rv_pow5 = p52 } =
   if structural then
-    let c = BigInt.compare s1 s2 in
+    let c = Bool.compare in1 in2 in
+    if c <> 0 then c else
+    let c = BigInt.compare m1 m2 in
     if c <> 0 then c else
     let c = BigInt.compare p21 p22 in
     if c <> 0 then c else
     BigInt.compare p51 p52
   else
+    let m1 = if in1 then BigInt.minus m1 else m1 in
+    let m2 = if in2 then BigInt.minus m2 else m2 in
     let p2_min,p5_min = BigInt.min p21 p22, BigInt.min p51 p52 in
     let v1 = BigInt.pow_int_pos_bigint 2 (BigInt.sub p21 p2_min) in
     let v1 = BigInt.mul v1 (BigInt.pow_int_pos_bigint 5 (BigInt.sub p51 p5_min)) in
-    let v1 = BigInt.mul s1 v1 in
+    let v1 = BigInt.mul m1 v1 in
     let v2 = BigInt.pow_int_pos_bigint 2 (BigInt.sub p22 p2_min) in
     let v2 = BigInt.mul v2 (BigInt.pow_int_pos_bigint 5 (BigInt.sub p52 p5_min)) in
-    let v2 = BigInt.mul s2 v2 in
+    let v2 = BigInt.mul m2 v2 in
     BigInt.compare v1 v2
 
 let neg_int { il_kind; il_int = i } =
   { il_kind; il_int = BigInt.minus i }
 
 let neg_real { rl_kind = k; rl_real = r } =
-  { rl_kind = k; rl_real = { r with rv_sig = BigInt.minus r.rv_sig } }
+  { rl_kind = k; rl_real = { r with rv_is_neg = not r.rv_is_neg } }
 
 let abs_int { il_kind; il_int = i } =
   { il_kind; il_int = BigInt.abs i }
 
 let abs_real { rl_kind; rl_real = r } =
-  { rl_kind; rl_real = { r with rv_sig = BigInt.abs r.rv_sig } }
+  { rl_kind; rl_real = { r with rv_is_neg = false } }
 
 exception InvalidConstantLiteral of int * string
 let invalid_constant_literal n s = raise (InvalidConstantLiteral(n,s))
@@ -100,12 +105,14 @@ let rec normalize v p e =
 let normalize v p =
   normalize v (BigInt.of_int p) BigInt.one
 
-let real_value ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
-  if BigInt.eq i BigInt.zero then { rv_sig = i; rv_pow2 = i; rv_pow5 = i }
+let real_value ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) ~is_neg i =
+  if BigInt.lt i BigInt.zero then failwith "real_value expects a non-negative mantissa";
+  if BigInt.eq i BigInt.zero then
+    { rv_is_neg = is_neg; rv_mantissa = i; rv_pow2 = i; rv_pow5 = i }
   else
     let (i, p2) = normalize i 2 in
     let (i, p5) = normalize i 5 in
-    { rv_sig = i; rv_pow2 = BigInt.add pow2 p2; rv_pow5 = BigInt.add pow5 p5 }
+    { rv_is_neg = is_neg; rv_mantissa = i; rv_pow2 = BigInt.add pow2 p2; rv_pow5 = BigInt.add pow5 p5 }
 
 (** Parsing *)
 
@@ -153,14 +160,13 @@ let real_literal ~radix ~neg ~int ~frac ~exp =
   if int  <> "" then check_integer_literal radix check int;
   if frac <> "" then check_integer_literal radix check frac;
   let s = parse_in_base radix (int ^ frac) in
-  let s = if neg then BigInt.minus s else s in
   let f = BigInt.of_int (- String.length frac) in
   let f = if radix = 16 then BigInt.mul_int 4 f else f in
   let e = BigInt.add_int e f in
   let r =
     match radix with
-    | 10 -> real_value ~pow2:e ~pow5:e s
-    | 16 -> real_value ~pow2:e ~pow5:BigInt.zero s
+    | 10 -> real_value ~pow2:e ~pow5:e ~is_neg:neg s
+    | 16 -> real_value ~pow2:e ~pow5:BigInt.zero ~is_neg:neg s
     | _ -> assert false in
   { rl_kind = k; rl_real = r }
 
@@ -299,19 +305,20 @@ let print_int_constant support fmt = function
   | { il_kind = k; il_int = i } ->
       print_int_literal support fmt k i
 
-let print_frac_real support fmt { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } =
+let print_frac_real support fmt { rv_is_neg = isneg; rv_mantissa = m; rv_pow2 = p2; rv_pow5 = p5 } =
   let num, den =
     let fact = BigInt.pow_int_pos_bigint 2 (BigInt.abs p2) in
     if BigInt.lt p2 BigInt.zero then
-      i, fact
+      m, fact
     else
-      BigInt.mul i fact, BigInt.one in
+      BigInt.mul m fact, BigInt.one in
   let num, den =
     let fact = BigInt.pow_int_pos_bigint 5 (BigInt.abs p5) in
     if BigInt.lt p5 BigInt.zero then
       num, BigInt.mul den fact
     else
       BigInt.mul num fact, den in
+  let num = if isneg then BigInt.minus num else num in
   let do_frac (no_den, with_den) =
     if BigInt.eq den BigInt.one then
       no_den fmt (BigInt.to_string num)
@@ -321,22 +328,23 @@ let print_frac_real support fmt { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } =
     k fmt (Printf.sprintf "%s_%s" (BigInt.to_string num) (BigInt.to_string den)) in
   force_support_nodef support.frac_real_support do_frac fallback
 
-let print_dec_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as r) =
+let print_dec_real support fmt k ({ rv_is_neg = isneg; rv_mantissa = m; rv_pow2 = p2; rv_pow5 = p5 } as r) =
   let do_it custom =
     let e = BigInt.min (BigInt.min p2 p5) k in
-    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
-    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 (BigInt.sub p5 e)) in
-    let i = BigInt.to_string i in
+    let m = BigInt.mul m (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
+    let m = BigInt.mul m (BigInt.pow_int_pos_bigint 5 (BigInt.sub p5 e)) in
+    let m = BigInt.to_string m in
     let p = BigInt.to_int (BigInt.sub k e) in
-    let (i,n) =
-      let n = String.length i in
-      if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
-    let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
+    let (m,n) =
+      let n = String.length m in
+      if n <= p then (String.make (p + 1 - n) '0' ^ m, p + 1) else (m, n) in
+    let (m,f) = String.sub m 0 (n - p), String.sub m (n - p) p in
+    let m = if isneg then "-" ^ m else m in
     let f = if f = "" then "0" else f in
     let e =
       if BigInt.eq k BigInt.zero then None
       else Some (BigInt.to_string k) in
-    custom fmt i f e in
+    custom fmt m f e in
   let default fmt i f e =
     match e with
     | None -> Format.fprintf fmt "%s.%s" i f
@@ -344,28 +352,29 @@ let print_dec_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as 
   check_support support.dec_real_support do_it default
     (fun () -> print_frac_real support fmt r)
 
-let print_hex_real support fmt k ({ rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } as r) =
+let print_hex_real support fmt k ({ rv_is_neg = isneg ; rv_mantissa = m; rv_pow2 = p2; rv_pow5 = p5 } as r) =
   let do_it custom =
     let e =
       if BigInt.lt p2 k then
         BigInt.sub p2 (BigInt.euclidean_mod (BigInt.sub p2 k) (BigInt.of_int 4))
       else k in
     assert (BigInt.ge p5 BigInt.zero);
-    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
-    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 p5) in
-    let i = Format.asprintf "%a" (print_in_base 16 None) i in
+    let m = BigInt.mul m (BigInt.pow_int_pos_bigint 2 (BigInt.sub p2 e)) in
+    let m = BigInt.mul m (BigInt.pow_int_pos_bigint 5 p5) in
+    let m = Format.asprintf "%a" (print_in_base 16 None) m in
     let p = BigInt.to_int (BigInt.sub k e) in
     assert (p mod 4 = 0);
     let p = p / 4 in
-    let (i,n) =
-      let n = String.length i in
-      if n <= p then (String.make (p + 1 - n) '0' ^ i, p + 1) else (i, n) in
-    let (i,f) = String.sub i 0 (n - p), String.sub i (n - p) p in
+    let (m,n) =
+      let n = String.length m in
+      if n <= p then (String.make (p + 1 - n) '0' ^ m, p + 1) else (m, n) in
+    let (m,f) = String.sub m 0 (n - p), String.sub m (n - p) p in
+    let m = if isneg then "-" ^ m else m in
     let f = if f = "" then "0" else f in
     let e =
       if BigInt.eq k BigInt.zero then None
       else Some (BigInt.to_string k) in
-    custom fmt i f e in
+    custom fmt m f e in
   let default fmt i f e =
     let e = Option.value ~default:"0" e in
     Format.fprintf fmt "0x%s.%sp%s" i f e in
@@ -387,8 +396,8 @@ let print_real_constant support fmt
       print_dec_real support fmt e r
 
 let print_real_constant support fmt r =
-  if BigInt.lt r.rl_real.rv_sig BigInt.zero then
-    let r = { r with rl_real = { r.rl_real with rv_sig = BigInt.minus r.rl_real.rv_sig } } in
+  if r.rl_real.rv_is_neg then
+    let r = { r with rl_real = { r.rl_real with rv_is_neg = false } } in
     let default fmt f =
       Format.fprintf fmt "(- %t)" f in
     force_support support.negative_real_support
@@ -432,12 +441,12 @@ exception NonRepresentableFloat of real_constant
 open BigInt
 
 let float_parser c =
-  let { rv_sig = i; rv_pow2 = p2; rv_pow5 = p5 } = c.rl_real in
-  (* get the value i and e such that c = i * 2 ^ e *)
+  let { rv_is_neg = isneg ; rv_mantissa = m; rv_pow2 = p2; rv_pow5 = p5 } = c.rl_real in
+  (* get the value m and e such that c = m * 2 ^ e *)
   if lt p5 zero then raise (NonRepresentableFloat c)
   else
-    let i = BigInt.mul i (BigInt.pow_int_pos_bigint 5 p5) in
-    i, p2
+    let m = BigInt.mul m (BigInt.pow_int_pos_bigint 5 p5) in
+    isneg, m, p2
 
 let compute_float c fp =
   let eb = BigInt.of_int fp.fp_exponent_digits in
@@ -454,52 +463,41 @@ let compute_float c fp =
   let emin = sub (add (of_int 2) eden) sb in
 
   (* get [s] and [e] such that "c = s * 2 ^ e" *)
-  let s, e = float_parser c in
+  let is_neg, m, e = float_parser c in
 
-  (* if s = 0 stop now *)
-  if eq s zero then
-    false, zero, zero (* FIXME: could return -0.0 sometimes ? *)
-
+  (* if m = 0 stop now *)
+  if eq m zero then
+    is_neg, zero, zero
   else
     begin
-    let sign = lt s zero in
-    let s, e = ref (abs s), ref e in
-
-
-    (* if s is too big or e is too small, try to remove trailing zeros
-       in s and incr e *)
-    while gt !s smax || lt !e emin do
-      let new_s, rem = euclidean_div_mod !s (of_int 2) in
+    let m, e = ref m, ref e in
+    (* if m is too big or e is too small, try to remove trailing zeros
+       in m and incr e *)
+    while gt !m smax || lt !e emin do
+      let new_m, rem = euclidean_div_mod !m (of_int 2) in
       if not (eq rem zero) then begin
         Debug.dprintf debug_float "Too many digits in significand.";
         raise (NonRepresentableFloat c);
       end else begin
-        s := new_s;
+        m := new_m;
         e := succ !e
       end
     done;
-
-    (* if s is too small and e is too big, add trailing zeros in s and
+    (* if m is too small and e is too big, add trailing zeros in s and
        decr e *)
-    while lt !s smin && gt !e emin do
-      s := mul_int 2 !s;
+    while lt !m smin && gt !e emin do
+      m := mul_int 2 !m;
       e := pred !e
     done;
-
-    Debug.dprintf debug_float " = %s * 2 ^ %s@." (to_string !s) (to_string !e);
-
-    if lt !s smin then begin
+    Debug.dprintf debug_float " = %s * 2 ^ %s@." (to_string !m) (to_string !e);
+    if lt !m smin then begin
       (* denormal case *)
-
       Debug.dprintf debug_float "final: c = 0.[%s] * 2 ^ ([0] - bias + 1); bias=%s, i.e, 0[%a][%a]@."
-        (to_string !s) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
-      (print_in_base 2 (Some (to_int (sub sb one)))) !s;
-
-      sign, zero, !s
-
+        (to_string !m) (to_string (sub emax one)) (print_in_base 2 (Some (to_int eb))) zero
+      (print_in_base 2 (Some (to_int (sub sb one)))) !m;
+      is_neg, zero, !m
     end else begin
       (* normal case *)
-
       (* normalize the exponent *)
       let fe = add !e (sub sb one) in
 
@@ -509,9 +507,9 @@ let compute_float c fp =
         raise (NonRepresentableFloat c)
       end;
 
-      (* add the exponent bia to e *)
+      (* add the exponent bias to e *)
       let fe = add fe (sub emax one) in
-      let fs = sub !s smin in
+      let fs = sub !m smin in
 
       Debug.dprintf debug_float "final: c = 1.[%s] * 2 ^ ([%s] - bias); bias=%s, i.e, 0[%a][%a]@."
         (to_string fs) (to_string fe) (to_string (sub emax one))
@@ -521,7 +519,7 @@ let compute_float c fp =
       assert (le zero fs && lt fs (pow_int_pos_bigint 2 (sub sb one))
               && le zero fe && lt fe (sub (pow_int_pos_bigint 2 eb) one));
 
-      sign, fe, fs
+      is_neg, fe, fs
     end
   end
 

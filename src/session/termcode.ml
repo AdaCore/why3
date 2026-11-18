@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -202,17 +202,18 @@ let const_v1 fmt c =
       | ILitOct -> Format.fprintf fmt "0o%a" (Number.print_in_base 8 None) i
       | ILitBin -> Format.fprintf fmt "0b%a" (Number.print_in_base 2 None) i
       end
-  | ConstReal { rl_kind=k; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
+  | ConstReal { rl_kind=k;
+                rl_real={ rv_is_neg = is_neg; rv_mantissa = m; rv_pow2 = p2; rv_pow5 = p5 } } ->
       (* not the actual encoding *)
-      sign fmt (BigInt.lt i BigInt.zero);
-      let i = BigInt.abs i in
+      sign fmt is_neg;
+      assert (BigInt.ge m BigInt.zero);
       begin match k with
       | RLitUnk | RLitDec _ ->
           Format.fprintf fmt "%s.0e%sp%s"
-            (BigInt.to_string i) (BigInt.to_string p5) (BigInt.to_string p2)
+            (BigInt.to_string m) (BigInt.to_string p5) (BigInt.to_string p2)
       | RLitHex _ ->
           Format.fprintf fmt "%a.0p%se%s"
-            (Number.print_in_base 16 None) i (BigInt.to_string p2) (BigInt.to_string p5)
+            (Number.print_in_base 16 None) m (BigInt.to_string p2) (BigInt.to_string p5)
       end
   | ConstStr c ->
       print_string_def fmt c
@@ -221,9 +222,9 @@ let const_v2 fmt c =
   match c with
   | ConstInt { il_kind=_; il_int=i } ->
       Format.pp_print_string fmt (BigInt.to_string i)
-  | ConstReal { rl_kind=_; rl_real={ rv_sig=i; rv_pow2=p2; rv_pow5=p5 } } ->
-      Format.fprintf fmt "%s.p%se%s"
-        (BigInt.to_string i) (BigInt.to_string p2) (BigInt.to_string p5)
+  | ConstReal { rl_kind=_; rl_real={ rv_is_neg = is_neg ; rv_mantissa = m; rv_pow2=p2; rv_pow5=p5 } } ->
+      Format.fprintf fmt "%s%s.p%se%s" (if is_neg then "-" else "")
+        (BigInt.to_string m) (BigInt.to_string p2) (BigInt.to_string p5)
   | ConstStr c ->
       print_string_def fmt c
 

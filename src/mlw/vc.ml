@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -74,7 +74,7 @@ let wb_attr = Ident.create_attribute "vc:white_box"
 let kp_attr = Ident.create_attribute "vc:keep_precondition"
 let nt_attr = Ident.create_attribute "vc:divergent"
 
-let explicit_result loc ce ity eid =
+let explicit_result ~attrs loc ce ity eid =
   let name =
     match ce.c_node with
     | Capp (rs, _) -> Format.asprintf "%s'result" rs.rs_name.id_string
@@ -82,7 +82,6 @@ let explicit_result loc ce ity eid =
     | Cfun _ -> "anonymous'result"
     | Cany -> "any'result"
   in
-  let attrs = Sattr.empty in
   let attrs = Sattr.add model_trace_result_attribute attrs in
   let attrs = Sattr.add (create_eid_attr eid) attrs in
   let attrs =
@@ -723,7 +722,7 @@ let rec k_expr env lps e res xmap =
                Klet (v, t_tag t, List.fold_right sp_and rinv sp)
             | None ->  Kval ([v], List.fold_right sp_and rinv sp) in
           if env.keep_trace && need_trace then
-            let vv = explicit_result loc ce v.pv_ity e.e_id in
+            let vv = explicit_result ~attrs:e.e_attrs loc ce v.pv_ity e.e_id in
             Kseq(k v,0,Klet(vv, t_var v.pv_vs, t_true))
           else
             k v

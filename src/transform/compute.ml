@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -117,62 +117,70 @@ let normalize_goal_transf ?pr_norm ?step_limit p env : 'a Trans.trans =
 let default_param = {
   compute_defs = false;
   compute_builtin = false;
+  compute_in_branches = false;
   compute_def_set = Term.Mls.empty;
   compute_max_quantifier_domain = 10;
 }
 
-let normalize_goal_transf_all env =
-  let p = { default_param with compute_defs = true; compute_builtin = true } in
+let compute_in_goal ~defs ~branches env =
+  let p = { default_param with
+            compute_defs = defs;
+            compute_builtin = true;
+            compute_in_branches = branches }
+  in
   normalize_goal_transf p env
 
-let normalize_goal_transf_few env =
-  let p = { default_param with compute_builtin = true } in
-  normalize_goal_transf p env
+let () = wrap_and_register
+    ~desc:"compute [nodef] [branches]@ computes in the goal. Pass [nodef] to forbid unfolding of definitions. Also computes under if and match branches if [branches] is given"
+    "compute"
+    (Toptbool ("nodef", Toptbool ("branches", Tenvtrans_l)))
+    (fun n b -> compute_in_goal ~defs:(not n) ~branches:b)
 
-let () =
-  Trans.register_env_transform_l "compute_in_goal" normalize_goal_transf_all
-  ~desc:"Perform@ computations@ in@ the@ goal,@ also@ using@ \
-    the@ automatically@ derived@ rules."
 
-let () =
-  Trans.register_env_transform_l "compute_specified" normalize_goal_transf_few
-  ~desc:"Perform@ computations@ in@ the@ goal,@ only@ using@ \
-    the@ user-specified@ rules."
-
-let normalize_hyp step_limit pr_norm env =
-  let p = { default_param with compute_defs = true; compute_builtin = true } in
+let compute_in_hypothesis step_limit ~defs ~branches pr_norm env =
+  let p = { default_param with
+            compute_defs = defs; compute_builtin = true;
+            compute_in_branches = branches }
+  in
   normalize_goal_transf ?pr_norm ?step_limit p env
 
 let () = wrap_and_register
-    ~desc:"step [in] <name>@ performs@ one@ \"elementary\"@ \
-      reduction@ step@ in@ the@ given@ premise@ (experimental)."
+    ~desc:"step [nodef] [branches] in <name>@ performs@ one@ \"elementary\"@ \
+      reduction@ step@ in@ the@ given@ hypothesis."
     "step"
-    (Topt ("in", Tprsymbol Tenvtrans_l))
-    (normalize_hyp (Some 1))
+    (Toptbool
+       ("nodef",
+        (Toptbool
+           ("branches",
+            (Topt ("in", Tprsymbol Tenvtrans_l))))))
+    (fun n b -> compute_in_hypothesis (Some 1) ~defs:(not n) ~branches:b)
 
 let () = wrap_and_register
-    ~desc:"steps <n> [in] <name>@ performs@ <n>@ \"elementary\"@ \
-      reduction@ steps@ in@ the@ given@ premise@ (experimental)."
+    ~desc:"steps <n> [nodef] [branches] in <name>]@ performs@ <n>@ \"elementary\"@ \
+      reduction@ steps@ in@ the@ given@ hypothesis."
     "steps"
-    (Tint (Topt ("in", Tprsymbol Tenvtrans_l)))
-    (fun n -> normalize_hyp (Some n))
+    (Tint (Toptbool
+             ("nodef",
+              (Toptbool
+                 ("branches", (Topt ("in", Tprsymbol Tenvtrans_l)))))))
+    (fun s n b -> compute_in_hypothesis (Some s) ~defs:(not n) ~branches:b)
 
 let () = wrap_and_register
-    ~desc:"compute_hyp [in] <name>@ performs@ computations@ \
-      in@ the@ given@ premise, also@ using@ the@ automatically@ \
-      derived@ rules."
+    ~desc:"compute_hyp [nodef] [branches] [in] <name>@ performs@ computations@ \
+      in@ the@ given@ hypothesis."
     "compute_hyp"
-    (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp None)
+    (Toptbool
+       ("nodef",
+        (Toptbool
+           ("branches", (Topt ("in", Tprsymbol Tenvtrans_l))))))
+    (fun n b -> compute_in_hypothesis None ~defs:(not n) ~branches:b)
 
-let normalize_hyp_few step_limit pr_norm env =
-  let p = { default_param with compute_builtin = true } in
-  normalize_goal_transf ?pr_norm ?step_limit p env
+let () = Trans.register_env_transform_l
+    ~desc:"compute_in_goal@ performs@ computations (legacy, default arguments)."
+    "compute_in_goal"
+    (compute_in_goal ~defs:true ~branches:false)
 
-let () = wrap_and_register
-    ~desc:"compute_hyp_specified [in] <name>@ performs@ computations@ \
-      in@ the@ given@ premise, only@ using@ the@ user-specified@ rules."
-    "compute_hyp_specified"
-    (Topt ("in", Tprsymbol Tenvtrans_l)) (normalize_hyp_few None)
+
 
 let simplify check_ls env : 'a Trans.trans =
   let normalize_transf engine =

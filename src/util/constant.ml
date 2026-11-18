@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -36,8 +36,8 @@ let int_const ?(il_kind=ILitUnk) n =
 let int_const_of_int n =
   int_const (BigInt.of_int n)
 
-let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) i =
-  ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 i }
+let real_const ?(pow2 = BigInt.zero) ?(pow5 = BigInt.zero) ~is_neg i =
+  ConstReal { rl_kind = RLitUnk; rl_real = real_value ~pow2 ~pow5 ~is_neg i }
 
 let real_const_from_string ~radix ~neg ~int ~frac ~exp =
   ConstReal (real_literal ~radix ~neg ~int ~frac ~exp)

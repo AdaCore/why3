@@ -2,289 +2,287 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC5" version="1.1.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_fm2012_treedel.mlw"/>
 <theory name="Memory" proved="true">
  <goal name="get_left&#39;vc" expl="VC for get_left" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="6" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
  <goal name="get_right&#39;vc" expl="VC for get_right" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="6" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
  <goal name="get_data&#39;vc" expl="VC for get_data" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="6" timelimit="1"><result status="valid" time="0.000000" steps="0"/></proof>
  </goal>
 </theory>
 <theory name="Treedel" proved="true">
  <goal name="extensionality&#39;vc" expl="VC for extensionality" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="extensionality&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="48"/></proof>
+  <proof prover="5"><result status="valid" time="0.015332" steps="17721"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.012257" steps="17496"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.285611" steps="24164"/></proof>
+  <proof prover="6"><result status="valid" time="1.558960" steps="10131"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="50"/></proof>
+  <proof prover="1"><result status="valid" time="0.042428" steps="2909"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="14"/></proof>
+  <proof prover="1"><result status="valid" time="0.059866" steps="3600"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.189858" steps="16129"/></proof>
+  <proof prover="6"><result status="valid" time="2.354538" steps="12480"/></proof>
   </goal>
   <goal name="extensionality&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="288"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="273"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="inorder_zip" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="inorder_zip.0" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="132"/></proof>
+  <proof prover="4"><result status="valid" time="0.053338" steps="10215"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="tree_left&#39;vc" expl="VC for tree_left" proved="true">
- <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+ <proof prover="5"><result status="valid" time="0.012291" steps="24344"/></proof>
  </goal>
  <goal name="tree_right&#39;vc" expl="VC for tree_right" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+ <proof prover="4"><result status="valid" time="0.031515" steps="5854"/></proof>
  </goal>
  <goal name="distinct_break_append" proved="true">
  <transf name="induction_ty_lex" proved="true" >
   <goal name="distinct_break_append.0" proved="true">
-  <proof prover="4"><result status="valid" time="0.149817" steps="16829"/></proof>
+  <proof prover="1"><result status="valid" time="0.073299" steps="10070"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="in_zip_tree&#39;vc" expl="VC for in_zip_tree" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="in_zip_tree&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="45"/></proof>
+  <proof prover="5"><result status="valid" time="0.016762" steps="29594"/></proof>
   </goal>
   <goal name="in_zip_tree&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="10"/></proof>
+  <proof prover="1"><result status="valid" time="0.081233" steps="5556"/></proof>
   </goal>
   <goal name="in_zip_tree&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="31"/></proof>
+  <proof prover="5"><result status="valid" time="0.010357" steps="27356"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="subst_zip_tree&#39;vc" expl="VC for subst_zip_tree" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="subst_zip_tree&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="18"/></proof>
+  <proof prover="4"><result status="valid" time="0.054585" steps="9609"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="subst_zip_tree&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.020000" steps="23"/></proof>
+   <proof prover="1"><result status="valid" time="0.090753" steps="9904"/></proof>
    </goal>
    <goal name="subst_zip_tree&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="144"/></proof>
+   <proof prover="6"><result status="valid" time="0.010000" steps="144"/></proof>
    </goal>
    <goal name="subst_zip_tree&#39;vc.1.2" expl="VC for subst_zip_tree" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="281"/></proof>
+   <proof prover="1"><result status="valid" time="0.060153" steps="8331"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="subst_zip_tree&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="5"><result status="valid" time="0.013224" steps="32637"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="44"/></proof>
+  <proof prover="1"><result status="valid" time="0.063323" steps="6507"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.4" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="92"/></proof>
+  <proof prover="5"><result status="valid" time="0.013198" steps="32966"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="100"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="100"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="76"/></proof>
+  <proof prover="5"><result status="valid" time="0.012744" steps="33317"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="30"/></proof>
+  <proof prover="1"><result status="valid" time="0.053079" steps="7386"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="94"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="94"/></proof>
   </goal>
   <goal name="subst_zip_tree&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="119"/></proof>
+  <proof prover="6"><result status="valid" time="0.000000" steps="119"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="main_lemma&#39;vc" expl="VC for main_lemma" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="main_lemma&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="5"><result status="valid" time="0.009299" steps="29872"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.1" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="main_lemma&#39;vc.1.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.020000" steps="57"/></proof>
+   <proof prover="6"><result status="valid" time="0.020000" steps="57"/></proof>
    </goal>
    <goal name="main_lemma&#39;vc.1.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.040000" steps="302"/></proof>
+   <proof prover="1"><result status="valid" time="0.075466" steps="9628"/></proof>
    </goal>
    <goal name="main_lemma&#39;vc.1.2" expl="assertion" proved="true">
-   <proof prover="5"><result status="valid" time="0.017258" steps="35253"/></proof>
+   <proof prover="1"><result status="valid" time="0.086009" steps="7001"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="main_lemma&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="63"/></proof>
+  <proof prover="4"><result status="valid" time="0.058603" steps="10698"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.100000" steps="321"/></proof>
+  <proof prover="4"><result status="valid" time="0.062009" steps="11271"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.012875" steps="33918"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.328530" steps="1700"/></proof>
+  <proof prover="1"><result status="valid" time="0.219784" steps="12744"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="201"/></proof>
+  <proof prover="4"><result status="valid" time="0.060272" steps="11144"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="129"/></proof>
+  <proof prover="1"><result status="valid" time="0.052486" steps="7201"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="6"/></proof>
+  <proof prover="4"><result status="valid" time="0.043197" steps="9534"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="300"/></proof>
+  <proof prover="1"><result status="valid" time="0.073865" steps="10109"/></proof>
   </goal>
   <goal name="main_lemma&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="26"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="search_tree_delete_min&#39;vc" expl="VC for search_tree_delete_min" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="search_tree_delete_min&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="5"><result status="valid" time="0.005175" steps="3210"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="1"><result status="valid" time="0.028820" steps="4282"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="5"><result status="valid" time="0.006123" steps="3339"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.3" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="24"/></proof>
+  <proof prover="1"><result status="valid" time="0.030666" steps="5426"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000"/></proof>
+  <proof prover="6"><result status="valid" time="0.048026" steps="218"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="5"><result status="valid" time="0.007180" steps="2725"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="310"/></proof>
+  <proof prover="1"><result status="valid" time="0.061832" steps="7967"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="5"><result status="valid" time="0.005178" steps="9443"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="23"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="22"/></proof>
+  <proof prover="5"><result status="valid" time="0.010445" steps="3450"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.10" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="20"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.11" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="1"><result status="valid" time="0.059561" steps="5914"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.12" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="241"/></proof>
+  <proof prover="1"><result status="valid" time="0.048203" steps="6508"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.13" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="5"><result status="valid" time="0.005244" steps="2708"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="41"/></proof>
+  <proof prover="6"><result status="valid" time="0.020000" steps="41"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="126"/></proof>
+  <proof prover="1"><result status="valid" time="0.041426" steps="6550"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="53"/></proof>
+  <proof prover="5"><result status="valid" time="0.008055" steps="3771"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="50"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="50"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.18" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="347"/></proof>
+  <proof prover="5"><result status="valid" time="0.005250" steps="4077"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="50"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="50"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="50"/></proof>
+  <proof prover="5"><result status="valid" time="0.011960" steps="11906"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.21" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.130000" steps="391"/></proof>
+  <proof prover="5"><result status="valid" time="0.018003" steps="49377"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.22" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="5"><result status="valid" time="0.007101" steps="2708"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.23" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="41"/></proof>
+  <proof prover="1"><result status="valid" time="0.066106" steps="7233"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.24" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.016307" steps="34339"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.006744" steps="3666"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="26"/></proof>
+  <proof prover="5"><result status="valid" time="0.007126" steps="3666"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="5"><result status="valid" time="0.012360" steps="3706"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="154"/></proof>
+  <proof prover="5"><result status="valid" time="0.018212" steps="36453"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.29" expl="assertion" proved="true">
-  <proof prover="2"><result status="valid" time="0.069341"/></proof>
+  <proof prover="1"><result status="valid" time="0.080868" steps="10250"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="73"/></proof>
+  <proof prover="5"><result status="valid" time="0.019665" steps="35652"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.31" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="76"/></proof>
+  <proof prover="6"><result status="valid" time="0.010000" steps="76"/></proof>
   </goal>
   <goal name="search_tree_delete_min&#39;vc.32" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="search_tree_delete_min&#39;vc.32.0" expl="VC for search_tree_delete_min" proved="true">
-   <proof prover="3"><result status="valid" time="0.060000" steps="949"/></proof>
+   <proof prover="6"><result status="valid" time="0.200510" steps="949"/></proof>
    </goal>
    <goal name="search_tree_delete_min&#39;vc.32.1" expl="VC for search_tree_delete_min" proved="true">
-   <proof prover="3"><result status="valid" time="0.010000" steps="178"/></proof>
+   <proof prover="6"><result status="valid" time="0.010000" steps="178"/></proof>
    </goal>
    <goal name="search_tree_delete_min&#39;vc.32.2" expl="VC for search_tree_delete_min" proved="true">
-   <proof prover="3"><result status="valid" time="0.070000" steps="648"/></proof>
+   <proof prover="1"><result status="valid" time="0.113814" steps="12077"/></proof>
    </goal>
    <goal name="search_tree_delete_min&#39;vc.32.3" expl="VC for search_tree_delete_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.310000" steps="41826"/></proof>
+   <proof prover="6"><result status="valid" time="0.273422" steps="2034"/></proof>
    </goal>
    <goal name="search_tree_delete_min&#39;vc.32.4" expl="VC for search_tree_delete_min" proved="true">
-   <proof prover="1"><result status="valid" time="0.490000" steps="47570"/></proof>
+   <proof prover="6"><result status="valid" time="0.390433" steps="2968"/></proof>
    </goal>
   </transf>
   </goal>

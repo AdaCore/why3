@@ -7,11 +7,33 @@ USER root
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -yq && \
     apt-get upgrade -yq --with-new-pkgs --auto-remove && \
-    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git libgmp-dev opam pkg-config unzip wget zlib1g-dev libgcc-s1 libstdc++6 adduser && \
-    apt-get install -yq spass && \
+    apt-get install -yq --no-install-recommends autoconf build-essential ca-certificates git rsync adduser && \
+    apt-get install -yq --no-install-recommends libgmp-dev opam pkg-config unzip wget && \
+    apt-get install -yq --no-install-recommends zlib1g-dev libgcc-s1 libstdc++6 adduser && \
+    apt-get install -yq --no-install-recommends libmpfr-dev libboost-dev python3-minimal && \
+    apt-get install -yq --no-install-recommends spass && \
     apt-get clean
 
-# install provers
+# install provers from binaries on the web
+
+## Vampire 5.0.1
+RUN wget --quiet https://github.com/vprover/vampire/releases/download/v5.0.1/vampire-Linux-X64.zip && \
+    unzip vampire-Linux-X64.zip && \
+    mv vampire /usr/local/bin/vampire-5.0.1 && \
+    rm -rf vampire-Linux-X64.zip
+
+## Colibri2 0.5
+RUN wget --quiet https://git.frama-c.com/pub/colibrics/-/jobs/artifacts/0.5/raw/bin/colibri2?job=generate-static -O colibri2-0.5   && \
+    chmod +x colibri2-0.5  && \
+    mv colibri2-0.5 /usr/local/bin/
+
+## Gappa 1.6.1
+RUN wget --quiet https://gappa.gitlabpages.inria.fr/releases/gappa-1.6.1.tar.gz && \
+    tar -xzf gappa-1.6.1.tar.gz && \
+    cd gappa-1.6.1 && \
+    ./configure && ./remake && ./remake install && \
+    rm -rf gappa-1.6.1 gappa-1.6.1.tar.gz
+
 ## CVC5 1.0.5
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/cvc5-Linux -O /usr/local/bin/cvc5-1.0.5 && \
     chmod a+x /usr/local/bin/cvc5-1.0.5 && \
@@ -26,9 +48,9 @@ RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-
 RUN wget --quiet https://github.com/cvc5/cvc5/releases/download/cvc5-1.2.1/cvc5-Linux-x86_64-static.zip && \
     unzip cvc5-Linux-x86_64-static.zip && \
     mv cvc5-Linux-x86_64-static/bin/cvc5 /usr/local/bin/cvc5-1.2.1 && \
-    ls -l /usr/local/bin && \
     rm -r cvc5-Linux-x86_64-static && \
     cvc5-1.2.1 --version
+
 ## CVC4 1.8
 RUN wget --quiet https://github.com/CVC4/CVC4-archived/releases/download/1.8/cvc4-1.8-x86_64-linux-opt -O /usr/local/bin/cvc4-1.8 && \
     chmod a+x /usr/local/bin/cvc4-1.8
@@ -44,16 +66,29 @@ RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/c
 ## CVC4 1.4
 RUN wget --quiet http://cvc4.cs.stanford.edu/downloads/builds/x86_64-linux-opt/cvc4-1.4-x86_64-linux-opt -O /usr/local/bin/cvc4-1.4 && \
     chmod a+x /usr/local/bin/cvc4-1.4
+
+## CVC3 2.4.1
+RUN wget --quiet https://cs.nyu.edu/acsys/cvc3/releases/2.4.1/linux64/cvc3-2.4.1-optimized-static.tar.gz && \
+    tar zxf cvc3-2.4.1-optimized-static.tar.gz && \
+    mv cvc3-2.4.1-optimized-static/bin/cvc3 /usr/local/bin/cvc3-2.4.1 && \
+    rm -r cvc3-2.4.1-optimized-static.tar.gz cvc3-2.4.1-optimized-static
+
 ## Z3 4.6.0
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.6.0/z3-4.6.0-x64-debian-8.10.zip && \
     unzip z3-4.6.0-x64-debian-8.10.zip && \
     mv z3-4.6.0-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.6.0 && \
     rm -r z3-4.6.0-x64-debian-8.10.zip z3-4.6.0-x64-debian-8.10
-## Z3 4.8.10
-RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-ubuntu-18.04.zip && \
-    unzip z3-4.8.10-x64-ubuntu-18.04.zip && \
-    mv z3-4.8.10-x64-ubuntu-18.04/bin/z3 /usr/local/bin/z3-4.8.10 && \
-    rm -r z3-4.8.10-x64-ubuntu-18.04.zip z3-4.8.10-x64-ubuntu-18.04
+## Z3 4.7.1
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-debian-8.10.zip && \
+    unzip z3-4.7.1-x64-debian-8.10.zip && \
+    mv z3-4.7.1-x64-debian-8.10/bin/z3 /usr/local/bin/z3-4.7.1 && \
+    rm -r z3-4.7.1-x64-debian-8.10.zip z3-4.7.1-x64-debian-8.10
+## Z3 4.8.17
+RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.8.17/z3-4.8.17-x64-glibc-2.31.zip && \
+    unzip z3-4.8.17-x64-glibc-2.31.zip && \
+    mv z3-4.8.17-x64-glibc-2.31/bin/z3 /usr/local/bin/z3-4.8.17 && \
+    rm -r z3-4.8.17-x64-glibc-2.31.zip z3-4.8.17-x64-glibc-2.31
+    ## Z3 4.11.2
 ## Z3 4.11.2
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.11.2/z3-4.11.2-x64-glibc-2.31.zip && \
         unzip z3-4.11.2-x64-glibc-2.31.zip && \
@@ -68,15 +103,25 @@ RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.12.6/z3-4
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.13.2/z3-4.13.2-x64-glibc-2.35.zip && \
     unzip z3-4.13.2-x64-glibc-2.35.zip && \
     mv z3-4.13.2-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.13.2 && \
-    ls -l /usr/local/bin && \
     rm -r z3-4.13.2-x64-glibc-2.35.zip z3-4.13.2-x64-glibc-2.35
 ## Z3 4.14.1
 RUN wget --quiet https://github.com/Z3Prover/z3/releases/download/z3-4.14.1/z3-4.14.1-x64-glibc-2.35.zip && \
     unzip z3-4.14.1-x64-glibc-2.35.zip && \
     mv z3-4.14.1-x64-glibc-2.35/bin/z3 /usr/local/bin/z3-4.14.1 && \
-    ls -l /usr/local/bin && \
     rm -r z3-4.14.1-x64-glibc-2.35.zip z3-4.14.1-x64-glibc-2.35
 
+# compile E prover versions from sources
+
+## E prover 2.0
+RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.0/E.tgz && \
+    tar -xzf E.tgz && \
+    mv E E-2.0 && \
+    cd E-2.0 && \
+    ./configure --bindir=/usr/local/bin && \
+    make  && \
+    mv PROVER/eprover /usr/local/bin/eprover-2.0 && \
+    cd .. && \
+    rm -rf E.tgz E-2.0
 ## E prover 2.6
 RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.6/E.tgz && \
     tar -xzf E.tgz && \
@@ -84,11 +129,9 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_2.
     cd E-2.6 && \
     ./configure --bindir=/usr/local/bin && \
     make && \
-    make install && \
+    mv PROVER/eprover /usr/local/bin/eprover-2.6 && \
     cd .. && \
-    rm -rf E.tgz E-2.6 && \
-    mv /usr/local/bin/eprover /usr/local/bin/eprover-2.6
-
+    rm -rf E.tgz E-2.6
 ## E prover 3.2.5
 RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.2/E.tgz && \
     tar -xzf E.tgz && \
@@ -96,14 +139,11 @@ RUN wget --quiet http://wwwlehre.dhbw-stuttgart.de/~sschulz/WORK/E_DOWNLOAD/V_3.
     cd E-3.2.5 && \
     ./configure --bindir=/usr/local/bin && \
     make && \
-    make install && \
+    mv PROVER/eprover /usr/local/bin/eprover-3.2.5 && \
     cd .. && \
-    rm -rf E.tgz E-3.2.5 && \
-    mv /usr/local/bin/eprover /usr/local/bin/eprover-3.2.5
+    rm -rf E.tgz E-3.2.5
 
-
-
-## list installed provers
+## list installed provers so far
 RUN ls -l /usr/local/bin
 
 # create user
@@ -112,9 +152,9 @@ USER why3
 ENV HOME=/home/why3
 WORKDIR /home/why3
 
-# install opam
+# install opam, alt-ergo and coq
 RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
-    opam switch create bench  ocaml-base-compiler.4.09.1 && \
+    opam switch create bench  ocaml-base-compiler.4.14.2 && \
     opam repository add coq-released https://coq.inria.fr/opam/released --all-switches && \
     opam install -y --switch=bench alt-ergo.2.0.0 && \
     cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.0.0 && \
@@ -130,7 +170,7 @@ RUN opam init -y --no-setup -j4 --bare --disable-sandboxing && \
     cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.5.4 && \
     opam install -y --switch=bench alt-ergo.2.6.2 && \
     cp /home/why3/.opam/bench/bin/alt-ergo /home/why3/alt-ergo-2.6.2 && \
-    opam install -y --switch=bench menhir zarith camlzip conf-autoconf re zenon.0.8.5 coq.8.16.1 coq-flocq coq-interval && \
+    opam install -y --switch=bench menhir zarith camlzip conf-autoconf re coq.8.20.1 coq-flocq coq-interval && \
     opam clean -a -c -r -s --logs
 
 USER root

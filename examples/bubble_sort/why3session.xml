@@ -2,42 +2,43 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bubble_sort.mlw"/>
 <theory name="BubbleSort" proved="true">
  <goal name="bubble_sort&#39;vc" expl="VC for bubble_sort" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="bubble_sort&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.074041" steps="36195"/></proof>
+  <proof prover="3"><result status="valid" time="0.074041" steps="33576"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.057119" steps="44143"/></proof>
+  <proof prover="3"><result status="valid" time="0.057119" steps="40362"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.046590" steps="39326"/></proof>
+  <proof prover="3"><result status="valid" time="0.046590" steps="36535"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.038935" steps="17507"/></proof>
+  <proof prover="3"><result status="valid" time="0.038935" steps="15371"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.044603" steps="17535"/></proof>
+  <proof prover="3"><result status="valid" time="0.044603" steps="15393"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.052953" steps="41075"/></proof>
+  <proof prover="3"><result status="valid" time="0.052953" steps="37991"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.048709" steps="41122"/></proof>
+  <proof prover="3"><result status="valid" time="0.048709" steps="37928"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.7" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.045909" steps="43097"/></proof>
+  <proof prover="3"><result status="valid" time="0.045909" steps="39300"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.8" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.047368" steps="42750"/></proof>
+  <proof prover="3"><result status="valid" time="0.047368" steps="39261"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.052246" steps="46756"/></proof>
+  <proof prover="3"><result status="valid" time="0.052246" steps="42353"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.10" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.170284" steps="10307"/></proof>
@@ -46,106 +47,106 @@
   <proof prover="1"><result status="valid" time="0.362711" steps="33275"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.248655" steps="431031"/></proof>
+  <proof prover="0"><result status="valid" time="0.147735" steps="734"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.13" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.144006" steps="19198"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.038080" steps="19203"/></proof>
+  <proof prover="3"><result status="valid" time="0.038080" steps="16381"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.039327" steps="19235"/></proof>
+  <proof prover="3"><result status="valid" time="0.039327" steps="16403"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.061210" steps="44653"/></proof>
+  <proof prover="3"><result status="valid" time="0.061210" steps="40723"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.17" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.058018" steps="52160"/></proof>
+  <proof prover="3"><result status="valid" time="0.058018" steps="43544"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.042461" steps="18727"/></proof>
+  <proof prover="3"><result status="valid" time="0.042461" steps="16133"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.19" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.095907" steps="11406"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.060108" steps="47337"/></proof>
+  <proof prover="3"><result status="valid" time="0.060108" steps="42704"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.21" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.057150" steps="41122"/></proof>
+  <proof prover="3"><result status="valid" time="0.057150" steps="37914"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.036539" steps="17175"/></proof>
+  <proof prover="3"><result status="valid" time="0.036539" steps="15167"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.057784" steps="40226"/></proof>
+  <proof prover="3"><result status="valid" time="0.057784" steps="37894"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.24" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.058298" steps="38907"/></proof>
+  <proof prover="3"><result status="valid" time="0.058298" steps="36100"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="test1&#39;vc" expl="VC for test1" proved="true">
- <proof prover="2"><result status="valid" time="0.071961" steps="53318"/></proof>
+ <proof prover="3"><result status="valid" time="0.071961" steps="48451"/></proof>
  </goal>
  <goal name="test2&#39;vc" expl="VC for test2" proved="true">
- <proof prover="2"><result status="valid" time="0.053707" steps="68050"/></proof>
+ <proof prover="3"><result status="valid" time="0.053707" steps="58482"/></proof>
  </goal>
  <goal name="bench&#39;vc" expl="VC for bench" proved="true">
- <proof prover="2"><result status="valid" time="0.042430" steps="38124"/></proof>
+ <proof prover="3"><result status="valid" time="0.042430" steps="35454"/></proof>
  </goal>
 </theory>
 <theory name="TAOCP" proved="true">
  <goal name="bubble_sort&#39;vc" expl="VC for bubble_sort" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="bubble_sort&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.028105" steps="2679"/></proof>
+  <proof prover="3"><result status="valid" time="0.028105" steps="2679"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.058850" steps="36019"/></proof>
+  <proof prover="3"><result status="valid" time="0.058850" steps="33410"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.2" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.028942" steps="2791"/></proof>
+  <proof prover="3"><result status="valid" time="0.028942" steps="2791"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.3" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.045459" steps="39209"/></proof>
+  <proof prover="3"><result status="valid" time="0.045459" steps="36338"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.4" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.060056" steps="2968"/></proof>
+  <proof prover="3"><result status="valid" time="0.060056" steps="2968"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.037537" steps="2973"/></proof>
+  <proof prover="3"><result status="valid" time="0.037537" steps="2973"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.041097" steps="40752"/></proof>
+  <proof prover="3"><result status="valid" time="0.041097" steps="37880"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.058038" steps="40434"/></proof>
+  <proof prover="3"><result status="valid" time="0.058038" steps="37595"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.058054" steps="46324"/></proof>
+  <proof prover="3"><result status="valid" time="0.058054" steps="44177"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.9" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.034576" steps="3089"/></proof>
+  <proof prover="3"><result status="valid" time="0.034576" steps="3089"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.10" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.056669" steps="42277"/></proof>
+  <proof prover="3"><result status="valid" time="0.056669" steps="40980"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.11" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.046853" steps="41885"/></proof>
+  <proof prover="3"><result status="valid" time="0.046853" steps="40590"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.055598" steps="46329"/></proof>
+  <proof prover="3"><result status="valid" time="0.055598" steps="44424"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.027964" steps="46699"/></proof>
+  <proof prover="3"><result status="valid" time="0.027964" steps="45408"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.14" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.144297" steps="9007"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.203598" steps="489639"/></proof>
+  <proof prover="0"><result status="valid" time="0.154693" steps="723"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.16" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.165283" steps="14090"/></proof>
@@ -154,21 +155,21 @@
   <proof prover="1"><result status="valid" time="0.144219" steps="12134"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.18" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.080244" steps="253896"/></proof>
+  <proof prover="3"><result status="valid" time="0.080244" steps="313547"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.19" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.046612" steps="41922"/></proof>
+  <proof prover="3"><result status="valid" time="0.046612" steps="40707"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.20" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.026049" steps="3160"/></proof>
+  <proof prover="3"><result status="valid" time="0.026049" steps="3160"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.21" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.040069" steps="43943"/></proof>
+  <proof prover="3"><result status="valid" time="0.040069" steps="42599"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.22" expl="loop invariant preservation" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="bubble_sort&#39;vc.22.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="0.034692" steps="43593"/></proof>
+   <proof prover="3"><result status="valid" time="0.034692" steps="42285"/></proof>
    </goal>
   </transf>
   </goal>
@@ -176,31 +177,31 @@
   <proof prover="1"><result status="valid" time="0.206065" steps="25044"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.026466" steps="3276"/></proof>
+  <proof prover="3"><result status="valid" time="0.026466" steps="3276"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.25" expl="loop variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.051195" steps="46353"/></proof>
+  <proof prover="3"><result status="valid" time="0.051195" steps="45074"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.26" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.044204" steps="45985"/></proof>
+  <proof prover="3"><result status="valid" time="0.044204" steps="44724"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.27" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.024583" steps="3124"/></proof>
+  <proof prover="3"><result status="valid" time="0.024583" steps="3124"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.28" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.038398" steps="52184"/></proof>
+  <proof prover="3"><result status="valid" time="0.038398" steps="50252"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.29" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.044270" steps="66109"/></proof>
+  <proof prover="3"><result status="valid" time="0.044270" steps="49682"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.30" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.051902" steps="44348"/></proof>
+  <proof prover="3"><result status="valid" time="0.051902" steps="41559"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.31" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.031893" steps="2951"/></proof>
+  <proof prover="3"><result status="valid" time="0.031893" steps="2951"/></proof>
   </goal>
   <goal name="bubble_sort&#39;vc.32" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.160555" steps="876058"/></proof>
+  <proof prover="3"><result status="valid" time="0.160555" steps="255504"/></proof>
   </goal>
  </transf>
  </goal>

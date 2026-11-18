@@ -3,7 +3,26 @@
 
 import "alt_ergo_smt.drv"
 
+(*
+
+We're not using native div and mod from Alt-Ergo, since the
+performance in proofs are not better, even worse
+
+theory int.EuclideanDivision
+  syntax function div "(div %1 %2)"
+  syntax function mod "(mod %1 %2)"
+  remove prop Mod_bound
+  remove prop Div_mod
+  remove prop Mod_1
+  remove prop Div_1
+end
+*)
+
 (* Extra functions on Real numbers in Alt-Ergo 2.6 *)
+
+(* apparently ae.pow does not seem to be available from SMT input
+
+Note: in SMT-LIB 2.7, the syntax ( ** x y) is introduced for power on integers
 
 theory real.PowerInt
   syntax function power "(ae.pow %1 %2)"
@@ -12,6 +31,7 @@ end
 theory real.PowerReal
   syntax function pow "(ae.pow %1 %2)"
 end
+*)
 
 (* Is there a square root function supported by Alt-Ergo ?
 theory real.Square

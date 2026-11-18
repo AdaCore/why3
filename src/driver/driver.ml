@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -294,10 +294,11 @@ let syntax_map drv =
 exception UnknownSpec of string
 
 let filename_regexp = Re.Str.regexp "%\\(.\\)"
+let filename_sanitizer = Ident.sanitizer
+    Ident.char_to_alnumus Ident.char_to_alnumus
 
-let get_filename drv ~input_file ~theory_name ~goal_name =
-  let sanitize = Ident.sanitizer
-    Ident.char_to_alnumus Ident.char_to_alnumus in
+
+let get_filename ?(sanitize=filename_sanitizer) ~input_file ~theory_name ~goal_name drv =
   let file = match drv.drv_filename with
     | Some f -> f
     | None -> "%f-%t-%g.dump"

@@ -20,7 +20,7 @@ section_start configure Configuration
 section_stop configure
 
 section_start build Building
-make -j2
+make DUNEJOBS=2
 section_stop build
 
 while test $# -gt 0
@@ -37,8 +37,8 @@ do
             bench/ide-bench
             ;;
         trywhy3)
-            make -j2 web_ide
-            make -j2 trywhy3.tar.gz
+            make web_ide
+            make trywhy3.tar.gz
             ;;
         doc)
             make predoc
@@ -57,17 +57,18 @@ do
             if test "$COQVER" != "" ; then
               sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
             fi
-            examples/regtests.sh --reduced-mode
+            examples/regtests.py --reduced-mode
             ;;
         nightly-bench-long)
-            bin/why3 config detect
+            bin/why3 config detect  &> nightly-bench-long.out
             sed -i why3.conf -e "s/running_provers_max = [0-9]*/running_provers_max = 4/"
             cat misc/nightly-bench-provers-why3-conf >> why3.conf
             COQVER=$(bin/why3 config list-provers | sed -n -e 's/Coq (\?\([0-9.]\+\).*/\1/p')
             if test "$COQVER" != "" ; then
               sed misc/bench-coq-why3-conf -e "s/@COQVER@/$COQVER/g" >> why3.conf
             fi
-            examples/regtests.sh --examples-mode || true
+            printf "\n" &>> nightly-bench-long.out
+            examples/regtests.py --examples-mode &>> nightly-bench-long.out || true
             ;;
     esac
     section_stop "test_$1"

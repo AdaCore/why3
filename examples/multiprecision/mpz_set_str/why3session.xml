@@ -6,9 +6,11 @@
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="3" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="7" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mpz_set_str.mlw"/>
 <theory name="Zset_str" proved="true">
@@ -953,6 +955,14 @@
   </goal>
   <goal name="wmpz_set_str&#39;vc.166" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="1.547469"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="wmpz_set_str&#39;vc.166.0" expl="precondition" proved="true">
+   <proof prover="4"><result status="valid" time="0.691533" steps="26852"/></proof>
+   </goal>
+   <goal name="wmpz_set_str&#39;vc.166.1" expl="precondition" proved="true">
+   <proof prover="8"><result status="valid" time="0.811905" steps="1638958"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="wmpz_set_str&#39;vc.167" expl="precondition" proved="true">
   <proof prover="7"><result status="valid" time="0.150000" steps="590"/></proof>

@@ -4,21 +4,60 @@
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="colibri2" version="0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Eprover" version="3.2.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="Gappa" version="1.6.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Spass" version="3.9" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Z3" version="4.8.17" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="11" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="12" name="Vampire" version="5.0.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="13" name="Eprover" version="2.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="zeros.mlw"/>
 <theory name="SetZeros" proved="true">
  <goal name="set_zeros&#39;vc" expl="VC for set_zeros" proved="true">
  <proof prover="0"><result status="valid" time="0.105727" steps="6972"/></proof>
  <proof prover="1"><result status="valid" time="0.058142" steps="92"/></proof>
- <proof prover="4"><result status="valid" time="0.066315" steps="10019"/></proof>
+ <proof prover="2"><result status="valid" time="0.066315" steps="9868"/></proof>
  <proof prover="5"><result status="valid" time="0.080686" steps="6734"/></proof>
+ <proof prover="8"><result status="valid" time="0.076135" steps="5221"/></proof>
+ <proof prover="10"><result status="valid" time="0.060030" steps="10854"/></proof>
+ <proof prover="11"><result status="valid" time="0.031811" steps="10706"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="set_zeros&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.014600" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.000970"/></proof>
+  <proof prover="12"><result status="valid" time="0.008865"/></proof>
+  </goal>
+  <goal name="set_zeros&#39;vc.1" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.019168" steps="104"/></proof>
+  <proof prover="4"><result status="valid" time="1.617355"/></proof>
+  <proof prover="12"><result status="valid" time="0.080429"/></proof>
+  <proof prover="13"><result status="valid" time="0.064204"/></proof>
+  </goal>
+  <goal name="set_zeros&#39;vc.2" expl="loop invariant preservation" proved="true">
+  <proof prover="12"><result status="valid" time="0.043621"/></proof>
+  </goal>
+  <goal name="set_zeros&#39;vc.3" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.015271" steps="89"/></proof>
+  <proof prover="7"><result status="valid" time="0.039793"/></proof>
+  <proof prover="12"><result status="valid" time="0.056776"/></proof>
+  <proof prover="13"><result status="valid" time="0.014144"/></proof>
+  </goal>
+  <goal name="set_zeros&#39;vc.4" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.013936" steps="32"/></proof>
+  <proof prover="12"><result status="valid" time="0.006520"/></proof>
+  </goal>
+ </transf>
  </goal>
  <goal name="harness&#39;vc" expl="VC for harness" proved="true">
  <proof prover="0"><result status="valid" time="0.082934" steps="2158"/></proof>
  <proof prover="1"><result status="valid" time="0.042564" steps="14"/></proof>
- <proof prover="4"><result status="valid" time="0.070995" steps="6536"/></proof>
+ <proof prover="2"><result status="valid" time="0.070995" steps="6536"/></proof>
+ <proof prover="3"><result status="valid" time="0.019417" steps="223"/></proof>
  <proof prover="5"><result status="valid" time="0.050479" steps="1518"/></proof>
  </goal>
 </theory>
@@ -26,31 +65,36 @@
  <goal name="all_zeros1&#39;vc" expl="VC for all_zeros1" proved="true">
  <proof prover="0"><result status="valid" time="0.082881" steps="4080"/></proof>
  <proof prover="1"><result status="valid" time="0.047374" steps="65"/></proof>
- <proof prover="4"><result status="valid" time="0.055471" steps="8868"/></proof>
+ <proof prover="2"><result status="valid" time="0.055471" steps="8944"/></proof>
+ <proof prover="3"><result status="valid" time="0.034899" steps="1761"/></proof>
  <proof prover="5"><result status="valid" time="0.069431" steps="3624"/></proof>
  </goal>
  <goal name="all_zeros2&#39;vc" expl="VC for all_zeros2" proved="true">
  <proof prover="0"><result status="valid" time="0.084874" steps="4263"/></proof>
  <proof prover="1"><result status="valid" time="0.051874" steps="76"/></proof>
- <proof prover="4"><result status="valid" time="0.068894" steps="9209"/></proof>
+ <proof prover="2"><result status="valid" time="0.068894" steps="9209"/></proof>
+ <proof prover="3"><result status="valid" time="0.044122" steps="1793"/></proof>
  <proof prover="5"><result status="valid" time="0.073933" steps="3631"/></proof>
  </goal>
  <goal name="all_zeros3&#39;vc" expl="VC for all_zeros3" proved="true">
  <proof prover="0"><result status="valid" time="0.030018" steps="4297"/></proof>
  <proof prover="1"><result status="valid" time="0.026080" steps="56"/></proof>
- <proof prover="4"><result status="valid" time="0.024164" steps="9902"/></proof>
+ <proof prover="2"><result status="valid" time="0.024164" steps="9978"/></proof>
+ <proof prover="3"><result status="valid" time="0.031410" steps="525"/></proof>
  <proof prover="5"><result status="valid" time="0.030298" steps="3192"/></proof>
  </goal>
  <goal name="all_zeros4&#39;vc" expl="VC for all_zeros4" proved="true">
  <proof prover="0"><result status="valid" time="0.030659" steps="3934"/></proof>
  <proof prover="1"><result status="valid" time="0.030528" steps="66"/></proof>
- <proof prover="4"><result status="valid" time="0.022786" steps="8770"/></proof>
+ <proof prover="2"><result status="valid" time="0.022786" steps="8770"/></proof>
+ <proof prover="3"><result status="valid" time="0.031644" steps="705"/></proof>
  <proof prover="5"><result status="valid" time="0.026814" steps="2992"/></proof>
  </goal>
  <goal name="all_zeros5&#39;vc" expl="VC for all_zeros5" proved="true">
  <proof prover="0"><result status="valid" time="0.045705" steps="9981"/></proof>
  <proof prover="1"><result status="valid" time="0.036186" steps="409"/></proof>
- <proof prover="4"><result status="valid" time="0.030227" steps="25362"/></proof>
+ <proof prover="2"><result status="valid" time="0.030227" steps="25362"/></proof>
+ <proof prover="3"><result status="valid" time="0.096952" steps="5430"/></proof>
  <proof prover="5"><result status="valid" time="0.065386" steps="10418"/></proof>
  </goal>
 </theory>

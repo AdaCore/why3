@@ -1,0 +1,12 @@
+(ocamllex coma_lexer)
+
+(menhir
+ (modules coma_parser ../../src/parser/parser_common)
+ (merge_into coma_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(library
+ (name coma)
+ (flags (:standard -open Why3))
+ (libraries why3 menhirLib))

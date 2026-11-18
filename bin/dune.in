@@ -1,0 +1,198 @@
+;; Why3
+
+(rule
+ (alias install_local)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/main.exe why3%{ext_exe})))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/main.exe why3.opt)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/main.bc why3.byte)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/isabelle-client/isabelle_client_main.exe isabelle_client.opt)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/isabelle-client/isabelle_client_main.bc isabelle_client.byte)))
+
+;; src/tools commands (generate ?)
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3bench.cma why3bench.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3bench.cmxs why3bench.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3config.cma why3config.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3config.cmxs why3config.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3execute.cma why3execute.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3execute.cmxs why3execute.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3extract.cma why3extract.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3extract.cmxs why3extract.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3pp.cma why3pp.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3pp.cmxs why3pp.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3prove.cma why3prove.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3prove.cmxs why3prove.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3realize.cma why3realize.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3realize.cmxs why3realize.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3replay.cma why3replay.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3replay.cmxs why3replay.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3shell.cma why3shell.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3shell.cmxs why3shell.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3show.cma why3show.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3show.cmxs why3show.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3wc.cma why3wc.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/tools/why3wc.cmxs why3wc.cmxs)))
+
+;; Other commands
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/why3doc/why3doc.cma why3doc.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/why3doc/why3doc.cmxs why3doc.cmxs)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/why3session/why3session.cma why3session.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/why3session/why3session.cmxs why3session.cmxs)))
+
+; why3ide is an "(executable (mode plugin))", dune don't accept building both
+; cma and cmxs, but only the "best" ones. Surprisingly, it seems to always
+; call the file why3ide.cmxs, even in the bytecode-only case, where it is
+; really a cma file
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (enabled_if (= @enable_ide@ yes))
+ (action (copy ../src/ide/why3ide.cmxs why3ide%{ext_plugin})))
+
+; factor this with the above using (aliases) field when available (dune 3.5)
+(alias
+ (name opt)
+ (deps why3ide.cmxs)
+ (enabled_if (= @enable_ide@ yes)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/ide/why3webserver.cma why3webserver.cma)))
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/ide/why3webserver.cmxs why3webserver.cmxs)))
+
+;; GNATWhy3
+
+(rule
+ (alias opt)
+ (mode (promote (until-clean)))
+ (action (copy ../src/gnat/gnat_main.exe gnatwhy3.opt)))
+
+(rule
+ (alias byte)
+ (mode (promote (until-clean)))
+ (action (copy ../src/gnat/gnat_main.bc gnatwhy3.byte)))

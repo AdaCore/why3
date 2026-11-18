@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -105,6 +105,9 @@ let id_canonical =
   let res = id_canonical ty in
   Ty.Hty.add ht ty res; res
 
+let memo_non_canonical = Term.Hterm.create 3
+  
+
 let poly_id_canonical =
   id_canonical (Ty.ty_var (Ty.tv_of_string "a"))
 
@@ -168,13 +171,20 @@ let rec lift_f el acc t0 =
             (ld :: abst, ax :: axml), ap
         | Nothing ->
             let (abst,axml), f = lift_f el acc f in
-            let tyl = List.map (fun x -> x.vs_ty) vl in
-            let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
-            let t = fs_app ls (List.map t_var vl) vs.vs_ty in
-            let f = t_forall_close_merge vl (t_subst_single vs t f) in
-            let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name in
-            let ax = create_prop_decl Paxiom (create_prsymbol id) f in
-            (create_param_decl ls :: abst, ax :: axml), t
+            let closed_f = t_forall_close_merge (vs::vl) f in
+            match Term.Hterm.find_opt memo_non_canonical closed_f with
+            | Some (ls,ax) ->
+              let t = fs_app ls (List.map t_var vl) vs.vs_ty in
+              (create_param_decl ls :: abst, ax :: axml), t 
+            | None ->
+              let tyl = List.map (fun x -> x.vs_ty) vl in
+              let ls = create_fsymbol (id_clone vs.vs_name) tyl vs.vs_ty in
+              let t = fs_app ls (List.map t_var vl) vs.vs_ty in
+              let f = t_forall_close_merge vl (t_subst_single vs t f) in
+              let id = id_derive (vs.vs_name.id_string ^ "'def") vs.vs_name in
+              let ax = create_prop_decl Paxiom (create_prsymbol id) f in
+              Term.Hterm.add memo_non_canonical closed_f (ls,ax);
+              (create_param_decl ls :: abst, ax :: axml), t
       in
       acc, t_attr_copy t0 t
   | Teps _ ->

@@ -5,7 +5,7 @@
 <prover id="0" name="Z3" version="4.6.0" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="1" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="2" name="Eprover" version="2.0" timelimit="5" steplimit="0" memlimit="2000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="2000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="2000"/>
 <prover id="4" name="Alt-Ergo" version="2.3.3" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="2000"/>
@@ -1996,22 +1996,22 @@
   </transf>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.38" expl="integer overflow" proved="true">
-  <proof prover="5"><result status="valid" time="0.200000" steps="44269"/></proof>
+  <proof prover="5"><result status="valid" time="0.200000" steps="44234"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.39" expl="loop variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.160000" steps="34624"/></proof>
+  <proof prover="5"><result status="valid" time="0.160000" steps="31601"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.40" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.260000" steps="43155"/></proof>
+  <proof prover="5"><result status="valid" time="0.260000" steps="43152"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.41" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.230000" steps="34848"/></proof>
+  <proof prover="5"><result status="valid" time="0.230000" steps="34824"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.42" expl="loop invariant preservation" proved="true">
-  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="34907"/></proof>
+  <proof prover="5" timelimit="5" memlimit="2000"><result status="valid" time="0.150000" steps="34881"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.43" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.210000" steps="36013"/></proof>
+  <proof prover="5"><result status="valid" time="0.210000" steps="35981"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.44" expl="loop invariant preservation" proved="true">
   <proof prover="1"><result status="valid" time="0.280000"/></proof>
@@ -2020,7 +2020,7 @@
   <proof prover="2"><result status="valid" time="0.020000"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.46" expl="loop invariant preservation" proved="true">
-  <proof prover="5"><result status="valid" time="0.210000" steps="44356"/></proof>
+  <proof prover="5"><result status="valid" time="0.210000" steps="44342"/></proof>
   </goal>
   <goal name="wmpn_limb_get_str&#39;vc.47" expl="precondition" proved="true">
   <proof prover="5"><result status="valid" time="0.090000" steps="30659"/></proof>
@@ -3175,7 +3175,7 @@
   <goal name="wmpn_get_str_other&#39;vc.192" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="wmpn_get_str_other&#39;vc.192.0" expl="assertion" proved="true">
-   <transf name="compute_in_goal" proved="true" >
+   <transf name="compute" proved="true" >
     <goal name="wmpn_get_str_other&#39;vc.192.0.0" expl="assertion" proved="true">
     <proof prover="1"><result status="valid" time="2.570000"/></proof>
     </goal>

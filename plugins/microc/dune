@@ -1,0 +1,11 @@
+(ocamllex mc_lexer)
+
+(menhir
+ (modules mc_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(library
+ (name microc)
+ (modules_without_implementation mc_ast)
+ (libraries why3 menhirLib))

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -365,6 +365,7 @@ let t_compare ~trigger ~attr ~loc ~const t1 t2 =
               perv_compare q1 q2;
               let rec add bnd bv1 bv2 vl1 vl2 = match vl1, vl2 with
                 | (v1::vl1), (v2::vl2) ->
+                    comp_raise (ty_compare v1.vs_ty v2.vs_ty);
                     let bv1 = Mvs.add v1 bnd bv1 in
                     let bv2 = Mvs.add v2 bnd bv2 in
                     add (bnd + 1) bv1 bv2 vl1 vl2
@@ -481,6 +482,7 @@ let t_hash ~trigger ~attr ~const t =
               t_hash (bnd + 1) vml e
           | Tquant (q,(vl,b,tr,f)) ->
               let h = Hashtbl.hash q in
+              let h = Hashcons.combine_list (fun vs -> ty_hash vs.vs_ty) h vl in
               let rec add bnd bv vl = match vl with
                 | v::vl -> add (bnd + 1) (Mvs.add v bnd bv) vl
                 | [] -> bnd, bv in
@@ -907,8 +909,8 @@ let t_nat_const n =
 let t_int_const n =
   t_const (Constant.int_const n) Ty.ty_int
 
-let t_real_const ?pow2 ?pow5 s =
-  t_const (Constant.real_const ?pow2 ?pow5 s) Ty.ty_real
+let t_real_const ?pow2 ?pow5 ~is_neg s =
+  t_const (Constant.real_const ?pow2 ?pow5 ~is_neg s) Ty.ty_real
 
 let t_string_const s =
   t_const (Constant.string_const s) Ty.ty_str

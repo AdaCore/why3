@@ -458,13 +458,39 @@ File floats.mlw:
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x0.8p-126:t) ] }
 
 <check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/floats.mlw", line 35, characters 55-68:
+Goal g14.
+Prover result is: Unknown (unknown + incomplete) (12053 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Checked model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+- Selected model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/floats.mlw", line 35, characters 37-50:
+Goal g14.
+Prover result is: Unknown (unknown + incomplete) (12053 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-52)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-52)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 41, characters 40-52)
-File "bench/check-ce/floats.mlw", line 41, characters 40-52:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-52)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-52)
+File "bench/check-ce/floats.mlw", line 43, characters 40-52:
 Goal g1.
 Prover result is: Unknown (unknown + incomplete) (15647 steps).
 The program does not comply to the verification goal, for example during the
@@ -478,7 +504,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 41:
+  Line 43:
     x = (0x1.0000000000001p0:t1)
     x = (0x1.0000000000001p0:t1)
     Execution of main function `g1'goal` with env:
@@ -487,7 +513,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 41:
+  Line 43:
     Property failure at postcondition of `g1'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.0000000000001p0:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ];
@@ -495,12 +521,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 40-53)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 40-53)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 43, characters 40-53)
-File "bench/check-ce/floats.mlw", line 43, characters 40-53:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 40-53)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 40-53)
+File "bench/check-ce/floats.mlw", line 45, characters 40-53:
 Goal g2.
 Prover result is: Unknown (unknown + incomplete) (15650 steps).
 The program does not comply to the verification goal, for example during the
@@ -514,7 +540,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 43:
+  Line 45:
     x = (0x1.0000000000001p0:t1)
     x = (0x1.0000000000001p0:t1)
     Execution of main function `g2'goal` with env:
@@ -523,7 +549,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 43:
+  Line 45:
     Property failure at postcondition of `g2'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.0000000000001p0:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ];
@@ -531,12 +557,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-42)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-42)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 45, characters 24-42)
-File "bench/check-ce/floats.mlw", line 45, characters 24-42:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-42)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-42)
+File "bench/check-ce/floats.mlw", line 47, characters 24-42:
 Goal g3.
 Prover result is: Unknown (unknown + incomplete) (15295 steps).
 The program does not comply to the verification goal, for example during the
@@ -550,7 +576,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 45:
+  Line 47:
     x = (0.0:t1)
     x = (0.0:t1)
     Execution of main function `g3'goal` with env:
@@ -559,19 +585,19 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 45:
+  Line 47:
     Property failure at postcondition of `g3'goal2` with env:
       { lsenv = []; vsenv = [ x = (0.0:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0.0:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 47, characters 24-43)
-File "bench/check-ce/floats.mlw", line 47, characters 24-43:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
+File "bench/check-ce/floats.mlw", line 49, characters 24-43:
 Goal g4.
 Prover result is: Unknown (unknown + incomplete) (592 steps).
 The program does not comply to the verification goal, for example during the
@@ -585,7 +611,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 47:
+  Line 49:
     x = (0x1.4p0:t1)
     x = (0x1.4p0:t1)
     Execution of main function `g4'goal` with env:
@@ -594,19 +620,19 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 47:
+  Line 49:
     Property failure at postcondition of `g4'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.4p0:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.4p0:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-43)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 49, characters 24-43)
-File "bench/check-ce/floats.mlw", line 49, characters 24-43:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-43)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-43)
+File "bench/check-ce/floats.mlw", line 51, characters 24-43:
 Goal g5.
 Prover result is: Unknown (unknown + incomplete) (15901 steps).
 The program does not comply to the verification goal, for example during the
@@ -620,7 +646,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 49:
+  Line 51:
     x = (0x1.0p64:t1)
     x = (0x1.0p64:t1)
     Execution of main function `g5'goal` with env:
@@ -629,19 +655,19 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 49:
+  Line 51:
     Property failure at postcondition of `g5'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.0p64:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.0p64:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 24-30)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 24-30)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 51, characters 24-30)
-File "bench/check-ce/floats.mlw", line 51, characters 24-30:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 24-30)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 24-30)
+File "bench/check-ce/floats.mlw", line 53, characters 24-30:
 Goal g6.
 Prover result is: Unknown (unknown + incomplete) (14934 steps).
 The program does not comply to the verification goal, for example during the
@@ -655,7 +681,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 51:
+  Line 53:
     x = not_a_number1
     x = not_a_number1
     Execution of main function `g6'goal` with env:
@@ -664,19 +690,19 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 51:
+  Line 53:
     Property failure at postcondition of `g6'goal2` with env:
       { lsenv = []; vsenv = [ x = not_a_number1, result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = not_a_number1 ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 40-64)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 40-64)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 53, characters 40-64)
-File "bench/check-ce/floats.mlw", line 53, characters 40-64:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 40-64)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 40-64)
+File "bench/check-ce/floats.mlw", line 55, characters 40-64:
 Goal g7.
 Prover result is: Unknown (unknown + incomplete) (54784 steps).
 The program does not comply to the verification goal, for example during the
@@ -690,7 +716,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 53:
+  Line 55:
     x = (0x1.AD43755C4BE7Ep53:t1)
     x = (0x1.AD43755C4BE7Ep53:t1)
     Execution of main function `g7'goal` with env:
@@ -699,7 +725,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 53:
+  Line 55:
     Property failure at postcondition of `g7'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.AD43755C4BE7Ep53:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ];
@@ -707,12 +733,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 24-60)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 55, characters 24-60)
-File "bench/check-ce/floats.mlw", line 55, characters 24-60:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 24-60)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 24-60)
+File "bench/check-ce/floats.mlw", line 57, characters 24-60:
 Goal g8.
 Prover result is: Unknown (unknown + incomplete) (614 steps).
 The program does not comply to the verification goal, for example during the
@@ -726,7 +752,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 55:
+  Line 57:
     x = plus_infinity1
     x = plus_infinity1
     Execution of main function `g8'goal` with env:
@@ -735,7 +761,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 55:
+  Line 57:
     Property failure at postcondition of `g8'goal2` with env:
       { lsenv = []; vsenv = [ x = plus_infinity1, result = () ];
         rsenv = [ zeroF = UNDEFINED ];
@@ -743,12 +769,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 59, characters 40-70)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 59, characters 40-70)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 57, characters 40-70)
-File "bench/check-ce/floats.mlw", line 57, characters 40-70:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 59, characters 40-70)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 59, characters 40-70)
+File "bench/check-ce/floats.mlw", line 59, characters 40-70:
 Goal g9.
 Prover result is: Unknown (unknown + incomplete) (36552 steps).
 The program does not comply to the verification goal, for example during the
@@ -762,7 +788,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 57:
+  Line 59:
     x = (0x0.0000000000001p-1022:t1)
     x = (0x0.0000000000001p-1022:t1)
     Execution of main function `g9'goal` with env:
@@ -771,7 +797,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 57:
+  Line 59:
     Property failure at postcondition of `g9'goal2` with env:
       { lsenv = [];
         vsenv = [ x = (0x0.0000000000001p-1022:t1), result = () ];
@@ -780,12 +806,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-98)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-98)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 60, characters 24-98)
-File "bench/check-ce/floats.mlw", line 60, characters 24-98:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-98)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-98)
+File "bench/check-ce/floats.mlw", line 62, characters 24-98:
 Goal g10.
 Prover result is: Unknown (unknown + incomplete) (130334 steps).
 The program does not comply to the verification goal, for example during the
@@ -799,7 +825,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 60:
+  Line 62:
     x = (0x1.999999999999Bp-4:t1)
     x = (0x1.999999999999Bp-4:t1)
     Execution of main function `g10'goal` with env:
@@ -808,7 +834,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 60:
+  Line 62:
     Property failure at postcondition of `g10'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.999999999999Bp-4:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ];
@@ -817,12 +843,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 64, characters 24-48)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 64, characters 24-48)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 62, characters 24-48)
-File "bench/check-ce/floats.mlw", line 62, characters 24-48:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 64, characters 24-48)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 64, characters 24-48)
+File "bench/check-ce/floats.mlw", line 64, characters 24-48:
 Goal g11.
 Prover result is: Unknown (unknown + incomplete) (592 steps).
 The program does not comply to the verification goal, for example during the
@@ -836,7 +862,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 62:
+  Line 64:
     x = (0x1.0p-1022:t1)
     x = (0x1.0p-1022:t1)
     Execution of main function `g11'goal` with env:
@@ -845,19 +871,19 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 62:
+  Line 64:
     Property failure at postcondition of `g11'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x1.0p-1022:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x1.0p-1022:t1) ] }
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 67, characters 24-62)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 67, characters 24-62)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 65, characters 24-62)
-File "bench/check-ce/floats.mlw", line 65, characters 24-62:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 67, characters 24-62)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 67, characters 24-62)
+File "bench/check-ce/floats.mlw", line 67, characters 24-62:
 Goal g12.
 Prover result is: Unknown (unknown + incomplete) (592 steps).
 The program does not comply to the verification goal, for example during the
@@ -871,7 +897,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 65:
+  Line 67:
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     x = (0x0.FFFFFFFFFFFFFp-1022:t1)
     Execution of main function `g12'goal` with env:
@@ -880,7 +906,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 65:
+  Line 67:
     Property failure at postcondition of `g12'goal2` with env:
       { lsenv = [];
         vsenv = [ x = (0x0.FFFFFFFFFFFFFp-1022:t1), result = () ];
@@ -889,12 +915,12 @@ File floats.mlw:
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 70, characters 24-48)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 70, characters 24-48)
 - Checked model 1: NC
-  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
-  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 68, characters 24-48)
-File "bench/check-ce/floats.mlw", line 68, characters 24-48:
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 70, characters 24-48)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/floats.mlw", line 70, characters 24-48)
+File "bench/check-ce/floats.mlw", line 70, characters 24-48:
 Goal g13.
 Prover result is: Unknown (unknown + incomplete) (592 steps).
 The program does not comply to the verification goal, for example during the
@@ -908,7 +934,7 @@ File ieee_float.mlw:
   Line 950:
     zeroF = UNDEFINED
 File floats.mlw:
-  Line 68:
+  Line 70:
     x = (0x0.8p-1022:t1)
     x = (0x0.8p-1022:t1)
     Execution of main function `g13'goal` with env:
@@ -917,7 +943,7 @@ File floats.mlw:
 Unknown location:
     Normal execution of function `Tuple0` with args: []
 File floats.mlw:
-  Line 68:
+  Line 70:
     Property failure at postcondition of `g13'goal2` with env:
       { lsenv = []; vsenv = [ x = (0x0.8p-1022:t1), result = () ];
         rsenv = [ zeroF = UNDEFINED ]; idenv = [ x = (0x0.8p-1022:t1) ] }

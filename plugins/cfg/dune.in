@@ -1,0 +1,30 @@
+(ocamllex cfg_lexer)
+
+(menhir
+ (modules cfg_parser ../../src/parser/parser_common)
+ (merge_into cfg_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(rule
+ (enabled_if (= @enable_stackify@ yes))
+ (action (copy stackify.real.ml stackify.ml)))
+
+(rule
+ (enabled_if (<> @enable_stackify@ yes))
+ (action (copy stackify.dummy.ml stackify.ml)))
+
+(rule
+ (enabled_if (= @enable_stackify@ yes))
+ (action (copy cfg_stackify.real.ml cfg_stackify.ml)))
+
+(rule
+ (enabled_if (<> @enable_stackify@ yes))
+ (action (copy cfg_stackify.dummy.ml cfg_stackify.ml)))
+
+(library
+ (name cfg)
+ (modules_without_implementation cfg_ast)
+ (flags (:standard -open Why3))
+ (libraries why3 menhirLib @META_OCAMLGRAPH@))
+

@@ -1131,10 +1131,6 @@ exit codes mean some failure in running the replay.
 
 Options are:
 
-.. option:: -s
-
-   Suppress the output of the final tree view.
-
 .. option:: -q
 
    Run quietly (no progress info).
@@ -1144,18 +1140,57 @@ Options are:
    Enforce saving the session, if all proof attempts replayed
    correctly, even if some goals are not proved.
 
+.. option:: --dont-save
+
+   Opposite to the above, never save the session after replay.
+
 .. option:: --obsolete-only
 
    Replay the proofs only if the session contains obsolete proof
    attempts.
 
+.. option:: --merging-only
+
+   Only proceed with the merge of the old session and the new file
+   contents, so as to identify the presence of obsolete results or
+   detached. The exit code is 1 if obsolete or detached nodes are
+   detected, 0 otherwise.
+
+.. option:: --ignore-shapes
+
+   When merging the old session with the new file contents, the shapes
+   stored in the accompanying file are ignored. Only useful when the
+   merging performs a bad goal matching due to the presence of very
+   similar goals. Also sometimes performs better when loading a
+   session obtained from an older version of Why3.
+
+.. option:: --use-steps
+
+   Replay the proofs by passing the step limits used by the former
+   proof attempt, if any.
+
+.. option:: --time-factor=f
+
+   Replay the proofs with a time limit that is `f` times the time
+   needed for the former proof attempt. The default time factor
+   is 10. Larger value may be needed when replaying proofs on a
+   machine which is significantly slower than the one used to obtain
+   the old session.
+
 .. option:: --smoke-detector[=none|top|deep]
 
-   Try to detect if the context is self-contradicting (default: top).
+   Try to detect if the context is self-contradicting (default:
+   top). See details below.
 
 .. option:: --prover=<prover>
 
    Restrict the replay to the selected provers only.
+
+The option ``-use-steps`` should improve the reproducibility of proofs,
+assuming that with a given steps limit the prover behavior is
+deterministic. Caution: it is not guaranteed. The option
+``--time-factor`` could be set to larger factor when replaying is done
+on a significantly slower computer than the former proof attempts.
 
 Smoke detector
 ~~~~~~~~~~~~~~
@@ -1777,7 +1812,7 @@ This includes the validation of assertions, function contracts, and loop
 invariants [#no-type-invars]_.
 
 There are two strategies to check the validity of an annotation: First, the term
-is reduced using the Why3 transformation ``compute_in_goal``. The annotation is
+is reduced using the Why3 transformation ``compute``. The annotation is
 valid when the result of the reduction is `true` and invalid when the result is
 `false`. When the transformation cannot reduce the term to a trivial term, and
 when a RAC prover is given using option :option:`--rac-prover`, the prover is

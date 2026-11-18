@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -260,11 +260,6 @@ Definition one_aux l : Vector.t bool (S l).
   exact (Vector.cons bool true l (Vector.const false l)).
 Defined.
 
-(* Why3 goal *)
-Definition one : t.
-  exact (one_aux last_bit).
-Defined.
-
 Definition ones_aux l : Vector.t bool l.
   exact (Vector.const true l).
 Defined.
@@ -280,6 +275,35 @@ Lemma Nth_ones :
   ((nth ones n) = Init.Datatypes.true).
   intros; apply nth_const; easy.
 Qed.
+
+(* Why3 goal *)
+Definition one : t.
+  exact (one_aux last_bit).
+Defined.
+
+(* Why3 goal *)
+Definition minus_one : t.
+Proof.
+  exact (ones_aux size_nat).
+Defined.
+
+(* Why3 goal *)
+Definition min_sint : t.
+Proof.
+  (* TODO *)
+Admitted.
+
+(* Why3 goal *)
+Definition max_sint : t.
+Proof.
+  (* TODO *)
+Admitted.
+
+(* Why3 goal *)
+Definition max_uint : t.
+Proof.
+  (* TODO *)
+Admitted.
 
 (* Why3 goal *)
 Definition bw_and : t -> t -> t.
@@ -1003,7 +1027,7 @@ match p with
             ((Vector.last prev) :: (Vector.shiftout prev))
 end.
 
-Lemma mod1_is_mod : forall x y, y > 0 -> mod1 x y = Zmod x y.
+Lemma mod1_is_mod : forall x y, y > 0 -> mod1 x y = Z.modulo x y.
   intros; unfold mod1, div.
   case Z_le_dec; intro.
   rewrite Z.mod_eq by lia; trivial.
@@ -1193,7 +1217,7 @@ Definition two_power_size : Numbers.BinNums.Z.
 Defined.
 
 (* Why3 goal *)
-Definition two_power_size_minus_one : Numbers.BinNums.Z.
+Definition two_power_sizem1 : Numbers.BinNums.Z.
 Proof.
   exact (Pow2int.pow2 (size - 1))%Z.
 Defined.
@@ -1209,8 +1233,8 @@ Lemma two_power_size_val : (two_power_size = (bv.Pow2int.pow2 size)).
 Qed.
 
 (* Why3 goal *)
-Lemma two_power_size_minus_one_val :
-  (two_power_size_minus_one = (bv.Pow2int.pow2 (size - 1%Z)%Z)).
+Lemma two_power_sizem1_val :
+  (two_power_sizem1 = (bv.Pow2int.pow2 (size - 1%Z)%Z)).
 Proof.
   auto.
 Qed.
@@ -1434,8 +1458,8 @@ Qed.
 (* Why3 goal *)
 Lemma to_int_bounds :
   forall (v:t),
-  ((-two_power_size_minus_one)%Z <= (to_int v))%Z /\
-  ((to_int v) < two_power_size_minus_one)%Z.
+  ((-two_power_sizem1)%Z <= (to_int v))%Z /\
+  ((to_int v) < two_power_sizem1)%Z.
 Proof.
 intros v.
 Admitted.
@@ -1443,7 +1467,7 @@ Admitted.
 (* Why3 goal *)
 Lemma to_int_of_int :
   forall (i:Numbers.BinNums.Z),
-  ((-two_power_size_minus_one)%Z <= i)%Z /\ (i < two_power_size_minus_one)%Z ->
+  ((-two_power_sizem1)%Z <= i)%Z /\ (i < two_power_sizem1)%Z ->
   ((to_int (of_int i)) = i).
 Proof.
 intros i (h1,h2).
@@ -1488,14 +1512,6 @@ Lemma Of_int_one_aux : forall {l}, one_aux l = nat_to_bvec (S l) 1%nat.
   auto with zarith.
 Qed.
 
-(* Why3 goal *)
-Lemma to_uint_one : ((to_uint one) = 1%Z).
-  unfold to_uint, one.
-  simpl.
-  rewrite bvec_to_nat_zeros.
-  auto with zarith.
-Qed.
-
 Lemma Of_int_one : one = of_int 1.
   apply Of_int_one_aux.
 Qed.
@@ -1511,6 +1527,36 @@ Lemma to_uint_ones : ((to_uint ones) = max_int).
   rewrite max_int_S.
   destruct size_in_range; auto with zarith.
 Qed.
+
+(* Why3 goal *)
+Lemma to_uint_one : ((to_uint one) = 1%Z).
+  unfold to_uint, one.
+  simpl.
+  rewrite bvec_to_nat_zeros.
+  auto with zarith.
+Qed.
+
+(* Why3 goal *)
+Lemma to_int_minus_one : ((to_int minus_one) = (-1%Z)%Z).
+Proof.
+  unfold to_int, minus_one.
+  simpl.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_int_min_sint : ((to_int min_sint) = (-two_power_sizem1)%Z).
+Proof.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_int_max_sint : ((to_int max_sint) = (two_power_sizem1 - 1%Z)%Z).
+Proof.
+Admitted.
+
+(* Why3 goal *)
+Lemma to_uint_max_uint : ((to_uint max_uint) = (two_power_size - 1%Z)%Z).
+Proof.
+Admitted.
 
 (* Why3 assumption *)
 Definition ult (x:t) (y:t) : Prop := ((to_uint x) < (to_uint y))%Z.
@@ -1989,6 +2035,38 @@ Lemma to_int_srem :
 Proof.
 intros v1 v2.
 Admitted.
+
+(* Why3 assumption *)
+Definition u_add_o (a:t) (b:t) : Prop :=
+  ~ (((to_uint a) + (to_uint b))%Z < two_power_size)%Z.
+
+(* Why3 assumption *)
+Definition s_add_o (a:t) (b:t) : Prop :=
+  ~ (((-two_power_sizem1)%Z <= ((to_int a) + (to_int b))%Z)%Z /\
+     (((to_int a) + (to_int b))%Z < two_power_sizem1)%Z).
+
+(* Why3 assumption *)
+Definition u_sub_o (a:t) (b:t) : Prop := ~ ((to_uint b) <= (to_uint a))%Z.
+
+(* Why3 assumption *)
+Definition s_sub_o (a:t) (b:t) : Prop :=
+  ~ (((-two_power_sizem1)%Z <= ((to_int a) - (to_int b))%Z)%Z /\
+     (((to_int a) - (to_int b))%Z < two_power_sizem1)%Z).
+
+(* Why3 assumption *)
+Definition u_mul_o (a:t) (b:t) : Prop :=
+  ~ (((to_uint a) * (to_uint b))%Z < two_power_size)%Z.
+
+(* Why3 assumption *)
+Definition s_mul_o (a:t) (b:t) : Prop :=
+  ~ (((-two_power_sizem1)%Z <= ((to_int a) * (to_int b))%Z)%Z /\
+     (((to_int a) * (to_int b))%Z < two_power_sizem1)%Z).
+
+(* Why3 assumption *)
+Definition s_neg_o (a:t) : Prop := ((to_int a) = (-two_power_sizem1)%Z).
+
+(* Why3 assumption *)
+Definition s_div_o (a:t) (b:t) : Prop := (a = min_sint) /\ (b = minus_one).
 
 (* Why3 goal *)
 Definition lsr_bv : t -> t -> t.

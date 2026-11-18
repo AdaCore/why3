@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -18,7 +18,7 @@ let read_channel env path file c =
     let loc = Loc.user_position (String.concat Filename.dir_sep (path@[file])) 0 0 0 0 in
     raise (Loc.Located(loc,e))
 
-let sexp_format = "sexp"
+let sexp_format : Env.fformat = "sexp"
 
 let () = Env.register_format Pmodule.mlw_language sexp_format ["sexp"]
     read_channel ~desc:"WhyML@ code in s-expressions format"

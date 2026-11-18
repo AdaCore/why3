@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -377,7 +377,7 @@ module ContextMenu = struct
       let span = "<span class='fas fa-magic why3-icon'></span>" in
       for i = 0 to 2 do
         prove_menu_entries.(i) ##. innerHTML :=
-          Js.string (Printf.sprintf "%s Prove (%d steps)" span alt_ergo_context_steps.(i))
+          Js.string (Printf.sprintf "%s Prove level %d (%d steps)" span (i+1) alt_ergo_context_steps.(i))
       done
 
     let get_context_step i =
@@ -629,7 +629,7 @@ module TaskList = struct
       else begin
         let btnProve =
           Format.sprintf
-            "<span id='%s_prove_button' title='Prove'> \
+            "<span id='%s_prove_button' title='Prove (level 0)'> \
               <i class='fas fa-magic why3-task-button-i'></i></span>" id in
         let btnSplit =
           Format.sprintf
@@ -744,8 +744,8 @@ module TaskList = struct
       addMouseEventListener true span !!"contextmenu" (fun e ->
           clear_task_selection ();
           select_task id span locs pretty;
-          let x = max 0 (e ##. clientX - 2) in
-          let y = max 0 (e ##. clientY - 2) in
+          let x = max 0 (Int32.to_int (Js.to_int32 (e ##. clientX)) - 2) in
+          let y = max 0 (Int32.to_int (Js.to_int32 (e ##. clientY)) - 2) in
           ContextMenu.show_at x y)
 
     let () =
@@ -772,21 +772,26 @@ let handle_why3_message o =
   match o with
   | Idle | Warning [] -> ()
   | Warning lst ->
+      List.iter (fun (_,s) -> log_time ("handle_why3_message/Warning: " ^ s)) lst;
       let annot =
         List.map (fun ((l1, c1), msg) ->
             (l1,c1, Js.string msg, !!"warning")) lst
       in
       Editor.set_annotations annot
 
-  | Error s -> TaskList.print_error s
+  | Error s ->
+     log ("handle_why3_message/Error: "^s);
+     TaskList.print_error s
 
   | ErrorLoc ((l1, b, l2, e), s) ->
+     log_time ("handle_why3_message/ErrorLoc: "^s);
       let r = Editor.mk_range l1 b l2 e in
       Editor.update_error_marker (Some (Editor.add_marker !!"why3-error" r, r));
       TaskList.print_error s;
       Editor.set_annotations [ (l1, b, Js.string s, !!"error") ]
 
   | Result sl ->
+     List.iter (fun s -> log_time ("handle_why3_message/Result: "^s)) sl;
       TaskList.clear ();
       let ul = Dom_html.createUl doc in
       ul ## setAttribute !!"id" !!"why3-exec-list";
@@ -799,10 +804,12 @@ let handle_why3_message o =
           Dom.appendChild ul li) sl
 
   | Theory (th_id, th_name) ->
+     log_time ("handle_why3_message/Theory: "^th_name);
       TaskList.add_theory_id th_id;
       TaskList.attach_to_parent (Printf.sprintf "id%d" th_id) "why3-theory-list" th_name [] None
 
   | Task (id, parent_id, expl, _code, locs, pretty, _steps) ->
+     log_time ("handle_why3_message/Task: "^expl);
       begin match Dom_html.getElementById_opt (Printf.sprintf "id%d" id) with
       | Some _ -> ()
       | None ->
@@ -821,6 +828,7 @@ let handle_why3_message o =
       ExampleList.update ()
 
   | UpdateStatus(st, id) ->
+     log_time ("handle_why3_message/UpdateStatus: "^string_of_int id);
       try
         let span_icon = getElement AsHtml.span (Printf.sprintf "id%d_icon" id) in
         let span_msg = getElement AsHtml.span (Printf.sprintf "id%d_msg" id) in
@@ -948,16 +956,13 @@ module ToolBar = struct
   let open_ = getElement AsHtml.input "why3-open"
 
   let start_open _ =
-    match Js.Optdef.to_option (open_ ##. files) with
-    | None -> Js._false
-    | Some f ->
-        match Js.Opt.to_option (f ## item 0) with
-        | None -> Js._false
-        | Some f ->
-            let reader = new%js File.fileReader in
-            reader ##. onloadend := Dom.handler (finish_open f reader);
-            reader ## readAsText (f :> File.blob Js.t);
-            Js._true
+    match Dom.list_of_nodeList (open_ ##. files) with
+    | [f] ->
+       let reader = new%js File.fileReader in
+       reader ##. onloadend := Dom.handler (finish_open f reader);
+       reader ## readAsText (f :> File.blob Js.t);
+       Js._true
+    | _ -> Js._false
 
   let () =
     open_ ##. onchange := Dom.handler start_open
@@ -1011,8 +1016,8 @@ module Panel = struct
             if !mouse_down then begin
                 let offset =
                   if is_wide ()
-                  then (e ##. clientX) - (main_panel ##. offsetLeft)
-                  else (e ##. clientY) - (main_panel ##. offsetTop)
+                  then Int32.to_int (Js.to_int32 (e ##. clientX)) - (main_panel ##. offsetLeft)
+                  else Int32.to_int (Js.to_int32 (e ##. clientY)) - (main_panel ##. offsetTop)
                 in
                 let offset = (js_string_of_int offset) ## concat !!"px" in
                 let edit_style = editor_container ##. style in
@@ -1088,6 +1093,8 @@ module Controller = struct
       alt_ergo_idle () && Queue.is_empty task_queue && not !why3_busy
 
     let process_task i w id s steps =
+      (* log the full task if needed for debugging *)
+      (* log_time ("process_task:\n" ^ s); *)
       let open Json_base in
       let convert v = Js.string (Format.asprintf "%a" print_json v) in
       let input =
@@ -1096,11 +1103,13 @@ module Controller = struct
              ["worker_id", Int id;
               "content",
               List (List.map (fun x -> String x) (String.split_on_char '\n' s))]) in
+      let steps = if steps >= 0 then steps else !alt_ergo_default_steps in
+      log_time ("process_task with steps = " ^ string_of_int steps);
       let options =
         convert
           (Record
-             ["steps_bound", Int (if steps >= 0 then steps else !alt_ergo_default_steps);
-              "input_format", String "Native";
+             ["steps_bound", Int steps;
+              "input_format", String "Smtlib2";
               "debug", Bool true]) in
       !alt_ergo_workers.(i) <- Busy (w, id);
       w ## postMessage (input, options)
@@ -1131,7 +1140,7 @@ module Controller = struct
       | exception Queue.Empty -> ()
 
     and init_ae_worker i =
-      let worker = Worker.create "alt-ergo-worker.js" in
+      let worker = Worker.create "alt-ergo-26-worker.js" in
       let handle_result id result =
         TaskList.print_alt_ergo_output id result;
         let status = match result with
@@ -1148,8 +1157,26 @@ module Controller = struct
               match Json_base.get_field result "status" with
               | Json_base.Record ["Unsat", _] -> Valid
               | Json_base.Record ["Unknown", _] -> Unknown "unknown"
-              | Json_base.Record ["Sat", _] -> Unknown "unknown"
-              | l -> Unknown (Format.asprintf "%a" Json_base.print_json l) in
+              | Json_base.Record ["Sat", _] -> Unknown "sat"
+              | l ->
+                 let diag =
+                   try
+                     match Json_base.get_field result "diagnostic" with
+                     | Json_base.List l ->
+                        List.fold_left
+                          (fun acc s ->
+                            match s with
+                            | Json_base.String s -> acc ^ "\n" ^ s
+                            | _ -> "(error: diagnostic element not a string ?)")
+                       "" l
+                     | _ -> "(error: diagnostic not a string list ?)"
+                   with Not_found -> "no diagnostic provided, sorry"
+                 in
+                 let s = Format.asprintf "%a" Json_base.print_json l in
+                 log_time ("worker ##. onmessage: " ^ s);
+                 log_time ("diagnostic: " ^ diag);
+                 Unknown s
+            in
             !alt_ergo_workers.(i) <- Free worker;
             handle_result id result;
             Js._false);

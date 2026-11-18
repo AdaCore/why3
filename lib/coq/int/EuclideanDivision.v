@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -21,7 +21,7 @@ Require Import Lia.
 Definition div : Numbers.BinNums.Z -> Numbers.BinNums.Z -> Numbers.BinNums.Z.
 Proof.
 intros x y.
-case (Z_le_dec 0 (Zmod x y)) ; intros H.
+case (Z_le_dec 0 (Z.modulo x y)) ; intros H.
 exact (Z.div x y).
 exact (Z.div x y + 1)%Z.
 Defined.

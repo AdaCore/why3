@@ -2,7 +2,7 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="1" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="5" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
@@ -17,7 +17,7 @@
  <proof prover="6" timelimit="1"><result status="valid" time="0.000000" steps="4"/></proof>
  </goal>
  <goal name="sum_ind" proved="true">
- <proof prover="6"><result status="valid" time="0.573120" steps="3585"/></proof>
+ <proof prover="6"><result status="valid" time="0.840004" steps="3585"/></proof>
  </goal>
  <goal name="maximum&#39;vc" expl="VC for maximum" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -41,7 +41,7 @@
    <goal name="maximum&#39;vc.4.1" expl="VC for maximum" proved="true">
    <transf name="remove" proved="true" arg1="real,bool,string,tuple0,unit,ref,map,mapii,key,value,zero,one,( * ),min,max,const,(!),is_none,size,below,create,permutation,table1,table2,Assoc,Unit_def_l,Unit_def_r,Inv_def_l,Inv_def_r,Comm,Assoc1,Mul_distr_l,Mul_distr_r,Comm1,Unitary,NonTrivialRing,Refl,Trans,Antisymm,Total,ZeroLessOne,CompatOrderAdd,CompatOrderMult,Min_r,Max_l,Min_comm,Max_comm,Min_assoc,Max_assoc,is_none&#39;spec,below&#39;spec,cardinal_empty,cardinal_remove,cardinal_below,create&#39;spec,n&#39;def,m&#39;def,Sum_def_empty,Sum_right_extension,Sum_transitivity,Sum_eq,H5,H7,H8,Ensures1,H10,Ensures3,Ensures4,Ensures5,Ensures6">
     <goal name="maximum&#39;vc.4.1.0" expl="VC for maximum" proved="true">
-    <proof prover="1"><result status="valid" time="1.164930" steps="7005345"/></proof>
+    <proof prover="0"><result status="valid" time="0.121463" steps="161845"/></proof>
     <proof prover="6" timelimit="1"><result status="valid" time="0.443789" steps="2833"/></proof>
     </goal>
    </transf>

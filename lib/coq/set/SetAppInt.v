@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -64,14 +64,14 @@ exact unit.
 Defined.
 
 (* Why3 goal *)
-Definition initial : t -> set.
+Definition initial : t -> set.Fset.fset Numbers.BinNums.Z.
 Proof.
 intro x.
 exact Fset.empty.
 Defined.
 
 (* Why3 goal *)
-Definition visited : t -> set.
+Definition visited : t -> set.Fset.fset Numbers.BinNums.Z.
 Proof.
 intro x.
 exact Fset.empty.
@@ -79,8 +79,7 @@ Defined.
 
 (* Why3 goal *)
 Lemma t'invariant :
-  forall (self:t),
-  set.Fset.subset (to_fset (visited self)) (to_fset (initial self)).
+  forall (self:t), set.Fset.subset (visited self) (initial self).
 Proof.
 intros self.
 unfold Fset.subset, to_fset, visited, initial.

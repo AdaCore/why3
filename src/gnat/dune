@@ -1,0 +1,8 @@
+(include_subdirs no)
+
+(executable
+ (name gnat_main)
+ (libraries why3 dynlink unix yojson sexplib)
+ (flags :standard -open Why3)
+ (modes byte exe)
+ (link_flags (:standard -linkall)))

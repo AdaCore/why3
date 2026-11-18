@@ -1,11 +1,11 @@
-(** Why3 driver for Colibri (with floating point support) *)
+(** Why3 driver for Colibri2 (with floating point support and bitvector) *)
 
 prelude ";; produced by local colibri2.drv ;;"
 prelude "(set-logic ALL)"
 prelude "(set-info :smt-lib-version 2.6)"
 
 filename "%f-%t-%g.psmt2"
-unknown "^\\(unknown\\|sat\\|Fail\\)$" "\\1"
+unknown "^\\(unknown\\|sat\\|Fail\\|unknown-branch-cut\\)$" "\\1"
 unknown "^(:reason-unknown \\([^)]*\\))$" "\\1"
 time "why3cpulimit time : %s s"
 valid "^unsat$"
@@ -14,6 +14,8 @@ steps "^(steps \\([0-9]+.?[0-9]*\\))" 1
 
 printer "smtv2.6par"
 
+import "smt-libv2-bv.gen"
+import "smt-libv2-bv-overflow-bv-def.gen"
 
 (* Performed introductions depending on whether counterexamples are
    requested, as said by the meta "get_counterexmp". When this meta
@@ -23,9 +25,8 @@ printer "smtv2.6par"
 transformation "counterexamples_dependent_intros"
 
 transformation "monomorphise_goal"
-transformation "eliminate_builtin"
+import "common-transformations.gen"
 transformation "compile_match"
-(* transformation "inline_trivial" *)
 transformation "simplify_formula"
 transformation "eliminate_inductive"
 transformation "eliminate_literal"
@@ -153,6 +154,77 @@ theory int.ComputerDivision
   syntax function mod "(colibri_crem %1 %2)"
 end
 
+theory bv.Pow2int
+
+  syntax function pow2 "(colibri_pow_int_int 2 %1)"
+
+  remove prop pow2_0
+  remove prop pow2_1
+  remove prop pow2_2
+  remove prop pow2_3
+  remove prop pow2_4
+  remove prop pow2_5
+  remove prop pow2_6
+  remove prop pow2_7
+  remove prop pow2_8
+  remove prop pow2_9
+  remove prop pow2_10
+  remove prop pow2_11
+  remove prop pow2_12
+  remove prop pow2_13
+  remove prop pow2_14
+  remove prop pow2_15
+  remove prop pow2_16
+  remove prop pow2_17
+  remove prop pow2_18
+  remove prop pow2_19
+  remove prop pow2_20
+  remove prop pow2_21
+  remove prop pow2_22
+  remove prop pow2_23
+  remove prop pow2_24
+  remove prop pow2_25
+  remove prop pow2_26
+  remove prop pow2_27
+  remove prop pow2_28
+  remove prop pow2_29
+  remove prop pow2_30
+  remove prop pow2_31
+  remove prop pow2_32
+  remove prop pow2_33
+  remove prop pow2_34
+  remove prop pow2_35
+  remove prop pow2_36
+  remove prop pow2_37
+  remove prop pow2_38
+  remove prop pow2_39
+  remove prop pow2_40
+  remove prop pow2_41
+  remove prop pow2_42
+  remove prop pow2_43
+  remove prop pow2_44
+  remove prop pow2_45
+  remove prop pow2_46
+  remove prop pow2_47
+  remove prop pow2_48
+  remove prop pow2_49
+  remove prop pow2_50
+  remove prop pow2_51
+  remove prop pow2_52
+  remove prop pow2_53
+  remove prop pow2_54
+  remove prop pow2_55
+  remove prop pow2_56
+  remove prop pow2_57
+  remove prop pow2_58
+  remove prop pow2_59
+  remove prop pow2_60
+  remove prop pow2_61
+  remove prop pow2_62
+  remove prop pow2_63
+  remove prop pow2_64
+
+end
 
 (*
 theory real.MinMax
@@ -185,4 +257,67 @@ end
 
 theory bool.Ite
   syntax function ite "(ite %1 %2 %3)"
+end
+
+theory HighOrd
+  syntax type     (->) "(Array %1 %2)"
+  syntax function (@)  "(select %1 %2)"
+
+  meta "encoding:lskept" function (@)
+  meta "encoding:ignore_polymorphism_ts" type (->)
+  meta "encoding:ignore_polymorphism_ls" function (@)
+end
+
+theory map.Map
+  syntax function get "(select %1 %2)"
+  syntax function set "(store %1 %2 %3)"
+
+  meta "encoding:lskept" function get
+  meta "encoding:lskept" function set
+  meta "encoding:ignore_polymorphism_ls" function get
+  meta "encoding:ignore_polymorphism_ls" function ([])
+  meta "encoding:ignore_polymorphism_ls" function set
+  meta "encoding:ignore_polymorphism_ls" function ([<-])
+end
+
+import "smt-libv2-floats.gen"
+
+theory bv.BV_Gen
+   syntax function to_uint "(bv2nat %1)"
+end
+
+theory bv.BV256
+  syntax function of_int "((_ nat2bv 256) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
+end
+
+theory bv.BV128
+  syntax function of_int "((_ nat2bv 128) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
+end
+
+theory bv.BV64
+  syntax function of_int "((_ nat2bv 64) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
+end
+
+theory bv.BV32
+  syntax function of_int "((_ nat2bv 32) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
+end
+
+theory bv.BV16
+  syntax function of_int "((_ nat2bv 16) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
+end
+
+theory bv.BV8
+  syntax function of_int "((_ nat2bv 8) %1)"
+  syntax function t'int "(bv2nat %1)"
+  syntax function to_int "(bv2int %1)"
 end

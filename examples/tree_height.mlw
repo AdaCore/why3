@@ -68,7 +68,15 @@ module Iteration
     | Kright _ k -> 1 + sizek k
     end
 
-  lemma sizek_nonneg: forall k: cont 'a. sizek k >= 0
+  let rec lemma sizek_nonneg (k: cont 'a) : unit
+  ensures {sizek k >= 0}
+  variant  { k }
+  =
+  match k with
+    | Id         -> ()
+    | Kleft  _ k -> sizek_nonneg k
+    | Kright _ k -> sizek_nonneg k
+    end
 
   function sizew (w: what 'a) : int =
     match w with
@@ -125,7 +133,14 @@ module HeightStack
     | Cons (_, t) s' -> size t + sizes s'
     end
 
-  lemma sizes_nonneg: forall s: stack 'a. sizes s >= 0
+  let rec lemma sizes_nonneg (s: stack 'a) : unit
+  ensures {sizes s >= 0}
+  variant  { s }
+  =
+  match s with
+    | Nil            -> ()
+    | Cons (_, _) s' -> sizes_nonneg s'
+    end
 
   let rec height_stack (m: int) (s: stack 'a) : int
     requires { m >= 0 }

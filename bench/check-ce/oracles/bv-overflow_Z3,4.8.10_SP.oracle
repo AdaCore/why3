@@ -1,0 +1,2956 @@
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (1224 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 8:
+    x = (128:t)
+    y = (128:t)
+    x = (128:t)
+    y = (128:t)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (128:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_add` with args:
+      [ a = (128:t), b = (128:t) ]
+    Property failure at precondition of `u_add` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (128:t), x = (128:t), y = (128:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (128:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (1563 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 9:
+    x = (96:t)
+    y = (64:t)
+    x = (96:t)
+    y = (64:t)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (96:t), y = (64:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_add` with args:
+      [ a = (96:t), b = (64:t) ]
+    Property failure at precondition of `s_add` with env:
+      { lsenv = [];
+        vsenv = [ a = (96:t), b = (64:t), x = (96:t), y = (64:t) ];
+        rsenv = []; idenv = [ a = (96:t), b = (64:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (1043 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 10:
+    x = (0:t)
+    y = (1:t)
+    x = (0:t)
+    y = (1:t)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (1:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub` with args:
+      [ a = (0:t), b = (1:t) ]
+    Property failure at precondition of `u_sub` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (1:t), x = (0:t), y = (1:t) ];
+        rsenv = []; idenv = [ a = (0:t), b = (1:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (1737 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 11:
+    x = (72:t)
+    y = (187:t)
+    x = (72:t)
+    y = (187:t)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (72:t), y = (187:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub` with args:
+      [ a = (72:t), b = (187:t) ]
+    Property failure at precondition of `s_sub` with env:
+      { lsenv = [];
+        vsenv = [ a = (72:t), b = (187:t), x = (72:t), y = (187:t) ];
+        rsenv = []; idenv = [ a = (72:t), b = (187:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (3363 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 12:
+    x = (37:t)
+    y = (7:t)
+    x = (37:t)
+    y = (7:t)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (37:t), y = (7:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul` with args:
+      [ a = (37:t), b = (7:t) ]
+    Property failure at precondition of `u_mul` with env:
+      { lsenv = []; vsenv = [ a = (37:t), b = (7:t), x = (37:t), y = (7:t) ];
+        rsenv = []; idenv = [ a = (37:t), b = (7:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (10691 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 13:
+    x = (133:t)
+    y = (5:t)
+    x = (133:t)
+    y = (5:t)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (133:t), y = (5:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul` with args:
+      [ a = (133:t), b = (5:t) ]
+    Property failure at precondition of `s_mul` with env:
+      { lsenv = [];
+        vsenv = [ a = (133:t), b = (5:t), x = (133:t), y = (5:t) ];
+        rsenv = []; idenv = [ a = (133:t), b = (5:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_neg_o: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (3000063 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 14:
+    x = (128:t)
+    x = (128:t)
+    Execution of main function `tsneg` with env:
+      { lsenv = []; vsenv = [ x = (128:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_neg` with args:
+      [ a = (128:t) ]
+    Property failure at precondition of `s_neg` with env:
+      { lsenv = []; vsenv = [ a = (128:t), x = (128:t) ]; rsenv = [];
+        idenv = [ a = (128:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (596 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 15:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `u_div` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (596 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (684 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = (128:t)
+    y = (255:t)
+    x = (128:t)
+    y = (255:t)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (255:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = (128:t), b = (255:t) ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (255:t), x = (128:t), y = (255:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (255:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (596 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 17:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `u_rem` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 8)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 7)
+(Idx 7)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (596 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 18:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `s_rem` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (1776 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 27:
+    x = (32768:t1)
+    y = (32768:t1)
+    x = (32768:t1)
+    y = (32768:t1)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (32768:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_add1` with args:
+      [ a = (32768:t1), b = (32768:t1) ]
+    Property failure at precondition of `u_add1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (32768:t1), b = (32768:t1), x = (32768:t1), y = (32768:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (32768:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (2462 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 28:
+    x = (34824:t1)
+    y = (32770:t1)
+    x = (34824:t1)
+    y = (32770:t1)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (34824:t1), y = (32770:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_add1` with args:
+      [ a = (34824:t1), b = (32770:t1) ]
+    Property failure at precondition of `s_add1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (34824:t1), b = (32770:t1), x = (34824:t1), y = (32770:t1) ];
+        rsenv = []; idenv = [ a = (34824:t1), b = (32770:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (1547 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 29:
+    x = (0:t1)
+    y = (1:t1)
+    x = (0:t1)
+    y = (1:t1)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (1:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub1` with args:
+      [ a = (0:t1), b = (1:t1) ]
+    Property failure at precondition of `u_sub1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (1:t1), x = (0:t1), y = (1:t1) ];
+        rsenv = []; idenv = [ a = (0:t1), b = (1:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (3394 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 30:
+    x = (16384:t1)
+    y = (49120:t1)
+    x = (16384:t1)
+    y = (49120:t1)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (16384:t1), y = (49120:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub1` with args:
+      [ a = (16384:t1), b = (49120:t1) ]
+    Property failure at precondition of `s_sub1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (16384:t1), b = (49120:t1), x = (16384:t1), y = (49120:t1) ];
+        rsenv = []; idenv = [ a = (16384:t1), b = (49120:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (10579 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 31:
+    x = (9376:t1)
+    y = (7:t1)
+    x = (9376:t1)
+    y = (7:t1)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (9376:t1), y = (7:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul1` with args:
+      [ a = (9376:t1), b = (7:t1) ]
+    Property failure at precondition of `u_mul1` with env:
+      { lsenv = [];
+        vsenv = [ a = (9376:t1), b = (7:t1), x = (9376:t1), y = (7:t1) ];
+        rsenv = []; idenv = [ a = (9376:t1), b = (7:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (64940 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 32:
+    x = (65044:t1)
+    y = (56488:t1)
+    x = (65044:t1)
+    y = (56488:t1)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (65044:t1), y = (56488:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul1` with args:
+      [ a = (65044:t1), b = (56488:t1) ]
+    Property failure at precondition of `s_mul1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (65044:t1), b = (56488:t1), x = (65044:t1), y = (56488:t1) ];
+        rsenv = []; idenv = [ a = (65044:t1), b = (56488:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_neg_o: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 33, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 33, characters 22-29)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 33, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (3000063 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 33:
+    x = (32768:t1)
+    x = (32768:t1)
+    Execution of main function `tsneg` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_neg1` with args:
+      [ a = (32768:t1) ]
+    Property failure at precondition of `s_neg1` with env:
+      { lsenv = []; vsenv = [ a = (32768:t1), x = (32768:t1) ]; rsenv = [];
+        idenv = [ a = (32768:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (612 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 34:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `u_div1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (612 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (716 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = (32768:t1)
+    y = (65535:t1)
+    x = (32768:t1)
+    y = (65535:t1)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (65535:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = (32768:t1), b = (65535:t1) ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (32768:t1), b = (65535:t1), x = (32768:t1), y = (65535:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (65535:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (612 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 36:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `u_rem1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 16)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 15)
+(Idx 15)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (612 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 37:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `s_rem1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (2896 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 47:
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (2147483648:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_add2` with args:
+      [ a = (2147483648:t2), b = (2147483648:t2) ]
+    Property failure at precondition of `u_add2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (2147483648:t2), x = (2147483648:t2),
+            y = (2147483648:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (2147483648:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (4472 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 48:
+    x = (2164269056:t2)
+    y = (2148302848:t2)
+    x = (2164269056:t2)
+    y = (2148302848:t2)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (2164269056:t2), y = (2148302848:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_add2` with args:
+      [ a = (2164269056:t2), b = (2148302848:t2) ]
+    Property failure at precondition of `s_add2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2164269056:t2), b = (2148302848:t2), x = (2164269056:t2),
+            y = (2148302848:t2) ]; rsenv = [];
+        idenv = [ a = (2164269056:t2), b = (2148302848:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (2539 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 49:
+    x = (0:t2)
+    y = (1:t2)
+    x = (0:t2)
+    y = (1:t2)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (1:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub2` with args:
+      [ a = (0:t2), b = (1:t2) ]
+    Property failure at precondition of `u_sub2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (1:t2), x = (0:t2), y = (1:t2) ];
+        rsenv = []; idenv = [ a = (0:t2), b = (1:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (4353 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 50:
+    x = (1074233408:t2)
+    y = (2682781696:t2)
+    x = (1074233408:t2)
+    y = (2682781696:t2)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (1074233408:t2), y = (2682781696:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub2` with args:
+      [ a = (1074233408:t2), b = (2682781696:t2) ]
+    Property failure at precondition of `s_sub2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (1074233408:t2), b = (2682781696:t2), x = (1074233408:t2),
+            y = (2682781696:t2) ]; rsenv = [];
+        idenv = [ a = (1074233408:t2), b = (2682781696:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (48398 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 51:
+    x = (15827200:t2)
+    y = (1176:t2)
+    x = (15827200:t2)
+    y = (1176:t2)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (15827200:t2), y = (1176:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul2` with args:
+      [ a = (15827200:t2), b = (1176:t2) ]
+    Property failure at precondition of `u_mul2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (15827200:t2), b = (1176:t2), x = (15827200:t2),
+            y = (1176:t2) ]; rsenv = [];
+        idenv = [ a = (15827200:t2), b = (1176:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (109487 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 52:
+    x = (3491242531:t2)
+    y = (915146937:t2)
+    x = (3491242531:t2)
+    y = (915146937:t2)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (3491242531:t2), y = (915146937:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul2` with args:
+      [ a = (3491242531:t2), b = (915146937:t2) ]
+    Property failure at precondition of `s_mul2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (3491242531:t2), b = (915146937:t2), x = (3491242531:t2),
+            y = (915146937:t2) ]; rsenv = [];
+        idenv = [ a = (3491242531:t2), b = (915146937:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_neg_o: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 53, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 53, characters 22-29)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 53, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (3000063 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 53:
+    x = (2147483648:t2)
+    x = (2147483648:t2)
+    Execution of main function `tsneg` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_neg2` with args:
+      [ a = (2147483648:t2) ]
+    Property failure at precondition of `s_neg2` with env:
+      { lsenv = []; vsenv = [ a = (2147483648:t2), x = (2147483648:t2) ];
+        rsenv = []; idenv = [ a = (2147483648:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (644 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 54:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `u_div2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (644 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (780 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = (2147483648:t2)
+    y = (4294967295:t2)
+    x = (2147483648:t2)
+    y = (4294967295:t2)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (4294967295:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = (2147483648:t2), b = (4294967295:t2) ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (4294967295:t2), x = (2147483648:t2),
+            y = (4294967295:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (4294967295:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (644 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 56:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `u_rem2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (644 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 57:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `s_rem2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (5160 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 67:
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    Execution of main function `tuadd` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_add3` with args:
+      [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ]
+    Property failure at precondition of `u_add3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3),
+            x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (7162 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 68:
+    x = (4611694814520410112:t3)
+    y = (4611686018427387904:t3)
+    x = (4611694814520410112:t3)
+    y = (4611686018427387904:t3)
+    Execution of main function `tsadd` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (4611694814520410112:t3), y = (4611686018427387904:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_add3` with args:
+      [ a = (4611694814520410112:t3), b = (4611686018427387904:t3) ]
+    Property failure at precondition of `s_add3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (4611694814520410112:t3), b = (4611686018427387904:t3),
+            x = (4611694814520410112:t3), y = (4611686018427387904:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (4611694814520410112:t3), b = (4611686018427387904:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (4587 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 69:
+    x = (0:t3)
+    y = (1:t3)
+    x = (0:t3)
+    y = (1:t3)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (1:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub3` with args:
+      [ a = (0:t3), b = (1:t3) ]
+    Property failure at precondition of `u_sub3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (1:t3), x = (0:t3), y = (1:t3) ];
+        rsenv = []; idenv = [ a = (0:t3), b = (1:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (10495 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 70:
+    x = (4611686019327066112:t3)
+    y = (13834811764677541888:t3)
+    x = (4611686019327066112:t3)
+    y = (13834811764677541888:t3)
+    Execution of main function `tssub` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (4611686019327066112:t3), y = (13834811764677541888:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub3` with args:
+      [ a = (4611686019327066112:t3), b = (13834811764677541888:t3) ]
+    Property failure at precondition of `s_sub3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (4611686019327066112:t3), b = (13834811764677541888:t3),
+            x = (4611686019327066112:t3), y = (13834811764677541888:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (4611686019327066112:t3), b = (13834811764677541888:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (1347711 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 71:
+    x = (166712104510211959:t3)
+    y = (5822294008331763731:t3)
+    x = (166712104510211959:t3)
+    y = (5822294008331763731:t3)
+    Execution of main function `tumul` with env:
+      { lsenv = [];
+        vsenv = [ x = (166712104510211959:t3), y = (5822294008331763731:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul3` with args:
+      [ a = (166712104510211959:t3), b = (5822294008331763731:t3) ]
+    Property failure at precondition of `u_mul3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (166712104510211959:t3), b = (5822294008331763731:t3),
+            x = (166712104510211959:t3), y = (5822294008331763731:t3) ];
+        rsenv = [];
+        idenv = [ a = (166712104510211959:t3), b = (5822294008331763731:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (629415 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 72:
+    x = (10520408729537478656:t3)
+    y = (9944034978590493016:t3)
+    x = (10520408729537478656:t3)
+    y = (9944034978590493016:t3)
+    Execution of main function `tsmul` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (10520408729537478656:t3), y = (9944034978590493016:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul3` with args:
+      [ a = (10520408729537478656:t3), b = (9944034978590493016:t3) ]
+    Property failure at precondition of `s_mul3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (10520408729537478656:t3), b = (9944034978590493016:t3),
+            x = (10520408729537478656:t3), y = (9944034978590493016:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (10520408729537478656:t3), b = (9944034978590493016:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_neg_o: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 73, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 73, characters 22-29)
+- Checked model 1: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 73, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (3000063 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 73:
+    x = (9223372036854775808:t3)
+    x = (9223372036854775808:t3)
+    Execution of main function `tsneg` with env:
+      { lsenv = []; vsenv = [ x = (9223372036854775808:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_neg3` with args:
+      [ a = (9223372036854775808:t3) ]
+    Property failure at precondition of `s_neg3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), x = (9223372036854775808:t3) ];
+        rsenv = []; idenv = [ a = (9223372036854775808:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (708 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 74:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `u_div3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (708 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (908 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = (9223372036854775808:t3)
+    y = (18446744073709551615:t3)
+    x = (9223372036854775808:t3)
+    y = (18446744073709551615:t3)
+    Execution of main function `tsdiv` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (9223372036854775808:t3), y = (18446744073709551615:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = (9223372036854775808:t3), b = (18446744073709551615:t3) ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (18446744073709551615:t3),
+            x = (9223372036854775808:t3), y = (18446744073709551615:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (9223372036854775808:t3), b = (18446744073709551615:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (708 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 76:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `u_rem3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 127)
+(Idx 64)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 63)))
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (708 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 77:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `s_rem3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -165,9 +165,17 @@ destruct (Bool.bool_dec (s x) true) as [Heq | Heq].
 + exists (List.cons x l1).
   split.
   - constructor; auto. intro Habs. eapply h1 in Habs. unfold Map.set in Habs. 
-    destruct why_decidable_eq; intuition.
-  - unfold Map.set in h1. intros. specialize (h1 e). destruct why_decidable_eq; [| intuition]. subst.
-    split; intuition. destruct H1; eauto.
+    now destruct why_decidable_eq.
+  - unfold Map.set in h1. intros. specialize (h1 e).
+    destruct why_decidable_eq as [<-|H].
+    split. easy.
+    now left.
+    split.
+    intros [<-|H2]. easy.
+    now apply h1.
+    intros H2.
+    right.
+    now apply h1.
 + exists l1.
   split; [auto|]. intros. specialize (h1 e). replace (Map.set s x false e) with (s e) in h1.
   eauto.
@@ -184,12 +192,17 @@ induction l.
 - destruct IHl. destruct H.
   destruct (List.in_dec eq_dec a l). 
   + exists x. split; eauto. intros. rewrite H0.
-    split; intuition. inversion H2; eauto. subst. assumption.
-  + destruct (Pdec a). 
-    ++ exists (List.cons a x). split. constructor; eauto.
-       rewrite H0. intro Habs. destruct Habs; eauto.
-       intros. simpl. rewrite H0. intuition. subst. assumption.
-    ++ exists x. split; eauto. intros. rewrite H0. intuition. simpl in H2. destruct H2; try subst; intuition. 
+    split ; intros [H1 H2] ; refine (conj _ H2).
+    now right.
+    now destruct H1 as [<- | H4].
+  + destruct (Pdec a).
+    * exists (List.cons a x). split. constructor; eauto.
+      rewrite H0. intro Habs. destruct Habs; eauto.
+      intros. simpl. rewrite H0. intuition. subst. assumption.
+    * exists x. split; eauto. intros. rewrite H0.
+      split ; intros [H1 H2] ; refine (conj _ H2).
+      now right.
+      now destruct H1 as [<- | H4].
 Qed.
 
 (* Why3 goal *)
@@ -443,7 +456,7 @@ split; intros.
       + eapply List.NoDup_incl_length; eauto. apply a0. intros e Hincl. eapply H2. assumption.
       + eapply List.NoDup_incl_length; eauto. intros e Hincl. eapply H2. assumption.
     }
-    intuition.
+    now apply Nat.le_antisymm.
   }
   rewrite Hnat. rewrite Nat2Z.inj_succ. ring. 
 Qed.
@@ -471,7 +484,7 @@ split.
   rewrite <- H0.
   assert (~ set.Set.mem x s'). 
   { unfold s'. unfold Map.set, set.Set.mem.
-    destruct why_decidable_eq; intuition. 
+    now destruct why_decidable_eq.
   }
   eapply cardinal_add in H1. rewrite H1. ring.
   unfold s'. eapply is_finite_remove. assumption.

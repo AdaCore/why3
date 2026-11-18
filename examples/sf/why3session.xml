@@ -2,17 +2,17 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="sf.mlw"/>
 <theory name="HoareLogic" proved="true">
  <goal name="slow_subtraction&#39;vc" expl="VC for slow_subtraction" proved="true">
- <proof prover="4"><result status="valid" time="0.050638" steps="717"/></proof>
+ <proof prover="0"><result status="valid" time="0.050638" steps="717"/></proof>
  </goal>
  <goal name="reduce_to_zero&#39;vc" expl="VC for reduce_to_zero" proved="true">
- <proof prover="4"><result status="valid" time="0.020588" steps="429"/></proof>
+ <proof prover="0"><result status="valid" time="0.020588" steps="429"/></proof>
  </goal>
  <goal name="slow_addition&#39;vc" expl="VC for slow_addition" proved="true">
  <proof prover="3"><result status="valid" time="0.021668" steps="14"/></proof>
@@ -41,7 +41,7 @@
  <proof prover="2"><result status="valid" time="0.011276" steps="8856"/></proof>
  </goal>
  <goal name="sqrt&#39;vc" expl="VC for sqrt" proved="true">
- <proof prover="4"><result status="valid" time="0.039010" steps="1246"/></proof>
+ <proof prover="0"><result status="valid" time="0.039010" steps="1246"/></proof>
  </goal>
  <goal name="factorial&#39;vc" expl="VC for factorial" proved="true">
  <proof prover="3"><result status="valid" time="0.033041" steps="391"/></proof>
@@ -49,10 +49,10 @@
 </theory>
 <theory name="MoreHoareLogic" proved="true">
  <goal name="list_sum&#39;vc" expl="VC for list_sum" proved="true">
- <proof prover="4"><result status="valid" time="0.041910" steps="4463"/></proof>
+ <proof prover="0"><result status="valid" time="0.041910" steps="4465"/></proof>
  </goal>
  <goal name="list_member&#39;vc" expl="VC for list_member" proved="true">
- <proof prover="4"><result status="valid" time="0.048357" steps="6431"/></proof>
+ <proof prover="0"><result status="valid" time="0.048357" steps="5543"/></proof>
  </goal>
 </theory>
 </file>

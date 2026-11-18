@@ -3,78 +3,78 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC4" version="1.7" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.11.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<file format="whyml">
+<prover id="2" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
 <path name=".."/><path name="func_literals.mlw"/>
-<theory name="Top">
+<theory name="Top" proved="true">
  <goal name="g1" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.080000" steps="7374"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="27796"/></proof>
+ <proof prover="0"><result status="valid" time="0.080000" steps="449"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="10"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="1384"/></proof>
  </goal>
  <goal name="g2" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="8335"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="30469"/></proof>
+ <proof prover="0"><result status="valid" time="0.050000" steps="815"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="24"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="1866"/></proof>
  </goal>
  <goal name="g3" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.060000" steps="8589"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="29007"/></proof>
+ <proof prover="0"><result status="valid" time="0.060000" steps="1061"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="61"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="2522"/></proof>
  </goal>
  <goal name="g4" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="7225"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="2504"/></proof>
+ <proof prover="0"><result status="valid" time="0.050000" steps="155"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="0"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="70"/></proof>
  </goal>
  <goal name="seq_ok1&#39;vc" expl="VC for seq_ok1" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.060000" steps="11483"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49845"/></proof>
+ <proof prover="0"><result status="valid" time="0.060000" steps="2295"/></proof>
  <proof prover="2"><result status="valid" time="0.059801" steps="67"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="8559"/></proof>
  </goal>
  <goal name="seq_ok2&#39;vc" expl="VC for seq_ok2" proved="true">
- <proof prover="0" obsolete="true"><result status="valid" time="0.070000" steps="11911"/></proof>
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49308"/></proof>
+ <proof prover="0"><result status="valid" time="0.070000" steps="2295"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="67"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="8559"/></proof>
  </goal>
  <goal name="seq_ok3&#39;vc" expl="VC for seq_ok3" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="50282"/></proof>
  <proof prover="2"><result status="valid" time="0.086013" steps="77"/></proof>
- <transf name="split_vc" >
-  <goal name="seq_ok3&#39;vc.0" expl="precondition">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="5708"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="8798"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="seq_ok3&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.040000" steps="167"/></proof>
   </goal>
-  <goal name="seq_ok3&#39;vc.1" expl="postcondition">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.060000" steps="9206"/></proof>
+  <goal name="seq_ok3&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.060000" steps="2317"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="seq_ok4&#39;vc" expl="VC for seq_ok4" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="49810"/></proof>
  <proof prover="2"><result status="valid" time="0.010000" steps="77"/></proof>
- <transf name="split_vc" >
-  <goal name="seq_ok4&#39;vc.0" expl="precondition">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.050000" steps="5708"/></proof>
+ <proof prover="3"><result status="valid" time="0.010000" steps="8798"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="seq_ok4&#39;vc.0" expl="precondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.050000" steps="167"/></proof>
   </goal>
-  <goal name="seq_ok4&#39;vc.1" expl="postcondition">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.080000" steps="10000"/></proof>
+  <goal name="seq_ok4&#39;vc.1" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.080000" steps="2317"/></proof>
   </goal>
  </transf>
  </goal>
- <goal name="array_ok1&#39;vc" expl="VC for array_ok1">
- <transf name="split_vc" >
+ <goal name="array_ok1&#39;vc" expl="VC for array_ok1" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="array_ok1&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="7301"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="3180"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="2654"/></proof>
   <proof prover="2"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="953"/></proof>
   </goal>
-  <goal name="array_ok1&#39;vc.1" expl="postcondition">
-  <transf name="inline_goal" >
-   <goal name="array_ok1&#39;vc.1.0" expl="postcondition">
-   <transf name="split_all_full" >
-    <goal name="array_ok1&#39;vc.1.0.0" expl="postcondition">
-    <proof prover="0" obsolete="true"><result status="valid" time="1.280000" steps="123857"/></proof>
+  <goal name="array_ok1&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="array_ok1&#39;vc.1.0" expl="postcondition" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="array_ok1&#39;vc.1.0.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.133883" steps="15007"/></proof>
     </goal>
    </transf>
    </goal>
@@ -83,34 +83,34 @@
  </transf>
  </goal>
  <goal name="array_ok2&#39;vc" expl="VC for array_ok2" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.030000" steps="113769"/></proof>
  <proof prover="2"><result status="valid" time="0.111472" steps="741"/></proof>
- <transf name="split_vc" >
-  <goal name="array_ok2&#39;vc.0" expl="array creation size">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="7301"/></proof>
+ <proof prover="3"><result status="valid" time="0.030000" steps="120937"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="array_ok2&#39;vc.0" expl="array creation size" proved="true">
+  <proof prover="0"><result status="valid" time="0.040000" steps="2654"/></proof>
   </goal>
-  <goal name="array_ok2&#39;vc.1" expl="postcondition">
-  <transf name="split_all_full" >
-   <goal name="array_ok2&#39;vc.1.0" expl="postcondition">
-   <proof prover="0" obsolete="true"><result status="valid" time="0.190000" steps="26456"/></proof>
+  <goal name="array_ok2&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="split_all_full" proved="true" >
+   <goal name="array_ok2&#39;vc.1.0" expl="postcondition" proved="true">
+   <proof prover="0"><result status="valid" time="0.190000" steps="16870"/></proof>
    </goal>
   </transf>
   </goal>
  </transf>
  </goal>
- <goal name="array_ok3&#39;vc" expl="VC for array_ok3">
- <transf name="split_vc" >
+ <goal name="array_ok3&#39;vc" expl="VC for array_ok3" proved="true">
+ <transf name="split_vc" proved="true" >
   <goal name="array_ok3&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="0" obsolete="true"><result status="valid" time="0.040000" steps="7302"/></proof>
-  <proof prover="1" obsolete="true"><result status="valid" time="0.010000" steps="3180"/></proof>
+  <proof prover="0"><result status="valid" time="0.040000" steps="2655"/></proof>
   <proof prover="2"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="3"><result status="valid" time="0.010000" steps="953"/></proof>
   </goal>
-  <goal name="array_ok3&#39;vc.1" expl="postcondition">
-  <transf name="inline_goal" >
-   <goal name="array_ok3&#39;vc.1.0" expl="postcondition">
-   <transf name="split_all_full" >
-    <goal name="array_ok3&#39;vc.1.0.0" expl="postcondition">
-    <proof prover="0" obsolete="true"><result status="valid" time="1.220000" steps="126144"/></proof>
+  <goal name="array_ok3&#39;vc.1" expl="postcondition" proved="true">
+  <transf name="inline_goal" proved="true" >
+   <goal name="array_ok3&#39;vc.1.0" expl="postcondition" proved="true">
+   <transf name="split_all_full" proved="true" >
+    <goal name="array_ok3&#39;vc.1.0.0" expl="postcondition" proved="true">
+    <proof prover="0"><result status="valid" time="0.116352" steps="15077"/></proof>
     </goal>
    </transf>
    </goal>
@@ -119,8 +119,8 @@
  </transf>
  </goal>
  <goal name="array_ok4&#39;vc" expl="VC for array_ok4" proved="true">
- <proof prover="1" obsolete="true"><result status="valid" time="0.030000" steps="106857"/></proof>
  <proof prover="2"><result status="valid" time="0.080000" steps="711"/></proof>
+ <proof prover="3"><result status="valid" time="0.030000" steps="121769"/></proof>
  </goal>
 </theory>
 </file>

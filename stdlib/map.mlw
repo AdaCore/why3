@@ -19,6 +19,14 @@ module Map
 
 end
 
+module Id
+
+  use Map
+
+  let function id : map 'a 'a = fun x -> x
+
+end
+
 module Const
 
   use Map

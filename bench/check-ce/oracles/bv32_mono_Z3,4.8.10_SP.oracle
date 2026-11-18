@@ -1,3 +1,37 @@
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
   - Concrete RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
@@ -7,7 +41,7 @@
   - Abstract RAC: FAILURE (postcondition at "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31)
 File "bench/check-ce/bv32_mono.mlw", line 11, characters 14-31:
 Sub-goal Postcondition of goal dummy_update'vc.
-Prover result is: Unknown (sat) (1193 steps).
+Prover result is: Unknown (sat) (1686 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File bv32_mono.mlw:
@@ -27,7 +61,24 @@ File bv32_mono.mlw:
       { lsenv = []; vsenv = [ r = { c = (132:t) }, result = () ]; rsenv = [];
         idenv = [ r = { c = (132:t) } ] }
 
+Warning: Error while interpreting u_sub_o_bv_def: No lsymbol found for qualified identifier (Qident (Isymbol bvule))
+
+Warning: Error while interpreting u_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
+Warning: Error while interpreting u_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 63)
+(Idx 32)))
+
 Warning: Error while interpreting to_int1: No lsymbol found for qualified identifier (Qident (Isymbol bvsle))
+
+Warning: Error while interpreting s_sub_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_mul_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
+
+Warning: Error while interpreting s_add_o_bv_def: Could not interpret (Qident (Iindexedsymbol extract (Idx 31)
+(Idx 31)))
 
 <check_ce:categorization>Categorizations of models:
 - Selected model 0: NC
@@ -38,7 +89,7 @@ Warning: Error while interpreting to_int1: No lsymbol found for qualified identi
   - Abstract RAC: STUCK (failure in precondition of `dummy_update_with_int` at "bench/check-ce/bv32_mono.mlw", line 15, characters 5-26)
 File "bench/check-ce/bv32_mono.mlw", line 17, characters 14-30:
 Sub-goal Postcondition of goal dummy_update_with_int'vc.
-Prover result is: Step limit exceeded (100046 steps).
+Prover result is: Step limit exceeded (100043 steps).
 The program does not comply to the verification goal, for example during the
   following execution:
 File bv32_mono.mlw:

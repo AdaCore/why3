@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.2.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<file format="coma" proved="true">
+<path name=".."/><path name="sudoku.coma"/>
+<theory name="Coma" proved="true">
+ <goal name="propagation_wf" proved="true">
+ <proof prover="1"><result status="valid" time="0.008012" steps="29464"/></proof>
+ </goal>
+ <goal name="vc_iteri" proved="true">
+ <proof prover="1"><result status="valid" time="0.004848" steps="1621"/></proof>
+ </goal>
+ <goal name="vc_check" proved="true">
+ <proof prover="1"><result status="valid" time="0.003248" steps="1621"/></proof>
+ </goal>
+ <goal name="vc_solve" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="vc_solve.0" proved="true">
+  <proof prover="1"><result status="valid" time="0.006982" steps="23886"/></proof>
+  </goal>
+  <goal name="vc_solve.1" proved="true">
+  <proof prover="1"><result status="valid" time="0.011803" steps="25146"/></proof>
+  </goal>
+  <goal name="vc_solve.2" proved="true">
+  <proof prover="1"><result status="valid" time="0.004217" steps="2020"/></proof>
+  </goal>
+  <goal name="vc_solve.3" proved="true">
+  <proof prover="1"><result status="valid" time="0.007464" steps="12456"/></proof>
+  </goal>
+  <goal name="vc_solve.4" proved="true">
+  <proof prover="1"><result status="valid" time="0.016141" steps="100489"/></proof>
+  </goal>
+  <goal name="vc_solve.5" proved="true">
+  <proof prover="1"><result status="valid" time="0.003267" steps="2104"/></proof>
+  </goal>
+  <goal name="vc_solve.6" proved="true">
+  <proof prover="1"><result status="valid" time="0.004001" steps="2109"/></proof>
+  </goal>
+  <goal name="vc_solve.7" proved="true">
+  <proof prover="1"><result status="valid" time="0.004204" steps="2132"/></proof>
+  </goal>
+  <goal name="vc_solve.8" proved="true">
+  <proof prover="1"><result status="valid" time="0.002020" steps="2016"/></proof>
+  </goal>
+  <goal name="vc_solve.9" proved="true">
+  <proof prover="1"><result status="valid" time="0.005053" steps="2478"/></proof>
+  </goal>
+  <goal name="vc_solve.10" proved="true">
+  <proof prover="1"><result status="valid" time="0.001870" steps="2498"/></proof>
+  </goal>
+  <goal name="vc_solve.11" proved="true">
+  <proof prover="1"><result status="valid" time="0.005569" steps="3702"/></proof>
+  </goal>
+  <goal name="vc_solve.12" proved="true">
+  <proof prover="1"><result status="valid" time="0.011627" steps="49072"/></proof>
+  </goal>
+  <goal name="vc_solve.13" proved="true">
+  <proof prover="1"><result status="valid" time="0.008444" steps="45156"/></proof>
+  </goal>
+  <goal name="vc_solve.14" proved="true">
+  <proof prover="1"><result status="valid" time="0.010460" steps="55671"/></proof>
+  </goal>
+  <goal name="vc_solve.15" proved="true">
+  <proof prover="0"><result status="valid" time="0.238302" steps="56760"/></proof>
+  </goal>
+  <goal name="vc_solve.16" proved="true">
+  <proof prover="1"><result status="valid" time="0.003808" steps="2507"/></proof>
+  </goal>
+  <goal name="vc_solve.17" proved="true">
+  <proof prover="1"><result status="valid" time="0.010884" steps="2860"/></proof>
+  </goal>
+  <goal name="vc_solve.18" proved="true">
+  <proof prover="1"><result status="valid" time="0.004893" steps="2880"/></proof>
+  </goal>
+  <goal name="vc_solve.19" proved="true">
+  <proof prover="1"><result status="valid" time="0.002923" steps="4264"/></proof>
+  </goal>
+  <goal name="vc_solve.20" proved="true">
+  <proof prover="1"><result status="valid" time="0.016814" steps="67276"/></proof>
+  </goal>
+  <goal name="vc_solve.21" proved="true">
+  <proof prover="1"><result status="valid" time="0.009749" steps="50653"/></proof>
+  </goal>
+  <goal name="vc_solve.22" proved="true">
+  <proof prover="1"><result status="valid" time="0.015742" steps="76371"/></proof>
+  </goal>
+  <goal name="vc_solve.23" proved="true">
+  <proof prover="0"><result status="valid" time="0.074414" steps="22706"/></proof>
+  </goal>
+  <goal name="vc_solve.24" proved="true">
+  <proof prover="1"><result status="valid" time="0.005608" steps="65271"/></proof>
+  </goal>
+  <goal name="vc_solve.25" proved="true">
+  <proof prover="1"><result status="valid" time="0.030534" steps="274441"/></proof>
+  </goal>
+  <goal name="vc_solve.26" proved="true">
+  <proof prover="1"><result status="valid" time="0.010817" steps="47822"/></proof>
+  </goal>
+  <goal name="vc_solve.27" proved="true">
+  <proof prover="1"><result status="valid" time="0.006183" steps="19939"/></proof>
+  </goal>
+  <goal name="vc_solve.28" proved="true">
+  <proof prover="1"><result status="valid" time="0.021031" steps="100471"/></proof>
+  </goal>
+  <goal name="vc_solve.29" proved="true">
+  <proof prover="1"><result status="valid" time="0.112314" steps="234752"/></proof>
+  </goal>
+  <goal name="vc_solve.30" proved="true">
+  <proof prover="1"><result status="valid" time="0.006283" steps="2566"/></proof>
+  </goal>
+  <goal name="vc_solve.31" proved="true">
+  <proof prover="1"><result status="valid" time="0.012703" steps="48440"/></proof>
+  </goal>
+  <goal name="vc_solve.32" proved="true">
+  <proof prover="1"><result status="valid" time="0.071073" steps="510397"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="vc_solve_main" proved="true">
+ <proof prover="1"><result status="valid" time="0.005026" steps="21585"/></proof>
+ </goal>
+</theory>
+</file>
+</why3session>

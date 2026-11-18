@@ -1,0 +1,65 @@
+(ocamllex why3wc)
+
+(library
+ (name why3bench)
+ (libraries unix why3)
+ (modules why3bench))
+
+(library
+ (name why3config)
+ (libraries why3)
+ (modules why3config))
+
+(library
+ (name why3execute)
+ (libraries why3)
+ (modules why3execute))
+
+(library
+ (name why3extract)
+ (libraries why3)
+ (modules why3extract))
+
+(library
+ (name why3pp)
+ (libraries why3)
+ (modules why3pp))
+
+(library
+ (name why3prove)
+ (libraries why3)
+ (modules why3prove))
+
+(library
+ (name why3realize)
+ (libraries why3)
+ (modules why3realize))
+
+(library
+ (name why3replay)
+ (libraries why3)
+ (modules why3replay))
+
+(library
+ (name why3shell)
+ (libraries why3)
+ (modules why3shell))
+
+(library
+ (name why3show)
+ (libraries why3)
+ (modules why3show))
+
+(library
+ (name why3wc)
+ (libraries why3)
+ (modules why3wc))
+
+(executable
+ (name main)
+ (libraries dynlink why3)
+ (modes byte exe)
+ (link_flags (:standard -linkall))
+ (modules main))
+
+(include_subdirs no)
