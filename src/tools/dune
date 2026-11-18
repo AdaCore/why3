@@ -57,7 +57,7 @@
 
 (executable
  (name main)
- (libraries dynlink why3)
+ (libraries dynlink why3 yojson sexplib)
  (modes byte exe)
  (link_flags (:standard -linkall))
  (modules main))
