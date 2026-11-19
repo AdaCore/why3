@@ -44,7 +44,10 @@ val get_debug_formatter : unit -> Format.formatter
 (** Get the formatter used when printing debug material. *)
 
 val dprintf : flag -> ('a, Format.formatter, unit) format -> 'a
-(** Print only if the flag is set. *)
+(** Print only if the flag is set. Expanded by the local debug_optim PPX. *)
+
+val dprintf_no_expansion : flag -> ('a, Format.formatter, unit) format -> 'a
+(** Same as {!dprintf}, without PPX expansion. *)
 
 val stack_trace : flag
 (** "stack_trace" flag. *)

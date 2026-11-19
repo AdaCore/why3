@@ -84,6 +84,7 @@ let dprintf flag s =
     end
   else Format.ifprintf !formatter s
 
+let dprintf_no_expansion = dprintf
 
 (*** Command-line arguments ****)
 
