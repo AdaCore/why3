@@ -169,8 +169,6 @@ let warning_active id =
 
 let disable_warning id = unset_flag (lookup_flag id)
 
-let disable_warning id = unset_flag (lookup_flag id)
-
 let without_warning name inner =
   let old = Hashtbl.find warning_table name in
   if not old.enabled then inner ()

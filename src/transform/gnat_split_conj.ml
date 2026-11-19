@@ -200,7 +200,7 @@ let all_vars tl =
   with Notallvars -> None
 
 let rec has_pretty_labels t =
-  let is_pretty_label s = Strings.has_prefix "GP_Pretty_Ada" s in
+  let is_pretty_label s = Strings.has_prefix ~prefix:"GP_Pretty_Ada" s in
   if Ident.Sattr.exists (fun a -> is_pretty_label a.Ident.attr_string) t.t_attrs then true
   else match t.t_node with
   | Tvar _ | Tconst _ | Tapp _ | Ttrue | Tfalse -> false

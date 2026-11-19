@@ -31,8 +31,6 @@ val intros :
  (** [intros ?known_map G f] returns the declarations after introducing
      premises of [goal G : f] *)
 
-val simplify_intros : Task.task Trans.trans
-
 val introduce_premises : Task.task Trans.trans
 (** [introduce_premises] pushes the universal quantifications, the
    implications and the let bindings of the goal into the context,

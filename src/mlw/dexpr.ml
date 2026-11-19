@@ -1303,9 +1303,6 @@ let check_unused_variable_fun (bl: Ity.pvsymbol list) (dsp: dspec_final) eff_rea
 
 (** Abstract values *)
 
-let attr_w_unmodified_var_no =
-  Ident.create_attribute "W:unmodified_variable:N"
-
 let cty_of_spec loc env bl mask dsp dity =
   let ity = ity_of_dity dity in
   let bl = binders env.ghs bl in
@@ -1323,6 +1320,8 @@ let cty_of_spec loc env bl mask dsp dity =
   check_unused_variable_fun bl dsp None;
   let cty = create_cty_defensive ~mask bl p q xq (get_oldies old) eff ity in
   (* Not useful in SPARK:
+  let attr_w_unmodified_var_no =
+    Ident.create_attribute "W:unmodified_variable:N" in
   (\* check that oldies are affected by the writes *\)
   let check_affected _ pv =
     if not (pv_affected cty.cty_effect.eff_writes pv) &&
