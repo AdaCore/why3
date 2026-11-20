@@ -4396,7 +4396,7 @@ printf %s "checking for ppxlib using ocamlfind... " >&6; }
   if test -n "$PPXLIB"; then
     PPXLIBVERSION=$($OCAMLFIND query -format "%v" ppxlib 2> /dev/null | tr -d '\r')
     as_arg_v1=$PPXLIBVERSION
-as_arg_v2=0.33.0
+as_arg_v2=0.25.0
 awk "$as_awk_strverscmp" v1="$as_arg_v1" v2="$as_arg_v2" /dev/null
 case $? in #(
   1) :
@@ -4404,7 +4404,7 @@ case $? in #(
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no (version $PPXLIBVERSION is too old)" >&5
 printf "%s\n" "no (version $PPXLIBVERSION is too old)" >&6; }
       enable_ppx=no
-      reason_ppx=" (ppxlib >= 0.33 not found)" ;; #(
+      reason_ppx=" (ppxlib >= 0.25 not found)" ;; #(
   0) :
 
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5

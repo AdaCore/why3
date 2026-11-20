@@ -399,14 +399,14 @@ if test "$enable_ocamlfind" = yes; then
   PPXLIB=$($OCAMLFIND query ppxlib 2> /dev/null | tr -d '\r')
   if test -n "$PPXLIB"; then
     PPXLIBVERSION=$($OCAMLFIND query -format "%v" ppxlib 2> /dev/null | tr -d '\r')
-    AX_VERSION_GE([$PPXLIBVERSION], 0.33.0, [
+    AX_VERSION_GE([$PPXLIBVERSION], 0.25.0, [
       AC_MSG_RESULT([yes])
       DEBUGOPTIMPPX="(pps ppx_debug_optim)"
       enable_ppx=yes
     ], [
       AC_MSG_RESULT([no (version $PPXLIBVERSION is too old)])
       enable_ppx=no
-      reason_ppx=" (ppxlib >= 0.33 not found)"])
+      reason_ppx=" (ppxlib >= 0.25 not found)"])
   else
     AC_MSG_RESULT([no])
     enable_ppx=no
