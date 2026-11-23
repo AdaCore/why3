@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -123,7 +123,7 @@ let connect_external socket_name =
   Buffer.clear recv_buf;
   client_connect ~fail:true socket_name
 
-let connect_internal libdir =
+let connect_internal _libdir =
   if is_connected () then raise AlreadyConnected;
   Buffer.clear recv_buf;
   let cwd = Unix.getcwd () in

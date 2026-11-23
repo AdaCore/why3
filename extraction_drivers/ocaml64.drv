@@ -150,12 +150,11 @@ end
 module set.SetAppInt
   prelude export "module SetAppInt = Set.Make(Z)\n"
   prelude export
-  "let interval l r =\
+  "let interval_Z l r =\
    \n  let rec aux acc l r =\
    \n    if Z.leq r l then acc\
    \n    else aux (SetAppInt.add l acc) (Z.add l Z.one) r\
    \n  in aux SetAppInt.empty l r\n"
-
   prelude export "exception SetAppIntIterDone\n"
 
   syntax type set      "SetAppInt.t"
@@ -174,7 +173,7 @@ module set.SetAppInt
   syntax val  cardinal "Z.of_int (SetAppInt.cardinal %1)" prec 4 3
   syntax val  min_elt  "SetAppInt.min_elt %1" prec 4 3
   syntax val  max_elt  "SetAppInt.max_elt %1" prec 4 3
-  syntax val  interval "interval %1 %2" prec 4 3 3
+  syntax val  interval "interval_Z %1 %2" prec 4 3 3
 
   syntax type Iter.t        "(Z.t Seq.t) ref"
   syntax exception Iter.Done "SetAppIntIterDone"
@@ -183,8 +182,34 @@ module set.SetAppInt
 
 end
 
+module set.SetAppInt63
+  prelude export "module SetAppInt63 = Set.Make(Int)\n"
+  prelude export "exception SetAppInt63IterDone\n"
+  syntax type set      "SetAppInt63.t"
+  syntax val  (==)     "SetAppInt63.equal %1 %2" prec 4 3 3
+  syntax val  subset   "SetAppInt63.subset %1 %2" prec 4 3 3
+  syntax val  empty    "%1; SetAppInt63.empty" prec 17 16
+  syntax val  is_empty "SetAppInt63.is_empty %1" prec 4 3
+  syntax val  add      "SetAppInt63.add %1 %2" prec 4 3 3
+  syntax val  mem      "SetAppInt63.mem %1 %2" prec 4 3 3
+  syntax val  remove   "SetAppInt63.remove %1 %2" prec 4 3 3
+  syntax val  union    "SetAppInt63.union %1 %2" prec 4 3 3
+  syntax val  inter    "SetAppInt63.inter %1 %2" prec 4 3 3
+  syntax val  diff     "SetAppInt63.diff %1 %2" prec 4 3 3
+  syntax val  choose   "SetAppInt63.choose %1" prec 4 3
+  syntax val  disjoint "SetAppInt63.disjoint %1 %2" prec 4 3 3
+  syntax val  cardinal "Z.of_int (SetAppInt63.cardinal %1)" prec 4 3
+
+  syntax type Iter.t        "(int Seq.t) ref"
+  syntax exception Iter.Done "SetAppInt63IterDone"
+  syntax val  Iter.create   "ref (SetAppInt63.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise SetAppInt63IterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+end
+
 module set.SetAppString
-  prelude export "module SetAppString = Set.Make(String)\nexception SetAppStringIterDone\n"
+  prelude export "module SetAppString = Set.Make(String)\n"
+  prelude export "exception SetAppStringIterDone\n"
   syntax type set      "SetAppString.t"
   syntax val  (==)     "SetAppString.equal %1 %2" prec 4 3 3
   syntax val  subset   "SetAppString.subset %1 %2" prec 4 3 3
@@ -222,17 +247,69 @@ module set.SetImpInt
 end
 
 module fmap.MapAppInt
-  prelude "module MapAppInt = Map.Make(Z)"
+  prelude export "module MapAppInt = Map.Make(Z)\n"
+  prelude export "exception MapAppIntIterDone\n"
+
   syntax type t        "%1 MapAppInt.t"
-  syntax val  create   "%1; MapAppInt.empty" prec 17 16
+  syntax val  create   "(let _ = %1 in MapAppInt.empty)" prec 17 16
   syntax val  is_empty "MapAppInt.is_empty"
   syntax val  add      "MapAppInt.add"
   syntax val  find     "MapAppInt.find"
   syntax val  find_exn "MapAppInt.find"
   syntax val  mem      "MapAppInt.mem"
   syntax val  remove   "MapAppInt.remove"
+  syntax val  mapi     "MapAppInt.mapi"
   syntax val  size     "Z.of_int (MapAppInt.cardinal %1)" prec 4 3
+
+  syntax type Iter.iter        "((Z.t * %1) Seq.t) ref"
+  syntax exception Iter.Done "MapAppIntIterDone"
+  syntax val  Iter.create   "ref (MapAppInt.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise MapAppIntIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
 end
+
+module fmap.MapAppInt63
+  prelude export "module MapAppInt63 = Map.Make(Int)\n"
+  prelude export "exception MapAppInt63IterDone\n"
+
+  syntax type t        "%1 MapAppInt63.t"
+  syntax val  create   "(let _ = %1 in MapAppInt63.empty)" prec 17 16
+  syntax val  is_empty "MapAppInt63.is_empty"
+  syntax val  add      "MapAppInt63.add"
+  syntax val  find     "MapAppInt63.find"
+  syntax val  find_exn "MapAppInt63.find"
+  syntax val  mem      "MapAppInt63.mem"
+  syntax val  remove   "MapAppInt63.remove"
+  syntax val  mapi     "MapAppInt63.mapi"
+  syntax val  size     "Z.of_int (MapAppInt63.cardinal %1)" prec 4 3
+
+  syntax type Iter.iter        "((int * %1) Seq.t) ref"
+  syntax exception Iter.Done "MapAppInt63IterDone"
+  syntax val  Iter.create   "ref (MapAppInt63.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise MapAppInt63IterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+end
+
+module fmap.MapAppString
+  prelude export "module MapAppString = Map.Make(String)\nexception MapAppStringIterDone\n"
+  syntax type t        "%1 MapAppString.t"
+  syntax val  create   "(let _ = %1 in MapAppString.empty)"
+  syntax val  is_empty "MapAppString.is_empty"
+  syntax val  add      "MapAppString.add"
+  syntax val  find     "MapAppString.find"
+  syntax val  find_exn "MapAppString.find"
+  syntax val  mem      "MapAppString.mem"
+  syntax val  remove   "MapAppString.remove"
+  syntax val  mapi     "MapAppString.mapi"
+
+  syntax type Iter.iter        "((string * %1) Seq.t) ref"
+  syntax exception Iter.Done "MapAppStringIterDone"
+  syntax val  Iter.create   "ref (MapAppString.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise MapAppStringIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+
+end
+
 
 module fmap.MapImpInt
   (* prelude "let create () = Hashtbl.create 8" *)
@@ -412,6 +489,52 @@ module mach.peano.Int63
   syntax val  to_int63    "%1"
   syntax val  of_int63    "%1"
 end
+
+module mach.peano.SetPeano
+  prelude export "module SetAppPeano = Set.Make(Int)\n"
+  prelude export "exception SetAppPeanoIterDone\n"
+  syntax type set      "SetAppPeano.t"
+  syntax val  (==)     "SetAppPeano.equal %1 %2" prec 4 3 3
+  syntax val  subset   "SetAppPeano.subset %1 %2" prec 4 3 3
+  syntax val  empty    "%1; SetAppPeano.empty" prec 17 16
+  syntax val  is_empty "SetAppPeano.is_empty %1" prec 4 3
+  syntax val  add      "SetAppPeano.add %1 %2" prec 4 3 3
+  syntax val  mem      "SetAppPeano.mem %1 %2" prec 4 3 3
+  syntax val  remove   "SetAppPeano.remove %1 %2" prec 4 3 3
+  syntax val  union    "SetAppPeano.union %1 %2" prec 4 3 3
+  syntax val  inter    "SetAppPeano.inter %1 %2" prec 4 3 3
+  syntax val  diff     "SetAppPeano.diff %1 %2" prec 4 3 3
+  syntax val  choose   "SetAppPeano.choose %1" prec 4 3
+  syntax val  disjoint "SetAppPeano.disjoint %1 %2" prec 4 3 3
+  syntax val  cardinal "Z.of_int (SetAppPeano.cardinal %1)" prec 4 3
+
+  syntax type Iter.t        "(int Seq.t) ref"
+  syntax exception Iter.Done "SetAppPeanoIterDone"
+  syntax val  Iter.create   "ref (SetAppPeano.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise SetAppPeanoIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+end
+
+module mach.peano.MapPeano
+  prelude export "module MapAppPeano = Map.Make(Int)\n"
+  prelude export "exception MapAppPeanoIterDone\n"
+  syntax type t        "%1 MapAppPeano.t"
+  syntax val  create   "(let _ = %1 in MapAppPeano.empty)"
+  syntax val  is_empty "MapAppPeano.is_empty"
+  syntax val  add      "MapAppPeano.add"
+  syntax val  find     "MapAppPeano.find"
+  syntax val  find_exn "MapAppPeano.find"
+  syntax val  mem      "MapAppPeano.mem"
+  syntax val  remove   "MapAppPeano.remove"
+
+  syntax type Iter.iter        "((int * %1) Seq.t) ref"
+  syntax exception Iter.Done "MapAppPeanoIterDone"
+  syntax val  Iter.create   "ref (MapAppPeano.to_seq %1)" prec 4 3
+  syntax val  Iter.next     "begin let t = (%1) in match !t () with Seq.Nil -> raise MapAppPeanoIterDone | Seq.Cons (e,nt) -> t := nt; e end"
+
+end
+
+
 
 module mach.onetime.OneTime
   syntax type t      "int"

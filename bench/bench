@@ -44,14 +44,32 @@ enabled () {
     [[ -z "$enabled_categories" || " $enabled_categories " =~ " $1 " ]]
 }
 
-simple_test() {
+simple_test_raw() {
     if ! "$@" > /dev/null 2> /dev/null; then
         echo "failed!"
         echo "$@"
         "$@"
-        exit 1
+        return 1
     fi
     echo "ok"
+    return 0
+}
+
+simple_test() {
+    ret=simple_test_raw "$@"
+    if ! $ret; then
+        exit $ret
+    fi
+}
+
+failed_simple_tests=""
+
+simple_test_no_exit() {
+    name=$1
+    shift 1
+    if ! simple_test_raw "$@"; then
+        failed_simple_tests="$failed_simple_tests$name\n"
+    fi
 }
 
 # TODO: remove the hack about int.mlw once it has become builtin
@@ -169,10 +187,16 @@ valid_goals () {
     bin/why3$suffix config list-provers | grep -q Alt-Ergo || return 0
     pgm="bin/why3$suffix prove"
     test -d $1 || exit 1
+    failed_simple_tests=""
     for f in $1/*.mlw; do
         printf "  $f... "
-        simple_test $pgm -t 15 -P alt-ergo $2 $f
-    done
+        simple_test_no_exit $f $pgm -t 15 -P alt-ergo $2 $f
+    done;
+    if test "$failed_simple_tests" != ""; then
+        printf "the following tests did not replay as expected:\n"
+        printf $failed_simple_tests
+        exit 1
+    fi
 }
 
 invalid_goals () {
@@ -274,7 +298,7 @@ replay () {
     test -d $1 || exit 1
     for f in $1/*/; do
         printf "  $f... "
-        simple_test $pgm $2 $f
+        simple_test_no_exit $f $pgm $2 $f
     done
 }
 
@@ -583,9 +607,9 @@ echo ""
 fi
 
 if enabled validgoals; then
-echo "=== Checking valid goals ==="
-valid_goals bench/valid
-echo ""
+    echo "=== Checking valid goals ==="
+    valid_goals bench/valid
+    echo ""
 fi
 
 if enabled validsplitgoals; then
@@ -726,6 +750,7 @@ extract_and_run bench/extraction/test
 extract_and_run bench/extraction/interface1
 extract_and_run bench/extraction/894_clone_module_with_interface
 extract_and_run examples/set_iterators
+extract_and_run examples/map_iterators
 extract_and_run examples/split_string
 extract_and_run examples/residual
 extract_and_run examples/euler001 1000000
@@ -734,9 +759,7 @@ extract_and_run examples/vstte10_max_sum
 extract_and_run examples/vstte12_combinators "((((K K) K) K) K)"
 extract_and_run examples/defunctionalization
 extract_and_run examples/sudoku 2,0,9,0,0,0,0,1,0,0,0,0,0,6,0,0,0,0,0,5,3,8,0,2,7,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,7,5,0,0,3,0,4,1,2,0,8,9,0,0,0,0,4,0,9,0,0,2,0,8,0,0,0,0,1,0,0,5,0,0,0,0,0,0,0,7,6
-if test -n "$has_ocamlfind"; then
-    extract_and_run examples/prover
-fi
+extract_and_run examples/prover
 echo ""
 fi
 
@@ -763,6 +786,7 @@ fi
 
 if enabled replay; then
 echo "=== Checking replay (no prover) ==="
+failed_simple_tests=""
 replay bench/replay
 replay examples/stdlib --merging-only
 replay examples/bts --merging-only
@@ -789,6 +813,11 @@ replay examples/prover "-L examples/prover --merging-only --warn-off=unused_vari
 replay examples/mlcfg --merging-only
 replay examples/coma --merging-only
 echo ""
+if test "$failed_simple_tests" != ""; then
+    printf "the following tests did not replay as expected:\n"
+    printf $failed_simple_tests
+    exit 1
+fi
 fi
 
 if enabled stackify && test -n "$has_stackify"; then

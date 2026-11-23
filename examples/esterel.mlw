@@ -52,11 +52,14 @@ module Esterel
     requires { not is_empty a.mdl }
     ensures { result.mdl = interval (min_elt a.mdl) size }
   = let ghost p = min_elt a.mdl in
+    assert { eq_sub a.bv zeros 0 p };
     let ghost p_bv = of_int p in
     assert { eq_sub_bv a.bv zeros zeros p_bv };
     let res = bw_or a.bv (neg a.bv) in
     assert { eq_sub_bv res zeros zeros p_bv };
     assert { eq_sub_bv res ones p_bv (sub size_bv p_bv) };
+    assert { eq_sub res ones p (size - p) };
+    assert { forall i. p <= i < size -> nth ones i = True by nth_bv ones (of_int i) = True };
     { bv = res;
       mdl = interval p size }
 

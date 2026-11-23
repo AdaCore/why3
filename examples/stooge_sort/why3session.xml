@@ -5,7 +5,7 @@
 <prover id="0" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="stooge_sort.mlw"/>
 <theory name="Top" proved="true">
@@ -29,7 +29,7 @@
    <proof prover="2"><result status="valid" time="0.044775" steps="113290"/></proof>
    </goal>
    <goal name="key_lemma&#39;vc.4.1" expl="postcondition" proved="true">
-   <proof prover="3" timelimit="5"><result status="valid" time="0.077436" steps="160"/></proof>
+   <proof prover="4" timelimit="5"><result status="valid" time="0.077436" steps="160"/></proof>
    </goal>
   </transf>
   </goal>
@@ -40,16 +40,16 @@
   <proof prover="2"><result status="valid" time="0.026779" steps="111792"/></proof>
   </goal>
   <goal name="key_lemma&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.160979" steps="34899"/></proof>
+  <proof prover="1"><result status="valid" time="0.160979" steps="34676"/></proof>
   </goal>
   <goal name="key_lemma&#39;vc.8" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.154592" steps="27563"/></proof>
+  <proof prover="0"><result status="valid" time="0.154592" steps="27478"/></proof>
   </goal>
   <goal name="key_lemma&#39;vc.9" expl="out of loop bounds" proved="true">
   <proof prover="2"><result status="valid" time="0.013062" steps="10603"/></proof>
   </goal>
   <goal name="key_lemma&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.287573" steps="755"/></proof>
+  <proof prover="4"><result status="valid" time="0.287573" steps="762"/></proof>
   </goal>
  </transf>
  </goal>
@@ -107,7 +107,7 @@
   <proof prover="2"><result status="valid" time="0.009713" steps="7072"/></proof>
   </goal>
   <goal name="stooge_sort_rec&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.031170" steps="20"/></proof>
+  <proof prover="4" timelimit="5"><result status="valid" time="0.031170" steps="20"/></proof>
   </goal>
   <goal name="stooge_sort_rec&#39;vc.18" expl="variant decrease" proved="true">
   <proof prover="2"><result status="valid" time="0.033902" steps="10494"/></proof>
@@ -133,7 +133,7 @@
    <proof prover="2"><result status="valid" time="0.014086" steps="10588"/></proof>
    </goal>
    <goal name="stooge_sort_rec&#39;vc.24.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.031807" steps="8"/></proof>
+   <proof prover="4"><result status="valid" time="0.031807" steps="8"/></proof>
    </goal>
   </transf>
   </goal>
@@ -200,7 +200,7 @@
    <goal name="stooge_sort_rec&#39;vc.42.0" expl="true case (assertion)" proved="true">
    <transf name="instantiate" proved="true" arg1="Ensures" arg2="j">
     <goal name="stooge_sort_rec&#39;vc.42.0.0" expl="true case (assertion)" proved="true">
-    <proof prover="0"><result status="valid" time="0.569792" steps="48724"/></proof>
+    <proof prover="0"><result status="valid" time="0.332120" steps="48724"/></proof>
     </goal>
    </transf>
    </goal>
@@ -225,10 +225,10 @@
   <proof prover="2"><result status="valid" time="0.045750" steps="106649"/></proof>
   </goal>
   <goal name="stooge_sort_rec&#39;vc.48" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.421338" steps="723"/></proof>
+  <proof prover="4"><result status="valid" time="0.262354" steps="723"/></proof>
   </goal>
   <goal name="stooge_sort_rec&#39;vc.49" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.338499" steps="729"/></proof>
+  <proof prover="4"><result status="valid" time="0.338499" steps="728"/></proof>
   </goal>
   <goal name="stooge_sort_rec&#39;vc.50" expl="postcondition" proved="true">
   <transf name="split_vc" proved="true" >

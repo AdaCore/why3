@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
+"https://www.why3.org/why3session.dtd">
+<why3session shape_version="6">
+<prover id="0" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<file format="whyml" proved="true">
+<path name=".."/><path name="map_iterators.mlw"/>
+<theory name="TestIntMapIterator" proved="true">
+ <goal name="incr&#39;vc" expl="VC for incr" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="incr&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.011621" steps="27382"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="2"><result status="valid" time="0.034435" steps="3659"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.015018" steps="50507"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.050656" steps="177"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.040804" steps="124"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.011658" steps="44724"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.015045" steps="35537"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.028598" steps="63"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="0"><result status="valid" time="0.049579" steps="7011"/></proof>
+  </goal>
+  <goal name="incr&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="2"><result status="valid" time="0.031882" steps="4113"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestPeanoMapIterator" proved="true">
+ <goal name="incr_peano&#39;vc" expl="VC for incr_peano" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="incr_peano&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.024972" steps="28274"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.016607" steps="34252"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="1"><result status="valid" time="0.035399" steps="117"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.076972" steps="7927"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.041686" steps="127"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.059188" steps="6289"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.071309" steps="7539"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.036232" steps="72"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.013732" steps="39174"/></proof>
+  </goal>
+  <goal name="incr_peano&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.015947" steps="37195"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestInt63MapIterator" proved="true">
+ <goal name="incr63&#39;vc" expl="VC for incr63" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="incr63&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.013586" steps="29641"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.019077" steps="35608"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.065063" steps="7276"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.086788" steps="8128"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.039765" steps="136"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.014864" steps="46816"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.052473" steps="7878"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="0"><result status="valid" time="0.074426" steps="8098"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.018810" steps="40578"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.011791" steps="38515"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+<theory name="TestStringMapIterator" proved="true">
+ <goal name="incr63&#39;vc" expl="VC for incr63" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="incr63&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.020658" steps="41037"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.013719" steps="47006"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.2" expl="loop variant decrease" proved="true">
+  <proof prover="3"><result status="valid" time="0.021033" steps="63965"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.3" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.139190" steps="11489"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.4" expl="loop invariant preservation" proved="true">
+  <proof prover="1"><result status="valid" time="0.074514" steps="161"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.5" expl="loop variant decrease" proved="true">
+  <proof prover="2"><result status="valid" time="0.084869" steps="9846"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.027224" steps="50018"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="2"><result status="valid" time="0.063481" steps="8249"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.8" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.033374" steps="52468"/></proof>
+  </goal>
+  <goal name="incr63&#39;vc.9" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.018229" steps="50447"/></proof>
+  </goal>
+ </transf>
+ </goal>
+</theory>
+</file>
+</why3session>

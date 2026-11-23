@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -78,6 +78,7 @@ type engine
 type params = {
   compute_defs : bool;
   compute_builtin : bool;
+  compute_in_branches : bool;
   compute_def_set : Term.Sls.t;
   compute_max_quantifier_domain : int;
 }

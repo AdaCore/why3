@@ -2,85 +2,85 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.6.0" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.11.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.13.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name=".."/><path name=".."/><path name="stdlib"/>
 <path name="pqueue.mlw"/>
 <theory name="Pqueue" proved="true">
  <goal name="t&#39;vc" expl="VC for t" proved="true">
- <proof prover="3"><result status="valid" time="0.020000" steps="47230"/></proof>
+ <proof prover="1"><result status="valid" time="0.020000" steps="43024"/></proof>
  </goal>
 </theory>
 <theory name="Harness" proved="true">
  <goal name="PQ.Refl" proved="true">
- <proof prover="2"><result status="valid" time="0.050000" steps="15332"/></proof>
+ <proof prover="5"><result status="valid" time="0.050000" steps="15333"/></proof>
  </goal>
  <goal name="PQ.Trans" proved="true">
- <proof prover="2"><result status="valid" time="0.060000" steps="15996"/></proof>
+ <proof prover="5"><result status="valid" time="0.060000" steps="15997"/></proof>
  </goal>
  <goal name="PQ.Total" proved="true">
- <proof prover="2"><result status="valid" time="0.030000" steps="16091"/></proof>
+ <proof prover="5"><result status="valid" time="0.030000" steps="16092"/></proof>
  </goal>
  <goal name="heapsort&#39;vc" expl="VC for heapsort" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="heapsort&#39;vc.0" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.050000" steps="22339"/></proof>
+  <proof prover="5"><result status="valid" time="0.050000" steps="22340"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.1" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.090000" steps="34704"/></proof>
+  <proof prover="5"><result status="valid" time="0.090000" steps="34709"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.2" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="25945"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="25946"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.3" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="27077"/></proof>
+  <proof prover="5"><result status="valid" time="0.060000" steps="27078"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.4" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.140000" steps="840"/></proof>
+  <proof prover="4"><result status="valid" time="0.140000" steps="836"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.5" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="25908"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="25909"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.6" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.060000" steps="31266"/></proof>
+  <proof prover="5"><result status="valid" time="0.060000" steps="31269"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.7" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="26299"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="26300"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.8" expl="loop invariant init" proved="true">
-  <proof prover="2"><result status="valid" time="0.110000" steps="32070"/></proof>
+  <proof prover="5"><result status="valid" time="0.110000" steps="32090"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.050000" steps="27664"/></proof>
+  <proof prover="5"><result status="valid" time="0.050000" steps="27665"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.10" expl="index in array bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="27804"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="27805"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.11" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.010000" steps="100"/></proof>
+  <proof prover="4"><result status="valid" time="0.010000" steps="100"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.12" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.030000" steps="579"/></proof>
+  <proof prover="4"><result status="valid" time="0.030000" steps="564"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.13" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="398"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="398"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.14" expl="loop invariant preservation" proved="true">
-  <proof prover="0"><result status="valid" time="0.720000" steps="8592"/></proof>
+  <proof prover="4"><result status="valid" time="1.062989" steps="8612"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="30002"/></proof>
+  <proof prover="5"><result status="valid" time="0.070000" steps="30005"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="0" timelimit="10" memlimit="4000"><result status="valid" time="1.852625" steps="13492"/></proof>
+  <proof prover="4" timelimit="10" memlimit="4000"><result status="valid" time="2.672124" steps="13495"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.17" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.040000" steps="26243"/></proof>
+  <proof prover="5"><result status="valid" time="0.040000" steps="26244"/></proof>
   </goal>
   <goal name="heapsort&#39;vc.18" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.070000" steps="32438"/></proof>
+  <proof prover="5"><result status="valid" time="0.070000" steps="32439"/></proof>
   </goal>
  </transf>
  </goal>

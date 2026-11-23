@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -55,10 +55,12 @@ val file_of_theory : driver -> string -> Theory.theory -> string
 (** [file_of_theory d f th] produces a filename
     for the prover of driver [d], for a theory [th] from filename [f] *)
 
-val get_filename : driver ->
+val get_filename :
+  ?sanitize:(string -> string) ->
   input_file:string ->
   theory_name:string ->
   goal_name:string ->
+  driver ->
   string
 (** Mangles a filename for the prover of the given driver *)
 

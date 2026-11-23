@@ -1,0 +1,33 @@
+(rule
+ (enabled_if (= @enable_re@ yes))
+ (action (copy myre.real.ml myre.ml)))
+
+(rule
+ (enabled_if (<> @enable_re@ yes))
+ (action (copy myre.dummy.ml myre.ml)))
+
+(rule
+ (enabled_if (= @enable_mpfr@ yes))
+ (action (copy mlmpfr_wrapper.real.ml mlmpfr_wrapper.ml)))
+
+(rule
+ (enabled_if (<> @enable_mpfr@ yes))
+ (action (copy mlmpfr_wrapper.dummy.ml mlmpfr_wrapper.ml)))
+
+(rule
+ (enabled_if (= @enable_zip@ yes))
+ (action (copy compress.z.ml compress.ml)))
+
+(rule
+ (enabled_if (<> @enable_zip@ yes))
+ (action (copy compress.none.ml compress.ml)))
+
+(library
+ (name why3deps)
+ (package why3)
+ (libraries @RELIB@ @MLMPFR@ @ZIPLIBDUNE@
+  (select mygraph.ml from
+   (ocamlgraph -> mygraph.real.ml)
+   (           -> mygraph.dummy.ml))))
+
+(include_subdirs no)

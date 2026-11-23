@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -11,11 +11,11 @@
 open Js_of_ocaml
 open Js
 
-let log s = ignore (Firebug.console ## log (string s))
+let log s = ignore (Console.console ## log (string s))
 
 let log_time s =
   let date = new%js date_now in
-  let date_str = string_of_float (date ## getTime /. 1000.) in
+  let date_str = Js.to_string date ## toString in
   log (date_str ^ " : " ^ s)
 
 let check_def s o =

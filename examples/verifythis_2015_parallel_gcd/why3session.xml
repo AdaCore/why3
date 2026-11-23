@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2015_parallel_gcd.mlw"/>
 <theory name="ParallelGCD" proved="true">
@@ -93,7 +93,7 @@
   <proof prover="6"><result status="valid" time="0.020168" steps="32820"/></proof>
   </goal>
   <goal name="step&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.047904" steps="117"/></proof>
+  <proof prover="0"><result status="valid" time="0.047904" steps="117"/></proof>
   </goal>
   <goal name="step&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="7"><result status="valid" time="0.074194" steps="13435"/></proof>
@@ -102,10 +102,10 @@
   <proof prover="3"><result status="valid" time="0.065294" steps="9287"/></proof>
   </goal>
   <goal name="step&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.032030" steps="55"/></proof>
+  <proof prover="0"><result status="valid" time="0.032030" steps="55"/></proof>
   </goal>
   <goal name="step&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.033431" steps="26"/></proof>
+  <proof prover="0"><result status="valid" time="0.033431" steps="26"/></proof>
   </goal>
   <goal name="step&#39;vc.17" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.022002" steps="29030"/></proof>
@@ -123,7 +123,7 @@
   <proof prover="6"><result status="valid" time="0.005051" steps="4229"/></proof>
   </goal>
   <goal name="step&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.034428" steps="2"/></proof>
+  <proof prover="0"><result status="valid" time="0.034428" steps="2"/></proof>
   </goal>
   <goal name="step&#39;vc.23" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.018365" steps="29368"/></proof>
@@ -139,7 +139,7 @@
   <proof prover="6"><result status="valid" time="0.011961" steps="30207"/></proof>
   </goal>
   <goal name="parallel_gcd&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.031551" steps="22"/></proof>
+  <proof prover="0"><result status="valid" time="0.031551" steps="22"/></proof>
   </goal>
   <goal name="parallel_gcd&#39;vc.2" expl="loop variant decrease" proved="true">
   <transf name="inline_all" proved="true" >
@@ -165,7 +165,7 @@
   <proof prover="3"><result status="valid" time="0.081758" steps="10588"/></proof>
   </goal>
   <goal name="parallel_gcd&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="8"><result status="valid" time="0.139002" steps="2698"/></proof>
+  <proof prover="0"><result status="valid" time="0.139002" steps="7785"/></proof>
   </goal>
  </transf>
  </goal>

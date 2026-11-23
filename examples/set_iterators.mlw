@@ -1,12 +1,13 @@
 
 
-(** {1 testing iterators on set of integers} *)
+(** {1 Testing set iterators} *)
 
+
+(** {2 Testing iterator on sets of unbounded integers} *)
 
 module TestIntSetIterator
 
   use int.Int
-  use mach.int.Int63
 
   use set.SetAppInt as S
 
@@ -26,7 +27,59 @@ module TestIntSetIterator
 
 end
 
-(** {1 testing iterators on set of strings} *)
+(** {2 Testing iterator on sets of "Peano" integers} *)
+
+module TestPeanoSetIterator
+
+  use int.Int
+  use mach.peano.Peano
+
+  use mach.peano.SetPeano as S
+
+  let filter_non_neg_peano (s:S.set)
+    ensures { forall x. S.mem x result <-> S.mem x s /\ x >= 0 }
+  =
+    let ref acc = S.empty () in
+    for x in s with S.Iter do
+      invariant { forall x. S.mem x acc -> S.mem x s /\ x >= 0 }
+      invariant { forall x. S.mem x it.S.Iter.visited /\ x >= 0 -> S.mem x acc }
+      variant { S.cardinal s - S.cardinal it.S.Iter.visited }
+      if Peano.ge x Peano.zero then
+          acc <- S.add x acc
+    done;
+    acc
+
+
+end
+
+
+(** {2 Testing iterator on sets of 63-bit integers} *)
+
+module TestInt63SetIterator
+
+  use int.Int
+  use mach.int.Int63
+
+  use set.SetAppInt63 as S
+
+  let filter_non_neg_int63 (s:S.set)
+    ensures { forall x. S.mem x result <-> S.mem x s /\ x >= 0 }
+  =
+    let ref acc = S.empty () in
+    for x in s with S.Iter do
+      invariant { forall x. S.mem x acc -> S.mem x s /\ x >= 0 }
+      invariant { forall x. S.mem x it.S.Iter.visited /\ x >= 0 -> S.mem x acc }
+      variant { S.cardinal s - S.cardinal it.S.Iter.visited }
+      if x >= (0:int63)  then
+          acc <- S.add x acc
+    done;
+    acc
+
+
+end
+
+
+(** {2 Testing iterator on sets of strings} *)
 
 module TestStringSetIterator
 

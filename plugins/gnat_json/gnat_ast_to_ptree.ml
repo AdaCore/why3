@@ -437,18 +437,16 @@ let rec mk_of_expr : 'a . (module E_or_T with type t = 'a) -> expr_id -> 'a =
           *      [Number.real_literal ~radix:10 ~neg:r.negative ~int:numerator ~frac:"0" ~exp:None;
           *       Number.real_literal ~radix:10 ~neg:false ~int:denominator ~frac:"0" ~exp:None]) *)
     else
-      let int =
-        let int = bigint_of_uint r.numerator in
-        if r.negative then BigInt.minus int else int in
+      let int = bigint_of_uint r.numerator in
       let exp = BigInt.(minus (bigint_of_uint r.denominator)) in
       match r.base with
       | 2 ->
-          mk_const (Constant.real_const ~pow2:exp ~pow5:BigInt.zero int)
+          mk_const (Constant.real_const ~is_neg:r.negative ~pow2:exp ~pow5:BigInt.zero int)
       | 10 ->
-          mk_const (Constant.real_const ~pow2:exp ~pow5:exp int)
+          mk_const (Constant.real_const ~is_neg:r.negative ~pow2:exp ~pow5:exp int)
       | 16 ->
           let pow2 = BigInt.mul_int 4 exp in
-          mk_const (Constant.real_const ~pow2 ~pow5:BigInt.zero int)
+          mk_const (Constant.real_const ~is_neg:r.negative ~pow2 ~pow5:BigInt.zero int)
       | _ ->
           conversion_error id ("unsupported base "^string_of_int r.base^" for ureal") () in
 

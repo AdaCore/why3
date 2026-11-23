@@ -29,66 +29,68 @@ module Algo63
     a[j] <- v;
     assert { exchange (old a) a i j }
 
-  val random (m n: int) : int ensures { m <= result <= n }
+  val random (m n: int) : int
+    requires { m <= n }
+    ensures  { m <= result <= n }
 
-  let partition_ (a: array int) (m n: int) (i j: ref int) (ghost ghx: ref int)
+  let partition_ (a: array int) (m n: int) (ref i j: int) (ghost ref ghx: int)
     requires { 0 <= m < n < length a }
-    ensures  { m <= !j < !i <= n }
+    ensures  { m <= j < i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
-    ensures  { forall r:int. m <= r <= !j -> a[r] <= !ghx }
-    ensures  { forall r:int. !j < r < !i -> a[r] = !ghx }
-    ensures  { forall r:int. !i <= r <= n -> a[r] >= !ghx }
+    ensures  { forall r: int. m <= r <= j -> a[r] <= ghx }
+    ensures  { forall r: int. j < r < i -> a[r] = ghx }
+    ensures  { forall r: int. i <= r <= n -> a[r] >= ghx }
   =
     let f = random m n in
     let x = a[f] in
     ghx := x;
     i := m;
     j := n;
-    let rec up_down () variant { 1 + !j - !i } =
-      requires { m <= !j <= n /\ m <= !i <= n }
+    let rec up_down () variant { 1 + j - i } =
+      requires { m <= j <= n /\ m <= i <= n }
       requires { permut_sub (old a) a m (n+1) }
-      requires { forall r:int. m <= r < !i -> a[r] <= x }
-      requires { forall r:int. !j < r <= n -> a[r] >= x }
+      requires { forall r: int. m <= r < i -> a[r] <= x }
+      requires { forall r: int. j < r <= n -> a[r] >= x }
       requires { a[f] = x }
-      ensures  { m <= !j <= !i <= n }
+      ensures  { m <= j <= i <= n }
       ensures  { permut_sub (old a) a m (n+1) }
-      ensures  { !i = n \/ a[!i] > x }
-      ensures  { !j = m \/ a[!j] < x }
+      ensures  { i = n \/ a[i] > x }
+      ensures  { j = m \/ a[j] < x }
       ensures  { a[f] = x }
-      ensures  { forall r:int. m <= r < !i -> a[r] <= x }
-      ensures  { forall r:int. !j < r <= n -> a[r] >= x }
-      while !i < n && a[!i] <= x do
-        invariant { m <= !i <= n }
-        invariant {forall r: int. m <= r < !i -> a[r] <= x }
-        variant { n - !i }
+      ensures  { forall r: int. m <= r < i -> a[r] <= x }
+      ensures  { forall r: int. j < r <= n -> a[r] >= x }
+      while i < n && a[i] <= x do
+        invariant { m <= i <= n }
+        invariant {forall r: int. m <= r < i -> a[r] <= x }
+        variant { n - i }
         incr i
       done;
-      while m < !j && a[!j] >= x do
-        invariant { m <= !j <= n }
-        invariant { forall r: int. !j < r <= n -> a[r] >= x }
-        variant { !j }
+      while m < j && a[j] >= x do
+        invariant { m <= j <= n }
+        invariant { forall r: int. j < r <= n -> a[r] >= x }
+        variant { j }
         decr j
       done;
-      if !i < !j then begin
-        exchange a m n !i !j;
+      if i < j then begin
+        exchange a m n i j;
         incr i;
         decr j;
         up_down ()
       end
     in
     up_down ();
-    assert { !j < !i \/ !j = !i = m \/ !j = !i = n };
-    if !i < f then begin exchange a m n !i f; incr i end
-    else if f < !j then begin exchange a m n f !j; decr j end
+    assert { j < i \/ j = i = m \/ j = i = n };
+    if i < f then begin exchange a m n i f; incr i end
+    else if f < j then begin exchange a m n f j; decr j end
 
-  let partition (a: array int) (m n: int) (i j: ref int) =
+  let partition (a: array int) (m n: int) (ref i j: int) =
     requires { 0 <= m < n < length a }
-    ensures  { m <= !j < !i <= n }
+    ensures  { m <= j < i <= n }
     ensures  { permut_sub (old a) a m (n+1) }
     ensures  { exists x: int.
-        (forall r:int. m <= r <= !j -> a[r] <= x) /\
-        (forall r:int. !j < r < !i -> a[r] = x) /\
-        (forall r:int. !i <= r <= n -> a[r] >= x) }
+        (forall r: int. m <= r <= j -> a[r] <= x) /\
+        (forall r: int. j < r < i -> a[r] = x) /\
+        (forall r: int. i <= r <= n -> a[r] >= x) }
     partition_ a m n i j (ref 0)
 
 end

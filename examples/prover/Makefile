@@ -19,23 +19,19 @@ ifeq ($(BENCH),yes)
 endif
 
 
-INCLUDES=$(INCLUDE) -I ../../plugins/tptp
-LIBS=why3.cmxa tptp_typing.cmx tptp_parser.cmx tptp_lexer.cmx
 WHY3FLAGS=-L . --warn-off=unused_variable
-PKGS=$(addprefix -package ,$(EXTPKGS))
 
 .PHONY: clean doc extract replay
 
-main.opt: prover.cmx run.cmx
-	$(OCAMLFIND) ocamlopt $(PKGS) -linkpkg $(INCLUDES) $(LIBS) -o $@ $^
+main.opt: FORCE
+	dune build $@
+
+FORCE:
 
 extract: prover.ml
 
 prover.ml:
 	$(WHY3) $(WHY3FLAGS) extract -D ocaml64 -o prover.ml ProverTest.mlw
-
-%.cmx: %.ml
-	$(OCAMLFIND) ocamlopt $(PKGS) $(INCLUDES) -c $<
 
 doc:
 

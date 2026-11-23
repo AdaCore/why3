@@ -1,5 +1,5 @@
 opam-version: "2.0"
-maintainer: "guillaume.melquiond@inria.fr"
+maintainer: "Claude.Marche@inria.fr"
 authors: [
   "François Bobot"
   "Jean-Christophe Filliâtre"
@@ -7,6 +7,7 @@ authors: [
   "Guillaume Melquiond"
   "Andrei Paskevich"
 ]
+x-maintenance-intent: ["(latest)"]
 
 homepage: "https://www.why3.org/"
 license: "LGPL-2.1-only"
@@ -24,6 +25,7 @@ tags: [
 
 build: [
   ["./autogen.sh"] {dev} # when pinning, there might be no configure file
+  ["touch" "configure"]
   ["./configure"
    "--prefix" prefix
    "--disable-frama-c"
@@ -40,7 +42,7 @@ build: [
    "--disable-stackify" {!ocamlgraph:installed | ocaml:version < "4.12"}
    "--enable-stackify" {ocamlgraph:installed & ocaml:version >= "4.12"}
    "--disable-ide"]
-  [make "-j%{jobs}%" "all" "byte"]
+  [make "DUNEJOBS=%{jobs}%" "all" "byte"]
   [make "doc" "stdlibdoc" "apidoc"] {with-doc}
 ]
 
@@ -53,6 +55,7 @@ depends: [
   "conf-autoconf" {build & dev}
   "ocaml" {>= "4.09"}
   "ocamlfind" {build}
+  "dune" {>= "2.9"}
   "menhir" {>= "20200211"}
   "zarith"
 ]
@@ -71,7 +74,6 @@ conflicts: [
   "why3-base"
   "ocamlgraph" {< "1.8.2"}
   "mlmpfr" {< "4.0.0"}
-  "ppxlib" {< "0.33"}
 ]
 
 synopsis: "Why3 environment for deductive program verification"

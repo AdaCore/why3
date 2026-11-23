@@ -1,9 +1,9 @@
 
+open Format
+
 open Set_iterators
 
 module S = SetAppInt
-
-open Format
 
 let pp_set fmt s =
   S.iter
@@ -21,6 +21,42 @@ let () =
   printf "before filter_non_neg: %a@." pp_set s;
   let s = filter_non_neg s in
   printf "after filter_non_neg: %a@." pp_set s;
+  ()
+
+module SP = SetAppPeano
+
+let pp_setp fmt s =
+  SP.iter
+    (fun n -> Format.printf "%d " n)
+    s
+
+let () =
+  let s = SP.empty in
+  let s = SP.add 42 s in
+  let s = SP.add (-17) s in
+  let s = SP.add 26 s in
+  let s = SP.add (-1) s in
+  printf "before filter_non_neg_peano: %a@." pp_setp s;
+  let s = filter_non_neg_peano s in
+  printf "after filter_non_neg_peano: %a@." pp_setp s;
+  ()
+
+module S63 = SetAppInt63
+
+let pp_set63 fmt s =
+  S63.iter
+    (fun n -> Format.printf "%d " n)
+    s
+
+let () =
+  let s = S63.empty in
+  let s = S63.add 42 s in
+  let s = S63.add (-17) s in
+  let s = S63.add 26 s in
+  let s = S63.add (-1) s in
+  printf "before filter_non_neg_int63: %a@." pp_set63 s;
+  let s = filter_non_neg_int63 s in
+  printf "after filter_non_neg_int63: %a@." pp_set63 s;
   ()
 
 module St = SetAppString

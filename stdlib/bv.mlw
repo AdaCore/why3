@@ -195,14 +195,18 @@ module BV_Gen
     forall n:int. nth zeros n = False
   meta "remove_unused:dependency" axiom Nth_zeros, function zeros
 
-  constant one : t
-
   constant ones : t
   axiom Nth_ones:
     forall n. 0 <= n < size -> nth ones n = True
   meta "remove_unused:dependency" axiom Nth_ones, function ones
 
-  (** Bitwise operators *)
+  constant one : t
+  constant minus_one : t
+  constant min_sint : t
+  constant max_sint : t
+  constant max_uint : t
+
+  (** {3 Bitwise operators} *)
 
   (* /!\ NOTE : both bw_and and bw_or don't need guard on n because of
   nth out of bound axiom *)
@@ -230,7 +234,7 @@ module BV_Gen
       nth (bw_not v) n = notb (nth v n)
   meta "remove_unused:dependency" axiom Nth_bw_not, function bw_not
 
-  (** Shift operators *)
+  (** {3 Shift operators} *)
 
   (** Warning: shift operators of an amount greater than or equal to
       the size are specified here, in concordance with SMTLIB. This is
@@ -302,17 +306,17 @@ module BV_Gen
   meta "remove_unused:dependency" axiom Nth_rotate_left, function rotate_left
 
 
-  (** Conversions from/to integers *)
+  (** {3 Conversions from/to integers} *)
 
   use Pow2int
 
   constant two_power_size : int
-  constant two_power_size_minus_one : int
+  constant two_power_sizem1 : int
 
   constant max_int : int
 
   axiom two_power_size_val : two_power_size = pow2 size
-  axiom two_power_size_minus_one_val : two_power_size_minus_one = pow2 (size-1)
+  axiom two_power_sizem1_val : two_power_sizem1 = pow2 (size-1)
 
   axiom max_int_val : max_int = two_power_size - 1
 
@@ -351,21 +355,26 @@ module BV_Gen
   meta "remove_unused:dependency" axiom to_uint_of_int, function of_int
 
   axiom to_int_bounds :
-    forall v:t. - two_power_size_minus_one <= to_int v < two_power_size_minus_one
+    forall v:t. - two_power_sizem1 <= to_int v < two_power_sizem1
   meta "remove_unused:dependency" axiom to_int_bounds, function to_int
 
   axiom to_int_of_int :
-    forall i. - two_power_size_minus_one <= i < two_power_size_minus_one -> to_int (of_int i) = i
+    forall i. - two_power_sizem1 <= i < two_power_sizem1 -> to_int (of_int i) = i
   meta "remove_unused:dependency" axiom to_int_of_int, function of_int
 
   constant size_bv : t
 
   axiom to_uint_size_bv : to_uint size_bv = size
   axiom to_uint_zeros   : to_uint zeros = 0
-  axiom to_uint_one     : to_uint one = 1
   axiom to_uint_ones    : to_uint ones = max_int
 
-  (** comparison operators *)
+  axiom to_uint_one     : to_uint one = 1
+  axiom to_int_minus_one: to_int minus_one = -1
+  axiom to_int_min_sint : to_int min_sint = - two_power_sizem1
+  axiom to_int_max_sint : to_int max_sint = two_power_sizem1 - 1
+  axiom to_uint_max_uint: to_uint max_uint = two_power_size - 1
+
+  (** {3 Comparison operators} *)
 
   use export why3.WellFounded.WellFounded
 
@@ -397,7 +406,7 @@ module BV_Gen
   meta "vc:proved_wf" predicate slt, lemma slt_wf
   meta "remove_unused:dependency" lemma slt_wf, predicate slt
 
-let predicate sle (v1 v2 : t) =
+  let predicate sle (v1 v2 : t) =
     Int.(<=) (to_int v1) (to_int v2)
 
   let predicate sgt (v1 v2 : t) =
@@ -415,7 +424,8 @@ let predicate sle (v1 v2 : t) =
   meta "remove_unused:dependency" axiom positive_is_ge_zeros, predicate sge
   meta "remove_unused:dependency" axiom positive_is_ge_zeros, predicate is_signed_positive
 
-  (** Arithmetic operators *)
+
+  (** {3 Arithmetic operators} *)
 
   val function add (v1 v2 : t) : t
   axiom to_uint_add:
@@ -491,7 +501,47 @@ let predicate sle (v1 v2 : t) =
     forall v1 v2. to_int (srem v1 v2) = CD.mod (to_int v1) (to_int v2)
   meta "remove_unused:dependency" axiom to_int_srem, function srem
 
-  (** Bitvector alternatives for shifts, rotations and nth *)
+
+
+  (** {3 Predicates for overflow checks} *)
+
+  (** [u_add_o x y] holds whenever unsigned addition overflows  *)
+  predicate u_add_o (a b:t) =
+    not (to_uint a + to_uint b < two_power_size)
+
+  (** [s_add_o x y] holds whenever signed addition overflows  *)
+  predicate s_add_o (a b:t) =
+    not (- two_power_sizem1 <= to_int a + to_int b < two_power_sizem1)
+
+  (** [u_sub_o x y] holds whenever unsigned subtraction overflows  *)
+  predicate u_sub_o (a b:t) =
+    not (to_uint a >= to_uint b)
+
+  (** [s_sub_o x y] holds whenever signed subtraction overflows  *)
+  predicate s_sub_o (a b:t) =
+    not (- two_power_sizem1 <= to_int a - to_int b < two_power_sizem1)
+
+  (** [u_mul_o x y] holds whenever unsigned multiplication overflows  *)
+  predicate u_mul_o (a b:t) =
+    not (to_uint a * to_uint b < two_power_size)
+
+  (** [s_mul_o x y] holds whenever signed multiplication overflows  *)
+  predicate s_mul_o (a b:t) =
+    not (- two_power_sizem1 <= to_int a * to_int b < two_power_sizem1)
+
+  (** [s_neg_o x] holds whenever signed negation overflows  *)
+  predicate s_neg_o (a:t) =
+    to_int a = - two_power_sizem1
+
+  (** [s_div_o x y] holds whenever signed division overflows, that is
+      when the dividend is [min_int] and the divisor is [-1] *)
+  predicate s_div_o (a b:t) =
+    a = min_sint /\ b = minus_one
+
+  (** remark: unsigned division, as well as signed or unsigned
+      remainder, never overflow *)
+
+  (** {3 Bitvector alternatives for shifts, rotations and nth} *)
 
   (** logical shift right *)
   val function lsr_bv t t : t
@@ -562,7 +612,7 @@ let predicate sle (v1 v2 : t) =
   meta "remove_unused:dependency" axiom Nth_bv_is_nth2, function nth_bv
   meta "remove_unused:dependency" axiom Nth_bv_is_nth2, function nth
 
-  (** equality axioms *)
+  (** {3 Equality on subranges} *)
 
   predicate eq_sub_bv t t t t
 
@@ -604,95 +654,143 @@ module BV256
   constant size           : int = 256
   constant two_power_size : int =
     0x1_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
-  constant two_power_size_minus_one : int =
-      0x8000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_sizem1 : int =
+    0x8000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF >
 
   constant zeros : t = 0x0
+  constant ones : t =
+    0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+
   constant one : t = 0x1
-  constant ones : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+  constant minus_one : t =
+    0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+  constant min_sint  : t =
+    0x8000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000
+  constant max_sint  : t =
+    0x7FFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+  constant max_uint  : t =
+    0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros = zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
+    goal to_uint_size_bv,
+    goal to_uint_zeros,
+    goal to_uint_ones,
+    goal to_uint_one,
+    goal to_int_minus_one,
+    goal to_int_min_sint,
+    goal to_int_max_sint,
+    goal to_uint_max_uint,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
 module BV128
   constant size           : int = 128
-  constant two_power_size : int =
-    0x1_0000_0000_0000_0000_0000_0000_0000_0000
-  constant two_power_size_minus_one : int =
-      0x8000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_size : int = 0x1_0000_0000_0000_0000_0000_0000_0000_0000
+  constant two_power_sizem1 : int = 0x8000_0000_0000_0000_0000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF >
 
   constant zeros : t = 0x0
-  constant one : t = 0x1
   constant ones : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+
+  constant one : t = 0x1
+  constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+  constant min_sint  : t = 0x8000_0000_0000_0000_0000_0000_0000_0000
+  constant max_sint  : t = 0x7FFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
+  constant max_uint  : t = 0xFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
 
+(** {2 64 bits} *)
+
 module BV64
   constant size           : int = 64
   constant two_power_size : int = 0x1_0000_0000_0000_0000
-  constant two_power_size_minus_one : int = 0x8000_0000_0000_0000
+  constant two_power_sizem1 : int = 0x8000_0000_0000_0000
 
   use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF_FFFF_FFFF >
 
   constant zeros : t = 0x0
-  constant one : t = 0x1
-  constant ones : t = 0xFFFF_FFFF_FFFF_FFFF
+  constant ones  : t = 0xFFFF_FFFF_FFFF_FFFF
+
+  constant one       : t = 0x1
+  constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
+  constant min_sint  : t = 0x8000_0000_0000_0000
+  constant max_sint  : t = 0x7FFF_FFFF_FFFF_FFFF
+  constant max_uint  : t = 0xFFFF_FFFF_FFFF_FFFF
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
+    goal to_uint_size_bv,
+    goal to_uint_zeros,
+    goal to_uint_ones,
+    goal to_uint_one,
+    goal to_int_minus_one,
+    goal to_int_min_sint,
+    goal to_int_max_sint,
+    goal to_uint_max_uint,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
@@ -700,30 +798,48 @@ end
 module BV32
   constant size           : int = 32
   constant two_power_size : int = 0x1_0000_0000
-  constant two_power_size_minus_one : int = 0x8000_0000
+  constant two_power_sizem1 : int = 0x8000_0000
 
   use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF_FFFF >
 
   constant zeros : t = 0x0
-  constant one : t = 0x1
   constant ones : t = 0xFFFF_FFFF
+
+  constant one : t = 0x1
+  constant minus_one : t = 0xFFFF_FFFF
+  constant min_sint : t = 0x8000_0000
+  constant max_sint : t = 0x7FFF_FFFF
+  constant max_uint : t = 0xFFFF_FFFF
+
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
+    goal to_uint_size_bv,
+    goal to_uint_zeros,
+    goal to_uint_ones,
+    goal to_uint_one,
+    goal to_int_minus_one,
+    goal to_int_min_sint,
+    goal to_int_max_sint,
+    goal to_uint_max_uint,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
@@ -731,30 +847,47 @@ end
 module BV16
   constant size : int = 16
   constant two_power_size : int = 0x1_0000
-  constant two_power_size_minus_one : int = 0x8000
+  constant two_power_sizem1 : int = 0x8000
 
   use int.Int as Int (* needed to use range types *)
 
   type t = < range 0 0xFFFF >
 
   constant zeros : t = 0x0
-  constant one : t = 0x1
   constant ones : t = 0xFFFF
+  constant one : t = 0x1
+  constant minus_one : t = 0xFFFF
+  constant min_sint : t = 0x8000
+  constant max_sint : t = 0x7FFF
+  constant max_uint : t = 0xFFFF
+
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
+    goal to_uint_size_bv,
+    goal to_uint_zeros,
+    goal to_uint_ones,
+    goal to_uint_one,
+    goal to_int_minus_one,
+    goal to_int_min_sint,
+    goal to_int_max_sint,
+    goal to_uint_max_uint,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
@@ -762,7 +895,7 @@ end
 module BV8
   constant size           : int = 8
   constant two_power_size : int = 0x1_00
-  constant two_power_size_minus_one : int = 0x80
+  constant two_power_sizem1 : int = 0x80
 
   use int.Int as Int (* needed to use range types *)
 
@@ -771,24 +904,42 @@ module BV8
   constant zeros : t = 0x0
   constant one : t = 0x1
   constant ones : t = 0xFF
+  constant minus_one : t = 0xFF
+  constant min_sint : t = 0x80
+  constant max_sint : t = 0x7F
+  constant max_uint : t = 0xFF
 
   clone export BV_Gen with
     type t = t,
     function to_uint = t'int,
     constant size = size,
     constant two_power_size = two_power_size,
-    constant two_power_size_minus_one = two_power_size_minus_one,
+    constant two_power_sizem1 = two_power_sizem1,
     constant max_int = t'maxInt,
     constant zeros,
-    constant one,
     constant ones,
+    constant one,
+    constant minus_one,
+    constant min_sint,
+    constant max_sint,
+    constant max_uint,
     goal size_pos,
     goal two_power_size_val,
-    goal two_power_size_minus_one_val,
+    goal two_power_sizem1_val,
     goal max_int_val,
+    goal to_uint_size_bv,
+    goal to_uint_zeros,
+    goal to_uint_ones,
+    goal to_uint_one,
+    goal to_int_minus_one,
+    goal to_int_min_sint,
+    goal to_int_max_sint,
+    goal to_uint_max_uint,
     axiom . (* should this be "lemma"? "goal"? *)
 
 end
+
+
 
 (** {2 Generic Converter} *)
 
@@ -1058,4 +1209,72 @@ module BVConverter_8_16
     function to_uint_big = BV16.t'int,
     axiom toSmall_to_uint, (* TODO: "lemma"? "goal"? *)
     axiom toBig_to_uint    (* TODO: "lemma"? "goal"? *)
+end
+
+
+
+
+(** {2 Predicates for overflow checks, defined as BV operations on twice the bit size} *)
+
+module BV_overflow_defs
+
+  type t
+  function minus_one : t
+  function min_sint : t
+  function max_sint : t
+  function max_uint : t
+  predicate uge t t
+
+  type tBig
+  function sto_big t : tBig
+  function uto_big t : tBig
+
+  constant min_sint_as_big : tBig = sto_big min_sint
+  constant max_sint_as_big : tBig = sto_big max_sint
+  constant max_uint_as_big : tBig = uto_big max_uint
+
+  predicate ule tBig tBig
+  predicate sle tBig tBig
+  function add tBig tBig : tBig
+  function sub tBig tBig : tBig
+  function mul tBig tBig : tBig
+
+  predicate u_add_o_bv_def (a b:t) =
+    not (ule (add (uto_big a) (uto_big b)) max_uint_as_big)
+
+  meta "remove_unused:keep" predicate u_add_o_bv_def
+
+  predicate s_add_o_bv_def (a b:t) =
+    let r = add (sto_big a) (sto_big b) in
+    not (sle min_sint_as_big r /\ sle r max_sint_as_big)
+
+  meta "remove_unused:keep" predicate s_add_o_bv_def
+
+  predicate u_sub_o_bv_def (a b:t) =
+    not (uge a b)
+
+  meta "remove_unused:keep" predicate u_sub_o_bv_def
+
+  predicate s_sub_o_bv_def (a b:t) =
+    let r = sub (sto_big a) (sto_big b) in
+    not (sle min_sint_as_big r /\ sle r max_sint_as_big)
+
+  meta "remove_unused:keep" predicate s_sub_o_bv_def
+
+  predicate u_mul_o_bv_def (a b:t) =
+    not (ule (mul (uto_big a) (uto_big b)) max_uint_as_big)
+
+  meta "remove_unused:keep" predicate u_mul_o_bv_def
+
+  predicate s_mul_o_bv_def (a b:t) =
+    let r = mul (sto_big a) (sto_big b) in
+    not (sle min_sint_as_big r /\ sle r max_sint_as_big)
+
+  meta "remove_unused:keep" predicate s_mul_o_bv_def
+
+  predicate s_div_o_bv_def (a b:t) =
+    a = min_sint /\ b = minus_one
+
+  meta "remove_unused:keep" predicate s_div_o_bv_def
+
 end

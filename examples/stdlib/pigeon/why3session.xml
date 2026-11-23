@@ -2,7 +2,8 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="2" name="CVC4" version="1.6" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.7.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml">
@@ -74,15 +75,15 @@
     <goal name="pigeon_0.0.0.0" proved="true">
     <transf name="assert" proved="true" arg1="(mem x1 empty)">
      <goal name="pigeon_0.0.0.0.0" expl="asserted formula" proved="true">
-     <proof prover="2"><result status="valid" time="0.060000" steps="13910"/></proof>
+     <proof prover="0"><result status="valid" time="0.060000" steps="7221"/></proof>
      </goal>
      <goal name="pigeon_0.0.0.0.1" proved="true">
-     <proof prover="2"><result status="valid" time="0.050000" steps="13106"/></proof>
+     <proof prover="0"><result status="valid" time="0.050000" steps="6792"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="pigeon_0.0.0.1" proved="true">
-    <proof prover="2"><result status="valid" time="0.040000" steps="13046"/></proof>
+    <proof prover="0"><result status="valid" time="0.040000" steps="6748"/></proof>
     </goal>
    </transf>
    </goal>
@@ -93,10 +94,10 @@
  <goal name="pigeon_1">
  </goal>
  <goal name="pigeon_2" proved="true">
- <proof prover="2"><result status="valid" time="0.050000" steps="8924"/></proof>
+ <proof prover="0"><result status="valid" time="0.050000" steps="5430"/></proof>
  </goal>
  <goal name="pigeonhole" proved="true">
- <proof prover="4"><result status="valid" time="0.295074" steps="565653"/></proof>
+ <proof prover="1"><result status="valid" time="0.153269" steps="401947"/></proof>
  </goal>
 </theory>
 </file>

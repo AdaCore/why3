@@ -28,8 +28,10 @@ module Length
     end
 
   lemma Length_nonnegative: forall l: list 'a. length l >= 0
+  meta "remove_unused:dependency" lemma Length_nonnegative, function length
 
   lemma Length_nil: forall l: list 'a. length l = 0 <-> l = Nil
+  meta "remove_unused:dependency" lemma Length_nil, function length
 
 end
 
@@ -117,8 +119,11 @@ module NthNoOpt
   function nth (n: int) (l: list 'a) : 'a
 
   axiom nth_cons_0: forall x:'a, r:list 'a. nth 0 (Cons x r) = x
+  meta "remove_unused:dependency" axiom nth_cons_0, function nth
+
   axiom nth_cons_n: forall x:'a, r:list 'a, n:int.
     n > 0 -> nth n (Cons x r) = nth (n-1) r
+  meta "remove_unused:dependency" axiom nth_cons_n, function nth
 
 end
 
@@ -132,12 +137,15 @@ module NthLength
 
   lemma nth_none_1:
      forall l: list 'a, i: int. i < 0 -> nth i l = None
+  meta "remove_unused:dependency" lemma nth_none_1, function nth
 
   lemma nth_none_2:
      forall l: list 'a, i: int. i >= length l -> nth i l = None
+  meta "remove_unused:dependency" lemma nth_none_2, function nth
 
   lemma nth_none_3:
      forall l: list 'a, i: int. nth i l = None -> i < 0 \/ i >= length l
+  meta "remove_unused:dependency" lemma nth_none_3, function nth
 
 end
 
@@ -167,10 +175,12 @@ module HdTlNoOpt
   function hd (l: list 'a) : 'a
 
   axiom hd_cons: forall x:'a, r:list 'a. hd (Cons x r) = x
+  meta "remove_unused:dependency" axiom hd_cons, function hd
 
   function tl (l: list 'a) : list 'a
 
   axiom tl_cons: forall x:'a, r:list 'a. tl (Cons x r) = r
+  meta "remove_unused:dependency" axiom tl_cons, function tl
 
 end
 
@@ -187,9 +197,11 @@ module NthHdTl
   lemma Nth_tl:
     forall l1 l2: list 'a. tl l1 = Some l2 ->
     forall i: int. i <> -1 -> nth i l2 = nth (i+1) l1
+  meta "remove_unused:dependency" lemma Nth_tl, function nth
 
   lemma Nth0_head:
     forall l: list 'a. nth 0 l = hd l
+  meta "remove_unused:dependency" lemma Nth0_head, function nth
 
 end
 
@@ -208,25 +220,30 @@ module Append
   lemma Append_assoc:
     forall l1 [@induction] l2 l3: list 'a.
     l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3
+  meta "remove_unused:dependency" lemma Append_assoc, function (++)
 
   lemma Append_l_nil:
     forall l: list 'a. l ++ Nil = l
+  meta "remove_unused:dependency" lemma Append_l_nil, function (++)
 
   use Length
   use int.Int
 
   lemma Append_length:
     forall l1 [@induction] l2: list 'a. length (l1 ++ l2) = length l1 + length l2
+  meta "remove_unused:dependency" lemma Append_length, function (++)
 
   use Mem
 
   lemma mem_append:
     forall x: 'a, l1 [@induction] l2: list 'a.
     mem x (l1 ++ l2) <-> mem x l1 \/ mem x l2
+  meta "remove_unused:dependency" lemma mem_append, function (++)
 
   lemma mem_decomp:
     forall x: 'a, l: list 'a.
     mem x l -> exists l1 l2: list 'a. l = l1 ++ Cons x l2
+  meta "remove_unused:dependency" lemma mem_decomp, function (++)
 
 end
 
@@ -240,10 +257,12 @@ module NthLengthAppend
   lemma nth_append_1:
     forall l1 l2: list 'a, i: int.
     i < length l1 -> nth i (l1 ++ l2) = nth i l1
+  meta "remove_unused:dependency" lemma nth_append_1, function nth
 
   lemma nth_append_2:
     forall l1 [@induction] l2: list 'a, i: int.
     length l1 <= i -> nth i (l1 ++ l2) = nth (i - length l1) l2
+  meta "remove_unused:dependency" lemma nth_append_2, function nth
 
 end
 
@@ -263,28 +282,34 @@ module Reverse
   lemma reverse_append:
     forall l1 l2: list 'a, x: 'a.
     (reverse (Cons x l1)) ++ l2 = (reverse l1) ++ (Cons x l2)
+  meta "remove_unused:dependency" lemma reverse_append, function reverse
 
   lemma reverse_cons:
     forall l: list 'a, x: 'a.
     reverse (Cons x l) = reverse l ++ Cons x Nil
+  meta "remove_unused:dependency" lemma reverse_cons, function reverse
 
 
   lemma cons_reverse:
     forall l: list 'a, x: 'a.
     Cons x (reverse l) = reverse (l ++ Cons x Nil)
+  meta "remove_unused:dependency" lemma cons_reverse, function reverse
 
   lemma reverse_reverse:
     forall l: list 'a. reverse (reverse l) = l
+  meta "remove_unused:dependency" lemma reverse_reverse, function reverse
 
   use Mem
 
   lemma reverse_mem:
     forall l: list 'a, x: 'a. mem x l <-> mem x (reverse l)
+  meta "remove_unused:dependency" lemma reverse_mem, function reverse
 
   use Length
 
   lemma Reverse_length:
     forall l: list 'a. length (reverse l) = length l
+  meta "remove_unused:dependency" lemma Reverse_length, function reverse
 
 end
 
@@ -305,6 +330,7 @@ module RevAppend
   lemma rev_append_append_l:
     forall r [@induction] s t: list 'a.
       rev_append (r ++ s) t = rev_append s (rev_append r t)
+  meta "remove_unused:dependency" lemma rev_append_append_l, function rev_append
 
   use int.Int
   use Length
@@ -312,15 +338,18 @@ module RevAppend
   lemma rev_append_length:
     forall s [@induction] t: list 'a.
       length (rev_append s t) = length s + length t
+  meta "remove_unused:dependency" lemma rev_append_length, function rev_append
 
   use Reverse
 
   lemma rev_append_def:
     forall r [@induction] s: list 'a. rev_append r s = reverse r ++ s
+  meta "remove_unused:dependency" lemma rev_append_def, function rev_append
 
   lemma rev_append_append_r:
     forall r s t: list 'a.
       rev_append r (s ++ t) = rev_append (rev_append s r) t
+  meta "remove_unused:dependency" lemma rev_append_append_r, function rev_append
 
 end
 
@@ -363,6 +392,7 @@ module Sorted
   lemma sorted_mem:
     forall x: t, l: list t.
     (forall y: t. mem y l -> le x y) /\ sorted l <-> sorted (Cons x l)
+  meta "remove_unused:dependency" lemma sorted_mem, predicate sorted
 
   use Append
 
@@ -371,6 +401,7 @@ module Sorted
     (sorted l1 /\ sorted l2 /\ (forall x y: t. mem x l1 -> mem y l2 -> le x y))
     <->
     sorted (l1 ++ l2)
+  meta "remove_unused:dependency" lemma sorted_append, predicate sorted
 
 end
 
@@ -431,23 +462,27 @@ module NumOcc
   (** number of occurrences of `x` in `l` *)
 
   lemma Num_Occ_NonNeg: forall x:'a, l: list 'a. num_occ x l >= 0
+  meta "remove_unused:dependency" lemma Num_Occ_NonNeg, function num_occ
 
   use Mem
 
   lemma Mem_Num_Occ :
     forall x: 'a, l: list 'a. mem x l <-> num_occ x l > 0
+  meta "remove_unused:dependency" lemma Mem_Num_Occ, function num_occ
 
   use Append
 
   lemma Append_Num_Occ :
     forall x: 'a, l1 [@induction] l2: list 'a.
     num_occ x (l1 ++ l2) = num_occ x l1 + num_occ x l2
+  meta "remove_unused:dependency" lemma Append_Num_Occ, function num_occ
 
   use Reverse
 
   lemma reverse_num_occ :
     forall x: 'a, l: list 'a.
     num_occ x l = num_occ x (reverse l)
+  meta "remove_unused:dependency" lemma reverse_num_occ, function num_occ
 
 end
 
@@ -462,46 +497,57 @@ module Permut
     forall x: 'a. num_occ x l1 = num_occ x l2
 
   lemma Permut_refl: forall l: list 'a. permut l l
+  meta "remove_unused:dependency" lemma Permut_refl, predicate permut
 
   lemma Permut_sym: forall l1 l2: list 'a. permut l1 l2 -> permut l2 l1
+  meta "remove_unused:dependency" lemma Permut_sym, predicate permut
 
   lemma Permut_trans:
     forall l1 l2 l3: list 'a. permut l1 l2 -> permut l2 l3 -> permut l1 l3
+  meta "remove_unused:dependency" lemma Permut_trans, predicate permut
 
   lemma Permut_cons:
     forall x: 'a, l1 l2: list 'a.
     permut l1 l2 -> permut (Cons x l1) (Cons x l2)
+  meta "remove_unused:dependency" lemma Permut_cons, predicate permut
 
   lemma Permut_swap:
     forall x y: 'a, l: list 'a. permut (Cons x (Cons y l)) (Cons y (Cons x l))
+  meta "remove_unused:dependency" lemma Permut_swap, predicate permut
 
   use Append
 
   lemma Permut_cons_append:
     forall x : 'a, l1 l2 : list 'a.
     permut (Cons x l1 ++ l2) (l1 ++ Cons x l2)
+  meta "remove_unused:dependency" lemma Permut_cons_append, predicate permut
 
   lemma Permut_assoc:
     forall l1 l2 l3: list 'a.
     permut ((l1 ++ l2) ++ l3) (l1 ++ (l2 ++ l3))
+  meta "remove_unused:dependency" lemma Permut_assoc, predicate permut
 
   lemma Permut_append:
     forall l1 l2 k1 k2 : list 'a.
     permut l1 k1 -> permut l2 k2 -> permut (l1 ++ l2) (k1 ++ k2)
+  meta "remove_unused:dependency" lemma Permut_append, predicate permut
 
   lemma Permut_append_swap:
     forall l1 l2 : list 'a.
     permut (l1 ++ l2) (l2 ++ l1)
+  meta "remove_unused:dependency" lemma Permut_append_swap, predicate permut
 
   use Mem
 
   lemma Permut_mem:
     forall x: 'a, l1 l2: list 'a. permut l1 l2 -> mem x l1 -> mem x l2
+  meta "remove_unused:dependency" lemma Permut_mem, predicate permut
 
   use Length
 
   lemma Permut_length:
     forall l1 [@induction] l2: list 'a. permut l1 l2 -> length l1 = length l2
+  meta "remove_unused:dependency" lemma Permut_length, predicate permut
 
 end
 
@@ -524,6 +570,7 @@ module Distinct
     forall l1 [@induction] l2: list 'a.
     distinct l1 -> distinct l2 -> (forall x:'a. mem x l1 -> not (mem x l2)) ->
     distinct (l1 ++ l2)
+  meta "remove_unused:dependency" lemma distinct_append, predicate distinct
 
 end
 
@@ -604,6 +651,7 @@ module FoldLeft
   lemma fold_left_append:
     forall l1 [@induction] l2: list 'a, f: 'b -> 'a -> 'b, acc : 'b.
     fold_left f acc (l1++l2) = fold_left f (fold_left f acc l1) l2
+  meta "remove_unused:dependency" lemma fold_left_append, function fold_left
 
 end
 
@@ -622,6 +670,7 @@ module FoldRight
   lemma fold_right_append:
     forall l1 [@induction] l2: list 'a, f: 'a -> 'b -> 'b, acc : 'b.
     fold_right f (l1++l2) acc = fold_right f l1 (fold_right f l2 acc)
+  meta "remove_unused:dependency" lemma fold_right_append, function fold_right
 
 end
 

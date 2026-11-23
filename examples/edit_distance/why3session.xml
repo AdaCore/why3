@@ -2,11 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.17" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="8" name="Z3" version="4.8.10" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="10" name="Coq" version="8.20.1" timelimit="10" steplimit="0" memlimit="0"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="edit_distance.mlw"/>
@@ -22,7 +22,7 @@
  <proof prover="4"><result status="valid" time="0.038630" steps="102"/></proof>
  </goal>
  <goal name="key_lemma_right" proved="true">
- <proof prover="10"><path name="edit_distance_Word_key_lemma_right_1.v"/><result status="valid" time="0.320000"/></proof>
+ <proof prover="10"><path name="edit_distance_Word_key_lemma_right_1.v"/><result status="valid" time="0.811228"/></proof>
  </goal>
  <goal name="dist_symetry" proved="true">
  <transf name="induction_pr" proved="true" >
@@ -63,16 +63,16 @@
    <goal name="min_dist_equal.0.1" proved="true">
    <transf name="inversion_pr" proved="true" >
     <goal name="min_dist_equal.0.1.0" proved="true">
-    <proof prover="9"><result status="valid" time="0.027098" steps="4009"/></proof>
+    <proof prover="0"><result status="valid" time="0.027098" steps="4009"/></proof>
     </goal>
     <goal name="min_dist_equal.0.1.1" proved="true">
-    <proof prover="3"><result status="valid" time="0.793493" steps="1399375"/></proof>
+    <proof prover="3"><result status="valid" time="1.766663" steps="1399375"/></proof>
     </goal>
     <goal name="min_dist_equal.0.1.2" proved="true">
-    <proof prover="8"><result status="valid" time="0.117153" steps="315844"/></proof>
+    <proof prover="1"><result status="valid" time="0.343299" steps="303676"/></proof>
     </goal>
     <goal name="min_dist_equal.0.1.3" proved="true">
-    <proof prover="9"><result status="valid" time="0.039959" steps="5475"/></proof>
+    <proof prover="0"><result status="valid" time="0.039959" steps="5515"/></proof>
     </goal>
    </transf>
    </goal>
@@ -81,14 +81,14 @@
  </transf>
  </goal>
  <goal name="min_dist_diff" proved="true">
- <proof prover="10"><path name="edit_distance_Word_min_dist_diff_1.v"/><result status="valid" time="0.326223"/></proof>
+ <proof prover="10"><path name="edit_distance_Word_min_dist_diff_1.v"/><result status="valid" time="0.932246"/></proof>
  </goal>
  <goal name="min_dist_eps" proved="true">
  <transf name="inline_goal" proved="true" >
   <goal name="min_dist_eps.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="min_dist_eps.0.0" proved="true">
-   <proof prover="9"><result status="valid" time="0.048165" steps="5290"/></proof>
+   <proof prover="0"><result status="valid" time="0.048165" steps="5291"/></proof>
    </goal>
    <goal name="min_dist_eps.0.1" proved="true">
    <transf name="inversion_pr" proved="true" >
@@ -96,13 +96,13 @@
     <proof prover="4"><result status="valid" time="0.030700" steps="16"/></proof>
     </goal>
     <goal name="min_dist_eps.0.1.1" proved="true">
-    <proof prover="9"><result status="valid" time="0.049572" steps="5877"/></proof>
+    <proof prover="0"><result status="valid" time="0.049572" steps="5884"/></proof>
     </goal>
     <goal name="min_dist_eps.0.1.2" proved="true">
     <proof prover="4"><result status="valid" time="0.033190" steps="23"/></proof>
     </goal>
     <goal name="min_dist_eps.0.1.3" proved="true">
-    <proof prover="9"><result status="valid" time="0.034039" steps="4243"/></proof>
+    <proof prover="0"><result status="valid" time="0.034039" steps="4243"/></proof>
     </goal>
    </transf>
    </goal>
@@ -115,10 +115,10 @@
   <goal name="min_dist_eps_length.0" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="min_dist_eps_length.0.0" proved="true">
-   <proof prover="9"><result status="valid" time="0.047703" steps="4947"/></proof>
+   <proof prover="0"><result status="valid" time="0.047703" steps="4949"/></proof>
    </goal>
    <goal name="min_dist_eps_length.0.1" proved="true">
-   <proof prover="9"><result status="valid" time="0.301840" steps="36881"/></proof>
+   <proof prover="0"><result status="valid" time="0.784388" steps="36898"/></proof>
    </goal>
   </transf>
   </goal>
@@ -127,12 +127,12 @@
 </theory>
 <theory name="EditDistance" proved="true">
  <goal name="suffix_length" proved="true">
- <proof prover="10" timelimit="5" memlimit="1000"><path name="edit_distance_WP_EditDistance_suffix_length_1.v"/><result status="valid" time="0.480000"/></proof>
+ <proof prover="10" timelimit="5" memlimit="1000"><path name="edit_distance_WP_EditDistance_suffix_length_1.v"/><result status="valid" time="0.890997"/></proof>
  </goal>
  <goal name="distance&#39;vc" expl="VC for distance" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="distance&#39;vc.0" expl="array creation size" proved="true">
-  <proof prover="9"><result status="valid" time="0.050069" steps="4716"/></proof>
+  <proof prover="0"><result status="valid" time="0.050069" steps="4717"/></proof>
   </goal>
   <goal name="distance&#39;vc.1" expl="loop invariant init" proved="true">
   <proof prover="3"><result status="valid" time="0.009222" steps="2899"/></proof>
@@ -177,10 +177,10 @@
   <proof prover="2"><result status="valid" time="0.065847" steps="12388"/></proof>
   </goal>
   <goal name="distance&#39;vc.15" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.155546" steps="23649"/></proof>
+  <proof prover="2"><result status="valid" time="0.331640" steps="23649"/></proof>
   </goal>
   <goal name="distance&#39;vc.16" expl="loop invariant preservation" proved="true">
-  <proof prover="4"><result status="valid" time="0.072702" steps="445"/></proof>
+  <proof prover="4"><result status="valid" time="0.213215" steps="445"/></proof>
   </goal>
   <goal name="distance&#39;vc.17" expl="loop invariant preservation" proved="true">
   <proof prover="4"><result status="valid" time="0.051781" steps="78"/></proof>
@@ -189,7 +189,7 @@
   <proof prover="3"><result status="valid" time="0.013651" steps="37228"/></proof>
   </goal>
   <goal name="distance&#39;vc.19" expl="index in array bounds" proved="true">
-  <proof prover="9"><result status="valid" time="0.041354" steps="7928"/></proof>
+  <proof prover="0"><result status="valid" time="0.041354" steps="7928"/></proof>
   </goal>
   <goal name="distance&#39;vc.20" expl="index in array bounds" proved="true">
   <proof prover="3"><result status="valid" time="0.012459" steps="37194"/></proof>
@@ -197,7 +197,7 @@
   <goal name="distance&#39;vc.21" expl="loop invariant preservation" proved="true">
   <transf name="unfold" proved="true" arg1="min_suffix">
    <goal name="distance&#39;vc.21.0" expl="loop invariant preservation" proved="true">
-   <proof prover="9"><result status="valid" time="0.332912" steps="29540"/></proof>
+   <proof prover="0"><result status="valid" time="0.528250" steps="29300"/></proof>
    </goal>
   </transf>
   </goal>
@@ -208,7 +208,7 @@
   <proof prover="2"><result status="valid" time="0.081832" steps="15074"/></proof>
   </goal>
   <goal name="distance&#39;vc.24" expl="loop invariant preservation" proved="true">
-  <proof prover="9"><result status="valid" time="0.068308" steps="7899"/></proof>
+  <proof prover="0"><result status="valid" time="0.068308" steps="7902"/></proof>
   </goal>
   <goal name="distance&#39;vc.25" expl="loop invariant preservation" proved="true">
   <proof prover="2"><result status="valid" time="0.048939" steps="10631"/></proof>
@@ -223,7 +223,7 @@
   <proof prover="4"><result status="valid" time="0.040335" steps="26"/></proof>
   </goal>
   <goal name="distance&#39;vc.29" expl="out of loop bounds" proved="true">
-  <proof prover="2"><result status="valid" time="0.072960" steps="22233"/></proof>
+  <proof prover="2"><result status="valid" time="0.213970" steps="22233"/></proof>
   </goal>
  </transf>
  </goal>

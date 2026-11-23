@@ -32,6 +32,8 @@ theory T32
   goal g13: forall x:t. not (eq x (0x1p-127:t))
   (** 2^{-127} is subnormal *)
 
+  goal g14: forall x y:t. eq x y -> (is_positive x <-> is_positive y)
+
 end
 
 theory T64

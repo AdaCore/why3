@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -30,8 +30,6 @@ val intros :
   ?known_map:Decl.known_map -> Decl.prsymbol -> Term.term -> Decl.decl list
  (** [intros ?known_map G f] returns the declarations after introducing
      premises of [goal G : f] *)
-
-val simplify_intros : Task.task Trans.trans
 
 val introduce_premises : Task.task Trans.trans
 (** [introduce_premises] pushes the universal quantifications, the

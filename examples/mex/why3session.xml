@@ -2,10 +2,11 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="2" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="5" name="Alt-Ergo" version="2.4.3" timelimit="30" steplimit="0" memlimit="1000"/>
-<prover id="6" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="mex.mlw"/>
@@ -46,13 +47,13 @@
   <proof prover="7"><result status="valid" time="0.020000" steps="5920"/></proof>
   </goal>
   <goal name="mex&#39;vc.8" expl="loop invariant preservation" proved="true">
-  <proof prover="2"><result status="valid" time="0.034682" steps="30755"/></proof>
+  <proof prover="1"><result status="valid" time="0.034682" steps="28393"/></proof>
   </goal>
   <goal name="mex&#39;vc.9" expl="precondition" proved="true">
   <proof prover="7"><result status="valid" time="0.030000" steps="5882"/></proof>
   </goal>
   <goal name="mex&#39;vc.10" expl="loop variant decrease" proved="true">
-  <proof prover="2" timelimit="5"><result status="valid" time="0.273961" steps="543072"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.028199" steps="51854"/></proof>
   </goal>
   <goal name="mex&#39;vc.11" expl="loop invariant preservation" proved="true">
   <proof prover="7"><result status="valid" time="0.040000" steps="6206"/></proof>
@@ -63,7 +64,7 @@
   <goal name="mex&#39;vc.13" expl="loop invariant preservation" proved="true">
   <transf name="split_all_full" proved="true" >
    <goal name="mex&#39;vc.13.0" expl="loop invariant preservation" proved="true">
-   <proof prover="2"><result status="valid" time="0.038894" steps="74903"/></proof>
+   <proof prover="1"><result status="valid" time="0.038894" steps="39076"/></proof>
    </goal>
   </transf>
   </goal>
@@ -71,7 +72,7 @@
   <proof prover="7"><result status="valid" time="0.030000" steps="5880"/></proof>
   </goal>
   <goal name="mex&#39;vc.15" expl="loop variant decrease" proved="true">
-  <proof prover="6"><result status="valid" time="1.722279" steps="161077"/></proof>
+  <proof prover="0"><result status="valid" time="1.722279" steps="163157"/></proof>
   </goal>
   <goal name="mex&#39;vc.16" expl="loop invariant preservation" proved="true">
   <proof prover="7"><result status="valid" time="0.020000" steps="5675"/></proof>
@@ -148,8 +149,8 @@
 </theory>
 <theory name="MexArrayNaive" proved="true">
  <goal name="mex&#39;vc" expl="VC for mex" proved="true">
- <proof prover="4"><result status="valid" time="0.423152" steps="2005"/></proof>
- <proof prover="5"><result status="valid" time="0.598065" steps="6670"/></proof>
+ <proof prover="4"><result status="valid" time="0.576542" steps="2005"/></proof>
+ <proof prover="5"><result status="valid" time="1.128571" steps="6670"/></proof>
  </goal>
 </theory>
 <theory name="MexArraySorted" proved="true">
@@ -174,7 +175,7 @@
   <proof prover="4"><result status="valid" time="0.042080" steps="29"/></proof>
   </goal>
   <goal name="mex&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.316656" steps="798"/></proof>
+  <proof prover="4"><result status="valid" time="0.180926" steps="798"/></proof>
   </goal>
   <goal name="mex&#39;vc.7" expl="index in array bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.037135" steps="12"/></proof>
@@ -226,6 +227,55 @@
   </goal>
   <goal name="mex&#39;vc.23" expl="out of loop bounds" proved="true">
   <proof prover="4"><result status="valid" time="0.027121" steps="3"/></proof>
+  </goal>
+ </transf>
+ </goal>
+ <goal name="mex_bis&#39;vc" expl="VC for mex_bis" proved="true">
+ <transf name="split_vc" proved="true" >
+  <goal name="mex_bis&#39;vc.0" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.011397" steps="785"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.1" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.005118" steps="817"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.2" expl="loop invariant init" proved="true">
+  <proof prover="3"><result status="valid" time="0.005996" steps="858"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.3" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.013941" steps="10034"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.4" expl="index in array bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.013396" steps="11049"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.5" expl="loop invariant preservation" proved="true">
+  <proof prover="4" timelimit="5"><result status="valid" time="0.023777" steps="14"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.6" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.012892" steps="13103"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.7" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.014102" steps="12219"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.8" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.006057" steps="889"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.9" expl="loop invariant preservation" proved="true">
+  <proof prover="3"><result status="valid" time="0.012101" steps="10344"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.10" expl="loop invariant preservation" proved="true">
+  <proof prover="3" timelimit="5"><result status="valid" time="0.015043" steps="11791"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.11" expl="postcondition" proved="true">
+  <proof prover="4" timelimit="5"><result status="valid" time="0.290947" steps="1006"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.12" expl="postcondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.012498" steps="11243"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.13" expl="postcondition" proved="true">
+  <proof prover="4"><result status="valid" time="0.107013" steps="249"/></proof>
+  </goal>
+  <goal name="mex_bis&#39;vc.14" expl="out of loop bounds" proved="true">
+  <proof prover="3"><result status="valid" time="0.010701" steps="9223"/></proof>
   </goal>
  </transf>
  </goal>

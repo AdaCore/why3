@@ -22,8 +22,8 @@ module Seq
     forall s: seq 'a. 0 <= length s
   meta "remove_unused:dependency" axiom length_nonnegative, function length
 
-  val function get (seq 'a) int : 'a
-    (* FIXME requires { 0 <= i < length s } *)
+  val function get (s: seq 'a) (i: int) : 'a
+    requires { 0 <= i < length s }
   (** `get s i` is the `i+1`-th element of sequence `s`
       (the first element has index 0) *)
 

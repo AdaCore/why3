@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -149,7 +149,7 @@ let elim le_int le_real neg_real type_kept kn range_metas float_metas d
     let emax = BigInt.pow_int_pos_bigint 2 (BigInt.pred eb) in
     let m = BigInt.pred (BigInt.pow_int_pos_bigint 2 sb) in
     let e = BigInt.sub emax sb in
-    let e_val = Constant.real_const m ~pow2:e ?pow5:None in
+    let e_val = Constant.real_const ~pow2:e ?pow5:None ~is_neg:false m in
     let max_term = t_const e_val ty_real in
     (* compose axiom *)
     let f =
@@ -240,7 +240,7 @@ let rec replace_negative_constants ls_neg_int ls_neg_real t =
     else
       t
   | Some ty, Tconst (ConstReal r) ->
-    if BigInt.lt r.rl_real.rv_sig BigInt.zero && ty_equal ty ty_real then
+    if r.rl_real.rv_is_neg && ty_equal ty ty_real then
       t_app ls_neg_real
         [ t_const (ConstReal (neg_real r)) ty_real ]
         (Some ty_real)
@@ -257,32 +257,22 @@ let eliminate_negative_constants env =
   Trans.rewrite (replace_negative_constants neg_int neg_real) None
 
 let max_real =
-  real_value ~pow2:(BigInt.of_int 970) (BigInt.of_string "0x1FFFFFFFFFFFFF")
+  real_value ~pow2:(BigInt.of_int 970) ~is_neg:false (BigInt.of_string "0x1FFFFFFFFFFFFF")
 
-let min_real = real_value ~pow2:(BigInt.of_int (-1024)) (BigInt.of_int 1)
+let min_real =
+  real_value ~pow2:(BigInt.of_int 1024) ~is_neg:true (BigInt.of_int 1)
+
 let max_int = BigInt.of_string "0x80000000"
 
 let constant_too_big t =
   match t.t_node with
   | Tconst (ConstReal r) ->
-    let r =
-      real_value
-        (BigInt.abs r.rl_real.rv_sig)
-        ~pow2:r.rl_real.rv_pow2 ~pow5:r.rl_real.rv_pow5
-    in
-    if
-      compare_real ~structural:false r max_real > 0
-      || compare_real ~structural:false r min_real <= 0
-         && not (BigInt.eq BigInt.zero r.rv_sig)
-    then
-      true
+    let v = r.rl_real in
+    if v.rv_is_neg then
+      compare_real ~structural:false v min_real <= 0
     else
-      false
-  | Tconst (ConstInt i) ->
-    if BigInt.ge (BigInt.abs i.il_int) max_int then
-      true
-    else
-      false
+      compare_real ~structural:false v max_real > 0
+  | Tconst (ConstInt i) -> BigInt.ge (BigInt.abs i.il_int) max_int
   | _ -> false
 
 let rec remove_decl acc t =

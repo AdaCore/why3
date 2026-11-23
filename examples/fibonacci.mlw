@@ -440,3 +440,31 @@ module FibSquare
     forall n: int. n >= 0 -> fib n = n*n <-> n=0 \/ n=1 \/ n=12
 
 end
+
+(** Fibonacci numbers can be extended to negative indices using the same
+    recurrence relation, namely `F n = F (n+2) - F (n+1)` for `n < 0`. *)
+module NegativeFibonacci
+
+  use int.Int
+  use int.EuclideanDivision
+
+  let rec function fib (n: int) : int
+    variant { if n < 0 then -n+1 else n }
+  = if n < 0 then fib (n+2) - fib (n+1) else
+    if n > 1 then fib (n-2) + fib (n-1) else
+    n
+
+  (** for all `n`, we have `F (-n) = (-1)^(n+1) F n` *)
+
+  let rec lemma property (n: int)
+    requires { n >= 0 }
+    ensures  { mod n 2 = 0 -> fib (-n) = - fib n }
+    ensures  { mod n 2 = 1 -> fib (-n) =   fib n }
+    variant  { n }
+  = if n > 0 then property (n-1);
+    if n > 1 then property (n-2)
+
+  lemma even: forall n. mod n 2 = 0 -> fib (-n) = - fib n
+  lemma odd : forall n. mod n 2 = 1 -> fib (-n) =   fib n
+
+end

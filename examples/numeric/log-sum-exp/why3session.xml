@@ -2,16 +2,16 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.12.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.12.6" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="7" name="Coq" version="8.20.1" timelimit="0" steplimit="0" memlimit="0"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="log-sum-exp.mlw"/>
 <theory name="RealHelpers" proved="true">
  <goal name="exp_bound_1&#39;vc" expl="VC for exp_bound_1" proved="true">
- <proof prover="7"><path name="logmnsummnexp_RealHelpers_exp_bound_1qtvc_1.v"/><result status="valid" time="1.193075"/></proof>
+ <proof prover="7"><path name="logmnsummnexp_RealHelpers_exp_bound_1qtvc_1.v"/><result status="valid" time="1.684572"/></proof>
  </goal>
  <goal name="log_1_minus_x&#39;vc" expl="VC for log_1_minus_x" proved="true">
  <transf name="split_vc" proved="true" >
@@ -32,26 +32,26 @@
  <proof prover="6"><result status="valid" time="0.029116" steps="57"/></proof>
  </goal>
  <goal name="sum_bounds&#39;vc" expl="VC for sum_bounds" proved="true">
- <proof prover="0"><result status="valid" time="0.028989" steps="4756"/></proof>
+ <proof prover="4"><result status="valid" time="0.028989" steps="5916"/></proof>
  </goal>
  <goal name="sum_abs&#39;vc" expl="VC for sum_abs" proved="true">
  <proof prover="1"><result status="valid" time="0.061536" steps="1949"/></proof>
  </goal>
  <goal name="sum_strictly_pos&#39;vc" expl="VC for sum_strictly_pos" proved="true">
- <proof prover="0"><result status="valid" time="0.014990" steps="3123"/></proof>
+ <proof prover="4"><result status="valid" time="0.014990" steps="3192"/></proof>
  </goal>
  <goal name="sum_accuracy&#39;vc" expl="VC for sum_accuracy" proved="true">
- <proof prover="3"><result status="valid" time="0.461191" steps="56553"/></proof>
+ <proof prover="2"><result status="valid" time="0.297580" steps="54061"/></proof>
  </goal>
 </theory>
 <theory name="FloatSummations" proved="true">
  <goal name="u_sum&#39;vc" expl="VC for u_sum" proved="true">
- <proof prover="3"><result status="valid" time="0.039200" steps="2143"/></proof>
+ <proof prover="2"><result status="valid" time="0.039200" steps="2139"/></proof>
  </goal>
  <goal name="u_sum_accuracy&#39;vc" expl="VC for u_sum_accuracy" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="u_sum_accuracy&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.059092" steps="10431"/></proof>
+  <proof prover="2"><result status="valid" time="0.059092" steps="10193"/></proof>
   </goal>
   <goal name="u_sum_accuracy&#39;vc.1" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.383699" steps="56608"/></proof>
@@ -63,7 +63,7 @@
   <proof prover="1"><result status="valid" time="0.026209" steps="3238"/></proof>
   </goal>
   <goal name="u_sum_accuracy&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.023353" steps="2067"/></proof>
+  <proof prover="2"><result status="valid" time="0.023353" steps="2063"/></proof>
   </goal>
   <goal name="u_sum_accuracy&#39;vc.5" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.029321" steps="3557"/></proof>
@@ -81,10 +81,10 @@
   <proof prover="6"><result status="valid" time="3.726488" steps="15777"/></proof>
   </goal>
   <goal name="u_sum_accuracy&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.170001" steps="12789"/></proof>
+  <proof prover="2"><result status="valid" time="0.170001" steps="12493"/></proof>
   </goal>
   <goal name="u_sum_accuracy&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.663028" steps="2086"/></proof>
+  <proof prover="6"><result status="valid" time="0.432711" steps="2086"/></proof>
   </goal>
  </transf>
  </goal>
@@ -97,7 +97,7 @@
   <proof prover="6"><result status="valid" time="0.073913" steps="205"/></proof>
   </goal>
   <goal name="u_sum_constant_bounds&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.024609" steps="2328"/></proof>
+  <proof prover="2"><result status="valid" time="0.024609" steps="2324"/></proof>
   </goal>
   <goal name="u_sum_constant_bounds&#39;vc.3" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
@@ -105,18 +105,18 @@
    <proof prover="6"><result status="valid" time="0.057170" steps="396"/></proof>
    </goal>
    <goal name="u_sum_constant_bounds&#39;vc.3.1" expl="VC for u_sum_constant_bounds" proved="true">
-   <proof prover="3"><result status="valid" time="0.024425" steps="2503"/></proof>
+   <proof prover="2"><result status="valid" time="0.024425" steps="2499"/></proof>
    </goal>
    <goal name="u_sum_constant_bounds&#39;vc.3.2" expl="VC for u_sum_constant_bounds" proved="true">
    <proof prover="6"><result status="valid" time="0.039272" steps="178"/></proof>
    </goal>
    <goal name="u_sum_constant_bounds&#39;vc.3.3" expl="VC for u_sum_constant_bounds" proved="true">
-   <proof prover="3"><result status="valid" time="0.029070" steps="2877"/></proof>
+   <proof prover="2"><result status="valid" time="0.029070" steps="2873"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="u_sum_constant_bounds&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.110849" steps="11007"/></proof>
+  <proof prover="2"><result status="valid" time="0.110849" steps="10769"/></proof>
   </goal>
   <goal name="u_sum_constant_bounds&#39;vc.5" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.026629" steps="3977"/></proof>
@@ -126,10 +126,10 @@
  <goal name="u_sum_accuracy_combine&#39;vc" expl="VC for u_sum_accuracy_combine" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="u_sum_accuracy_combine&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.029372" steps="2250"/></proof>
+  <proof prover="2"><result status="valid" time="0.029372" steps="2246"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020932" steps="1563"/></proof>
+  <proof prover="4"><result status="valid" time="0.020932" steps="1563"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.2" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.041759" steps="306"/></proof>
@@ -141,16 +141,16 @@
   <proof prover="6"><result status="valid" time="0.057323" steps="123"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.397954" steps="1685"/></proof>
+  <proof prover="6"><result status="valid" time="0.244587" steps="1685"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.039606" steps="181"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.342428" steps="1647"/></proof>
+  <proof prover="6"><result status="valid" time="0.510073" steps="1647"/></proof>
   </goal>
   <goal name="u_sum_accuracy_combine&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.038078" steps="3421"/></proof>
+  <proof prover="2"><result status="valid" time="0.038078" steps="3417"/></proof>
   </goal>
  </transf>
  </goal>
@@ -162,32 +162,32 @@
   <proof prover="1"><result status="valid" time="0.031580" steps="5567"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.020119" steps="22596"/></proof>
+  <proof prover="4"><result status="valid" time="0.020119" steps="22596"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.2" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.088809" steps="15544"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.191811" steps="53546"/></proof>
+  <proof prover="6"><result status="valid" time="1.047311" steps="53546"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.4" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.334610" steps="6134"/></proof>
+  <proof prover="6"><result status="valid" time="0.192199" steps="6134"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.204976" steps="2054"/></proof>
+  <proof prover="6"><result status="valid" time="0.075169" steps="2054"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.184487" steps="2503"/></proof>
   </goal>
   <goal name="log_combine_err&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.027122" steps="3911"/></proof>
+  <proof prover="2"><result status="valid" time="0.027122" steps="3899"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="lse_accuracy&#39;vc" expl="VC for lse_accuracy" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse_accuracy&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.154041" steps="759"/></proof>
+  <proof prover="6"><result status="valid" time="0.291902" steps="759"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.1" expl="precondition" proved="true">
   <transf name="instantiate" proved="true" arg1="Assert" arg2="i">
@@ -197,59 +197,66 @@
   </transf>
   </goal>
   <goal name="lse_accuracy&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.036542" steps="3889"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.036542" steps="3877"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.044066" steps="3118"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.044066" steps="3106"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.038968" steps="3913"/></proof>
+  <proof prover="2"><result status="valid" time="0.038968" steps="3901"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.257867" steps="30276"/></proof>
+  <proof prover="2"><result status="valid" time="0.257867" steps="29970"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.6" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.046211" steps="289"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.027040" steps="3534"/></proof>
+  <proof prover="2"><result status="valid" time="0.027040" steps="3522"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.8" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.249766" steps="33092"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052668" steps="3544"/></proof>
+  <proof prover="2"><result status="valid" time="0.052668" steps="3532"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.10" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="lse_accuracy&#39;vc.10.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.067785" steps="14551"/></proof>
+   <proof prover="2"><result status="valid" time="0.067785" steps="14239"/></proof>
    </goal>
    <goal name="lse_accuracy&#39;vc.10.1" expl="VC for lse_accuracy" proved="true">
-   <proof prover="3"><result status="valid" time="0.037618" steps="4085"/></proof>
+   <proof prover="2"><result status="valid" time="0.037618" steps="4073"/></proof>
    </goal>
    <goal name="lse_accuracy&#39;vc.10.2" expl="VC for lse_accuracy" proved="true">
    <proof prover="6"><result status="valid" time="0.317331" steps="1045"/></proof>
    </goal>
    <goal name="lse_accuracy&#39;vc.10.3" expl="VC for lse_accuracy" proved="true">
-   <proof prover="6"><result status="valid" time="0.176794" steps="762"/></proof>
+   <proof prover="6"><result status="valid" time="0.295727" steps="762"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="lse_accuracy&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.056795" steps="3899"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.056795" steps="3887"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.109737" steps="13333"/></proof>
+  <proof prover="2"><result status="valid" time="0.109737" steps="13071"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.071080" steps="13953"/></proof>
+  <proof prover="2"><result status="valid" time="0.071080" steps="13673"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.804399" steps="36186"/></proof>
+  <transf name="split_vc" proved="true" >
+   <goal name="lse_accuracy&#39;vc.14.0" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="1.361879" steps="23618"/></proof>
+   </goal>
+   <goal name="lse_accuracy&#39;vc.14.1" expl="postcondition" proved="true">
+   <proof prover="6"><result status="valid" time="0.050863" steps="222"/></proof>
+   </goal>
+  </transf>
   </goal>
   <goal name="lse_accuracy&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.020049" steps="2527"/></proof>
+  <proof prover="4"><result status="valid" time="0.020049" steps="2527"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.16" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="0.243528" steps="692"/></proof>
@@ -267,13 +274,13 @@
   <proof prover="6"><result status="valid" time="0.046997" steps="278"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.21" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="1.319415" steps="72237"/></proof>
+  <proof prover="6"><result status="valid" time="1.272378" steps="72237"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.22" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="0.536934" steps="16176"/></proof>
+  <proof prover="6"><result status="valid" time="0.554559" steps="16176"/></proof>
   </goal>
   <goal name="lse_accuracy&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.023922" steps="29699"/></proof>
+  <proof prover="4"><result status="valid" time="0.023922" steps="29698"/></proof>
   </goal>
  </transf>
  </goal>
@@ -286,69 +293,69 @@
  <proof prover="6"><result status="valid" time="0.051400" steps="341"/></proof>
  </goal>
  <goal name="g&#39;vc" expl="VC for g" proved="true">
- <proof prover="3"><result status="valid" time="0.040116" steps="2504"/></proof>
+ <proof prover="2"><result status="valid" time="0.040116" steps="2513"/></proof>
  </goal>
  <goal name="g_bounds&#39;vc" expl="VC for g_bounds" proved="true">
- <proof prover="6"><result status="valid" time="0.810320" steps="38090"/></proof>
+ <proof prover="6"><result status="valid" time="0.906322" steps="38090"/></proof>
  </goal>
  <goal name="u_g&#39;vc" expl="VC for u_g" proved="true">
- <proof prover="3"><result status="valid" time="0.036029" steps="3831"/></proof>
+ <proof prover="2"><result status="valid" time="0.036029" steps="3799"/></proof>
  </goal>
  <goal name="g_accuracy&#39;vc" expl="VC for g_accuracy" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="g_accuracy&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.050654" steps="11526"/></proof>
+  <proof prover="2"><result status="valid" time="0.050654" steps="11476"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.085676" steps="19922"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.053403" steps="8904"/></proof>
+  <proof prover="2"><result status="valid" time="0.053403" steps="8854"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.045489" steps="8906"/></proof>
+  <proof prover="2"><result status="valid" time="0.045489" steps="8856"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.036088" steps="8908"/></proof>
+  <proof prover="2"><result status="valid" time="0.036088" steps="8858"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.066717" steps="8910"/></proof>
+  <proof prover="2"><result status="valid" time="0.066717" steps="8860"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.6" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.066303" steps="261"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044440" steps="10921"/></proof>
+  <proof prover="2"><result status="valid" time="0.044440" steps="10871"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020038" steps="12053"/></proof>
+  <proof prover="4"><result status="valid" time="0.020038" steps="12053"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.066000" steps="8920"/></proof>
+  <proof prover="2"><result status="valid" time="0.066000" steps="8870"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.10" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.141026" steps="678"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="6"><result status="valid" time="4.994924" steps="447001"/></proof>
+  <proof prover="6"><result status="valid" time="6.172879" steps="447001"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.035008" steps="10559"/></proof>
+  <proof prover="2"><result status="valid" time="0.035008" steps="10498"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.055277" steps="10561"/></proof>
+  <proof prover="2"><result status="valid" time="0.055277" steps="10500"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.065451" steps="10562"/></proof>
+  <proof prover="2"><result status="valid" time="0.065451" steps="10501"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.130989" steps="8177"/></proof>
+  <proof prover="6"><result status="valid" time="0.253576" steps="8177"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.042248" steps="11512"/></proof>
+  <proof prover="2"><result status="valid" time="0.042248" steps="11451"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.054364" steps="10575"/></proof>
+  <proof prover="2"><result status="valid" time="0.054364" steps="10514"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.18" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.063451" steps="2406"/></proof>
@@ -357,107 +364,107 @@
   <proof prover="6"><result status="valid" time="0.197277" steps="2406"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.031645" steps="9079"/></proof>
+  <proof prover="2"><result status="valid" time="0.031645" steps="9018"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.21" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.049547" steps="10950"/></proof>
+  <proof prover="2"><result status="valid" time="0.049547" steps="10889"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044478" steps="9100"/></proof>
+  <proof prover="2"><result status="valid" time="0.044478" steps="9039"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.23" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.030239" steps="18345"/></proof>
+  <proof prover="4"><result status="valid" time="0.030239" steps="18345"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.24" expl="assertion" proved="true">
   <proof prover="1"><result status="valid" time="0.100582" steps="22778"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.034930" steps="11124"/></proof>
+  <proof prover="2"><result status="valid" time="0.034930" steps="11063"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.039001" steps="11125"/></proof>
+  <proof prover="2"><result status="valid" time="0.039001" steps="11064"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.27" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.163950" steps="31770"/></proof>
+  <proof prover="2"><result status="valid" time="0.163950" steps="31312"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.186975" steps="12631"/></proof>
+  <proof prover="2"><result status="valid" time="0.064882" steps="12570"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.043045" steps="11330"/></proof>
+  <proof prover="2"><result status="valid" time="0.043045" steps="11269"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.181072" steps="38470"/></proof>
+  <proof prover="2"><result status="valid" time="0.181072" steps="37980"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.169975" steps="32086"/></proof>
+  <proof prover="2"><result status="valid" time="0.169975" steps="31599"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.32" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.083692" steps="13209"/></proof>
+  <proof prover="2"><result status="valid" time="0.083692" steps="13148"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.33" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.055196" steps="13399"/></proof>
+  <proof prover="2"><result status="valid" time="0.055196" steps="13335"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.34" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.062792" steps="13621"/></proof>
+  <proof prover="2"><result status="valid" time="0.062792" steps="13557"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.35" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070202" steps="13944"/></proof>
+  <proof prover="2"><result status="valid" time="0.070202" steps="13880"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.36" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.041471" steps="11643"/></proof>
+  <proof prover="2"><result status="valid" time="0.041471" steps="11576"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.37" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.143849" steps="33454"/></proof>
+  <proof prover="2"><result status="valid" time="0.143849" steps="32977"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.38" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052902" steps="11678"/></proof>
+  <proof prover="2"><result status="valid" time="0.052902" steps="11611"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.39" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051978" steps="11802"/></proof>
+  <proof prover="2"><result status="valid" time="0.051978" steps="11735"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.40" expl="assertion" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="g_accuracy&#39;vc.40.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.214487" steps="14720"/></proof>
+   <proof prover="2"><result status="valid" time="0.071255" steps="14653"/></proof>
    </goal>
    <goal name="g_accuracy&#39;vc.40.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.067711" steps="11816"/></proof>
+   <proof prover="2"><result status="valid" time="0.067711" steps="11749"/></proof>
    </goal>
    <goal name="g_accuracy&#39;vc.40.2" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.050623" steps="11814"/></proof>
+   <proof prover="2"><result status="valid" time="0.050623" steps="11747"/></proof>
    </goal>
    <goal name="g_accuracy&#39;vc.40.3" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.147994" steps="11810"/></proof>
+   <proof prover="2"><result status="valid" time="0.147994" steps="11743"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="g_accuracy&#39;vc.41" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.186717" steps="14051"/></proof>
+  <proof prover="2"><result status="valid" time="0.186717" steps="13984"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.159983" steps="11615"/></proof>
+  <proof prover="2"><result status="valid" time="0.159983" steps="11551"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.43" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.270877" steps="48221"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.44" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.087516" steps="13886"/></proof>
+  <proof prover="2"><result status="valid" time="0.087516" steps="13822"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.054009" steps="13717"/></proof>
+  <proof prover="2"><result status="valid" time="0.054009" steps="13653"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.46" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.039079" steps="11854"/></proof>
+  <proof prover="2"><result status="valid" time="0.039079" steps="11790"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.47" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.033564" steps="9541"/></proof>
+  <proof prover="2"><result status="valid" time="0.033564" steps="9460"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.48" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.037386" steps="9709"/></proof>
+  <proof prover="2"><result status="valid" time="0.037386" steps="9621"/></proof>
   </goal>
   <goal name="g_accuracy&#39;vc.49" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="2.958951" steps="168435"/></proof>
+  <proof prover="6"><result status="valid" time="1.901861" steps="168435"/></proof>
   </goal>
  </transf>
  </goal>
@@ -471,48 +478,48 @@
  <proof prover="6"><result status="valid" time="0.061542" steps="156"/></proof>
  </goal>
  <goal name="u_h&#39;vc" expl="VC for u_h" proved="true">
- <proof prover="0"><result status="valid" time="0.024081" steps="11230"/></proof>
+ <proof prover="4"><result status="valid" time="0.024081" steps="11230"/></proof>
  </goal>
  <goal name="gg_bounds&#39;vc" expl="VC for gg_bounds" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="gg_bounds&#39;vc.0" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="4.360111" steps="255343"/></proof>
+  <proof prover="6"><result status="valid" time="5.831387" steps="255343"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.051735" steps="10877"/></proof>
+  <proof prover="2"><result status="valid" time="0.051735" steps="10823"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.2" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="0.384500" steps="11537"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.115593" steps="27130"/></proof>
+  <proof prover="2"><result status="valid" time="0.115593" steps="26839"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.049322" steps="10242"/></proof>
+  <proof prover="2"><result status="valid" time="0.049322" steps="10188"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.054005" steps="10316"/></proof>
+  <proof prover="2"><result status="valid" time="0.054005" steps="10262"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.033139" steps="10954"/></proof>
+  <proof prover="2"><result status="valid" time="0.033139" steps="10900"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.268254" steps="273683"/></proof>
+  <proof prover="4"><result status="valid" time="0.268254" steps="273683"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.055210" steps="10875"/></proof>
+  <proof prover="2"><result status="valid" time="0.055210" steps="10821"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.045056" steps="10272"/></proof>
+  <proof prover="2"><result status="valid" time="0.045056" steps="10218"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.10" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.045489" steps="10304"/></proof>
+  <proof prover="2"><result status="valid" time="0.045489" steps="10250"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="0.760079" steps="34386"/></proof>
+  <proof prover="6"><result status="valid" time="0.711522" steps="34386"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.131093" steps="29146"/></proof>
+  <proof prover="2"><result status="valid" time="0.131093" steps="28449"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.13" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.296801" steps="8008"/></proof>
@@ -521,38 +528,38 @@
   <proof prover="6"><result status="valid" time="0.071728" steps="264"/></proof>
   </goal>
   <goal name="gg_bounds&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.035310" steps="10100"/></proof>
+  <proof prover="2"><result status="valid" time="0.035310" steps="10049"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="slse_accuracy&#39;vc" expl="VC for slse_accuracy" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="slse_accuracy&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.034185" steps="10390"/></proof>
+  <proof prover="2"><result status="valid" time="0.034185" steps="10336"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.041752" steps="10391"/></proof>
+  <proof prover="2"><result status="valid" time="0.041752" steps="10337"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.035206" steps="181"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.030292" steps="11890"/></proof>
+  <proof prover="4"><result status="valid" time="0.030292" steps="11890"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.4" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.035923" steps="180"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.039645" steps="10442"/></proof>
+  <proof prover="2"><result status="valid" time="0.039645" steps="10383"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.033498" steps="10473"/></proof>
+  <proof prover="2"><result status="valid" time="0.033498" steps="10414"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.7" expl="assertion" proved="true">
   <proof prover="6"><result status="valid" time="0.239464" steps="928"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.8" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.045651" steps="11359"/></proof>
+  <proof prover="2"><result status="valid" time="0.045651" steps="11300"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.9" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.037319" steps="201"/></proof>
@@ -561,77 +568,77 @@
   <proof prover="6"><result status="valid" time="0.230234" steps="4836"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.332505" steps="29687"/></proof>
+  <proof prover="2"><result status="valid" time="0.141318" steps="29344"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.033164" steps="10697"/></proof>
+  <proof prover="2"><result status="valid" time="0.033164" steps="10638"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.262220" steps="36443"/></proof>
+  <proof prover="2"><result status="valid" time="0.262220" steps="35786"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.944827" steps="124961"/></proof>
+  <proof prover="2"><result status="valid" time="0.638562" steps="124029"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040172" steps="11531"/></proof>
+  <proof prover="2"><result status="valid" time="0.040172" steps="11442"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.186657" steps="35402"/></proof>
+  <proof prover="2"><result status="valid" time="0.186657" steps="34863"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="6"><result status="valid" time="1.430159" steps="51107"/></proof>
+  <proof prover="6"><result status="valid" time="0.966006" steps="51107"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.057554" steps="12837"/></proof>
+  <proof prover="2"><result status="valid" time="0.057554" steps="12748"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.19" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.143174" steps="35419"/></proof>
+  <proof prover="2"><result status="valid" time="0.143174" steps="34880"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.055647" steps="11579"/></proof>
+  <proof prover="2"><result status="valid" time="0.055647" steps="11490"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051610" steps="11699"/></proof>
+  <proof prover="2"><result status="valid" time="0.051610" steps="11610"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.22" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.052150" steps="11716"/></proof>
+  <proof prover="2"><result status="valid" time="0.052150" steps="11627"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.23" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.077207" steps="490"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051341" steps="11736"/></proof>
+  <proof prover="2"><result status="valid" time="0.051341" steps="11647"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.25" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.056013" steps="11764"/></proof>
+  <proof prover="2"><result status="valid" time="0.056013" steps="11675"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.26" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="3.472246" steps="258217"/></proof>
+  <proof prover="6"><result status="valid" time="3.472246" steps="258216"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.27" expl="precondition" proved="true">
   <transf name="instantiate" proved="true" arg1="H2" arg2="i1,i">
    <goal name="slse_accuracy&#39;vc.27.0" expl="precondition" proved="true">
-   <proof prover="6"><result status="valid" time="0.461323" steps="14477"/></proof>
+   <proof prover="6"><result status="valid" time="0.445011" steps="14477"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="slse_accuracy&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.022326" steps="13643"/></proof>
+  <proof prover="4"><result status="valid" time="0.022326" steps="13643"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.038480" steps="10383"/></proof>
+  <proof prover="2"><result status="valid" time="0.038480" steps="10286"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.30" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.068765" steps="204"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.31" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.640992" steps="111828"/></proof>
+  <proof prover="2"><result status="valid" time="0.640992" steps="110994"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.32" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.049077" steps="280"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.33" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.536281" steps="111338"/></proof>
+  <proof prover="2"><result status="valid" time="0.773696" steps="110552"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.34" expl="postcondition" proved="true">
   <proof prover="6"><result status="valid" time="0.070752" steps="290"/></proof>
@@ -640,67 +647,67 @@
   <proof prover="6"><result status="valid" time="0.056554" steps="321"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.36" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.046224" steps="12908"/></proof>
+  <proof prover="2"><result status="valid" time="0.046224" steps="12811"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.37" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.057738" steps="339"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.38" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.724676" steps="110450"/></proof>
+  <proof prover="2"><result status="valid" time="0.479544" steps="109665"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.39" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.037726" steps="11848"/></proof>
+  <proof prover="2"><result status="valid" time="0.037726" steps="11751"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.40" expl="postcondition" proved="true">
-  <proof prover="6" timelimit="30"><result status="valid" time="13.642326" steps="780601"/></proof>
+  <proof prover="6" timelimit="30"><result status="valid" time="12.127200" steps="780601"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.41" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.044908" steps="12916"/></proof>
+  <proof prover="2"><result status="valid" time="0.044908" steps="12819"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.035878" steps="11852"/></proof>
+  <proof prover="2"><result status="valid" time="0.035878" steps="11755"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.43" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.617383" steps="110456"/></proof>
+  <proof prover="2"><result status="valid" time="0.617383" steps="109671"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.245259" steps="33096"/></proof>
+  <proof prover="2" timelimit="1"><result status="valid" time="0.245259" steps="32614"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.45" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.144045" steps="31763"/></proof>
+  <proof prover="2"><result status="valid" time="0.144045" steps="31323"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.46" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.040421" steps="11958"/></proof>
+  <proof prover="2"><result status="valid" time="0.040421" steps="11861"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.47" expl="postcondition" proved="true">
-  <proof prover="6"><result status="valid" time="8.156782" steps="401198"/></proof>
+  <proof prover="6"><result status="valid" time="7.193452" steps="401198"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.48" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.047886" steps="11920"/></proof>
+  <proof prover="2"><result status="valid" time="0.047886" steps="11823"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.49" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.163601" steps="13066"/></proof>
+  <proof prover="2"><result status="valid" time="0.163601" steps="12969"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.50" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.165478" steps="13074"/></proof>
+  <proof prover="2"><result status="valid" time="0.165478" steps="12977"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.51" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040558" steps="11827"/></proof>
+  <proof prover="2"><result status="valid" time="0.040558" steps="11730"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.52" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.136207" steps="33981"/></proof>
+  <proof prover="2"><result status="valid" time="0.136207" steps="33530"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.53" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.036168" steps="11940"/></proof>
+  <proof prover="2"><result status="valid" time="0.036168" steps="11843"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.54" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.049106" steps="332"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.55" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.083912" steps="13083"/></proof>
+  <proof prover="2"><result status="valid" time="0.083912" steps="12986"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.56" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.042880" steps="12018"/></proof>
+  <proof prover="2"><result status="valid" time="0.042880" steps="11921"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.57" expl="assertion" proved="true">
   <proof prover="6" timelimit="60"><result status="valid" time="5.135302" steps="376101"/></proof>
@@ -713,16 +720,16 @@
   </transf>
   </goal>
   <goal name="slse_accuracy&#39;vc.59" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.041363" steps="12351"/></proof>
+  <proof prover="2"><result status="valid" time="0.041363" steps="12268"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.60" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.046790" steps="213"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.61" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.042729" steps="12408"/></proof>
+  <proof prover="2"><result status="valid" time="0.042729" steps="12325"/></proof>
   </goal>
   <goal name="slse_accuracy&#39;vc.62" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.034349" steps="11775"/></proof>
+  <proof prover="2"><result status="valid" time="0.034349" steps="11674"/></proof>
   </goal>
  </transf>
  </goal>

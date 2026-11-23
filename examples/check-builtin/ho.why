@@ -1,0 +1,31 @@
+theory C
+  use int.Int
+
+  function sum (int -> int) int int : int
+
+  goal G1: forall i j.
+    let tmp1 = (fun _ -> 0) in
+    let tmp2 = (fun _ -> 0) in  
+    sum tmp1 i j = sum tmp2 i j
+
+  function cst (x:int) (_:int) : int = x
+
+  goal G2: forall i j.
+    let tmp1 = (cst 0) in
+    let tmp2 = (cst 0) in  
+    sum tmp1 i j = sum tmp2 i j
+
+  function summ ((int -> int) -> int -> int) int int : int
+  
+  goal G3: forall i j.
+    let tmp1 = (fun x i -> x i) in
+    let tmp2 = (fun x -> x) in  
+    summ tmp1 i j = summ tmp2 i j
+
+
+  goal G4: forall i j.
+    let tmp1 = (fun _ _ -> 0) in
+    let tmp2 = (fun _ -> cst 0) in  
+    summ tmp1 i j = summ tmp2 i j
+
+end

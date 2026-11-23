@@ -1,0 +1,7 @@
+(ocamllex lexer)
+
+(menhir
+ (modules parser_common parser)
+ (merge_into parser)
+ (infer false)
+ (flags --table --strict --explain --external-tokens Parser_tokens))

@@ -2,8 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="coincidence_count_list.mlw"/>
@@ -14,47 +16,47 @@
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="coincidence_count&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="11759"/></proof>
+  <proof prover="3"><result status="valid" time="0.010286" steps="6968"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="10893"/></proof>
+  <proof prover="3"><result status="valid" time="0.020758" steps="29678"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="11001"/></proof>
+  <proof prover="3"><result status="valid" time="0.019617" steps="27759"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.050000" steps="11746"/></proof>
+  <proof prover="3"><result status="valid" time="0.011756" steps="6870"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="10999"/></proof>
+  <proof prover="1"><result status="valid" time="0.048667" steps="19"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="9405"/></proof>
+  <proof prover="3"><result status="valid" time="0.008123" steps="2301"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="11723"/></proof>
+  <proof prover="0"><result status="valid" time="0.059079" steps="4217"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.020000" steps="9401"/></proof>
+  <proof prover="3"><result status="valid" time="0.010944" steps="2300"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="4"><result status="valid" time="0.040000" steps="11006"/></proof>
+  <proof prover="3"><result status="valid" time="0.021542" steps="29935"/></proof>
   </goal>
   <goal name="coincidence_count&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.003461" steps="61954"/></proof>
+  <proof prover="0"><result status="valid" time="0.282526" steps="30909"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="CoincidenceCountAnyType" proved="true">
  <goal name="SetApp.eq&#39;refn&#39;vc" expl="VC for eq&#39;refn" proved="true">
- <proof prover="4"><result status="valid" time="0.020000" steps="5971"/></proof>
+ <proof prover="4"><result status="valid" time="0.020000" steps="2774"/></proof>
  </goal>
  <goal name="Transitive.Trans" proved="true">
  <proof prover="1"><result status="valid" time="0.000000" steps="8"/></proof>
  </goal>
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
- <proof prover="1"><result status="valid" time="1.734092" steps="18699"/></proof>
+ <proof prover="0"><result status="valid" time="0.322655" steps="38655"/></proof>
  </goal>
 </theory>
 <theory name="CoincidenceCountList" proved="true">
@@ -62,7 +64,7 @@
  <proof prover="1"><result status="valid" time="0.000000" steps="3"/></proof>
  </goal>
  <goal name="coincidence_count&#39;vc" expl="VC for coincidence_count" proved="true">
- <proof prover="1"><result status="valid" time="0.330458" steps="3177"/></proof>
+ <proof prover="2"><result status="valid" time="0.253594" steps="20925"/></proof>
  </goal>
 </theory>
 </file>

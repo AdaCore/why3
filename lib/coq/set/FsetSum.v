@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -101,8 +101,8 @@ destruct ClassicalEpsilon.constructive_indefinite_description.
 destruct a0 as (Hx0dup, Hx0eq). destruct a1 as (Hx1dup, Hx1eq).
 split. intros.
 + eapply fold_left_iff_symm; eauto.
-  * intuition.
-  * intuition.
+  * apply Z.add_comm.
+  * intros; apply eq_sym, Z.add_assoc.
   * intros. rewrite Hx0eq. rewrite Hx1eq. unfold Map.set. 
     destruct why_decidable_eq; try subst; intuition.
 + intros.
@@ -113,19 +113,21 @@ split. intros.
   erewrite <- (fold_left_iff_symm (List.app x0' x0'')); eauto.
   * rewrite List.fold_left_app. rewrite fold_left_symm.
     ++ auto.
-    ++ intuition.
-    ++ intuition.
-  * intuition.
-  * intuition.
+    ++ apply Z.add_comm.
+    ++ intros; apply eq_sym, Z.add_assoc.
+  * apply Z.add_comm.
+  * intros; apply eq_sym, Z.add_assoc.
   * intros. rewrite List.in_app_iff. rewrite Hx0 in Hx0eq.
     specialize (Hx0eq e). rewrite List.in_app_iff in Hx0eq. simpl in Hx0eq.
     unfold Map.set in *. split; intros.
     ++ destruct H2.
        ** apply Hx1eq. destruct why_decidable_eq.
-          -- subst. eapply List.NoDup_remove_2 in Hx0dup. intuition.
+          -- subst. eapply List.NoDup_remove_2 in Hx0dup.
+             elim Hx0dup. apply List.in_or_app. now left.
           -- intuition.
        ** eapply Hx1eq. destruct why_decidable_eq.
-          -- subst. eapply List.NoDup_remove_2 in Hx0dup. intuition.
+          -- subst. eapply List.NoDup_remove_2 in Hx0dup.
+             elim Hx0dup. apply List.in_or_app. now right.
           -- intuition.
     ++ eapply Hx1eq in H2.
        destruct why_decidable_eq.
@@ -177,11 +179,13 @@ destruct ClassicalEpsilon.constructive_indefinite_description.
 destruct a1 as (Hdidup, Hdieq).
 destruct a0 as (Hx0dup, Hx0eq).
 destruct a2 as (Hx1dup, Hx1eq).
-  rewrite fold_left_symm; try now intuition.
+  rewrite fold_left_symm.
+  2: apply Z.add_comm.
+  2: intros; apply eq_sym, Z.add_assoc.
   rewrite Z.add_0_l. rewrite <- List.fold_left_app.
   eapply fold_left_iff_symm; eauto.
-  + intuition.
-  + intuition.
+  + apply Z.add_comm.
+  + intros; apply eq_sym, Z.add_assoc.
   + intros. rewrite List.in_app_iff. rewrite Hx1eq. rewrite Hx0eq.
     rewrite Hdieq. rewrite set.Set.diff'def. unfold set.Set.mem.
     split; intros.
@@ -191,7 +195,7 @@ destruct a2 as (Hx1dup, Hx1eq).
     - intros. rewrite Hx1eq in H0. rewrite Hdieq. rewrite set.Set.diff'def.
       intuition.
 }
-lia.
+rewrite H0. ring.
 Qed.
 
 Lemma sum_union_disj {a:Type} {a_WT:WhyType a} :
@@ -210,16 +214,19 @@ destruct ClassicalEpsilon.constructive_indefinite_description.
 destruct a0 as (Hundup, Huneq).
 destruct a1 as (Hx0dup, Hx0eq).
 destruct a2 as (Hx1dup, Hx1eq).
-  rewrite fold_left_symm; try now intuition.
-  rewrite Z.add_0_l. rewrite <- List.fold_left_app.
-  eapply fold_left_iff_symm; eauto.
-  + intuition.
-  + intuition.
-  + intros. rewrite List.in_app_iff. rewrite Hx1eq. rewrite Hx0eq. rewrite Huneq.
-    rewrite set.Set.union'def. clear - e. intuition.
-  + eapply Cardinal.NoDup_app; eauto.
-    * intros. intro. apply Hx0eq in H0. apply Hx1eq in H.
-      specialize (Hdisj e). intuition.
+rewrite fold_left_symm.
+2: apply Z.add_comm.
+2: intros; apply eq_sym, Z.add_assoc.
+rewrite Z.add_0_l. rewrite <- List.fold_left_app.
+eapply fold_left_iff_symm; eauto.
++ apply Z.add_comm.
++ intros; apply eq_sym, Z.add_assoc.
++ intros. rewrite List.in_app_iff. rewrite Hx1eq. rewrite Hx0eq. rewrite Huneq.
+  rewrite set.Set.union'def. clear - e. intuition.
++ eapply Cardinal.NoDup_app; eauto.
+  intros. intro. apply Hx0eq in H0. apply Hx1eq in H.
+  specialize (Hdisj e).
+  now destruct Hdisj.
 Qed.
 
 (* Why3 goal *)
@@ -312,7 +319,7 @@ assert (Z.of_nat (length (a0 :: x)) = Z.of_nat (length x) + 1)%Z.
 simpl. rewrite Zpos_P_of_succ_nat. ring.
 rewrite H.
 rewrite IHx. rewrite @fold_left_symm; eauto.
-intuition.
-intuition.
+apply Z.add_comm.
+intros; apply eq_sym, Z.add_assoc.
 Qed.
 

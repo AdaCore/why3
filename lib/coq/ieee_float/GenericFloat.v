@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -476,7 +476,8 @@ Qed.
 
 Lemma is_nan_dec: forall x, {is_nan x} + {~ is_nan x}.
 Proof.
-  intro; destruct x; compute; intuition.
+  intro; destruct x; try now right.
+  now left.
 Qed.
 
 Lemma eq_not_nan_refl: forall {x : t}, ~ is_nan x -> eq x x.

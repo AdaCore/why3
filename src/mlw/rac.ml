@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -151,10 +151,7 @@ let task_prefix (env: env) =
         in
         let inst_ls =
           Mls.fold (fun ls v acc ->
-              let do_add = match task with
-                | None -> false
-                | Some task_hd -> Mid.mem v.Term.ls_name task_hd.task_known
-              in
+              let do_add = Mid.mem v.Term.ls_name (Task.task_known task) in
               if do_add then Mls.add ls v acc else acc)
             sm.sm_ls Mls.empty in
         let inst =

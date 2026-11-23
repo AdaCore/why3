@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
+<prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC5" version="1.1.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="tower_of_hanoi.mlw"/>
 <theory name="Hanoi" proved="true">
@@ -105,7 +105,7 @@
 </theory>
 <theory name="Tower_of_Hanoi" proved="true">
  <goal name="RevSorted.Transitive.Trans" proved="true">
- <proof prover="1"><result status="valid" time="0.030362" steps="2121"/></proof>
+ <proof prover="1"><result status="valid" time="0.030362" steps="223"/></proof>
  </goal>
  <goal name="tower&#39;vc" expl="VC for tower" proved="true">
  <proof prover="1"><result status="valid" time="0.038067" steps="3433"/></proof>
@@ -135,7 +135,7 @@
   <proof prover="4"><result status="valid" time="0.016160" steps="29841"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="5"><result status="valid" time="0.029446" steps="18"/></proof>
+  <proof prover="0"><result status="valid" time="0.029446" steps="18"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.2" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.059509" steps="8950"/></proof>
@@ -144,10 +144,10 @@
   <proof prover="1"><result status="valid" time="0.044294" steps="6095"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.170869" steps="19165"/></proof>
+  <proof prover="1"><result status="valid" time="0.323472" steps="19165"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.166123" steps="20542"/></proof>
+  <proof prover="1"><result status="valid" time="0.395591" steps="20542"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.6" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.032284" steps="5137"/></proof>
@@ -159,7 +159,7 @@
   <proof prover="4"><result status="valid" time="0.015818" steps="30522"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.067020" steps="10483"/></proof>
+  <proof prover="3"><result status="valid" time="0.181325" steps="10483"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.10" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.015807" steps="30829"/></proof>
@@ -168,16 +168,16 @@
   <proof prover="1"><result status="valid" time="0.059695" steps="9067"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.125107" steps="17703"/></proof>
+  <proof prover="1"><result status="valid" time="0.277072" steps="17703"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.036182" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.036182" steps="36"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.14" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.061120" steps="9223"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.027335" steps="36"/></proof>
+  <proof prover="0"><result status="valid" time="0.027335" steps="36"/></proof>
   </goal>
   <goal name="hanoi_rec&#39;vc.16" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.035785" steps="4640"/></proof>
@@ -193,7 +193,7 @@
  <goal name="tower_of_hanoi&#39;vc" expl="VC for tower_of_hanoi" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="tower_of_hanoi&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.044064" steps="105"/></proof>
+  <proof prover="0"><result status="valid" time="0.044064" steps="105"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.1" expl="precondition" proved="true">
   <proof prover="1"><result status="valid" time="0.086175" steps="9864"/></proof>
@@ -202,7 +202,7 @@
   <proof prover="1"><result status="valid" time="0.061510" steps="6460"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="5"><result status="valid" time="0.025898" steps="6"/></proof>
+  <proof prover="0"><result status="valid" time="0.025898" steps="6"/></proof>
   </goal>
   <goal name="tower_of_hanoi&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="1"><result status="valid" time="0.055891" steps="7226"/></proof>

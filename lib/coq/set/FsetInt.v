@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -127,8 +127,11 @@ Fixpoint seqZ l len : list Numbers.BinNums.Z :=
 
 Lemma seqZ_le: forall len x l, List.In x (seqZ l len) -> (l <= x)%Z.
 Proof.
-induction len; simpl; intuition.
-eapply IHlen in H0; intuition.
+induction len; simpl. easy.
+intros x l [->|H].
+apply Z.le_refl.
+apply IHlen in H.
+lia.
 Qed.
 
 Lemma seqZ_le2: forall len x l, List.In x (seqZ l len) -> (x < l + Z.of_nat len)%Z.
@@ -183,17 +186,16 @@ destruct (Z_le_dec l r).
     rewrite Z2Nat.id; [|lia].
     destruct Z_le_dec.
     * destruct Z_lt_dec. split; intros; [reflexivity|].
-      intuition.
-      intuition ; try inversion H.
-    * intuition ; try inversion H.
-+ exists List.nil. 
+      lia. lia.
+    * lia.
++ exists List.nil.
   split.
   - constructor.
   - intros.
     destruct Z_le_dec; try destruct Z_lt_dec; intuition.
     lia.
-    inversion H.
-    inversion H.
+    easy.
+    easy.
 Qed.
 
 (* Why3 goal *)
@@ -229,10 +231,14 @@ destruct (Z_le_dec l r).
 + exists (seqZ l (Z.to_nat (r - l)%Z)).
   split. apply seqZ_NoDup.
   intros. rewrite seqZ_In_iff.
-  rewrite Z2Nat.id; [|lia].
-  destruct Z_le_dec; try destruct Z_lt_dec; intuition; try inversion H.
+  rewrite Z2Nat.id by lia.
+  destruct Z_le_dec.
+  2: lia.
+  destruct Z_lt_dec ; lia.
 + exists nil. split. constructor.
-  simpl. intros. destruct Z_le_dec; try destruct Z_lt_dec; intuition.
+  simpl. intros. destruct Z_le_dec.
+  2: easy.
+  destruct Z_lt_dec; lia.
 Qed.
 
 
@@ -264,7 +270,10 @@ split.
   rewrite <- H3. rewrite seqZ_length. rewrite Z2Nat.id; lia.
 + intros. destruct a. 
   destruct x. reflexivity.
-  specialize (H2 z). contradict H2. destruct Z_le_dec. 
-  destruct Z_lt_dec. lia. intuition. intuition.
+  specialize (H2 z).
+  destruct H2 as [H2 _].
+  specialize (H2 (or_introl eq_refl)).
+  destruct Z_le_dec.
+  destruct Z_lt_dec. lia. easy. easy.
 Qed.
 

@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -620,7 +620,10 @@ module Print = struct
                         @;<1 0>@[<hv 2>then@;%a@]\
                         @;<1 0>@[<hv 2>else@;%a@]@]")
           (print_expr ~opr:false info 15) e1
-          (print_expr ~opr:false ~be:true info 15) e2
+          (print_expr ~be:true
+           (* while the 'then' block is closed by 'else', '~opr:false' cannot be used
+              as it might cause a dangling 'else' *)
+           ~opr:true info 15) e2
           (print_expr ~be:true info 15) e3
     | Eblock [] ->
         pp_print_string fmt "()"
@@ -681,10 +684,10 @@ module Print = struct
           (print_list newline (print_branch info)) bl
           (print_list newline (print_xbranch info true)) xl
     | Eexn (xs, None, e) ->
-        fprintf fmt "@[<hv>let exception %a in@\n%a@]"
+        fprintf fmt (protect_on_be ~boxed (opr && prec < 18) "@[<hv>let exception %a in@\n%a@]")
           (print_uident info) xs.xs_name (print_expr info 18) e
     | Eexn (xs, Some t, e) ->
-        fprintf fmt "@[<hv>let exception %a of %a in@\n%a@]"
+        fprintf fmt (protect_on_be ~boxed (opr && prec < 18) "@[<hv>let exception %a of %a in@\n%a@]")
           (print_uident info) xs.xs_name (print_ty ~use_quote:false ~paren:true info) t
           (print_expr info 18) e
     | Eignore e ->

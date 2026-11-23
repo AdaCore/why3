@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -115,7 +115,7 @@ let check_params ~loc h p a =
         aux ~loc ll rr
     | Pc (_, wl, l) :: ll, Pc (_, wr, r) :: rr ->
         if not (Svs.equal (Svs.of_list wl) (Svs.of_list wr)) then
-          Loc.errorm ~loc "[coma typing] prewrite mismatch"
+          Loc.errorm ~loc "[coma typing] prewrite mismatch";
         aux ~loc l r;
         aux ~loc ll rr
     | [], _ | _, [] ->
@@ -237,7 +237,10 @@ let hs_register (hs,_,_ as reg) =
   Pdecl.create_exn_decl xs
 
 let rec subs_param (mty, mvs as acc) = function
-  | Pt _ as p -> acc, p
+  | Pt a ->
+      let b = create_tvsymbol (id_clone a.tv_name) in
+      let mty = Mtv.add a (ty_var b) mty in
+      (mty, mvs), Pt b
   | Pv v ->
       let t = ty_inst mty v.vs_ty in
       let v' = create_vsymbol (id_clone v.vs_name) t in

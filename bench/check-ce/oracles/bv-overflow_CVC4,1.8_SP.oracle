@@ -1,0 +1,1281 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 8, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (635 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 8:
+    x = (128:t)
+    y = (128:t)
+    x = (128:t)
+    y = (128:t)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (128:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_add` with args:
+      [ a = (128:t), b = (128:t) ]
+    Property failure at precondition of `u_add` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (128:t), x = (128:t), y = (128:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (128:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 9, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (823 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 9:
+    x = (128:t)
+    y = (128:t)
+    x = (128:t)
+    y = (128:t)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (128:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_add` with args:
+      [ a = (128:t), b = (128:t) ]
+    Property failure at precondition of `s_add` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (128:t), x = (128:t), y = (128:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (128:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 10, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (83 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 10:
+    x = (0:t)
+    y = (1:t)
+    x = (0:t)
+    y = (1:t)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (1:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub` with args:
+      [ a = (0:t), b = (1:t) ]
+    Property failure at precondition of `u_sub` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (1:t), x = (0:t), y = (1:t) ];
+        rsenv = []; idenv = [ a = (0:t), b = (1:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 11, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (1086 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 11:
+    x = (128:t)
+    y = (8:t)
+    x = (128:t)
+    y = (8:t)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (8:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub` with args:
+      [ a = (128:t), b = (8:t) ]
+    Property failure at precondition of `s_sub` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (8:t), x = (128:t), y = (8:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (8:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 12, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (2759 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 12:
+    x = (161:t)
+    y = (242:t)
+    x = (161:t)
+    y = (242:t)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (161:t), y = (242:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul` with args:
+      [ a = (161:t), b = (242:t) ]
+    Property failure at precondition of `u_mul` with env:
+      { lsenv = [];
+        vsenv = [ a = (161:t), b = (242:t), x = (161:t), y = (242:t) ];
+        rsenv = []; idenv = [ a = (161:t), b = (242:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 13, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (3333 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 13:
+    x = (247:t)
+    y = (32:t)
+    x = (247:t)
+    y = (32:t)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (247:t), y = (32:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul` with args:
+      [ a = (247:t), b = (32:t) ]
+    Property failure at precondition of `s_mul` with env:
+      { lsenv = [];
+        vsenv = [ a = (247:t), b = (32:t), x = (247:t), y = (32:t) ];
+        rsenv = []; idenv = [ a = (247:t), b = (32:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29)
+File "bench/check-ce/bv-overflow.mlw", line 14, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Unknown (unknown + incomplete) (16104 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 14:
+    x = (128:t)
+    x = (128:t)
+    Execution of main function `tsneg` with env:
+      { lsenv = []; vsenv = [ x = (128:t) ]; rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_neg` with args:
+      [ a = (128:t) ]
+    Property failure at precondition of `s_neg` with env:
+      { lsenv = []; vsenv = [ a = (128:t), x = (128:t) ]; rsenv = [];
+        idenv = [ a = (128:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 15, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 15:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `u_div` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 16, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (111 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 16:
+    x = (128:t)
+    y = (255:t)
+    x = (128:t)
+    y = (255:t)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (128:t), y = (255:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div` with args:
+      [ a = (128:t), b = (255:t) ]
+    Property failure at precondition of `s_div` with env:
+      { lsenv = [];
+        vsenv = [ a = (128:t), b = (255:t), x = (128:t), y = (255:t) ];
+        rsenv = []; idenv = [ a = (128:t), b = (255:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 17, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 17:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `u_rem` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 18, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 18:
+    x = (0:t)
+    y = (0:t)
+    x = (0:t)
+    y = (0:t)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t), y = (0:t) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem` with args:
+      [ a = (0:t), b = (0:t) ]
+    Property failure at precondition of `s_rem` with env:
+      { lsenv = []; vsenv = [ a = (0:t), b = (0:t), x = (0:t), y = (0:t) ];
+        rsenv = []; idenv = [ b = (0:t) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 27, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (1155 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 27:
+    x = (32768:t1)
+    y = (32768:t1)
+    x = (32768:t1)
+    y = (32768:t1)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (32768:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_add1` with args:
+      [ a = (32768:t1), b = (32768:t1) ]
+    Property failure at precondition of `u_add1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (32768:t1), b = (32768:t1), x = (32768:t1), y = (32768:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (32768:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 28, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (1508 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 28:
+    x = (32768:t1)
+    y = (32768:t1)
+    x = (32768:t1)
+    y = (32768:t1)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (32768:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_add1` with args:
+      [ a = (32768:t1), b = (32768:t1) ]
+    Property failure at precondition of `s_add1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (32768:t1), b = (32768:t1), x = (32768:t1), y = (32768:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (32768:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 29, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (83 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 29:
+    x = (0:t1)
+    y = (1:t1)
+    x = (0:t1)
+    y = (1:t1)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (1:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub1` with args:
+      [ a = (0:t1), b = (1:t1) ]
+    Property failure at precondition of `u_sub1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (1:t1), x = (0:t1), y = (1:t1) ];
+        rsenv = []; idenv = [ a = (0:t1), b = (1:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 30, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (2038 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 30:
+    x = (32768:t1)
+    y = (8:t1)
+    x = (32768:t1)
+    y = (8:t1)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (8:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub1` with args:
+      [ a = (32768:t1), b = (8:t1) ]
+    Property failure at precondition of `s_sub1` with env:
+      { lsenv = [];
+        vsenv = [ a = (32768:t1), b = (8:t1), x = (32768:t1), y = (8:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (8:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 31, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (11182 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 31:
+    x = (30494:t1)
+    y = (57074:t1)
+    x = (30494:t1)
+    y = (57074:t1)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (30494:t1), y = (57074:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul1` with args:
+      [ a = (30494:t1), b = (57074:t1) ]
+    Property failure at precondition of `u_mul1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (30494:t1), b = (57074:t1), x = (30494:t1), y = (57074:t1) ];
+        rsenv = []; idenv = [ a = (30494:t1), b = (57074:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 32, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (13155 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 32:
+    x = (64518:t1)
+    y = (64:t1)
+    x = (64518:t1)
+    y = (64:t1)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (64518:t1), y = (64:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul1` with args:
+      [ a = (64518:t1), b = (64:t1) ]
+    Property failure at precondition of `s_mul1` with env:
+      { lsenv = [];
+        vsenv = [ a = (64518:t1), b = (64:t1), x = (64518:t1), y = (64:t1) ];
+        rsenv = []; idenv = [ a = (64518:t1), b = (64:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 33, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (150013 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 34, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 34:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `u_div1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 35, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (111 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 35:
+    x = (32768:t1)
+    y = (65535:t1)
+    x = (32768:t1)
+    y = (65535:t1)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (32768:t1), y = (65535:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div1` with args:
+      [ a = (32768:t1), b = (65535:t1) ]
+    Property failure at precondition of `s_div1` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (32768:t1), b = (65535:t1), x = (32768:t1), y = (65535:t1) ];
+        rsenv = []; idenv = [ a = (32768:t1), b = (65535:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 36, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 36:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `u_rem1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 37, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 37:
+    x = (0:t1)
+    y = (0:t1)
+    x = (0:t1)
+    y = (0:t1)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t1), y = (0:t1) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem1` with args:
+      [ a = (0:t1), b = (0:t1) ]
+    Property failure at precondition of `s_rem1` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t1), b = (0:t1), x = (0:t1), y = (0:t1) ];
+        rsenv = []; idenv = [ b = (0:t1) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 47, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (2195 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 47:
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    Execution of main function `tuadd` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (2147483648:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_add2` with args:
+      [ a = (2147483648:t2), b = (2147483648:t2) ]
+    Property failure at precondition of `u_add2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (2147483648:t2), x = (2147483648:t2),
+            y = (2147483648:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (2147483648:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 48, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (2880 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 48:
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    x = (2147483648:t2)
+    y = (2147483648:t2)
+    Execution of main function `tsadd` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (2147483648:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_add2` with args:
+      [ a = (2147483648:t2), b = (2147483648:t2) ]
+    Property failure at precondition of `s_add2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (2147483648:t2), x = (2147483648:t2),
+            y = (2147483648:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (2147483648:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 49, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (83 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 49:
+    x = (0:t2)
+    y = (1:t2)
+    x = (0:t2)
+    y = (1:t2)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (1:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub2` with args:
+      [ a = (0:t2), b = (1:t2) ]
+    Property failure at precondition of `u_sub2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (1:t2), x = (0:t2), y = (1:t2) ];
+        rsenv = []; idenv = [ a = (0:t2), b = (1:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 50, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (3942 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 50:
+    x = (2147483648:t2)
+    y = (8:t2)
+    x = (2147483648:t2)
+    y = (8:t2)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (8:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub2` with args:
+      [ a = (2147483648:t2), b = (8:t2) ]
+    Property failure at precondition of `s_sub2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (8:t2), x = (2147483648:t2),
+            y = (8:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (8:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 51, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Unknown (sat) (44114 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 51:
+    x = (2926978353:t2)
+    y = (4219209743:t2)
+    x = (2926978353:t2)
+    y = (4219209743:t2)
+    Execution of main function `tumul` with env:
+      { lsenv = []; vsenv = [ x = (2926978353:t2), y = (4219209743:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_mul2` with args:
+      [ a = (2926978353:t2), b = (4219209743:t2) ]
+    Property failure at precondition of `u_mul2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2926978353:t2), b = (4219209743:t2), x = (2926978353:t2),
+            y = (4219209743:t2) ]; rsenv = [];
+        idenv = [ a = (2926978353:t2), b = (4219209743:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 52, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Unknown (sat) (53519 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 52:
+    x = (287964676:t2)
+    y = (2516799473:t2)
+    x = (287964676:t2)
+    y = (2516799473:t2)
+    Execution of main function `tsmul` with env:
+      { lsenv = []; vsenv = [ x = (287964676:t2), y = (2516799473:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_mul2` with args:
+      [ a = (287964676:t2), b = (2516799473:t2) ]
+    Property failure at precondition of `s_mul2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (287964676:t2), b = (2516799473:t2), x = (287964676:t2),
+            y = (2516799473:t2) ]; rsenv = [];
+        idenv = [ a = (287964676:t2), b = (2516799473:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 53, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (150144 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 54, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 54:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `u_div2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 55, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (111 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 55:
+    x = (2147483648:t2)
+    y = (4294967295:t2)
+    x = (2147483648:t2)
+    y = (4294967295:t2)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (2147483648:t2), y = (4294967295:t2) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div2` with args:
+      [ a = (2147483648:t2), b = (4294967295:t2) ]
+    Property failure at precondition of `s_div2` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (2147483648:t2), b = (4294967295:t2), x = (2147483648:t2),
+            y = (4294967295:t2) ]; rsenv = [];
+        idenv = [ a = (2147483648:t2), b = (4294967295:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 56, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 56:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `u_rem2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 57, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 57:
+    x = (0:t2)
+    y = (0:t2)
+    x = (0:t2)
+    y = (0:t2)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t2), y = (0:t2) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem2` with args:
+      [ a = (0:t2), b = (0:t2) ]
+    Property failure at precondition of `s_rem2` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t2), b = (0:t2), x = (0:t2), y = (0:t2) ];
+        rsenv = []; idenv = [ b = (0:t2) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 67, characters 28-37:
+Sub-goal Unsigned addition overflow of goal tuadd'vc.
+Prover result is: Unknown (sat) (4275 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 67:
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    Execution of main function `tuadd` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `u_add3` with args:
+      [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ]
+    Property failure at precondition of `u_add3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3),
+            x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 68, characters 28-37:
+Sub-goal Signed addition overflow of goal tsadd'vc.
+Prover result is: Unknown (sat) (5616 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 68:
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    x = (9223372036854775808:t3)
+    y = (9223372036854775808:t3)
+    Execution of main function `tsadd` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_add3` with args:
+      [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ]
+    Property failure at precondition of `s_add3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3),
+            x = (9223372036854775808:t3), y = (9223372036854775808:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (9223372036854775808:t3), b = (9223372036854775808:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 69, characters 28-37:
+Sub-goal Unsigned subtraction overflow of goal tusub'vc.
+Prover result is: Unknown (sat) (83 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 69:
+    x = (0:t3)
+    y = (1:t3)
+    x = (0:t3)
+    y = (1:t3)
+    Execution of main function `tusub` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (1:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_sub3` with args:
+      [ a = (0:t3), b = (1:t3) ]
+    Property failure at precondition of `u_sub3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (1:t3), x = (0:t3), y = (1:t3) ];
+        rsenv = []; idenv = [ a = (0:t3), b = (1:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 70, characters 28-37:
+Sub-goal Signed subtraction overflow of goal tssub'vc.
+Prover result is: Unknown (sat) (7751 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 70:
+    x = (9223372036854775808:t3)
+    y = (8:t3)
+    x = (9223372036854775808:t3)
+    y = (8:t3)
+    Execution of main function `tssub` with env:
+      { lsenv = []; vsenv = [ x = (9223372036854775808:t3), y = (8:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_sub3` with args:
+      [ a = (9223372036854775808:t3), b = (8:t3) ]
+    Property failure at precondition of `s_sub3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (8:t3),
+            x = (9223372036854775808:t3), y = (8:t3) ]; rsenv = [];
+        idenv = [ a = (9223372036854775808:t3), b = (8:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 71, characters 28-37:
+Sub-goal Unsigned multiplication overflow of goal tumul'vc.
+Prover result is: Step limit exceeded (170480 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 72, characters 28-37:
+Sub-goal Signed multiplication overflow of goal tsmul'vc.
+Prover result is: Step limit exceeded (195082 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: BAD_CE
+  - Concrete RAC: NORMAL
+  - Abstract RAC: NORMAL
+File "bench/check-ce/bv-overflow.mlw", line 73, characters 22-29:
+Sub-goal Negation overflow of goal tsneg'vc.
+Prover result is: Step limit exceeded (150250 steps).
+Sorry, we don't have a good counterexample for you :(
+
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 74, characters 28-37:
+Sub-goal Division by zero of goal tudiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 74:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tudiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_div3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `u_div3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Division by zero of goal tsdiv'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tsdiv` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 75, characters 28-37:
+Sub-goal Signed division overflow check of goal tsdiv'vc.
+Prover result is: Unknown (sat) (111 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 75:
+    x = (9223372036854775808:t3)
+    y = (18446744073709551615:t3)
+    x = (9223372036854775808:t3)
+    y = (18446744073709551615:t3)
+    Execution of main function `tsdiv` with env:
+      { lsenv = [];
+        vsenv =
+          [ x = (9223372036854775808:t3), y = (18446744073709551615:t3) ];
+        rsenv = []; idenv = [] }
+    (giant-step) execution of unimplemented function `s_div3` with args:
+      [ a = (9223372036854775808:t3), b = (18446744073709551615:t3) ]
+    Property failure at precondition of `s_div3` with env:
+      { lsenv = [];
+        vsenv =
+          [ a = (9223372036854775808:t3), b = (18446744073709551615:t3),
+            x = (9223372036854775808:t3), y = (18446744073709551615:t3) ];
+        rsenv = [];
+        idenv =
+          [ a = (9223372036854775808:t3), b = (18446744073709551615:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 76, characters 28-37:
+Sub-goal Remainder by zero of goal turem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 76:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `turem` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `u_rem3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `u_rem3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+  - Abstract RAC: FAILURE (precondition at "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37)
+File "bench/check-ce/bv-overflow.mlw", line 77, characters 28-37:
+Sub-goal Remainder by zero of goal tsrem'vc.
+Prover result is: Unknown (sat) (73 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+File bv-overflow.mlw:
+  Line 77:
+    x = (0:t3)
+    y = (0:t3)
+    x = (0:t3)
+    y = (0:t3)
+    Execution of main function `tsrem` with env:
+      { lsenv = []; vsenv = [ x = (0:t3), y = (0:t3) ]; rsenv = [];
+        idenv = [] }
+    (giant-step) execution of unimplemented function `s_rem3` with args:
+      [ a = (0:t3), b = (0:t3) ]
+    Property failure at precondition of `s_rem3` with env:
+      { lsenv = [];
+        vsenv = [ a = (0:t3), b = (0:t3), x = (0:t3), y = (0:t3) ];
+        rsenv = []; idenv = [ b = (0:t3) ] }
+

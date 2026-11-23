@@ -1,0 +1,16 @@
+(rule
+ (target prover.ml)
+ (deps (glob_files *.mlw))
+ (alias extract)
+ (mode fallback)
+ (action (run ../../bin/why3.opt -L . --warn-off=unused_variable extract
+                -D ocaml64 -o prover.ml ProverTest.mlw)))
+
+(executable
+ (name run)
+ (flags :standard -open Tptp -w -27-32-39 -warn-error -26)
+ (libraries tptp zarith))
+
+(rule
+ (mode (promote (until-clean)))
+ (action (copy run.exe main.opt)))

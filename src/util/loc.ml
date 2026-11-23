@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -166,8 +166,6 @@ let warn_unknown_warning =
 
 let warning_active id =
   (Hashtbl.find warning_table id).enabled
-
-let disable_warning id = unset_flag (lookup_flag id)
 
 let disable_warning id = unset_flag (lookup_flag id)
 

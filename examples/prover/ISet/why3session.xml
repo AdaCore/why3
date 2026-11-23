@@ -2,21 +2,21 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="ISet.mlw"/>
 <theory name="Logic" proved="true">
  <goal name="iset_ok_char&#39;vc" expl="VC for iset_ok_char" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="iset_ok_char&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="3059"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="1942"/></proof>
   </goal>
   <goal name="iset_ok_char&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="2645"/></proof>
+  <proof prover="3"><result status="valid" time="0.020000" steps="2312"/></proof>
   </goal>
   <goal name="iset_ok_char&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.070000" steps="12718"/></proof>
+  <proof prover="3"><result status="valid" time="0.183752" steps="13116"/></proof>
   </goal>
  </transf>
  </goal>
@@ -25,90 +25,90 @@
  <goal name="insert&#39;vc" expl="VC for insert" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="insert&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="37"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="38"/></proof>
   </goal>
   <goal name="insert&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="16"/></proof>
   </goal>
   <goal name="insert&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="698"/></proof>
+  <proof prover="2"><result status="valid" time="0.136087" steps="659"/></proof>
   </goal>
   <goal name="insert&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="205"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="205"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="remove&#39;vc" expl="VC for remove" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="remove&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="30"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="30"/></proof>
   </goal>
   <goal name="remove&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="34"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="35"/></proof>
   </goal>
   <goal name="remove&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="14"/></proof>
   </goal>
   <goal name="remove&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="38"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="38"/></proof>
   </goal>
   <goal name="remove&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="16"/></proof>
   </goal>
   <goal name="remove&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="136"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="136"/></proof>
   </goal>
   <goal name="remove&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="183"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="183"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="merge&#39;vc" expl="VC for merge" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="merge&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="48"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="48"/></proof>
   </goal>
   <goal name="merge&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="50"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="50"/></proof>
   </goal>
   <goal name="merge&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="62"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="61"/></proof>
   </goal>
   <goal name="merge&#39;vc.3" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="60"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="61"/></proof>
   </goal>
   <goal name="merge&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="26"/></proof>
   </goal>
   <goal name="merge&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.020000" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.020000" steps="14"/></proof>
   </goal>
   <goal name="merge&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="1"><result status="valid" time="0.040000" steps="63"/></proof>
+  <proof prover="2"><result status="valid" time="0.040000" steps="63"/></proof>
   </goal>
   <goal name="merge&#39;vc.7" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="62"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="63"/></proof>
   </goal>
   <goal name="merge&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="14"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="14"/></proof>
   </goal>
   <goal name="merge&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="28"/></proof>
   </goal>
   <goal name="merge&#39;vc.10" expl="variant decrease" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="70"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="71"/></proof>
   </goal>
   <goal name="merge&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="26"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="26"/></proof>
   </goal>
   <goal name="merge&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.010000" steps="28"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="28"/></proof>
   </goal>
   <goal name="merge&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.450000" steps="57212"/></proof>
+  <proof prover="3"><result status="valid" time="0.645782" steps="65013"/></proof>
   </goal>
   <goal name="merge&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.180000" steps="4489"/></proof>
+  <proof prover="2"><result status="valid" time="0.345386" steps="4489"/></proof>
   </goal>
  </transf>
  </goal>

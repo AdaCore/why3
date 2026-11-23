@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -101,14 +101,13 @@ Definition is_empty {a:Type} {a_WT:WhyType a} (s:fset a) : Prop :=
 Definition empty {a:Type} {a_WT:WhyType a} : fset a.
 Proof.
 exists (fun x => false). 
-apply Cardinal.is_finite_empty. unfold set.Set.is_empty.
-unfold set.Set.mem. intuition.
+now apply Cardinal.is_finite_empty.
 Defined.
 
 (* Why3 goal *)
 Lemma is_empty_empty {a:Type} {a_WT:WhyType a} : is_empty (empty : fset a).
 Proof.
-unfold empty, is_empty, mem, set.Set.mem. intuition.
+easy.
 Qed.
 
 (* Why3 goal *)
@@ -117,7 +116,10 @@ Lemma empty_is_empty {a:Type} {a_WT:WhyType a} :
 Proof.
 intros s h1.
 eapply extensionality. intro. unfold empty, is_empty, mem, set.Set.mem in *.
-destruct s. intuition. destruct (h1 _ H). 
+destruct s.
+split.
+intros H. now elim (h1 x).
+easy.
 Qed.
 
 (* Why3 goal *)
@@ -162,7 +164,9 @@ Lemma remove_def {a:Type} {a_WT:WhyType a} :
 Proof.
 intros x s y.
 unfold mem, remove, set.Set.mem, Map.set. destruct s.
-destruct why_decidable_eq; intuition.
+destruct why_decidable_eq as [<- | H].
+now split.
+intuition.
 Qed.
 
 (* Why3 goal *)

@@ -1,0 +1,114 @@
+
+(** {1 Testing map iterators} *)
+
+
+(** {2 Testing iterator on maps indexed by integers} *)
+
+module TestIntMapIterator
+
+  use int.Int
+
+  use set.Fset as S
+  use fmap.MapAppInt as M
+
+  let incr (s : M.t int) : (r : M.t int)
+    ensures { forall k:int. M.mem k s -> s k >= 0 -> M.mem k r && r k = s k + 1 }
+    ensures { forall k:int. M.mem k r -> M.mem k s && s k >= 0 && r k = s k + 1 }
+  =
+    let ref acc = M.create () in
+    for x in s with M.Iter do
+      invariant { forall k. M.mem k acc -> M.mem k s && s k >= 0 && acc k = s k + 1 }
+      invariant { forall k. S.mem k it.M.Iter.visited -> s k >= 0 -> M.mem k acc && acc k = s k + 1 }
+      variant { S.cardinal (M.domain s) - S.cardinal it.M.Iter.visited }
+      let (k,v) = x in
+      if v >= 0 then acc <- M.add k (v+1) acc
+    done;
+    acc
+
+
+end
+
+
+(** {2 Testing iterator on maps indexed by "Peano" integers} *)
+
+module TestPeanoMapIterator
+
+  use int.Int
+  use mach.peano.Peano as Peano
+
+  use set.Fset as S
+  use mach.peano.MapPeano as M
+
+  let incr_peano (s : M.t int) : (r : M.t int)
+    ensures { forall k:Peano.t. M.mem k s -> s k >= 0 -> M.mem k r && r k = s k + 1 }
+    ensures { forall k:Peano.t. M.mem k r -> M.mem k s && s k >= 0 && r k = s k + 1 }
+  =
+    let ref acc = M.create () in
+    for x in s with M.Iter do
+      invariant { forall k. M.mem k acc -> M.mem k s && s k >= 0 && acc k = s k + 1 }
+      invariant { forall k. S.mem k it.M.Iter.visited -> s k >= 0 -> M.mem k acc && acc k = s k + 1 }
+      variant { S.cardinal (M.domain s) - S.cardinal it.M.Iter.visited }
+      let (k,v) = x in
+      if v >= 0 then acc <- M.add k (v+1) acc
+    done;
+    acc
+
+
+end
+
+
+
+(** {2 Testing iterator on maps indexed by 63-bits integers} *)
+
+module TestInt63MapIterator
+
+  use int.Int
+  use mach.int.Int63
+
+  use set.Fset as S
+  use fmap.MapAppInt63 as M
+
+  let incr63 (s : M.t int) : (r : M.t int)
+    ensures { forall k:int63. M.mem k s -> s k >= 0 -> M.mem k r && r k = s k + 1 }
+    ensures { forall k:int63. M.mem k r -> M.mem k s && s k >= 0 && r k = s k + 1 }
+  =
+    let ref acc = M.create () in
+    for x in s with M.Iter do
+      invariant { forall k. M.mem k acc -> M.mem k s && s k >= 0 && acc k = s k + 1 }
+      invariant { forall k. S.mem k it.M.Iter.visited -> s k >= 0 -> M.mem k acc && acc k = s k + 1 }
+      variant { S.cardinal (M.domain s) - S.cardinal it.M.Iter.visited }
+      let (k,v) = x in
+      if v >= 0 then acc <- M.add k (v+1) acc
+    done;
+    acc
+
+
+end
+
+
+
+(** {2 Testing iterator on maps indexed by strings} *)
+
+module TestStringMapIterator
+
+  use int.Int
+
+  use set.Fset as S
+  use fmap.MapAppString as M
+
+  let incr_str (s : M.t int) : (r : M.t int)
+    ensures { forall k:string. M.mem k s -> s k >= 0 -> M.mem k r && r k = s k + 1 }
+    ensures { forall k:string. M.mem k r -> M.mem k s && s k >= 0 && r k = s k + 1 }
+  =
+    let ref acc = M.create () in
+    for x in s with M.Iter do
+      invariant { forall k. M.mem k acc -> M.mem k s && s k >= 0 && acc k = s k + 1 }
+      invariant { forall k. S.mem k it.M.Iter.visited -> s k >= 0 -> M.mem k acc && acc k = s k + 1 }
+      variant { S.cardinal (M.domain s) - S.cardinal it.M.Iter.visited }
+      let (k,v) = x in
+      if v >= 0 then acc <- M.add k (v+1) acc
+    done;
+    acc
+
+
+end

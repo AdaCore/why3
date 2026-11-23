@@ -1,0 +1,18 @@
+module Test
+
+  use ref.Ref
+  use int.Int
+  use int.ComputerDivision
+
+  let s (x: int)
+    requires { 0 <= x <= 65535 }
+  =
+    let ref y: int = 42 in
+    assert { [@expl:check 1] 0 <= y * y <= 65535 };
+    y <- y * y;
+    assert { [@expl:check 2] x <> 0 };
+    y <- div y x;
+    assert { [@expl:check 3] 0 <= y - 100000 <= 65535 };
+    y <- y - 2 * y;
+
+end

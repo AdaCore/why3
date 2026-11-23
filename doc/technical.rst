@@ -293,19 +293,10 @@ by :why3:tool:`why3 show transformations`.
    This is useful when a prover fails to find relevant hypotheses in
    a very large context. Example: ``clear_but h23,h25``.
 
-.. why3:transform:: compute_hyp
+.. why3:transform:: compute [nodef] [branches] [in H]
 
-   Apply the transformation :why3:transform:`compute_in_goal` on the given
-   hypothesis.
-
-.. why3:transform:: compute_hyp_specified
-
-   Apply the transformation :why3:transform:`compute_specified` on the
-   given hypothesis.
-
-.. why3:transform:: compute_in_goal
-
-   Aggressively apply all known computation/simplification rules.
+   Aggressively apply all known computation/simplification rules to the goal, or to the
+   hypothesis ``H`` if the latter is given as argument after ``in``.
 
    The kinds of simplification are as follows.
 
@@ -320,8 +311,9 @@ by :why3:tool:`why3 show transformations`.
       goal like ``6*7=42`` is solved by those transformations.
 
    -  Unfolding of definitions, as done by :why3:transform:`inline_goal`. Transformation
-      :why3:transform:`compute_in_goal` unfolds all definitions, including recursive
-      ones. For :why3:transform:`compute_specified`, the user can enable unfolding of a
+      ``compute`` unfolds all definitions, including recursive
+      ones, unless the parameter ``nodef`` is given. Yet, for ``compute nodef``,
+      the user can enable unfolding of a
       specific logic symbol by attaching the meta :why3:meta:`rewrite_def` to the
       symbol.
 
@@ -369,7 +361,7 @@ by :why3:tool:`why3 show transformations`.
        lemma l: forall x y. ([@rewrite] x = y) -> f x = f y
 
    can be proved by :why3:transform:`introduce_premises` followed by
-   :why3:transform:`compute_specified`.
+   ``compute nodef``.
 
    The computations performed by this transformation can take an
    arbitrarily large number of steps, or even not terminate. For this
@@ -383,11 +375,7 @@ by :why3:tool:`why3 show transformations`.
    When this upper limit is reached, a warning is issued, and the
    partly-reduced goal is returned as the result of the transformation.
 
-.. why3:transform:: compute_specified
-
-   Same as :why3:transform:`compute_in_goal`, but perform rewriting using
-   only built-in operators and user-provided rules.
-
+   Additionally, by passing the argument `branches`
 .. why3:transform:: cut
 
    Same as :why3:transform:`assert`, but the order of the generated subgoals

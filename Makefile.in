@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #  The Why3 Verification Platform   /   The Why3 Development Team  #
-#  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  #
+#  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  #
 #                                                                  #
 #  This software is distributed under the terms of the GNU Lesser  #
 #  General Public License version 2.1, with the special exception  #
@@ -80,10 +80,6 @@ DEPFLAGS = -slash
 
 ifeq (@enable_why3_lib@,yes)
 INCLUDES += -I lib/why3
-endif
-ifeq (@OCAMLBEST@,opt)
-# the semantics of the -native flag changed in ocaml 4.03.0
-#DEPFLAGS += -native
 endif
 
 ifeq (@OCAMLBEST@,opt)
@@ -196,18 +192,17 @@ endif
 # main target
 ###############
 
-ifeq (@enable_why3_lib@,yes)
-all: @OCAMLBEST@
-else
 all:
+
+ifeq (@enable_why3_lib@,yes)
+DUNEALLTARGET += @@OCAMLBEST@
 endif
 
-plugins: plugins.@OCAMLBEST@
-opt: plugins.opt
-byte: plugins.byte
+plugins: dune.@OCAMLBEST@
 
 ifeq (@enable_local@,yes)
 all: install_local
+DUNEALLTARGET += @install_local
 endif
 
 .PHONY: byte opt clean depend all install install-lib uninstall
@@ -218,7 +213,7 @@ endif
 .PHONY: coq install-coq uninstall-coq clean-coq
 .PHONY: pvs install-pvs uninstall-pvs clean-pvs
 .PHONY: install-isabelle clean-isabelle
-.PHONY: plugins plugins.byte plugins.opt
+.PHONY: plugins
 .PHONY: trywhy3 clean-trywhy3
 
 .SUFFIXES:
@@ -229,170 +224,71 @@ CLEANLIBS =
 GENERATED =
 
 ##############
+# Dune
+##############
+
+.PHONY: dune.lib dune.byte dune.opt
+
+DUNEPKGS =
+
+ifeq (@enable_why3_lib@,yes)
+DUNEPKGS += why3
+DUNEALLTARGET += why3.install
+endif
+
+ifeq (@enable_ide@,yes)
+DUNEPKGS += why3-ide
+DUNEALLTARGET += bin/why3ide.$(SHAREDBEST)
+endif
+
+ifeq (@enable_coq_libs@,yes)
+DUNEPKGS += why3-coq
+endif
+
+comma:=,
+empty:=
+# space value
+space:= $(empty) $(empty)
+
+DUNE = @DUNE@
+DFLAGS = --root . --only-packages=$(subst $(space),$(comma),$(strip $(DUNEPKGS)))
+DUNEFLAGS =
+DUNEJOBS = auto
+DUNEBUILD = $(DUNE) build $(DFLAGS) $(DUNEFLAGS) -j $(DUNEJOBS)
+
+# Files created by this Makefile which must exists before calling dune
+DUNEDEPS = src/dune src/util/config.ml src/parser/parser_messages.ml
+
+FORCE:
+
+dune.all: $(DUNEDEPS)
+	$(DUNEBUILD) $(DUNEALLTARGET)
+
+# why3.install contains nothing but the why3 library for the moment
+dune.lib: $(DUNEDEPS)
+	$(DUNEBUILD) why3.install
+
+dune.byte: $(DUNEDEPS)
+	$(DUNEBUILD) @byte
+
+dune.opt: $(DUNEDEPS)
+	$(DUNEBUILD) @opt
+
+byte: dune.byte
+opt:  dune.opt
+all: dune.all
+
+
+clean::
+	$(DUNE) clean $(DUNEFLAGS)
+
+##############
 # Why3 library
 ##############
 
 LIBGENERATED = \
 	src/util/config.ml \
-	src/util/rc.ml src/util/lexlib.ml src/util/mysexplib.ml \
-	src/util/json_parser.mli src/util/json_parser.ml \
-	src/util/json_lexer.ml src/util/mlmpfr_wrapper.ml \
-	src/parser/lexer.ml \
-	src/core/parser_tokens.mli src/core/parser_tokens.ml \
-	src/parser/parser.mli src/parser/parser.ml \
-	src/parser/parser_messages.ml \
-	src/driver/driver_parser.mli src/driver/driver_parser.ml \
-	src/driver/driver_lexer.ml \
-	src/driver/sexp.ml \
-	src/session/compress.ml src/session/xml.ml \
-	src/session/strategy_parser.ml
-
-LIB_UTIL = exn_printer mysexplib config bigInt mlmpfr_wrapper util opt lists strings \
-	   pp extmap extset exthtbl weakhtbl diffmap hcpt \
-	   hashcons wstdlib getopt \
-	   json_base json_parser json_lexer \
-	   debug loc print_tree \
-	   cmdline sysutil lexlib rc plugin bigInt number constant vector pqueue
-
-ifeq (@enable_re@,no)
-LIBGENERATED += src/util/re.ml
-LIB_UTIL += re
-endif
-
-LIB_CORE = \
-	ident ty term pattern decl coercion theory \
-	parser_tokens keywords \
-	task pretty dterm env trans printer model_parser
-
-LIB_DRIVER = prove_client whyconf call_provers driver_parser driver_lexer driver \
-		autodetection smtv2_model_defs sexp smtv2_model_parser
-
-LIB_MLW = ity expr pdecl eval_match typeinv vc pmodule dexpr big_real \
-          pinterp_core rac pinterp check_ce
-
-ifeq (@enable_infer@,yes)
-LIB_INFER = o2oterm domain infer_why3 quant_domain union_find disjunctive_term_domain uf_domain infer_cfg infer_loop
-endif
-
-ifeq (@enable_bddinfer@,yes)
-LIB_BDDINFER = bddparam abstract ast interp_expression infer why3infer
-endif
-
-LIB_EXTRACT = mltree compile mlinterp pdriver ml_printer \
-              c ocaml cakeml java
-
-LIB_PARSER = ptree ptree_helpers glob typing \
-		parser_messages parser typing report lexer mlw_printer \
-		sexp_parser
-
-LIB_TRANSFORM = simplify_formula inlining split_goal \
-		args_wrapper reduction_engine compute \
-		remove_unused detect_polymorphism \
-		fold_defs eliminate_quantifiers \
-		eliminate_definition extensional \
-		abstract_quantifiers eliminate_unknown_types \
-		eliminate_unknown_lsymbols eliminate_symbol \
-		eliminate_inductive eliminate_let eliminate_if \
-		libencoding eliminate_algebraic discriminate encoding \
-		encoding_select encoding_guards_full encoding_tags_full \
-		encoding_guards encoding_tags encoding_twin \
-		encoding_sort simplify_array filter_trigger \
-		abstraction close_epsilon lift_epsilon \
-		eliminate_gnatprove_guard_epsilon \
-		eliminate_epsilon instantiate_predicate smoke_detector \
-		prop_curry eliminate_literal \
-		generic_arg_trans_utils case apply subst \
-		introduction ind_itp destruct cut congruence \
-		rec_logic gnat_rewrite eliminate_unused gnat_split_conj \
-                gnat_split_disj gnat_trivial \
-		eliminate_unused_hypo eliminate_literal induction induction_pr \
-		induction induction_pr prepare_for_counterexmp \
-		reflection keep_only_arithmetic
-
-LIB_PRINTER = cntexmp_printer alt_ergo why3printer smtv1 smtv2 coq\
-	      pvs isabelle \
-	      simplify gappa cvc3 yices mathematica
-
-LIB_SESSION = compress xml termcode session_itp \
-              strategy strategy_parser controller_itp \
-	      server_utils itp_communication \
-	      itp_server json_util unix_scheduler
-
-LIB_CMIONLY = driver/driver_ast
-
-LIBMODULES =  $(addprefix src/util/, $(LIB_UTIL)) \
-	      $(addprefix src/core/, $(LIB_CORE)) \
-	      $(addprefix src/driver/, $(LIB_DRIVER)) \
-	      $(addprefix src/mlw/, $(LIB_MLW)) \
-	      $(addprefix src/infer/, $(LIB_INFER)) \
-	      $(addprefix src/extract/, $(LIB_EXTRACT)) \
-	      $(addprefix src/parser/, $(LIB_PARSER)) \
-	      $(addprefix src/bddinfer/, $(LIB_BDDINFER)) \
-	      $(addprefix src/transform/, $(LIB_TRANSFORM)) \
-	      $(addprefix src/printer/, $(LIB_PRINTER)) \
-	      $(addprefix src/session/, $(LIB_SESSION))
-
-LIBDIRS = util core driver mlw extract parser transform printer session gnat
-
-ifeq (@enable_infer@,yes)
-	LIBDIRS += infer
-endif
-
-ifeq (@enable_bddinfer@,yes)
-	LIBDIRS += bddinfer
-endif
-
-LIBINCLUDES = $(addprefix -I src/, $(LIBDIRS))
-
-LIBDEP = $(addsuffix .dep, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.dep)
-LIBCMO = $(addsuffix .cmo, $(LIBMODULES))
-LIBCMX = $(addsuffix .cmx, $(LIBMODULES))
-LIBCMI = $(addsuffix .cmi, $(LIBMODULES)) $(LIB_CMIONLY:%=src/%.cmi)
-
-$(LIBDEP) $(LIBCMO) $(LIBCMX) $(LIBCMI): INCLUDES += $(LIBINCLUDES)
-$(LIBCMX): OFLAGS += -for-pack Why3
-
-$(LIBDEP): $(LIBGENERATED)
-
-src/parser/ptree.cmx src/parser/ptree.cmo: FLAGS += -w -70
-src/util/mysexplib.cmx src/util/mysexplib.cmo: FLAGS += -w -70
-
-# Mlmpfr
-
-ifeq (@enable_mpfr@,yes)
-
-ifeq (@old_mpfr@,yes)
-src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_old.ml Makefile
-	$(HIDE)$(CMP_CP)
-else ifeq (@enable_mpfr@,yes)
-src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_real.ml Makefile
-	$(HIDE)$(CMP_CP)
-endif
-
-else
-src/util/mlmpfr_wrapper.ml: src/util/mlmpfr_dummy.ml Makefile
-	$(HIDE)$(CMP_CP)
-endif
-
-# Ocamlzip
-
-ifeq (@enable_zip@,yes)
-src/session/compress.ml: src/session/compress_z.ml Makefile
-	$(HIDE)$(CMP_CP)
-else
-src/session/compress.ml: src/session/compress_none.ml Makefile
-	$(HIDE)$(CMP_CP)
-endif
-
-# sexp_conv
-
-ifeq (@enable_sexp@, yes)
-src/util/mysexplib.ml: src/util/mysexplib-real.ml Makefile
-	$(HIDE)$(CMP_CP)
-else
-src/util/mysexplib.ml: src/util/mysexplib-dummy.ml Makefile
-	$(HIDE)$(CMP_CP)
-endif
+	src/parser/parser_messages.ml
 
 .PHONY: initialize_messages update-parsing-error-handling
 
@@ -400,7 +296,7 @@ PARSERS=src/parser/parser_common.mly src/parser/parser.mly
 
 src/parser/parser_messages.ml: src/parser/handcrafted.messages
 	@rm -f src/parser/parser_messages.ml src/parser/parser_messages.ml.tmp
-	@$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --update-errors \
+	@$(MENHIR) --strict $(PARSERS) --base src/parser/parser --update-errors \
 		src/parser/handcrafted.messages > src/parser/handcrafted.messages.temp
 	@if  ! diff -b src/parser/handcrafted.messages src/parser/handcrafted.messages.temp > /dev/null; then \
 			echo "Parsing error handling must be updated, the file 'src/parser/handcrafted.messages.temp' \
@@ -408,67 +304,17 @@ contains an updated version that must be checked before replacing 'src/parser/ha
 		exit 1; \
 	fi
 	@rm -f src/parser/handcrafted.messages.temp
-	$(MENHIR) --explain --strict $(PARSERS) --base src/parser/parser --compile-errors \
+	$(MENHIR) --strict $(PARSERS) --base src/parser/parser --compile-errors \
 		src/parser/handcrafted.messages > src/parser/parser_messages.ml
 
 clean::
 	rm -f src/parser/parser_messages.ml.tmp src/parser/handcrafted.messages.temp
 
-# debug optimisation ppx
-
-ifeq (@enable_ppx@,yes)
-src/util/ppx_debug_optim$(EXE): src/util/debug_optim.ml
-	$(SHOW) 'Linking $@'
-	$(HIDE) $(OCAMLFIND) opt -package ppxlib -linkpkg src/util/debug_optim.ml -o $@
-
-ifeq (@OCAML_OS_TYPE@,Win32)
-# Relative calls to executable on Windows cannot use / as path separator
-PPX_DEBUG_OPTIM_EXE = src\\util\\ppx_debug_optim$(EXE)
-else
-PPX_DEBUG_OPTIM_EXE = src/util/ppx_debug_optim$(EXE)
-endif
-
-src/transform/reflection.cmx: src/util/ppx_debug_optim$(EXE)
-src/transform/reflection.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
-src/extract/mlinterp.cmx: src/util/ppx_debug_optim$(EXE)
-src/extract/mlinterp.cmx: OFLAGS += -ppx $(PPX_DEBUG_OPTIM_EXE)
-
-clean::
-	rm -f src/util/ppx_debug_optim$(EXE)
-endif
-
-# Re
-
-ifeq (@enable_re@,no)
-src/util/re.ml: src/util/recompat.ml Makefile
-	$(CMP_CP)
-LIBGENERATED += src/util/re.ml
-endif
-GENERATED += src/util/re.ml
-
-# build targets
-
-byte: lib/why3/why3.cma
-opt:  lib/why3/why3.cmxa lib/why3/why3.cmxs
-
-lib/why3/why3.cma: lib/why3/why3.cmo
-lib/why3/why3.cmxa: lib/why3/why3.cmx
-lib/why3/why3.cmxs: lib/why3/why3.cmx
-
-lib/why3/why3.cmo: $(LIBCMO)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -pack -o $@ $^
-
-lib/why3/why3.cmx: $(LIBCMX) lib/why3/why3.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) $(CMIHACK) -pack -o $@ $(filter %.cmx, $^)
+byte: dune.lib
+opt:  dune.lib
 
 # clean and depend
 
-MAKEINC += $(LIBDEP)
-
-CLEANDIRS += src $(addprefix src/, $(LIBDIRS))
-CLEANLIBS += lib/why3/why3
 GENERATED += $(LIBGENERATED)
 
 ###############
@@ -521,9 +367,8 @@ uninstall-lib:
 uninstall:: uninstall-lib
 
 install-lib::
-	$(MKDIR_P) $(OCAMLINSTALLLIB)/why3
-	$(INSTALL_DATA) $(wildcard $(addprefix lib/why3/why3., $(INSTALLED_LIB_EXTS))) \
-		lib/why3/META $(OCAMLINSTALLLIB)/why3
+	$(DUNE) install --root . --prefix $(prefix) \
+		--libdir $(OCAMLINSTALLLIB) --section lib,libexec why3
 
 ##################
 # Why3 emacs mode
@@ -559,158 +404,14 @@ endif
 # Why3 plugins
 ##################
 
-PLUGGENERATED = \
-	plugins/tptp/tptp_lexer.ml \
-	plugins/tptp/tptp_parser.ml plugins/tptp/tptp_parser.mli \
-	plugins/coma/coma_lexer.ml \
-	plugins/coma/coma_parser.ml plugins/coma/coma_parser.mli \
-	plugins/python/py_lexer.ml \
-	plugins/python/py_parser.ml plugins/python/py_parser.mli \
-	plugins/microc/mc_lexer.ml \
-	plugins/microc/mc_parser.ml plugins/microc/mc_parser.mli \
-	plugins/cfg/cfg_lexer.ml \
-	plugins/cfg/cfg_parser.ml plugins/cfg/cfg_parser.mli \
-	plugins/parser/dimacs.ml \
-	plugins/ada_terms/ada_lexer.ml \
-	plugins/ada_terms/ada_parser.ml plugins/ada_terms/ada_parser.mli
-
-PLUG_PARSER = genequlin dimacs
-PLUG_PRINTER =
-PLUG_TRANSFORM =
-PLUG_STRATEGIES = forward_propagation
-PLUG_TPTP = tptp_parser tptp_typing tptp_lexer tptp_printer
-PLUG_COMA = coma_logic coma_syntax coma_parser coma_lexer coma_typing coma_main
-PLUG_PYTHON = py_parser py_lexer py_main
-PLUG_MICROC = mc_parser mc_lexer mc_printer mc_main
-PLUG_CFG = cfg_parser cfg_lexer cfg_paths subregion_analysis cfg_main
-ifeq (@enable_stackify@,yes)
-PLUG_CFG += stackify cfg_stackify
-endif
-PLUG_ADA = ada_nametable ada_parser ada_lexer ada_main
-
-PLUG_CMIONLY = tptp/tptp_ast python/py_ast microc/mc_ast cfg/cfg_ast
-
-PLUGINS = genequlin dimacs tptp python microc coma cfg forward_propagation ada_terms gnat_json
-
-TPTPMODULES = $(addprefix plugins/tptp/, $(PLUG_TPTP))
-COMAMODULES = $(addprefix plugins/coma/, $(PLUG_COMA))
-PYTHONMODULES = $(addprefix plugins/python/, $(PLUG_PYTHON))
-MICROCMODULES = $(addprefix plugins/microc/, $(PLUG_MICROC))
-CFGMODULES = $(addprefix plugins/cfg/, $(PLUG_CFG))
-ADAMODULES = $(addprefix plugins/ada_terms/, $(PLUG_ADA))
-GNATJSONMODULES := $(addprefix plugins/gnat_json/, ptree_constructors gnat_ast gnat_ast_pretty gnat_ast_to_ptree)
-
-TPTPCMO = $(addsuffix .cmo, $(TPTPMODULES))
-TPTPCMX = $(addsuffix .cmx, $(TPTPMODULES))
-
-COMACMO = $(addsuffix .cmo, $(COMAMODULES))
-COMACMX = $(addsuffix .cmx, $(COMAMODULES))
-
-PYTHONCMO = $(addsuffix .cmo, $(PYTHONMODULES))
-PYTHONCMX = $(addsuffix .cmx, $(PYTHONMODULES))
-
-MICROCCMO = $(addsuffix .cmo, $(MICROCMODULES))
-MICROCCMX = $(addsuffix .cmx, $(MICROCMODULES))
-
-ADACMO = $(addsuffix .cmo, $(ADAMODULES))
-ADACMX = $(addsuffix .cmx, $(ADAMODULES))
-
-GNATJSONCMO = $(addsuffix .cmo, $(GNATJSONMODULES))
-GNATJSONCMX = $(addsuffix .cmx, $(GNATJSONMODULES))
+PLUGINS = gnat_json ada_terms genequlin dimacs tptp python microc coma cfg forward_propagation
 
 ifeq (@enable_hypothesis_selection@,yes)
-PLUG_TRANSFORM += hypothesis_selection
 PLUGINS += hypothesis_selection
-
-lib/plugins/hypothesis_selection.cmxs: EXTINCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cma:  EXTINCLUDES += -I @OCAMLGRAPHLIB@
-lib/plugins/hypothesis_selection.cmxs: EXTLIBS += graph.cmxa
-lib/plugins/hypothesis_selection.cma:  EXTOBJS += graph.cma
-ifeq (@enable_ocamlfind@,yes)
-lib/plugins/hypothesis_selection.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
-lib/plugins/hypothesis_selection.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
 endif
-endif
-
-PLUGMODULES = $(addprefix plugins/parser/, $(PLUG_PARSER)) \
-	      $(addprefix plugins/printer/, $(PLUG_PRINTER)) \
-	      $(addprefix plugins/transform/, $(PLUG_TRANSFORM)) \
-	      $(addprefix plugins/strategies/, $(PLUG_STRATEGIES)) \
-	      $(TPTPMODULES) $(COMAMODULES) \
-	      $(PYTHONMODULES) $(MICROCMODULES) $(CFGMODULES) \
-	      $(ADAMODULES) $(GNATJSONMODULES)
-
-PLUGDEP = $(addsuffix .dep, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.dep)
-PLUGCMO = $(addsuffix .cmo, $(PLUGMODULES))
-PLUGCMX = $(addsuffix .cmx, $(PLUGMODULES))
-PLUGCMI = $(addsuffix .cmi, $(PLUGMODULES)) $(PLUG_CMIONLY:%=plugins/%.cmi)
-
-PLUGDIRS = parser printer transform strategies tptp coma python microc cfg ada_terms gnat_json
-PLUGINCLUDES = $(addprefix -I plugins/, $(PLUGDIRS))
-
-ifeq (@enable_stackify@,yes)
-plugins/cfg/stackify.cmx: EXTINCLUDES += -I @OCAMLGRAPHLIB@
-plugins/cfg/stackify.cmo: EXTINCLUDES += -I @OCAMLGRAPHLIB@
-plugins/cfg/stackify.cmx: EXTLIBS += graph.cmxa
-plugins/cfg/stackify.cmo: EXTOBJS += graph.cma
-ifeq (@enable_ocamlfind@,yes)
-plugins/cfg/stackify.cmx: FLAGS += -package ocamlgraph
-plugins/cfg/stackify.cmo: FLAGS += -package ocamlgraph
-lib/plugins/cfg.cmxs: FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
-lib/plugins/cfg.cma:  FLAGS += -package ocamlgraph -dontlink "$(EXTPKGS)" -linkpkg
-endif
-endif
-
-$(PLUGDEP) $(PLUGCMO) $(PLUGCMX) $(PLUGCMI): INCLUDES += $(PLUGINCLUDES)
-
-$(PLUGDEP): $(PLUGGENERATED)
 
 LIBPLUGCMA =  $(PLUGINS:%=lib/plugins/%.cma)
 LIBPLUGCMXS = $(PLUGINS:%=lib/plugins/%.cmxs)
-
-plugins.byte: $(LIBPLUGCMA)
-plugins.opt : $(LIBPLUGCMXS)
-
-lib/plugins:
-	mkdir lib/plugins
-
-lib/plugins/%.cmxs: | lib/plugins
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -shared -o $@ $^
-
-lib/plugins/%.cma: | lib/plugins
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -a -o $@ $^
-
-$(PLUG_PARSER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/parser/%.cmx
-$(PLUG_PARSER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/parser/%.cmo
-$(PLUG_PRINTER:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/printer/%.cmx
-$(PLUG_PRINTER:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/printer/%.cmo
-$(PLUG_TRANSFORM:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/transform/%.cmx
-$(PLUG_TRANSFORM:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/transform/%.cmo
-$(PLUG_STRATEGIES:%=lib/plugins/%.cmxs): lib/plugins/%.cmxs: plugins/strategies/%.cmx
-$(PLUG_STRATEGIES:%=lib/plugins/%.cma): lib/plugins/%.cma: plugins/strategies/%.cmo
-lib/plugins/tptp.cmxs: $(TPTPCMX)
-lib/plugins/tptp.cma: $(TPTPCMO)
-lib/plugins/coma.cmxs: $(COMACMX)
-lib/plugins/coma.cma: $(COMACMO)
-lib/plugins/python.cmxs: $(PYTHONCMX)
-lib/plugins/python.cma: $(PYTHONCMO)
-lib/plugins/microc.cmxs: $(MICROCCMX)
-lib/plugins/microc.cma: $(MICROCCMO)
-lib/plugins/cfg.cmxs: $(addsuffix .cmx, $(CFGMODULES))
-lib/plugins/cfg.cma: $(addsuffix .cmo, $(CFGMODULES))
-lib/plugins/ada_terms.cmxs: $(ADACMX)
-lib/plugins/ada_terms.cmo: $(ADACMO)
-lib/plugins/gnat_json.cmxs: $(GNATJSONCMX)
-lib/plugins/gnat_json.cmo: $(GNATJSONCMO)
-
-# depend and clean targets
-
-MAKEINC += $(PLUGDEP)
-
-CLEANDIRS += plugins $(addprefix plugins/, $(PLUGDIRS)) lib/plugins
-GENERATED += $(PLUGGENERATED)
 
 uninstall-bin::
 	rm -f $(PLUGINS:%=$(LIBDIR)/why3/plugins/%.cma)
@@ -724,36 +425,21 @@ install-bin::
 # Why3 commands
 ###############
 
-TOOLSGENERATED = src/tools/why3wc.ml
-
 TOOLS_BIN = \
 	why3config why3execute why3extract why3prove \
 	why3realize why3replay why3show why3wc why3bench
 
-TOOLS_FILES = main $(TOOLS_BIN)
+bin/why3.opt: dune.all
+bin/why3.byte: dune.all
 
-TOOLSMODULES = $(addprefix src/tools/, $(TOOLS_FILES))
+$(TOOLS_BIN:%=bin/%.cma):  dune.all
+$(TOOLS_BIN:%=bin/%.cmxs): dune.all
 
-TOOLSDEP = $(addsuffix .dep, $(TOOLSMODULES))
-TOOLSCMO = $(addsuffix .cmo, $(TOOLSMODULES))
-TOOLSCMX = $(addsuffix .cmx, $(TOOLSMODULES))
-
-$(TOOLSDEP) $(TOOLSCMO) $(TOOLSCMX): INCLUDES += -I src/tools
-
-$(TOOLSDEP): $(TOOLSGENERATED)
-
-byte: bin/why3.byte $(TOOLS_BIN:%=bin/%.cma)
-opt:  bin/why3.opt  $(TOOLS_BIN:%=bin/%.cmxs)
-
-bin/why3.opt: $(WHY3CMXA) src/tools/main.cmx
-bin/why3.byte: $(WHY3CMA) src/tools/main.cmo
-
-$(TOOLS_BIN:%=bin/%.cma):  bin/%.cma:  src/tools/%.cmo
-$(TOOLS_BIN:%=bin/%.cmxs): bin/%.cmxs: src/tools/%.cmx
+bin/why3$(EXE): dune.all
 
 uninstall-bin::
 	rm -f $(BINDIR)/why3$(EXE)
-	rm -f $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
+	rm -f $(TOOLS_BIN:%=$(TOOLDIR)/%.$(SHAREDBEST))
 
 install-bin::
 	$(MKDIR_P) $(BINDIR)
@@ -766,9 +452,6 @@ install_local:: bin/why3$(EXE) $(TOOLS_BIN:%=bin/%.$(SHAREDBEST))
 install_local:: share/drivers share/extraction_drivers share/stdlib
 
 ifneq (@OCAML_OS_TYPE@,Win32)
-bin/why3$(EXE): bin/why3.@OCAMLBEST@
-	ln -sf $(notdir $<) $@
-
 share/drivers share/extraction_drivers share/stdlib: share/%:
 	ln -snf ../$* $@
 else
@@ -777,9 +460,6 @@ else
 # anymore, make the copies every time the compilation is run.
 
 .PHONY: share/drivers share/extraction_drivers share/stdlib
-
-bin/why3$(EXE): bin/why3.@OCAMLBEST@
-	cp $< $@
 
 share/drivers share/extraction_drivers share/stdlib: share/%:
 	cp -r $* share/
@@ -791,49 +471,6 @@ clean::
 	rm -rf share/stdlib
 endif
 endif
-
-MAKEINC += $(TOOLSDEP)
-
-CLEANDIRS += src/tools
-GENERATED += $(TOOLSGENERATED)
-
-clean::
-	rm -f bin/why3*
-
-############
-# GNATWhy3 #
-############
-
-GNATWHY3_FILES := gnat_util gnat_loc gnat_expl gnat_counterexamples gnat_config\
-	      gnat_scheduler gnat_manual gnat_report gnat_checks gnat_main
-
-GNATWHY3MODULES := $(addprefix src/gnat/, $(GNATWHY3_FILES))
-GNATWHY3DEP = $(addsuffix .dep, $(GNATWHY3MODULES))
-GNATWHY3CMO = $(addsuffix .cmo, $(GNATWHY3MODULES))
-# Import external printer parser for Ada
-GNATWHY3CMX = $(addsuffix .cmx, $(GNATWHY3MODULES))
-$(GNATWHY3CMO) $(GNATWHY3CMX): INCLUDES += -I src/util -I src/gnat
-$(GNATWHY3DEP): DEPFLAGS += -I src/util -I src/gnat
-
-# build targets
-
-byte: bin/gnatwhy3.byte
-opt:  bin/gnatwhy3.opt
-
-bin/gnatwhy3.opt: lib/why3/why3.cmxa $(GNATWHY3CMX)
-bin/gnatwhy3.byte: lib/why3/why3.cma $(GNATWHY3CMO)
-
-install_no_local::
-	cp -f bin/gnatwhy3.@OCAMLBEST@ $(BINDIR)/gnatwhy3$(EXE)
-
-ifneq "$(MAKECMDGOALS:clean%=clean)" "clean"
--include $(GNATWHY3DEP)
-endif
-
-CLEANDIRS += src/gnat
-
-clean::
-	rm -f bin/gnatwhy3.byte bin/gnatwhy3.opt bin/gnatwhy3
 
 ##############
 # Why3server #
@@ -975,48 +612,15 @@ xml-validate-local:
 # IDE
 ###############
 
-IDEGENERATED =
-GENERATED += $(IDEGENERATED)
-
 ifeq (@enable_ide@,yes)
-
-IDE_FILES =
-
-ifeq (@enable_statmemprof@,yes)
-IDE_FILES += statmemprof
-
-bin/why3ide.cmxs bin/why3ide.cma: EXTPKGS += @STATMEMPROFPKG@
-endif
-
-IDE_FILES += gconfig ide_utils why3ide
-
-IDEMODULES = $(addprefix src/ide/, $(IDE_FILES))
-
-IDEDEP = $(addsuffix .dep, $(IDEMODULES))
-IDECMO = $(addsuffix .cmo, $(IDEMODULES))
-IDECMX = $(addsuffix .cmx, $(IDEMODULES))
-
-$(IDEDEP) $(IDECMO) $(IDECMX): INCLUDES += -I src/ide
-
-$(IDEDEP): $(IDEGENERATED)
 
 # build targets
 
-byte: bin/why3ide.cma
-opt:  bin/why3ide.cmxs
+bin/why3ide.cmxs: dune.all
+bin/why3ide.cma:  dune.all
 
-bin/why3ide.cmxs bin/why3ide.cma: FLAGS += $(addprefix -package ,@LABLGTKPKG@) -dontlink "$(EXTPKGS)" -linkpkg
-
-bin/why3ide.cmxs: $(IDECMX)
-bin/why3ide.cma:  $(IDECMO)
-
-# depend and clean targets
-
-MAKEINC += $(IDEDEP)
-
-CLEANDIRS += src/ide
-
-ide: bin/why3ide.$(SHAREDBEST)
+ide: $(DUNEDEPS)
+	$(DUNEBUILD) bin/why3ide.$(SHAREDBEST)
 
 uninstall-ide:
 	rm -f $(TOOLDIR)/why3ide.$(SHAREDBEST)
@@ -1046,29 +650,10 @@ endif
 # WEBSERV
 ###############
 
-WEBSERV_FILES = wserver why3web
-
-WEBSERVMODULES = $(addprefix src/ide/, $(WEBSERV_FILES))
-
-WEBSERVDEP = $(addsuffix .dep, $(WEBSERVMODULES))
-WEBSERVCMO = $(addsuffix .cmo, $(WEBSERVMODULES))
-WEBSERVCMX = $(addsuffix .cmx, $(WEBSERVMODULES))
-
-$(WEBSERVDEP) $(WEBSERVCMO) $(WEBSERVCMX): INCLUDES += -I src/ide
-
 # build targets
 
-byte: bin/why3webserver.cma
-opt:  bin/why3webserver.cmxs
-
-bin/why3webserver.cmxs: $(WEBSERVCMX)
-bin/why3webserver.cma:  $(WEBSERVCMO)
-
-# depend and clean targets
-
-MAKEINC += $(WEBSERVDEP)
-
-CLEANDIRS += src/ide
+bin/why3webserver.cmxs: dune.all
+bin/why3webserver.cma:  dune.all
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3webserver.$(SHAREDBEST)
@@ -1084,33 +669,10 @@ install_local:: bin/why3webserver.$(SHAREDBEST)
 # Session
 ###############
 
-SESSION_FILES = why3session_lib why3session_info \
-		why3session_html why3session_latex why3session_update  \
-		why3session_output why3session_create why3session_main
-# TODO: why3session_copy why3session_rm why3session_csv why3session_run
-#       why3session_output
-
-SESSIONMODULES = $(addprefix src/why3session/, $(SESSION_FILES))
-
-SESSIONDEP = $(addsuffix .dep, $(GNATASTMODULES) $(SESSIONMODULES))
-SESSIONCMO = $(addsuffix .cmo, $(GNATASTMODULES) $(SESSIONMODULES))
-SESSIONCMX = $(addsuffix .cmx, $(GNATASTMODULES) $(SESSIONMODULES))
-
-$(SESSIONDEP) $(SESSIONCMO) $(SESSIONCMX): INCLUDES += -I src/why3session
-
 # build targets
 
-byte: bin/why3session.cma
-opt:  bin/why3session.cmxs
-
-bin/why3session.cmxs: $(SESSIONCMX)
-bin/why3session.cma:  $(SESSIONCMO)
-
-# depend and clean targets
-
-MAKEINC += $(SESSIONDEP)
-
-CLEANDIRS += src/why3session
+bin/why3session.cmxs: dune.all
+bin/why3session.cma:  dune.all
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3session.$(SHAREDBEST)
@@ -1125,27 +687,10 @@ install_local:: bin/why3session.$(SHAREDBEST)
 # Why3 Shell
 ###############
 
-SHELL_FILES = why3shell
-
-SHELLMODULES = $(addprefix src/tools/, $(SHELL_FILES))
-
-SHELLDEP = $(addsuffix .dep, $(SHELLMODULES))
-SHELLCMO = $(addsuffix .cmo, $(SHELLMODULES))
-SHELLCMX = $(addsuffix .cmx, $(SHELLMODULES))
-
-$(SHELLDEP) $(SHELLCMO) $(SHELLCMX): INCLUDES += -I src/tools
-
 # build targets
 
-byte: bin/why3shell.cma
-opt:  bin/why3shell.cmxs
-
-bin/why3shell.cmxs: $(SHELLCMX)
-bin/why3shell.cma:  $(SHELLCMO)
-
-# depend and clean targets
-
-MAKEINC += $(SHELLDEP)
+bin/why3shell.cmxs: dune.all
+bin/why3shell.cma:  dune.all
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3shell.$(SHAREDBEST)
@@ -1172,44 +717,45 @@ clean-coq::
 
 COQLIBS_INT_FILES = Abs ComputerDivision Div2 EuclideanDivision Int MinMax Power NumOf
 COQLIBS_INT_ALL_FILES = Exponentiation $(COQLIBS_INT_FILES)
-COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
 
 COQLIBS_BOOL_FILES = Bool
-COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
 
-ifeq (@enable_coq_fp_libs@,yes)
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry Truncate
-else
-COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square Trigonometry
-endif
-COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
+COQLIBS_REAL_FILES = Abs ExpLog FromInt MinMax PowerInt PowerReal Real RealInfix Square
 
 COQLIBS_NUMBER_FILES = Divisibility Gcd Parity Prime Coprime
-COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
 
 COQLIBS_SET_FILES = Set Cardinal Fset FsetInduction FsetInt FsetSum SetApp SetAppInt SetImp SetImpInt
-COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
 
 COQLIBS_MAP_FILES = Map Const MapExt Occ MapPermut MapInjection
-COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
 
 COQLIBS_LIST_FILES = List Length Mem Nth NthLength HdTl NthHdTl Append NthLengthAppend Reverse HdTlNoOpt NthNoOpt RevAppend Combine Distinct NumOcc Permut
-COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
 
 COQLIBS_OPTION_FILES = Option
-COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
 
 COQLIBS_BV_FILES = Pow2int BV_Gen
-COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
 
 ifeq (@enable_coq_fp_libs@,yes)
 COQLIBS_FP_FILES = Rounding SingleFormat Single DoubleFormat Double
 COQLIBS_FP_ALL_FILES = GenFloat $(COQLIBS_FP_FILES)
-COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
-
 COQLIBS_IEEEFLOAT_FILES = RoundingMode GenericFloat Float32 Float64
-COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
+COQLIBS_REAL_FILES += Truncate
 endif
+
+ifeq (@enable_coq_interval@,yes)
+COQLIBS_REAL_FILES += Trigonometry
+endif
+
+COQLIBS_INT = $(addprefix lib/coq/int/, $(COQLIBS_INT_ALL_FILES))
+COQLIBS_BOOL = $(addprefix lib/coq/bool/, $(COQLIBS_BOOL_FILES))
+COQLIBS_NUMBER = $(addprefix lib/coq/number/, $(COQLIBS_NUMBER_FILES))
+COQLIBS_SET = $(addprefix lib/coq/set/, $(COQLIBS_SET_FILES))
+COQLIBS_MAP = $(addprefix lib/coq/map/, $(COQLIBS_MAP_FILES))
+COQLIBS_LIST = $(addprefix lib/coq/list/, $(COQLIBS_LIST_FILES))
+COQLIBS_OPTION = $(addprefix lib/coq/option/, $(COQLIBS_OPTION_FILES))
+COQLIBS_BV = $(addprefix lib/coq/bv/, $(COQLIBS_BV_FILES))
+COQLIBS_REAL = $(addprefix lib/coq/real/, $(COQLIBS_REAL_FILES))
+COQLIBS_FP = $(addprefix lib/coq/floating_point/, $(COQLIBS_FP_ALL_FILES))
+COQLIBS_IEEEFLOAT = $(addprefix lib/coq/ieee_float/, $(COQLIBS_IEEEFLOAT_FILES))
 
 COQLIBS_FOR_DRIVERS_FILES = ComputerOfEuclideanDivision
 COQLIBS_FOR_DRIVERS = $(addprefix lib/coq/for_drivers/, $(COQLIBS_FOR_DRIVERS_FILES))
@@ -1622,37 +1168,19 @@ clean:: clean-isabelle
 # Isabelle client
 #######################
 
-ISABELLEC_FILES := isabelle_client_main
-
-ISABELLECMODULES := $(addprefix src/isabelle-client/, $(ISABELLEC_FILES))
-ISABELLECDEP = $(addsuffix .dep, $(ISABELLECMODULES))
-ISABELLECCMO = $(addsuffix .cmo, $(ISABELLECMODULES))
-ISABELLECCMX = $(addsuffix .cmx, $(ISABELLECMODULES))
-
-$(ISABELLECDEP) $(ISABELLECCMO) $(ISABELLECCMX): INCLUDES += -I src/isabelle-client -I src/util
-
-depend: $(ISABELLECDEP)
-CLEANDIRS += src/isabelle-client
-
 # build targets
 
 byte: bin/isabelle_client.byte
 opt:  bin/isabelle_client.opt
 
-bin/isabelle_client.opt: lib/why3/why3.cmxa $(ISABELLECCMX)
-
-bin/isabelle_client.byte: lib/why3/why3.cma $(ISABELLECCMO)
+bin/isabelle_client.opt: dune.all
+bin/isabelle_client.byte: dune.all
 
 # install-bin::
 # 	cp -f bin/isabelle_client.@OCAMLBEST@ $(BINDIR)/isabelle_client$(EXE)
 
 # uninstall-bin::
 # 	rm -f $(BINDIR)/isabelle_client$(EXE)
-
-MAKEINC += $(ISABELLECDEP)
-
-clean::
-	rm -f bin/isabelle_client.byte bin/isabelle_client.opt bin/isabelle_client
 
 ################
 # Jessie3 plugin
@@ -1690,27 +1218,10 @@ endif
 # Why3 pp
 ###############
 
-PRETTYPRINT_FILES = why3pp
-
-PRETTYPRINTMODULES = $(addprefix src/tools/, $(PRETTYPRINT_FILES))
-
-PRETTYPRINTDEP = $(addsuffix .dep, $(PRETTYPRINTMODULES))
-PRETTYPRINTCMO = $(addsuffix .cmo, $(PRETTYPRINTMODULES))
-PRETTYPRINTCMX = $(addsuffix .cmx, $(PRETTYPRINTMODULES))
-
-$(PRETTYPRINTDEP) $(PRETTYPRINTCMO) $(PRETTYPRINTCMX): INCLUDES += -I src/tools
-
 # build targets
 
-byte: bin/why3pp.cma
-opt:  bin/why3pp.cmxs
-
-bin/why3pp.cmxs: $(PRETTYPRINTCMX)
-bin/why3pp.cma:  $(PRETTYPRINTCMO)
-
-# depend and clean targets
-
-MAKEINC += $(PRETTYPRINTDEP)
+bin/why3pp.cmxs: dune.all
+bin/why3pp.cma:  dune.all
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3pp.$(SHAREDBEST)
@@ -1725,34 +1236,10 @@ install_local:: bin/why3pp.$(SHAREDBEST)
 # why3doc
 #########
 
-WHY3DOCGENERATED = src/why3doc/doc_lexer.ml
-
-WHY3DOC_FILES = doc_html doc_def doc_lexer doc_main
-
-WHY3DOCMODULES = $(addprefix src/why3doc/, $(WHY3DOC_FILES))
-
-WHY3DOCDEP = $(addsuffix .dep, $(WHY3DOCMODULES))
-WHY3DOCCMO = $(addsuffix .cmo, $(WHY3DOCMODULES))
-WHY3DOCCMX = $(addsuffix .cmx, $(WHY3DOCMODULES))
-
-$(WHY3DOCDEP) $(WHY3DOCCMO) $(WHY3DOCCMX): INCLUDES += -I src/why3doc
-
-$(WHY3DOCDEP): $(WHY3DOCGENERATED)
-
 # build targets
 
-byte: bin/why3doc.cma
-opt:  bin/why3doc.cmxs
-
-bin/why3doc.cmxs: $(WHY3DOCCMX)
-bin/why3doc.cma:  $(WHY3DOCCMO)
-
-# depend and clean targets
-
-MAKEINC += $(WHY3DOCDEP)
-
-CLEANDIRS += src/why3doc
-GENERATED += $(WHY3DOCGENERATED)
+bin/why3doc.cmxs: dune.all
+bin/why3doc.cma:  dune.all
 
 uninstall-bin::
 	rm -f $(TOOLDIR)/why3doc.$(SHAREDBEST)
@@ -1768,22 +1255,12 @@ install_local:: bin/why3doc.$(SHAREDBEST)
 #########
 
 ifeq ($(DEBUGJS),yes)
- JSOO_DEBUG=--pretty --debug-info --source-map
+ JSOO_DEBUG=--Werror --pretty --debug-info --source-map
  JS_MAPS=trywhy3.map why3_worker.map
 else
  JSOO_DEBUG=
  JS_MAPS=
 endif
-
-TRYWHY3_FILES = json_base json_parser json_lexer bindings shortener trywhy3 why3_worker worker_proto
-
-TRYWHY3MODULES = $(addprefix src/trywhy3/, $(TRYWHY3_FILES))
-
-TRYWHY3DEP = $(addsuffix .dep, $(TRYWHY3MODULES))
-TRYWHY3CMO = $(addsuffix .cmo, $(TRYWHY3MODULES))
-TRYWHY3CMI = $(addsuffix .cmi, $(TRYWHY3MODULES))
-
-$(TRYWHY3DEP) $(TRYWHY3CMO) $(TRYWHY3CMI): INCLUDES += -I src/trywhy3
 
 TRYWHY3_COMMON_PACK = \
 	trywhy3.js trywhy3.html trywhy3.css trywhy3_custom.css \
@@ -1815,49 +1292,26 @@ trywhy3: src/trywhy3/trywhy3.js src/trywhy3/why3_worker.js
 
 src/trywhy3/trywhy3.js: src/trywhy3/trywhy3.byte
 	$(SHOW) 'Js_of_ocaml $<'
-	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror $<
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) $<
 
-src/trywhy3/trywhy3.byte: $(addprefix src/trywhy3/, json_base.cmo json_parser.cmo json_lexer.cmo bindings.cmo worker_proto.cmo shortener.cmo trywhy3.cmo)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLFIND) ocamlc -o $@ -package js_of_ocaml -package menhirLib -linkpkg $^
+# TODO: really use grouped target ?
+src/trywhy3/trywhy3.byte src/trywhy3/why3_worker.byte: FORCE $(DUNEDEPS)
+	$(DUNEBUILD) @trywhy3
 
 src/trywhy3/why3_worker.js: src/trywhy3/why3_worker.byte src/trywhy3/trywhy3.conf src/trywhy3/try_alt_ergo.drv
 	$(SHOW) 'Js_of_ocaml $<'
-	$(HIDE)js_of_ocaml $(JSOO_DEBUG) --Werror -I . -I src/trywhy3 \
-	  --extern-fs --file=trywhy3.conf:/ --file=try_alt_ergo.drv:/ \
-	  `find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
-	  +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
-
-src/trywhy3/why3_worker.byte: $(WHY3CMA) $(PYTHONCMO) $(MICROCCMO) \
-		$(addprefix src/trywhy3/, bindings.cmo worker_proto.cmo why3_worker.cmo)
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLFIND) ocamlc $(filter-out -thread,$(BFLAGS)) -package js_of_ocaml -o $@ -linkpkg $^
-
-$(addprefix src/trywhy3/, worker_proto.cmo why3_worker.cmo): BFLAGS += -package js_of_ocaml
-
-$(addprefix src/trywhy3/, bindings.cmo trywhy3.cmo): BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
-
-TRYWHY3JSON_FILES = json_base json_parser json_lexer
-TRYWHY3JSON = $(TRYWHY3JSON_FILES:%=src/trywhy3/%.ml) $(TRYWHY3JSON_FILES:%=src/trywhy3/%.mli)
-
-$(TRYWHY3JSON): src/trywhy3/%: src/util/%
-	cp $< $@
-
-GENERATED += $(TRYWHY3JSON)
-
-$(TRYWHY3DEP): $(TRYWHY3JSON)
-
-MAKEINC += $(TRYWHY3DEP)
+	$(HIDE)js_of_ocaml $(JSOO_DEBUG) -I . -I src/trywhy3 \
+		--extern-fs --file=trywhy3.conf:/ --file=try_alt_ergo.drv:/ \
+		`find stdlib -name "*.mlw" -exec printf " --file=%s:/%s" {} {} ";"` \
+		+dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js \
+		+zarith_stubs_js/runtime.js $<
 
 clean-trywhy3:
-	rm -f src/trywhy3/trywhy3.js src/trywhy3/trywhy3.byte \
-	  src/trywhy3/why3_worker.js src/trywhy3/why3_worker.byte \
+	rm -f src/trywhy3/trywhy3.js \
+	  src/trywhy3/why3_worker.js \
 	  trywhy3.tar.gz
 
 clean:: clean-trywhy3
-
-CLEANDIRS += src/trywhy3
-
 
 #########
 # why3webserver and full web/js interface
@@ -1865,21 +1319,10 @@ CLEANDIRS += src/trywhy3
 
 ifeq (@enable_web_ide@,yes)
 
-src/ide/why3_js.cmo: BFLAGS += -package js_of_ocaml -package js_of_ocaml-ppx
-
-src/ide/why3_js.byte: lib/why3/why3.cma src/ide/why3_js.cmo
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLFIND) ocamlc -package js_of_ocaml \
-	  $(filter-out -thread,$(BFLAGS)) -o $@ -linkpkg $(BLINKFLAGS) $^
-
-src/ide/why3_js.js: src/ide/why3_js.byte
-	$(SHOW) 'Js_of_ocaml $<'
-	$(HIDE)js_of_ocaml --Werror +dynlink.js +toplevel.js +zarith_stubs_js/biginteger.js +zarith_stubs_js/runtime.js $<
+src/ide/why3_js.js: FORCE $(DUNEDEPS)
+	$(DUNEBUILD) $@
 
 web_ide: src/ide/why3_js.js
-
-opt: bin/why3webserver.cmxs
-byte: bin/why3webserver.cma src/ide/why3_js.cmo
 
 endif
 
@@ -1889,8 +1332,7 @@ endif
 
 .PHONY: bench test
 
-bench:: bin/why3.@OCAMLBEST@ bin/why3config.$(SHAREDBEST) plugins $(TOOLS) \
-  share/Makefile.config bin/why3extract.$(SHAREDBEST)
+bench:: dune.all share/Makefile.config
 	bin/why3.@OCAMLBEST@ config list-provers | grep -q Alt-Ergo || \
 		bin/why3.@OCAMLBEST@ config detect
 	@echo "=== Check API examples ==="
@@ -1937,25 +1379,16 @@ test-itp.opt: src/printer/itp.ml lib/why3/why3.cmxa
 	$(if $(QUIET),@echo 'Ocamlopt $<' &&) \
 	$(OCAMLOPT) -o $@ -I lib/why3 $(INCLUDES) $(OLINKFLAGS) lib/why3/why3.cmxa $<
 
-test-api-%.byte: examples/use_api/%.ml lib/why3/why3.cma
-	$(SHOW) 'Ocaml    $<'
-	$(HIDE)($(OCAMLC) -o $@ -I lib/why3 $(BFLAGS) $(BLINKFLAGS) lib/why3/why3.cma $<) \
-		|| (printf "Compilation failed for API test $@. Please fix it.\n"; exit 2)
-
-test-api-%.opt: examples/use_api/%.ml lib/why3/why3.cmxa
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)($(OCAMLOPT) -o $@ -I lib/why3 $(OFLAGS) $(OLINKFLAGS) lib/why3/why3.cmxa $<) \
-		|| (printf "Compilation failed for API test $@. Please fix it.\n"; exit 2)
-
-test-api-%: test-api-%.@OCAMLBEST@
+test-api-%:
 	$(HIDE)mkdir -p examples/use_api/results
-	$(HIDE)(./$< | sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
-			   -e 's/0\.0[0-9]/<hidden>/g;s/[0-9]\+ steps/<hidden> steps/' \
-			    > examples/use_api/results/$@.stdout ) \
+	$(HIDE)($(DUNE) exec $(DUNEFLAGS) --display=quiet -- examples/use_api/$*.exe | \
+		    sed -e 's/^\(Versions of Alt-Ergo found: \).*$$/\1<hidden>/' \
+			-e 's/0\.0[0-9]/<hidden>/g;s/[0-9]\+ steps/<hidden> steps/' \
+			> examples/use_api/results/$@.stdout ) \
 		|| (printf "Execution failed for API test $<. Please fix it.\n"; exit 2)
 	$(HIDE)(diff -u examples/use_api/oracles/$@.stdout examples/use_api/results/$@.stdout) \
 		|| (printf "Oracle updated for API test $<. Please review it.\n"; cp examples/use_api/results/$@.stdout examples/use_api/oracles/$@.stdout )
-	$(HIDE)rm -f $< why3session.xml why3shapes why3shapes.gz
+	$(HIDE)rm -f why3session.xml why3shapes why3shapes.gz
 
 
 #test-shape: lib/why3/why3.cma
@@ -2065,7 +1498,7 @@ MODULESTODOC = \
 	util/extmap util/extset util/exthtbl \
 	util/weakhtbl util/wstdlib util/rc util/debug \
 	util/loc util/pp util/bigInt util/number \
-	util/mlmpfr_wrapper \
+	why3deps/mlmpfr_wrapper \
 	core/ident core/ty core/term core/decl core/coercion core/theory \
 	core/env core/task core/trans core/pretty core/printer \
 	core/model_parser \
@@ -2085,7 +1518,9 @@ endif
 
 FILESTODOC = $(subst .ml.mli,.ml,$(MODULESTODOC:%=src/%.mli))
 
-DOCFLAGS = -sort $(INCLUDES) $(LIBINCLUDES)
+# TODO: dune internal hierarchy, to be removed. Put this in $(INCLUDES) ??
+DOCFLAGS = -sort -I _build/default/src/.why3.objs/byte \
+	-I _build/default/src/why3deps/.why3deps.objs/byte -open Why3 -open Why3deps
 
 ifeq (@enable_ocamlfind@,yes)
 	DOCFLAGS += $(addprefix -package ,$(EXTPKGS))
@@ -2181,7 +1616,7 @@ STDLIBS = \
 STDLIBFILES = $(patsubst %,stdlib/%.mlw, $(STDLIBS))
 
 # TODO: remove the hack about int.mlw once it has become builtin
-stdlibdoc: $(STDLIBFILES) bin/why3.@OCAMLBEST@ bin/why3doc.$(SHAREDBEST)
+stdlibdoc: $(STDLIBFILES) dune.all
 	mkdir -p doc/stdlibdoc
 	sed -e "s/use Int/use int.Int/" stdlib/int.mlw > int.mlw
 	rm -f doc/stdlibdoc/style.css
@@ -2197,116 +1632,6 @@ stdlibdoc: $(STDLIBFILES) bin/why3.@OCAMLBEST@ bin/why3doc.$(SHAREDBEST)
 
 clean::
 	rm -f doc/stdlibdoc/*
-
-################
-# generic rules
-################
-
-%.cmi: %.mli
-	$(SHOW) 'Ocamlc   $<'
-	$(HIDE)$(OCAMLC) -c $(BFLAGS) $<
-
-# suppress "unused rec" warning for Menhir-produced files
-%.cmo: %.ml %.mly
-	$(SHOW) 'Ocamlc   $<'
-	$(HIDE)$(OCAMLC) -c $(BFLAGS) -w -39 $<
-
-# suppress "unused rec" warning for Menhir-produced files
-%.cmx: %.ml %.mly
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) -w -39 $(CMIHACK) $<
-
-%.cmo: %.ml
-	$(SHOW) 'Ocamlc   $<'
-	$(HIDE)$(OCAMLC) -c $(BFLAGS) $<
-
-%.cmx: %.ml %.mli
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $<
-
-%.cmx: %.ml
-	$(SHOW) 'Ocamlopt $<'
-	$(HIDE)$(OCAMLOPT) -c $(OFLAGS) $(CMIHACK) $<
-
-%.cma:
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) -a $(BFLAGS) -o $@ $^
-
-%.cmxa:
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) -a $(OFLAGS) -o $@ $^
-
-%.cmxs:
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) -shared $(OFLAGS) -o $@ $^
-
-%.ml: %.mll
-	$(SHOW) 'Ocamllex $<'
-	$(HIDE)$(OCAMLLEX) $<
-
-# the % below are not a typo; they are a way to force Make to consider all the targets at once
-src/c%re/parser_tokens.ml src/c%re/parser_tokens.mli: src/parser/parser_common.mly
-	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --base src/core/parser_tokens --only-tokens $^
-
-src/p%rser/parser.ml src/p%rser/parser.mli: $(PARSERS)
-	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base src/parser/parser \
-		--external-tokens Parser_tokens $^
-
-pl%gins/cfg/cfg_parser.ml pl%gins/cfg/cfg_parser.mli: src/parser/parser_common.mly plugins/cfg/cfg_parser.mly
-	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/cfg/cfg_parser $^
-	$(HIDE)for f in plugins/cfg/cfg_parser.mli plugins/cfg/cfg_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
-
-pl%gins/coma/coma_parser.ml pl%gins/coma/coma_parser.mli: src/parser/parser_common.mly plugins/coma/coma_parser.mly
-	$(SHOW) 'Menhir $^'
-	$(HIDE)$(MENHIR) --table --explain --strict --base plugins/coma/coma_parser $^
-	$(HIDE)for f in plugins/coma/coma_parser.mli plugins/coma/coma_parser.ml; do (echo "open Why3"; cat $$f) > $$f.new && mv $$f.new $$f; done
-
-%.ml %.mli: %.mly
-	$(SHOW) 'Menhir $<'
-	$(HIDE)$(MENHIR) --table --explain --strict $<
-
-%.dep: %.ml %.mli
-	$(SHOW) 'Ocamldep $<'
-	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $<i $(TOTARGET)
-
-%.dep: %.ml
-	$(SHOW) 'Ocamldep $<'
-	$(HIDE)($(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $<; \
-	        echo '$*.cmx : $*.cmi'; \
-	        echo '$*.cmi : $*.cmo') $(TOTARGET)
-
-%.dep: %.mli
-	$(SHOW) 'Ocamldep $<'
-	$(HIDE)$(OCAMLDEP) $(DEPFLAGS) $(INCLUDES) $< $(TOTARGET)
-
-bin/%.opt:
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLOPT) $(OFLAGS) -o $@ $(OLINKFLAGS) $^
-
-bin/%.byte:
-	$(SHOW) 'Linking  $@'
-	$(HIDE)$(OCAMLC) $(BFLAGS) -o $@ $(BLINKFLAGS) $^
-
-# .ml4.ml:
-# 	$(CAMLP4) pr_o.cmo -impl $< > $@
-
-# jc/jc_ai.ml: jc/jc_annot_inference.ml jc/jc_annot_fail.ml Makefile
-# 	if test "@enable_apron@" = "yes" ; then \
-# 	  echo "# 1 \"jc/jc_annot_inference.ml\"" > jc/jc_ai.ml; \
-# 	  cat jc/jc_annot_inference.ml >> jc/jc_ai.ml; \
-# 	else \
-# 	  echo "# 1 \"jc/jc_annot_fail.ml\"" > jc/jc_ai.ml; \
-# 	  cat jc/jc_annot_fail.ml >> jc/jc_ai.ml; \
-# 	fi
-
-# %_why.v: %.mlw $(BINARY)
-# 	$(BINARY) -coq $*.mlw
-
-# %_why.pvs: %.mlw $(BINARY)
-# 	$(BINARY) -pvs $*.mlw
 
 # Emacs tags
 ############
@@ -2373,9 +1698,13 @@ AUTOCONF_FILES = \
 	Makefile \
 	src/jessie/Makefile \
 	src/config.sh \
-	.merlin \
+	src/dune \
+	src/util/dune \
+	src/why3deps/dune \
 	src/jessie/.merlin \
-	lib/why3/META \
+	bin/dune \
+	lib/plugins/dune \
+	plugins/cfg/dune \
 	lib/coq/version \
 	lib/pvs/version
 

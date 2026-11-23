@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -138,7 +138,7 @@ Lemma subset_remove {a:Type} {a_WT:WhyType a} :
 Proof.
 intros x s y.
 unfold mem, Map.set.
-destruct (why_decidable_eq x y) as [->|H] ; intuition.
+now destruct (why_decidable_eq x y) as [->|H].
 Qed.
 
 (* Why3 goal *)
@@ -332,7 +332,9 @@ intuition.
   destruct (s1 x); destruct (s2 x); intuition.
 - rewrite <- H.
   rewrite Bool.andb_true_iff.
-  destruct (s2 x); intuition.
+  destruct (s2 x).
+  now left.
+  now right.
 Qed.
 
 (* Why3 goal *)
@@ -345,7 +347,9 @@ unfold disjoint, diff.
 unfold mem.
 intros x.
 rewrite Bool.andb_true_iff.
-destruct (s2 x); intuition.
+destruct (s2 x).
+now left.
+now right.
 Qed.
 
 (* Why3 goal *)

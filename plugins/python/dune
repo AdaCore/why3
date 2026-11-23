@@ -1,0 +1,11 @@
+(ocamllex py_lexer)
+
+(menhir
+ (modules py_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(library
+ (name python)
+ (modules_without_implementation py_ast)
+ (libraries why3 menhirLib))

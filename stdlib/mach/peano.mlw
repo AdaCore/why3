@@ -41,9 +41,9 @@ module Peano
   val ge (x y: t) : bool
     ensures { result <-> x.v >= y.v }
   val eq (x y: t) : bool
-    ensures { result <-> x.v = y.v }
+    returns { True -> x = y | False -> x.v <> y.v }
   val ne (x y: t) : bool
-    ensures { result <-> x.v <> y.v }
+    returns { True -> x.v <> y.v | False -> x = y }
 
   val neg (x: t) : t
     ensures { result.v = - x.v }
@@ -116,5 +116,52 @@ module Int63
   val of_int63 (x:int63) (low high: t) : t
     requires { low.v <= x <= high.v }
     ensures { result.v = x }
+
+end
+
+
+module SetPeano
+
+  use Peano
+
+  clone export set.SetApp with type elt = Peano.t, val eq = Peano.eq
+
+end
+
+
+module MapPeano
+
+  use Peano
+  clone export fmap.MapApp with type key = Peano.t, val eq = Peano.eq
+
+  val mapi (f: Peano.t -> 'v -> 'w) (m: t 'v) : t 'w
+    ensures {forall i. S.mem i m.domain -> result i = f i (m i)}
+
+  scope Iter  (* iteration over maps *)
+
+    type iter 'v = abstract {
+              initial: fmap Peano.t 'v;
+      mutable visited: S.fset Peano.t;
+    } invariant {
+      S.subset visited initial.domain
+    }  by {
+      initial = empty;
+      visited = S.empty;
+    }
+
+    val create (m: t 'v) : iter 'v
+      ensures { result.initial = m.to_fmap }
+      ensures { S.is_empty result.visited }
+
+    exception Done
+
+    val next (it: iter 'v) : (Peano.t, 'v)
+      writes { it }
+      raises  { Done -> it.visited = (old it).visited = it.initial.domain}
+      returns { (r,v) -> S.mem r it.initial.domain /\ it.initial r = v /\
+                     not (S.mem r (old it).visited) /\
+                     it.visited = S.add r (old it).visited }
+
+  end
 
 end

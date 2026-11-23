@@ -2,10 +2,10 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="0" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="2" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.7" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Z3" version="4.12.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="hashtbl_impl.mlw"/>
 <theory name="HashtblImpl" proved="true">
@@ -45,7 +45,7 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="11181"/></proof>
   </goal>
   <goal name="resize&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="13061"/></proof>
+  <proof prover="3"><result status="valid" time="0.060000" steps="13133"/></proof>
   </goal>
   <goal name="resize&#39;vc.7" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.050000" steps="13184"/></proof>
@@ -76,7 +76,7 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="9355"/></proof>
   </goal>
   <goal name="resize&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="53668"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="53668"/></proof>
   </goal>
   <goal name="resize&#39;vc.16" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.040000" steps="10175"/></proof>
@@ -105,7 +105,7 @@
  </transf>
  </goal>
  <goal name="list_find&#39;vc" expl="VC for list_find" proved="true">
- <proof prover="3"><result status="valid" time="0.060000" steps="11298"/></proof>
+ <proof prover="3"><result status="valid" time="0.060000" steps="11344"/></proof>
  </goal>
  <goal name="find&#39;vc" expl="VC for find" proved="true">
  <transf name="split_goal_right" proved="true" >
@@ -116,17 +116,17 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="7922"/></proof>
   </goal>
   <goal name="find&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.091449" steps="10383"/></proof>
+  <proof prover="0"><result status="valid" time="0.091449" steps="10358"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="list_remove&#39;vc" expl="VC for list_remove" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="list_remove&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="8508"/></proof>
+  <proof prover="3"><result status="valid" time="0.030000" steps="8556"/></proof>
   </goal>
   <goal name="list_remove&#39;vc.1" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="8333"/></proof>
+  <proof prover="3"><result status="valid" time="0.040000" steps="8381"/></proof>
   </goal>
   <goal name="list_remove&#39;vc.2" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.040000" steps="9986"/></proof>
@@ -142,7 +142,7 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="7922"/></proof>
   </goal>
   <goal name="remove&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.080040" steps="8609"/></proof>
+  <proof prover="0"><result status="valid" time="0.080040" steps="8588"/></proof>
   </goal>
   <goal name="remove&#39;vc.3" expl="postcondition" proved="true">
   <proof prover="3"><result status="valid" time="0.010000" steps="5595"/></proof>
@@ -154,7 +154,7 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="10356"/></proof>
   </goal>
   <goal name="remove&#39;vc.6" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="42652"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="42724"/></proof>
   </goal>
   <goal name="remove&#39;vc.7" expl="type invariant" proved="true">
   <proof prover="2"><result status="valid" time="0.040000"/></proof>
@@ -182,7 +182,7 @@
   <proof prover="3"><result status="valid" time="0.040000" steps="11145"/></proof>
   </goal>
   <goal name="add&#39;vc.4" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="81645"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="81915"/></proof>
   </goal>
   <goal name="add&#39;vc.5" expl="type invariant" proved="true">
   <proof prover="2"><result status="valid" time="0.110000"/></proof>
@@ -206,7 +206,7 @@
   <proof prover="3"><result status="valid" time="0.030000" steps="10692"/></proof>
   </goal>
   <goal name="add&#39;vc.12" expl="type invariant" proved="true">
-  <proof prover="0"><result status="valid" time="0.020000" steps="78500"/></proof>
+  <proof prover="4"><result status="valid" time="0.020000" steps="78578"/></proof>
   </goal>
   <goal name="add&#39;vc.13" expl="type invariant" proved="true">
   <proof prover="2"><result status="valid" time="0.100000"/></proof>

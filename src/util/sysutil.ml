@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -77,11 +77,16 @@ let write_file_fmt f c =
 
 
 let write_unique_file_fmt f c =
-  let dir = Filename.dirname f in
-  let base = Filename.basename f in
-  let prefix = Filename.remove_extension base in
-  let suffix = Filename.extension base in
-  let _,oc = Filename.open_temp_file ~temp_dir:dir prefix suffix in
+  let oc =
+    try open_out_gen [Open_creat;Open_excl;Open_text;Open_wronly] 0o444 f
+    with _ ->
+      let dir = Filename.dirname f in
+      let base = Filename.basename f in
+      let prefix = Filename.remove_extension base in
+      let suffix = Filename.extension base in
+      let _,oc = Filename.open_temp_file ~temp_dir:dir prefix suffix in
+      oc
+  in
   let fmt = Format.formatter_of_out_channel oc in
   Fun.protect
     ~finally:(fun () ->

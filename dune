@@ -1,0 +1,7 @@
+(env
+ (_ (flags (:standard -no-strict-sequence -w -9-52+29+40@48+60 -warn-error -16))))
+ ; --warn-error -16 because dune treat 16 as fatal but why3 as non-fatal
+
+(alias
+ (name default)
+ (deps (alias_rec install_local)))

@@ -1,5 +1,14 @@
 :x: marks a potential source of incompatibility
 
+Version 1.9.0, October 19, 2026
+-------------------------------
+
+Compilation
+  * compatibility with OCaml up to 5.5 and hopefully beyond
+
+  * compilation now requires Dune. Yet, compilation should still be
+    launched using `make` or `make -j`.
+
 API
   * The `module Impl : Intf` feature is now supported at the level of the Ptree
     API. This include a breaking change in the Ptree.mlw_file type. :x:
@@ -7,8 +16,47 @@ API
     versions of a module for a better support of the `module Impl : Intf`
     feature :x:
 
+Provers
+  * support for Z3 4.x up to 4.16.0, and 5.x up to 5.3.0
+  * support for E prover 3.x
+  * support for Rocq up to 9.2
+
+Transformations
+  * new transformation `compute` with arguments, of the form
+    ```
+    compute [nodef] [branches] [in H]
+    ```
+    if `nodef` is set, definitions are not unfolded anymore
+    if `branches` is set, also reduces below branches of `if` and `match`
+  * `compute_hyp` is replaced by `compute .. in ..` :x:
+  * `compute_specified` is replaced by `compute nodef ..` :x:
+  * `compute_hyp_specified` is replaced by `compute nodef .. in ..` :x:
+  * `compute_in_goal` remains as a legacy transformation, as an alias
+    to `compute` with no arguments. (deprecated)
+
+Stdlib
+  * added iterators on sets and maps of unbounded integers, 63-bit
+    integers, "Peano" integers and strings, with appropriate
+    declarations in the OCaml64 driver
+  * fix missing pre-condition on Seq.get
+
+Drivers
+  * extended coverage of the "remove unused" mechanism, including on
+    lists and sets. Usually gains some proofs or make them faster, but
+    may occasionally lose some :x:
+
+Extraction
+  * Fix OCaml extraction of `if then else` and `let exception`
+
+Tools
+  * `why3 replay`: new option `--dont-save`, improved documentation of
+    other options.
+
+Why3 server
+  * various fixes (contribution by Johannes Kanig)
+
 Version 1.8.2, September 16, 2025
----------------------------
+---------------------------------
 
 Compilation
   * compatibility with OCaml 5.4 (MR !1228)
@@ -20,7 +68,7 @@ Sessions
   * fix issue with file identifiers in sessions (MR !1231)
 
 Extraction
-  * restore compatibility of OCaml extraction with js_of_ocaml
+  * restore compatibility of OCaml extraction with `js_of_ocaml`
 
 Version 1.8.1, June 4, 2025
 ---------------------------
@@ -33,6 +81,9 @@ Miscellaneous
 
 Plugins
   * resurrect the BDD-infer loop invariant generation plug-in
+
+Provers
+  * support for Alt-Ergo 2.6.x with the SMT-LIB input format
 
 Version 1.8.0, December 11, 2024
 --------------------------------

@@ -1,0 +1,13 @@
+(ocamllex json_lexer lexlib rc)
+
+(menhir
+ (modules json_parser)
+ (flags --table --strict --explain))
+
+(rule
+ (enabled_if (= @enable_sexp@ yes))
+ (action (copy mysexplib.real.ml mysexplib.ml)))
+
+(rule
+ (enabled_if (<> @enable_sexp@ yes))
+ (action (copy mysexplib.dummy.ml mysexplib.ml)))

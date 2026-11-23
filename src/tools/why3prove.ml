@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -526,6 +526,8 @@ let do_input config env drv = function
         | "-" -> "stdin",
             Env.read_channel Env.base_language ?format env "stdin" stdin
         | fname ->
+            if not (Sys.file_exists fname) then
+              Loc.errorm "%s: no such file" fname;
             let (mlw_files, _) =
               Env.read_file Env.base_language ?format env fname in
             (fname, mlw_files)

@@ -1,0 +1,340 @@
+
+(** {VerifyThis 2026, challenge 1: Ada and her papers}
+
+  See {h <a href="https://verifythis.github.io/onsite/archive/2026/challenge1.pdf">the challenge here</a>}.
+
+  Team YYY (Jean-Christophe Filliâtre)
+
+  All tasks verified, including the bonus tasks.
+
+*)
+
+use int.Int
+use int.ComputerDivision
+use int.NumOf
+use array.Array
+
+predicate sorted (a: array int) =
+  forall i j. 0 <= i <= j < length a -> a[i] >= a[j]
+
+function atleast (a: array int) (v: int) : int -> bool =
+  fun i -> a[i] >= v
+
+predicate hindex (a: array int) (h: int) =
+  0 <= h <= length a &&
+  numof (atleast a h    ) 0 (length a) >= h &&
+  numof (atleast a (h+1)) 0 (length a) <= h
+
+(** For the proofs to come, a much better definition of the h-index is that
+    - all values in `a[0..h]` are greater or equal to `h`
+    - all values in `a[h..n]` are no greater than `h`
+
+    We provide this equivalence with the following two lemmas. *)
+
+let lemma hindex_intro (a: array int) (h: int)
+  requires { 0 <= h <= length a }
+  requires { forall i. 0 <= i < h -> a[i] >= h }
+  requires { forall i. h <= i < length a -> a[i] <= h }
+  ensures  { hindex a h }
+= assert { numof (atleast a h) 0 h = h };
+  assert { numof (atleast a h) 0 (length a) >= h };
+  assert { numof (atleast a (h+1)) 0 h <= h };
+  assert { numof (atleast a (h+1)) h (length a) = 0 };
+  ()
+
+let lemma hindex_elim (a: array int) (h: int)
+  requires { sorted a }
+  requires { hindex a h }
+  ensures  { forall i. 0 <= i < h -> a[i] >= h }
+  ensures  { forall i. h <= i < length a -> a[i] <= h }
+= assert { numof (atleast a h) 0 h = h };
+  assert { numof (atleast a h) 0 (length a) >= h };
+  assert { numof (atleast a (h+1)) 0 h <= h };
+  assert { numof (atleast a (h+1)) h (length a) = 0 };
+  ()
+
+(** Function `compute` computes the h-index in a naive, linear way. *)
+
+let compute (a: array int) : (h: int)
+  requires { sorted a }
+  ensures  { hindex a h }
+= let ref h = 0 in
+  let n = length a in
+  while h < n && h < a[h] do
+    invariant { 0 <= h <= n }
+    invariant { forall i. 0 <= i < h -> a[i] >= h }
+    variant   { n - h }
+    h <- h + 1
+  done;
+  return h
+
+(** Function `compute_opt` computes the h-index in logarithmic time
+    using binary search. *)
+
+let compute_opt (a: array int) : (h: int)
+  requires { sorted a }
+  ensures  { hindex a h }
+= let n = length a in
+  let ref lo = 0 in
+  let ref hi = n in
+  while lo < hi do
+    invariant { 0 <= lo <= hi <= n } variant { hi - lo }
+    invariant { forall i. 0 <= i < lo -> a[i] >= lo }
+    invariant { forall i. hi <= i < n -> a[i] <= hi }
+    let mid = lo + div (hi - lo) 2 in
+    if a[mid] <= mid then hi <- mid else lo <- mid + 1
+  done;
+  return lo
+
+(** Function `update` increases the publication value at index `i`
+    and returns the updated h-index.
+
+    It also maintains the array sorted, so the array element being
+    incremented is not necessarily the one at index `i`, but rather
+    the leftmost one being equal to `a[i]`.
+
+    For the purpose of the specification, we also return (as a ghost
+    value) the array position `m` where the value is actually
+    incremented and we ensure that it initially contained the same
+    value as the one at position `i`.  *)
+
+let lemma keep_sorted (a1 a2: array int) (lo: int)
+  requires { 0 <= lo < length a1 = length a2 }
+  requires { sorted a1 }
+  requires { lo = 0 || a1[lo - 1] > a1[lo] }
+  requires { forall i. 0 <= i < length a1 -> i <> lo -> a2[i] = a1[i] }
+  requires { a2[lo] = a1[lo] + 1 }
+  ensures  { sorted a2 }
+= ()
+
+let update (a: array int) (h: int) (i: int) : (h': int, ghost m: int)
+  requires { 0 <= i < length a }
+  requires { sorted a }
+  requires { hindex a h }
+  ensures  { sorted a }
+  ensures  { 0 <= m < length a && old a[m] = old a[i] && a[m] = old a[m]+1 }
+  ensures  { forall j. 0 <= j < length a -> j <> m -> a[j] = old a[j] }
+  ensures  { hindex a h' }
+= hindex_elim a h;
+  let x = a[i] in
+  let ref lo = 0 in
+  let ref hi = i in
+  while lo < hi do
+    invariant { 0 <= lo <= hi <= i } variant { hi - lo }
+    invariant { forall j. hi <= j <= i -> a[j] = x }
+    invariant { forall j. 0 <= j < lo -> a[j] > x }
+    let mid = lo + div (hi - lo) 2 in
+    if a[mid] = x then hi <- mid else lo <- mid + 1
+  done;
+  a[lo] <- a[lo] + 1;
+  if lo = h && a[lo] = h+1 then (
+    hindex_intro a (h+1);
+    return (h+1, lo)
+  );
+  hindex_intro a h;
+  return (h, lo)
+
+(** Bonus 2: sort then compute *)
+
+(** The permutation property can be defined in terms of `numof atleast`,
+    by stating that it is invariant for any value `x`. *)
+
+predicate permut (a1 a2: array int) =
+  length a1 = length a2 &&
+  forall x. numof (atleast a1 x) 0 (length a1)
+          = numof (atleast a2 x) 0 (length a2)
+
+(** We are not going to prove a sorting algorithm again (there are
+    plenty of examples in this very gallery) but at least we can prove
+    that swapping two elements ensures the permutation property, and
+    thus any swap-based sorting algorithm also does. *)
+
+let swap (a: array int) (i j: int) : unit
+  requires { 0 <= i < j < length a }
+  ensures  { permut (old a) a }
+= let n = length a in
+  let lemma split (b: array int) : unit requires { length b = n }
+    ensures { forall x. numof (atleast a x) 0 n
+                      = numof (atleast a x) 0 i
+                      + numof (atleast a x) i (i+1)
+                      + numof (atleast a x) (i+1) j
+                      + numof (atleast a x) j (j+1)
+                      + numof (atleast a x) (j+1) n }
+    = () in
+  split a;
+  let t = a[i] in
+  a[i] <- a[j];
+  a[j] <- t;
+  assert { forall x. numof (atleast a x) 0 i
+                   = numof (atleast (old a) x) 0 i };
+  assert { forall x. numof (atleast a x) (i+1) j
+                   = numof (atleast (old a) x) (i+1) j };
+  assert { forall x. numof (atleast a x) (j+1) n
+                   = numof (atleast (old a) x) (j+1) n };
+  split a
+
+(** let's assume we can sort *)
+val rsort (a: array int) : unit
+  writes  { a }
+  ensures { sorted a }
+  ensures { permut (old a) a }
+
+let sort_then_compute (a: array int) : (h: int)
+  ensures { hindex (old a) h } (* /!\ the challenge requests `old a` here *)
+= rsort a;
+  assert { forall h. hindex a h = hindex (old a) h };
+  return compute_opt a
+
+(** Bonus 3: function `update_k` adds `k` to the citation `i`,
+    maintains the sorted order, and returns the updated h-index.
+                                           i
+          +------------+---+-------------+---+--------------+
+    old a |            | t   u   ...   v | x |              |
+          +------------+---+-------------+---+--------------+
+                        \                 \
+                         \    shifted      \
+                          \                 \
+          +------------+---+-------------+---+--------------+
+        a |     =      |x+k| t   u   ...   v |      =       |
+          +------------+---+-------------+---+--------------+
+                         m
+
+   No need for a binary search here, since we are going to move all the
+   values anyway, so the complexity would be exactly the same.
+*)
+
+let lemma keep_sorted_2 (a1 a2: array int) (m i: int)
+  requires { sorted a1 }
+  requires { 0 <= m <= i < length a1 = length a2 }
+  requires { a2[m] >= a1[i] }
+  requires { forall j. 0 <= j < m -> a2[j] = a1[j] >= a2[m] }
+  requires { forall j. m < j <= i -> a2[j] = a1[j-1] < a2[m] }
+  requires { forall j. i < j < length a2 -> a2[j] = a1[j] }
+  ensures  { sorted a2 }
+  (* ensures  { forall x. x <= a1[i] -> numof (atleast a2 x) 0 (length a2) *)
+  (*                                  = numof (atleast a1 x) 0 (length a1) } *)
+= ()
+
+let update_k (a: array int) (h: int) (i: int) (k: int) : (h': int, ghost m: int)
+  requires { 0 <= i < length a }
+  requires { k >= 0 }
+  requires { sorted a }
+  requires { hindex a h }
+  ensures  { sorted a }
+  ensures  { 0 <= m <= i }
+  ensures  { forall j. 0 <= j < m -> a[j] = old a[j] }
+  ensures  { a[m] = old a[i] + k }
+  ensures  { forall j. m < j <= i -> a[j] = old a[j-1] }
+  ensures  { forall j. i < j < length a -> a[j] = old a[j] }
+  ensures  { hindex a h' }
+= hindex_elim a h;
+  let x = a[i] in
+  let y = x + k in
+  let ref m = i in
+  while m > 0 && a[m-1] < y do
+    invariant { 0 <= m <= i }
+    invariant  { forall j. 0 <= j < m -> a[j] = old a[j] }
+    invariant  { forall j. m < j <= i -> x <= a[j] = old a[j-1] < y }
+    invariant  { forall j. i < j < length a -> a[j] = old a[j] }
+    variant    { m }
+    a[m] <- a[m-1];
+    m <- m-1
+  done;
+  a[m] <- y;
+  keep_sorted_2 (pure{old a}) a m i;
+  if h < length a && a[h] > h then (
+    hindex_intro a (h+1);
+    return (h+1, m)
+  );
+  hindex_intro a h;
+  return (h, m)
+
+(** Bonus 1: complexity *)
+
+(** We model time in a straightforward way (though manual, and thus error-prone):
+    a global ghost counter `time` is incremented at each loop iteration
+    and the complexity of a function is then `time - old time`. *)
+
+val ghost ref time: int
+
+(** Compexity of `compute` is O(n) *)
+
+let compute_complexity (a: array int) : (h: int)
+  ensures { 0 < time - old time <= length a + 1 }
+= let ref h = 0 in
+  let n = length a in
+  time <- time + 1;
+  while h < n && h < a[h] do
+    invariant { 0 <= h <= n }
+    invariant { time - old time = h + 1 }
+    variant   { n - h }
+    time <- time + 1;
+    h <- h + 1
+  done;
+  return h
+
+use int.Power
+use int.MinMax
+
+(** Showing logarithmic complexity of binary search is unpleasant for two
+    reasons:
+
+    - First, we have to turn `T <= log N` into `2^T <= N`;
+
+    - Second, though the argument is trivial (the length of `hi-lo` is
+      divided by two at each step), it is not easy to turn it into a loop
+      invariant. Indeed, the invariant `2^T * (hi-lo) <= N+1` is natural,
+      and indeed a loop invariant, but `hi-lo=0` when we exit the loop.
+      So we are rather interested in the penultimate iteration, when
+      `hi-lo` is 1 or 2. So we maintain it in a ghost variable `last`. *)
+
+(** Complexity of `compute_opt` is O(log n) *)
+
+let compute_opt_complexity (a: array int) : (h: int)
+  ensures { 0 < time - old time }
+  ensures { power 2 (time - (old time) - 1) <= 2 * length a + 1 }
+= let n = length a in
+  let ref lo = 0 in
+  let ref hi = n in
+  time <- time + 1; (* for all the computation outside the loop *)
+  let ghost ref last = 2 * n + 1 in
+  while lo < hi do
+    invariant { 0 <= lo <= hi <= n } variant { hi - lo }
+    invariant { 1 <= time - old time }
+    invariant { power 2 (time - (old time) - 1) * last <= 2 * n + 1 }
+    invariant { 2 * (hi - lo) <= last }
+    invariant { 0 < last <= 2 * (hi - lo) + 2 }
+    last <- hi - lo;
+    let mid = lo + div (hi - lo) 2 in
+    if a[mid] <= mid then hi <- mid else lo <- mid + 1;
+    time <- time + 1;
+  done;
+  return lo
+
+(** Complexity of `update` is O(log i), and thus O(log n) *)
+
+let update_complexity (a: array int) (h: int) (i: int) : (h': int, ghost m: int)
+  requires { 0 <= i < length a }
+  ensures  { 1 <= time - old time }
+  ensures  { power 2 (time - (old time) - 1) <= 2 * i + 1 }
+= let x = a[i] in
+  let ref lo = 0 in
+  let ref hi = i in
+  time <- time + 1; (* for all the computation outside the loop *)
+  let ghost ref last = 2 * i + 1 in
+  while lo < hi do
+    invariant { 0 <= lo <= hi <= i } variant { hi - lo }
+    invariant { 1 <= time - old time }
+    invariant { power 2 (time - (old time) - 1) * last <= 2 * i + 1 }
+    invariant { 2 * (hi - lo) <= last }
+    invariant { 0 < last <= 2 * (hi - lo) + 2 }
+    last <- hi - lo;
+    let mid = lo + div (hi - lo) 2 in
+    if a[mid] = x then hi <- mid else lo <- mid + 1;
+    time <- time + 1;
+  done;
+  a[lo] <- a[lo] + 1;
+  if lo = h && a[lo] = h+1 then (
+    return (h+1, lo)
+  );
+  return (h, lo)

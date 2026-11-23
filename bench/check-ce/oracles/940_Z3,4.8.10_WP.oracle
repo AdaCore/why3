@@ -1,0 +1,29 @@
+<check_ce:categorization>Categorizations of models:
+- Selected model 0: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/940.mlw", line 10, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/940.mlw", line 10, characters 14-24)
+- Checked model 1: NC
+  - Concrete RAC: FAILURE (postcondition at "bench/check-ce/940.mlw", line 10, characters 14-24)
+  - Abstract RAC: FAILURE (postcondition at "bench/check-ce/940.mlw", line 10, characters 14-24)
+File "bench/check-ce/940.mlw", line 10, characters 14-24:
+Sub-goal Postcondition of goal test'vc.
+Prover result is: Unknown (sat) (169 steps).
+The program does not comply to the verification goal, for example during the
+  following execution:
+Unknown location:
+    _ = ()
+File 940.mlw:
+  Line 9:
+    _ = ()
+    Execution of main function `test` with env:
+      { lsenv = []; vsenv = [ _ = () ]; rsenv = []; idenv = [] }
+  Line 11:
+    Normal execution of function `Tuple0` with args: []
+    (giant-step) execution of unimplemented function `f` with args:
+      [ _ = () ]
+    result of `f` = 0
+  Line 10:
+    Property failure at postcondition of `test` with env:
+      { lsenv = []; vsenv = [ _ = (), result = 0 ]; rsenv = [];
+        idenv = [ result = 0 ] }
+

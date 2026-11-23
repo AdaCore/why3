@@ -2,594 +2,659 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="CVC4" version="1.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="CVC3" version="2.4.1" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="4" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="9" name="CVC4" version="1.4" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="10" name="Eprover" version="1.8-001" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="Firstorder_tableau_impl.mlw"/>
 <theory name="Logic" proved="true">
  <goal name="nlsize_positive_lemma_tableau&#39;vc" expl="VC for nlsize_positive_lemma_tableau" proved="true">
- <proof prover="3"><result status="valid" time="0.130000" steps="440"/></proof>
+ <proof prover="3"><result status="valid" time="0.451110" steps="441"/></proof>
  </goal>
  <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc" expl="VC for nlmodel_subst_commutation_lemma_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="84"/></proof>
+  <proof prover="5"><result status="valid" time="0.155441" steps="321964"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="49"/></proof>
+  <proof prover="5"><result status="valid" time="2.283373" steps="5225993"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="53"/></proof>
+  <proof prover="5"><result status="valid" time="2.671921" steps="5226482"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="57"/></proof>
+  <proof prover="3"><result status="valid" time="0.293275" steps="57"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.051643" steps="62"/></proof>
+  <proof prover="5"><result status="valid" time="1.823987" steps="5229935"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.044571" steps="11"/></proof>
+  <proof prover="5"><result status="valid" time="0.363260" steps="478819"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.042793" steps="11"/></proof>
+  <proof prover="5"><result status="valid" time="0.637793" steps="478823"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.048099" steps="11"/></proof>
+  <proof prover="5"><result status="valid" time="0.579155" steps="478827"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.8" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="11"/></proof>
+  <proof prover="5"><result status="valid" time="0.661915" steps="478831"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.050000" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.650859" steps="481876"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.386489" steps="481880"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.354990" steps="481884"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.045427" steps="12"/></proof>
+  <proof prover="5"><result status="valid" time="0.397903" steps="481888"/></proof>
   </goal>
   <goal name="nlmodel_subst_commutation_lemma_tableau&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="913"/></proof>
+  <proof prover="3"><result status="valid" time="0.732597" steps="913"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="nlmodel_rename_commutation_lemma_tableau&#39;vc" expl="VC for nlmodel_rename_commutation_lemma_tableau" proved="true">
- <proof prover="3"><result status="valid" time="0.070000" steps="78"/></proof>
+ <proof prover="3"><result status="valid" time="0.400511" steps="78"/></proof>
  </goal>
  <goal name="bound_depth_of_symbol_in_tableau_nonnegative&#39;vc" expl="VC for bound_depth_of_symbol_in_tableau_nonnegative" proved="true">
- <proof prover="3"><result status="valid" time="0.150000" steps="292"/></proof>
+ <proof prover="1"><result status="valid" time="0.816074" steps="50237"/></proof>
  </goal>
  <goal name="bound_depth_of_fo_term_in_tableau_nonnegative&#39;vc" expl="VC for bound_depth_of_fo_term_in_tableau_nonnegative" proved="true">
- <proof prover="3"><result status="valid" time="0.180000" steps="302"/></proof>
+ <proof prover="3"><result status="valid" time="0.466326" steps="303"/></proof>
  </goal>
  <goal name="model_equal_tableau&#39;vc" expl="VC for model_equal_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="model_equal_tableau&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="159"/></proof>
+  <proof prover="5"><result status="valid" time="0.380259" steps="891663"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.062350" steps="296"/></proof>
+  <proof prover="3"><result status="valid" time="0.404973" steps="295"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040727" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.167835" steps="111241"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060943" steps="287"/></proof>
+  <proof prover="3"><result status="valid" time="0.451852" steps="288"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.171137" steps="160455"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="43"/></proof>
+  <proof prover="5"><result status="valid" time="0.702028" steps="1808371"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="424"/></proof>
+  <proof prover="3"><result status="valid" time="0.484428" steps="428"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.041598" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.212288" steps="162686"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="469"/></proof>
+  <proof prover="3"><result status="valid" time="0.307243" steps="452"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.157301" steps="163263"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.055874" steps="45"/></proof>
+  <proof prover="5"><result status="valid" time="0.342256" steps="1841476"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="262"/></proof>
+  <proof prover="3"><result status="valid" time="0.381898" steps="263"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.138383" steps="163255"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.130000" steps="274"/></proof>
+  <proof prover="3"><result status="valid" time="0.315378" steps="264"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="7"/></proof>
+  <proof prover="5"><result status="valid" time="0.182723" steps="163527"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="47"/></proof>
+  <proof prover="5"><result status="valid" time="0.696282" steps="1839048"/></proof>
   </goal>
   <goal name="model_equal_tableau&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="139"/></proof>
+  <proof prover="3"><result status="valid" time="0.370453" steps="139"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Impl" proved="true">
  <goal name="bind_var_symbol_in_tableau&#39;vc" expl="VC for bind_var_symbol_in_tableau" proved="true">
- <proof prover="3" timelimit="1"><result status="valid" time="1.199260" steps="14109"/></proof>
+ <transf name="split_vc" proved="true" >
+  <goal name="bind_var_symbol_in_tableau&#39;vc.0" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.302448" steps="794694"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.1" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.293265" steps="822562"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.2" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.314977" steps="811907"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.3" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.106154" steps="57847"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.4" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.070358" steps="57844"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.5" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.087086" steps="57031"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.6" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.077396" steps="57886"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.7" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.085973" steps="57867"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.8" expl="assertion" proved="true">
+  <proof prover="5"><result status="valid" time="0.076628" steps="57062"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.9" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.134254" steps="391465"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.10" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.267395" steps="99"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.11" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.179035" steps="407222"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.12" expl="precondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.616831" steps="49646"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.13" expl="variant decrease" proved="true">
+  <proof prover="5"><result status="valid" time="0.178488" steps="407938"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.14" expl="precondition" proved="true">
+  <proof prover="5"><result status="valid" time="0.164973" steps="402149"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.15" expl="precondition" proved="true">
+  <proof prover="3"><result status="valid" time="0.356650" steps="184"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.16" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.815440" steps="51229"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.17" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.796471" steps="51274"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.18" expl="postcondition" proved="true">
+  <proof prover="1"><result status="valid" time="0.671967" steps="52912"/></proof>
+  </goal>
+  <goal name="bind_var_symbol_in_tableau&#39;vc.19" expl="postcondition" proved="true">
+  <transf name="split_vc" proved="true" >
+   <goal name="bind_var_symbol_in_tableau&#39;vc.19.0" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.295034" steps="48"/></proof>
+   </goal>
+   <goal name="bind_var_symbol_in_tableau&#39;vc.19.1" expl="postcondition" proved="true">
+   <proof prover="3"><result status="valid" time="0.332325" steps="136"/></proof>
+   </goal>
+  </transf>
+  </goal>
+ </transf>
  </goal>
  <goal name="bind_var_fo_term_in_tableau&#39;vc" expl="VC for bind_var_fo_term_in_tableau" proved="true">
- <proof prover="3" timelimit="1"><result status="valid" time="0.895193" steps="12237"/></proof>
+ <proof prover="3"><result status="valid" time="4.847182" steps="12172"/></proof>
  </goal>
  <goal name="unbind_var_symbol_in_tableau&#39;vc" expl="VC for unbind_var_symbol_in_tableau" proved="true">
- <proof prover="9"><result status="valid" time="2.280000"/></proof>
+ <proof prover="3"><result status="valid" time="4.027585" steps="10252"/></proof>
  </goal>
  <goal name="unbind_var_fo_term_in_tableau&#39;vc" expl="VC for unbind_var_fo_term_in_tableau" proved="true">
- <proof prover="9"><result status="valid" time="2.320000"/></proof>
+ <proof prover="3"><result status="valid" time="2.527505" steps="7153"/></proof>
  </goal>
  <goal name="subst_base_symbol_in_tableau&#39;vc" expl="VC for subst_base_symbol_in_tableau" proved="true">
- <proof prover="3" timelimit="1"><result status="valid" time="0.934736" steps="13590"/></proof>
+ <proof prover="3"><result status="valid" time="3.909156" steps="13575"/></proof>
  </goal>
  <goal name="subst_base_fo_term_in_tableau&#39;vc" expl="VC for subst_base_fo_term_in_tableau" proved="true">
- <proof prover="3" timelimit="1"><result status="valid" time="0.600581" steps="8025"/></proof>
+ <proof prover="3"><result status="valid" time="2.354778" steps="8015"/></proof>
  </goal>
  <goal name="construct_tableau&#39;vc" expl="VC for construct_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="construct_tableau&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="27"/></proof>
+  <proof prover="5"><result status="valid" time="0.270656" steps="523284"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.1" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="27"/></proof>
+  <proof prover="1"><result status="valid" time="0.394970" steps="50911"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="59"/></proof>
+  <proof prover="5"><result status="valid" time="0.180645" steps="345296"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="75"/></proof>
+  <proof prover="5"><result status="valid" time="0.135144" steps="345368"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.110000" steps="94"/></proof>
+  <proof prover="5"><result status="valid" time="0.129615" steps="345448"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.048336" steps="27"/></proof>
+  <proof prover="1"><result status="valid" time="0.301952" steps="44660"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.180000" steps="27"/></proof>
+  <proof prover="1"><result status="valid" time="0.362414" steps="44660"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="39"/></proof>
+  <proof prover="1"><result status="valid" time="0.371016" steps="44817"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="39"/></proof>
+  <proof prover="1"><result status="valid" time="0.366302" steps="44817"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.170000" steps="183"/></proof>
+  <proof prover="3"><result status="valid" time="0.366889" steps="183"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="184"/></proof>
+  <proof prover="3"><result status="valid" time="0.338073" steps="184"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.180000" steps="201"/></proof>
+  <proof prover="3"><result status="valid" time="0.317655" steps="201"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.140000" steps="202"/></proof>
+  <proof prover="3"><result status="valid" time="0.345561" steps="202"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="187"/></proof>
+  <proof prover="3"><result status="valid" time="0.345374" steps="187"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.059491" steps="188"/></proof>
+  <proof prover="3"><result status="valid" time="0.284290" steps="188"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.170000" steps="373"/></proof>
+  <proof prover="3"><result status="valid" time="0.352245" steps="373"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.180000" steps="393"/></proof>
+  <proof prover="3"><result status="valid" time="0.349712" steps="393"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="66"/></proof>
+  <proof prover="5"><result status="valid" time="0.279688" steps="846251"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.18" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.160000" steps="98285"/></proof>
+  <proof prover="5"><result status="valid" time="0.035258" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.19" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="68"/></proof>
+  <proof prover="5"><result status="valid" time="0.385440" steps="1092186"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.20" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.180000" steps="98285"/></proof>
+  <proof prover="5"><result status="valid" time="0.038848" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.128126" steps="97645"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.042983" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.23" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.106974" steps="99301"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.033560" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052889" steps="70"/></proof>
+  <proof prover="5"><result status="valid" time="0.477264" steps="1124794"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.26" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.123744" steps="98284"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.27" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.044523" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.28" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.133266" steps="98288"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.29" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.170000" steps="98285"/></proof>
+  <proof prover="5"><result status="valid" time="0.048399" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.073489" steps="100437"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.051484" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.077214" steps="100931"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.33" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.050129" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.34" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.055846" steps="70"/></proof>
+  <proof prover="5"><result status="valid" time="0.578808" steps="1143100"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.35" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.052389" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.176152" steps="99092"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.36" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.056251" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.37" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.139153" steps="99096"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.38" expl="assertion" proved="true">
-  <proof prover="0"><result status="valid" time="0.170000" steps="98285"/></proof>
+  <proof prover="5"><result status="valid" time="0.052059" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.39" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.087195" steps="100966"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.40" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.032336" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.41" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.092551" steps="101155"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="9"/></proof>
+  <proof prover="5"><result status="valid" time="0.032917" steps="26796"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.43" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="70"/></proof>
+  <proof prover="5"><result status="valid" time="0.351051" steps="1139604"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="5.663450" steps="102944"/></proof>
+  <proof prover="1"><result status="valid" time="3.824263" steps="188099"/></proof>
   </goal>
   <goal name="construct_tableau&#39;vc.45" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.385390" steps="5462"/></proof>
+  <proof prover="1"><result status="valid" time="0.640339" steps="160444"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="destruct_tableau&#39;vc" expl="VC for destruct_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="destruct_tableau&#39;vc.0" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="77"/></proof>
+  <proof prover="1"><result status="valid" time="0.621486" steps="63459"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.1" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="41"/></proof>
+  <proof prover="5"><result status="valid" time="0.085500" steps="354470"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.2" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.058777" steps="55"/></proof>
+  <proof prover="5"><result status="valid" time="0.405232" steps="1043930"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.3" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="62"/></proof>
+  <proof prover="5"><result status="valid" time="0.408013" steps="953478"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.4" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="63"/></proof>
+  <proof prover="5"><result status="valid" time="0.454555" steps="953766"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.5" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="62"/></proof>
+  <proof prover="5"><result status="valid" time="0.446021" steps="953915"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.6" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="62"/></proof>
+  <proof prover="5"><result status="valid" time="0.387179" steps="953948"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.7" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="120"/></proof>
+  <proof prover="3"><result status="valid" time="0.284119" steps="119"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.8" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.053306" steps="322"/></proof>
+  <proof prover="1"><result status="valid" time="1.712973" steps="156849"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.9" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="128"/></proof>
+  <proof prover="3"><result status="valid" time="0.090000" steps="127"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.057777" steps="327"/></proof>
+  <proof prover="1"><result status="valid" time="2.966607" steps="158996"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.11" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.130000" steps="128"/></proof>
+  <proof prover="3"><result status="valid" time="0.275242" steps="128"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.12" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.054923" steps="350"/></proof>
+  <proof prover="1"><result status="valid" time="1.761127" steps="161166"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.13" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="150"/></proof>
+  <proof prover="3"><result status="valid" time="0.227501" steps="150"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.14" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.063489" steps="420"/></proof>
+  <proof prover="1"><result status="valid" time="1.519840" steps="163782"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.15" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="149"/></proof>
+  <proof prover="3"><result status="valid" time="0.354930" steps="148"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.16" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.061009" steps="429"/></proof>
+  <proof prover="1"><result status="valid" time="2.223748" steps="166967"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.17" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="156"/></proof>
+  <proof prover="3"><result status="valid" time="0.243773" steps="157"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.18" expl="assertion" proved="true">
-  <proof prover="4"><result status="valid" time="0.058618" steps="440"/></proof>
+  <proof prover="1"><result status="valid" time="1.967647" steps="168655"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.19" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.046827" steps="42"/></proof>
+  <proof prover="3"><result status="valid" time="0.249947" steps="42"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="83"/></proof>
+  <proof prover="3"><result status="valid" time="0.281213" steps="83"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.050746" steps="46"/></proof>
+  <proof prover="5"><result status="valid" time="0.572121" steps="1131135"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="86"/></proof>
+  <proof prover="5"><result status="valid" time="0.525928" steps="1162222"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.23" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="89"/></proof>
+  <proof prover="3"><result status="valid" time="0.317538" steps="89"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.456647" steps="1130489"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.180000" steps="75"/></proof>
+  <proof prover="5"><result status="valid" time="0.554990" steps="1211625"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.053778" steps="48"/></proof>
+  <proof prover="5"><result status="valid" time="0.480950" steps="1131372"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.27" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.180000" steps="77"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.28" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="93"/></proof>
+  <proof prover="5"><result status="valid" time="0.635411" steps="1349578"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052617" steps="46"/></proof>
+  <proof prover="5"><result status="valid" time="0.359748" steps="1130633"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.180000" steps="78"/></proof>
+  <proof prover="5"><result status="valid" time="0.512629" steps="1211822"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.31" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="50"/></proof>
+  <proof prover="5"><result status="valid" time="0.416211" steps="1131539"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.067149" steps="80"/></proof>
+  <proof prover="5"><result status="valid" time="0.545663" steps="1214069"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.33" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="96"/></proof>
+  <proof prover="5"><result status="valid" time="0.725920" steps="1348224"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.34" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="99"/></proof>
+  <proof prover="5"><result status="valid" time="0.563396" steps="1319136"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.35" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="100"/></proof>
+  <proof prover="1"><result status="valid" time="1.284765" steps="166031"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.36" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="106"/></proof>
+  <proof prover="5"><result status="valid" time="0.628392" steps="1329992"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.37" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="106"/></proof>
+  <proof prover="5"><result status="valid" time="0.756431" steps="1330805"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.38" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="111"/></proof>
+  <proof prover="5"><result status="valid" time="0.598980" steps="1345646"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.39" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.080000" steps="112"/></proof>
+  <proof prover="5"><result status="valid" time="0.803869" steps="1346465"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.40" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="1163"/></proof>
+  <proof prover="3"><result status="valid" time="0.595253" steps="1163"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.41" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.140000" steps="1168"/></proof>
+  <proof prover="3"><result status="valid" time="0.622224" steps="1168"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.42" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="1191"/></proof>
+  <proof prover="3"><result status="valid" time="0.571425" steps="1191"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.43" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.140000" steps="1200"/></proof>
+  <proof prover="3"><result status="valid" time="0.644539" steps="1200"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.44" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.160000" steps="1174"/></proof>
+  <proof prover="3"><result status="valid" time="0.733122" steps="1174"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.45" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="1178"/></proof>
+  <proof prover="3"><result status="valid" time="0.588066" steps="1178"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.46" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="1"><result status="valid" time="0.450000" steps="5645"/></proof>
+  <proof prover="3"><result status="valid" time="1.983042" steps="5646"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.47" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="1559"/></proof>
+  <proof prover="3"><result status="valid" time="0.748984" steps="1559"/></proof>
   </goal>
   <goal name="destruct_tableau&#39;vc.48" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.335542" steps="4750"/></proof>
+  <proof prover="3"><result status="valid" time="1.644510" steps="4750"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="nlsubst_symbol_in_tableau&#39;vc" expl="VC for nlsubst_symbol_in_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="nlsubst_symbol_in_tableau&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="40"/></proof>
+  <proof prover="5"><result status="valid" time="0.341975" steps="499560"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051354" steps="30"/></proof>
+  <proof prover="5"><result status="valid" time="0.205649" steps="479863"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.056769" steps="44"/></proof>
+  <proof prover="5"><result status="valid" time="0.351040" steps="705500"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="33"/></proof>
+  <proof prover="5"><result status="valid" time="0.313824" steps="677520"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051035" steps="36"/></proof>
+  <proof prover="5"><result status="valid" time="0.276807" steps="678235"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="22"/></proof>
+  <proof prover="3"><result status="valid" time="0.247273" steps="22"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="36"/></proof>
+  <proof prover="5"><result status="valid" time="0.278128" steps="682584"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="38"/></proof>
+  <proof prover="5"><result status="valid" time="0.318704" steps="689551"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052727" steps="40"/></proof>
+  <proof prover="5"><result status="valid" time="0.213243" steps="693893"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.9" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.0" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.860000" steps="212822"/></proof>
+   <proof prover="3"><result status="valid" time="0.316809" steps="197"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.190000" steps="618"/></proof>
+   <proof prover="5"><result status="valid" time="0.439397" steps="870890"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.2" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.080000" steps="205"/></proof>
+   <proof prover="3"><result status="valid" time="0.394115" steps="205"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.3" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.350000" steps="195257"/></proof>
+   <proof prover="5"><result status="valid" time="0.364850" steps="753252"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.4" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.820000" steps="211010"/></proof>
+   <proof prover="5"><result status="valid" time="0.347183" steps="785786"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.9.5" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.830000" steps="215891"/></proof>
+   <proof prover="3"><result status="valid" time="0.755983" steps="2463"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.10" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_symbol_in_tableau&#39;vc.10.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.120000" steps="175"/></proof>
+   <proof prover="5"><result status="valid" time="0.412531" steps="950701"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.10.1" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.390000"/></proof>
+   <proof prover="3"><result status="valid" time="0.337944" steps="174"/></proof>
    </goal>
    <goal name="nlsubst_symbol_in_tableau&#39;vc.10.2" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.160000" steps="166"/></proof>
+   <proof prover="5"><result status="valid" time="0.373505" steps="928881"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.11" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.398670" steps="10214"/></proof>
+  <proof prover="3"><result status="valid" time="1.683518" steps="11389"/></proof>
   </goal>
   <goal name="nlsubst_symbol_in_tableau&#39;vc.12" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.400000" steps="211588"/></proof>
+  <proof prover="5"><result status="valid" time="0.133584" steps="73898"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="nlsubst_fo_term_in_tableau&#39;vc" expl="VC for nlsubst_fo_term_in_tableau" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="36"/></proof>
+  <proof prover="5"><result status="valid" time="0.202660" steps="481326"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.054084" steps="29"/></proof>
+  <proof prover="5"><result status="valid" time="0.220776" steps="481240"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.150000" steps="45"/></proof>
+  <proof prover="5"><result status="valid" time="0.319179" steps="702985"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051614" steps="35"/></proof>
+  <proof prover="5"><result status="valid" time="0.313897" steps="678608"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="36"/></proof>
+  <proof prover="5"><result status="valid" time="0.293031" steps="679240"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="21"/></proof>
+  <proof prover="1"><result status="valid" time="0.752728" steps="83736"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.039375" steps="25"/></proof>
+  <proof prover="3"><result status="valid" time="0.168602" steps="25"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.049067" steps="39"/></proof>
+  <proof prover="5"><result status="valid" time="0.289694" steps="684066"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="42"/></proof>
+  <proof prover="5"><result status="valid" time="0.295176" steps="693089"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="43"/></proof>
+  <proof prover="5"><result status="valid" time="0.274630" steps="694720"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="45"/></proof>
+  <proof prover="5"><result status="valid" time="0.258894" steps="696188"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.11" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.0" expl="assertion" proved="true">
-   <proof prover="10"><result status="valid" time="0.500000"/></proof>
+   <proof prover="5"><result status="valid" time="0.349824" steps="870003"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.1" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.070000" steps="208"/></proof>
+   <proof prover="3"><result status="valid" time="0.344360" steps="208"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.2" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.080000" steps="198"/></proof>
+   <proof prover="3"><result status="valid" time="0.375206" steps="198"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.3" expl="assertion" proved="true">
-   <proof prover="0"><result status="valid" time="0.860000" steps="211297"/></proof>
+   <proof prover="5"><result status="valid" time="0.491691" steps="905948"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.4" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.100000" steps="7"/></proof>
+   <proof prover="5"><result status="valid" time="0.125086" steps="70766"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.11.5" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.150000" steps="862"/></proof>
+   <proof prover="3"><result status="valid" time="0.585640" steps="862"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.12" expl="assertion" proved="true">
   <transf name="split_goal_right" proved="true" >
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.12.0" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.090000" steps="209"/></proof>
+   <proof prover="3"><result status="valid" time="0.324791" steps="209"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.12.1" expl="assertion" proved="true">
-   <proof prover="3" timelimit="20"><result status="valid" time="0.110000" steps="440"/></proof>
+   <proof prover="3"><result status="valid" time="0.419630" steps="440"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.12.2" expl="assertion" proved="true">
-   <proof prover="2"><result status="valid" time="0.410000"/></proof>
+   <proof prover="3"><result status="valid" time="0.237962" steps="215"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.12.3" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.060000" steps="50"/></proof>
+   <proof prover="5"><result status="valid" time="0.279432" steps="816274"/></proof>
    </goal>
    <goal name="nlsubst_fo_term_in_tableau&#39;vc.12.4" expl="assertion" proved="true">
-   <proof prover="3"><result status="valid" time="0.130000" steps="173"/></proof>
+   <proof prover="5"><result status="valid" time="0.450584" steps="930195"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="2413"/></proof>
+  <proof prover="3"><result status="valid" time="1.022701" steps="2932"/></proof>
   </goal>
   <goal name="nlsubst_fo_term_in_tableau&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.400000" steps="211011"/></proof>
+  <proof prover="5"><result status="valid" time="0.140331" steps="73744"/></proof>
   </goal>
  </transf>
  </goal>

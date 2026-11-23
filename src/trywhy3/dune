@@ -1,0 +1,62 @@
+(include_subdirs no)
+
+(rule
+ (action (copy ../util/json_base.ml json_base.ml)))
+
+(rule
+ (action (copy ../util/json_base.mli json_base.mli)))
+
+(rule
+ (action (copy ../util/json_parser.ml json_parser.ml)))
+
+(rule
+ (action (copy ../util/json_parser.mli json_parser.mli)))
+
+(rule
+ (action (copy ../util/json_lexer.ml json_lexer.ml)))
+
+(rule
+ (action (copy ../util/json_lexer.mli json_lexer.mli)))
+
+(library
+ (name trywhy3_shared)
+ (modules bindings worker_proto)
+ (wrapped false)
+ (preprocess (pps js_of_ocaml-ppx))
+ (libraries js_of_ocaml))
+
+(executable
+ (name trywhy3)
+ (modes byte); js)
+ (preprocess (pps js_of_ocaml-ppx))
+; (js_of_ocaml
+;  (flags --Werror))
+ (libraries trywhy3_shared js_of_ocaml menhirLib)
+ (modules json_base json_parser json_lexer shortener trywhy3))
+
+(rule
+ (alias trywhy3)
+ (mode (promote (until-clean)))
+; (action (copy trywhy3.bc.js trywhy3.js)))
+ (action (copy trywhy3.bc trywhy3.byte)))
+
+; dune 2.9 pass the (js_of_ocaml (flags ...)) to the `js_of_ocaml link`
+; command, which fails. This changes should be reversed once upgrading
+; dune to a version that separate compile flags and link flags correctly
+(executable
+ (name why3_worker)
+ (modes byte); js)
+ (flags :standard -linkall)
+; (js_of_ocaml
+;  (flags --Werror +dynlink.js +toplevel.js
+;     --extern-fs --file=%{dep:trywhy3.conf}:/
+;     --file=%{dep:try_alt_ergo.drv}:/
+;     (:include flags.inc)))
+ (libraries trywhy3_shared python microc why3); zarith_stubs_js)
+ (modules why3_worker))
+
+(rule
+ (alias trywhy3)
+ (mode (promote (until-clean)))
+; (action (copy why3_worker.bc.js why3_worker.js)))
+ (action (copy why3_worker.bc why3_worker.byte)))

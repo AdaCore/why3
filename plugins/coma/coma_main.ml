@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -52,8 +52,8 @@ let eval_match muc vl f =
 let add_def (c,muc) (flat,dfl) =
   Debug.dprintf debug "\n@[%a@]@." Coma_syntax.PP.pp_def_block dfl;
   let c, gl = vc_defn (c_known c muc.muc_intf.muc_theory.uc_known) flat dfl in
-  let add muc ({hs_name = {Ident.id_string = s}}, f) =
-    let pr = Decl.create_prsymbol (Ident.id_fresh ("vc_" ^ s)) in
+  let add muc ({hs_name = Ident.{id_string = s; id_loc = loc}}, f) =
+    let pr = Decl.create_prsymbol (Ident.id_fresh ?loc ("vc_" ^ s)) in
     let d = Decl.create_prop_decl Decl.Pgoal pr (eval_match muc [] f) in
     Pmodule.add_pdecl ~vc:false muc (Pdecl.create_pure_decl d) in
   let muc = List.fold_left add muc gl in

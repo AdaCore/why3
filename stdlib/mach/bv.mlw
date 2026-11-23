@@ -3,9 +3,6 @@
     This module provides extra functions with pre-conditions ensuring
     the absence of overflows.
 
-    Those pre-conditions are expressed in term of interpretation into
-    mathematical integers, or using bitvectors of size 128.
-
 *)
 
 (** {2 Generic module, for a parametric size} *)
@@ -18,12 +15,8 @@ module BVCheck_Gen
   constant size : int
   constant size_bv : t
 
-  (* Overflow checks are performed using bitvectors of size 128. Thus
-     this module cannot be cloned with a [size] > 64. *)
-  axiom not_greater_than_64 : size <= 64
-
   constant two_power_size : int
-  constant two_power_size_minus_one : int
+  constant two_power_sizem1 : int
   constant zeros           : t
   constant minus_one : t
 
@@ -34,6 +27,7 @@ module BVCheck_Gen
   function add  t t : t
   function sub  t t : t
   function mul  t t : t
+  function neg  t   : t
   function udiv t t : t
   function urem t t : t
   function sdiv t t : t
@@ -56,66 +50,62 @@ module BVCheck_Gen
   predicate sge t t
   predicate sgt t t
 
-  use bv.BV128 as BV128
-
-  function sto_bv128 t : BV128.t
-  function uto_bv128 t : BV128.t
-
   constant min_sint : t
   constant max_sint : t
   constant max_uint : t
-  constant min_sint_as_bv128 : BV128.t = sto_bv128 min_sint
-  constant max_sint_as_bv128 : BV128.t = sto_bv128 max_sint
-  constant max_uint_as_bv128 : BV128.t = uto_bv128 max_uint
+
+  predicate u_add_o t t
+  predicate s_add_o t t
+  predicate u_sub_o t t
+  predicate s_sub_o t t
+  predicate u_mul_o t t
+  predicate s_mul_o t t
+  predicate s_neg_o t
+  predicate s_div_o t t
 
   (** unsigned addition forbidding overflows *)
   val u_add (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-                  to_uint a + to_uint b < two_power_size
-               \/ BV128.ule (BV128.add (uto_bv128 a) (uto_bv128 b)) max_uint_as_bv128 }
+    requires { [@expl:unsigned addition overflow] not (u_add_o a b) }
     ensures  { to_uint result = to_uint a + to_uint b }
     ensures  { result = add a b }
 
   (** signed addition forbidding overflows *)
   val s_add (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-      - two_power_size_minus_one <= to_int a + to_int b < two_power_size_minus_one
-      \/ let r = BV128.add (sto_bv128 a) (sto_bv128 b) in
-         (BV128.sle min_sint_as_bv128 r /\ BV128.sle r max_sint_as_bv128) }
+    requires { [@expl:signed addition overflow] not (s_add_o a b) }
     ensures  { to_int result = to_int a + to_int b }
     ensures  { result = add a b }
 
   (** unsigned subtraction with overflow check *)
   val u_sub (a b:t) : t
-    requires { [@expl:arithmetic overflow] to_uint a >= to_uint b \/ uge a b }
+    requires { [@expl:unsigned subtraction overflow] not (u_sub_o a b) }
     ensures  { result = sub a b }
     ensures  { to_uint result = to_uint a - to_uint b }
 
   (** signed subtraction with overflow check *)
   val s_sub (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-      - two_power_size_minus_one <= to_int a - to_int b < two_power_size_minus_one
-      \/ let r = BV128.sub (sto_bv128 a) (sto_bv128 b) in
-         (BV128.sle min_sint_as_bv128 r /\ BV128.sle r max_sint_as_bv128) }
+    requires { [@expl:signed subtraction overflow] not (s_sub_o a b) }
     ensures  { result = sub a b }
     ensures  { to_int result = to_int a - to_int b }
 
   (** unsigned multiplication with overflow check *)
   val u_mul (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-                  to_uint a * to_uint b < two_power_size
-               \/ BV128.ule (BV128.mul (uto_bv128 a) (uto_bv128 b)) max_uint_as_bv128 }
+    requires { [@expl:unsigned multiplication overflow] not (u_mul_o a b) }
     ensures  { result = mul a b }
     ensures  { to_uint result = to_uint a * to_uint b }
 
   (** signed multiplication with overflow check *)
   val s_mul (a b:t) : t
-    requires { [@expl:arithmetic overflow]
-      - two_power_size_minus_one <= to_int a * to_int b < two_power_size_minus_one
-      \/ let r = BV128.mul (sto_bv128 a) (sto_bv128 b) in
-         (BV128.sle min_sint_as_bv128 r /\ BV128.sle r max_sint_as_bv128) }
+    requires { [@expl:signed multiplication overflow] not (s_mul_o a b) }
     ensures  { result = mul a b }
     ensures  { to_int result = to_int a * to_int b }
+
+  (** signed negation with overflow check *)
+  val s_neg (a:t) : t
+    requires { [@expl:negation overflow] not (s_neg_o a) }
+    ensures  { result = neg a }
+    ensures  { to_int result = - to_int a }
+
+  (** remark: there is no such thing as ``unsigned negation'' *)
 
   use bv.Pow2int
 
@@ -123,8 +113,7 @@ module BVCheck_Gen
       For this function we do not forbid overflow: bits can be ``lost'' on the left.
       This function corresponds to the left shifting [<<] of unsigned ints in C or Java *)
   val u_lsl (a b:t) : t
-    requires { [@expl:out-of-bounds shifting]
-                ult b size_bv \/ to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] ult b size_bv }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
@@ -132,14 +121,11 @@ module BVCheck_Gen
       than bitvector size, but also forbidding overflow.
       This function corresponds to the left shifting [<<] of signed ints in C or Java *)
   val s_lsl (a b:t) : t
-    requires { [@expl:out-of-bounds shifting]
-                ult b size_bv \/ to_uint b < size }
-    requires { [@expl:out-of-bounds shifting]
-                sle zeros a \/ to_int a >= 0 }
+    requires { [@expl:out-of-bounds shifting] ult b size_bv }
+    requires { [@expl:out-of-bounds shifting] sle zeros a }
     requires { [@expl:arithmetic overflow]
-      (to_int a) * (pow2 (to_int b)) < two_power_size_minus_one
-      \/ let r = BV128.lsl_bv (sto_bv128 a) (sto_bv128 b) in
-         (BV128.sle min_sint_as_bv128 r /\ BV128.sle r max_sint_as_bv128) }
+               (to_int a) * (pow2 (to_int b)) < two_power_sizem1
+             }
     ensures  { result = lsl_bv a b }
     ensures  { result = lsl a (to_uint b) }
 
@@ -148,8 +134,7 @@ module BVCheck_Gen
       This function corresponds to the (logical) right shifting [>>] of unsigned ints in C
       or Java. *)
   val u_lsr (a b:t) : t
-    requires { [@expl:out-of-bounds shifting]
-                ult b size_bv \/ to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] ult b size_bv }
     ensures  { result = lsr_bv a b }
     ensures  { result = lsr a (to_uint b) }
 
@@ -158,8 +143,7 @@ module BVCheck_Gen
       corresponds to the arithmetic right shifting [>>>] of signed
       ints in Java, that does not exist in C. *)
   val s_asr (a b:t) : t
-    requires { [@expl:out-of-bounds shifting]
-                ult b size_bv \/ to_uint b < size }
+    requires { [@expl:out-of-bounds shifting] ult b size_bv }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
@@ -167,10 +151,8 @@ module BVCheck_Gen
       argument to be smaller than bitvector size, and that the first argument in non-negative.
       This function corresponds to the right shifting [>>] of signed ints in C. *)
   val s_asr_strict (a b:t) : t
-    requires { [@expl:out-of-bounds shifting]
-                ult b size_bv \/ to_uint b < size }
-    requires { [@expl:out-of-bounds shifting]
-                sge a zeros \/ to_int a >= 0 }
+    requires { [@expl:out-of-bounds shifting] ult b size_bv }
+    requires { [@expl:out-of-bounds shifting] sge a zeros }
     ensures  { result = asr_bv a b }
     ensures  { result = asr a (to_uint b) }
 
@@ -178,13 +160,13 @@ module BVCheck_Gen
 
   (** unsigned division requires the second argument to be non-zero *)
   val u_div (a b:t) : t
-    requires { [@expl:division by zero] b <> zeros \/ to_uint b <> 0 }
+    requires { [@expl:division by zero] b <> zeros }
     ensures  { to_uint result = ED.div (to_uint a) (to_uint b) }
     ensures  { result = udiv a b }
 
   (** unsigned remainder requires the second argument to be non-zero *)
   val u_rem (a b:t) : t
-    requires { [@expl:remainder by zero] b <> zeros  \/ to_uint b <> 0 }
+    requires { [@expl:remainder by zero] b <> zeros }
     ensures  { to_uint result = ED.mod (to_uint a) (to_uint b) }
     ensures  { result = urem a b }
 
@@ -193,15 +175,14 @@ module BVCheck_Gen
   (** signed division requires the second argument to be non-zero, but also that
       either the dividend is not [min_int] or the divisor is not [-1] *)
   val s_div (a b:t) : t
-    requires { [@expl:division by zero] b <> zeros  \/ to_int b <> 0 }
-    requires { [@expl:signed division overflow check] (a <> min_sint \/ b <> minus_one)
-                \/ (to_int a <> to_int min_sint \/ to_int b <> -1)}
+    requires { [@expl:division by zero] b <> zeros }
+    requires { [@expl:signed division overflow check] not (s_div_o a b) }
     ensures  { to_int result = CD.div (to_int a) (to_int b) }
     ensures  { result = sdiv a b }
 
   (** signed remainder requires the second argument to be non-zero *)
   val s_rem (a b:t) : t
-    requires { [@expl:remainder by zero] b <> zeros \/ to_int b <> 0 }
+    requires { [@expl:remainder by zero] b <> zeros }
     ensures  { to_int result = CD.mod (to_int a) (to_int b) }
     ensures  { result = srem a b }
 
@@ -251,19 +232,12 @@ end
 module BVCheck8
   use export bv.BV8
 
-  constant minus_one : t = 0xFF
-  constant min_sint : t = 0x80
-  constant max_sint : t = 0x7F
-  constant max_uint : t = 0xFF
-
-  use bv.BVConverter_8_128
-
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     constant size_bv = size_bv,
     function two_power_size = two_power_size,
-    function two_power_size_minus_one = two_power_size_minus_one,
+    function two_power_sizem1 = two_power_sizem1,
     function zeros = zeros,
     function minus_one = minus_one,
     function min_sint = min_sint,
@@ -275,6 +249,7 @@ module BVCheck8
     function add = add,
     function sub = sub,
     function mul = mul,
+    function neg = neg,
     function udiv = udiv,
     function urem = urem,
     function sdiv = sdiv,
@@ -293,27 +268,47 @@ module BVCheck8
     predicate slt = slt,
     predicate sge = sge,
     predicate sgt = sgt,
-    function sto_bv128 = stoBig,
-    function uto_bv128 = toBig
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+  use bv.BV16 as BV16
+  use bv.BVConverter_8_16 as C
+
+  clone bv.BV_overflow_defs with
+    type t = t,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    predicate uge = uge,
+    type tBig = BV16.t,
+    function sto_big = C.stoBig,
+    function uto_big = C.toBig,
+    predicate ule = BV16.ule,
+    predicate sle = BV16.sle,
+    function add = BV16.add,
+    function sub = BV16.sub,
+    function mul = BV16.mul
+
 end
+
 
 
 module BVCheck16
   use export bv.BV16
 
-  constant minus_one : t = 0xFFFF
-  constant min_sint : t = 0x8000
-  constant max_sint : t = 0x7FFF
-  constant max_uint : t = 0xFFFF
-
-  use bv.BVConverter_16_128
-
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     constant size_bv = size_bv,
     function two_power_size = two_power_size,
-    function two_power_size_minus_one = two_power_size_minus_one,
+    function two_power_sizem1 = two_power_sizem1,
     function zeros = zeros,
     function minus_one = minus_one,
     function min_sint = min_sint,
@@ -325,6 +320,7 @@ module BVCheck16
     function add = add,
     function sub = sub,
     function mul = mul,
+    function neg = neg,
     function udiv = udiv,
     function urem = urem,
     function sdiv = sdiv,
@@ -343,26 +339,45 @@ module BVCheck16
     predicate slt = slt,
     predicate sge = sge,
     predicate sgt = sgt,
-    function sto_bv128 = stoBig,
-    function uto_bv128 = toBig
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+  use bv.BV32 as BV32
+  use bv.BVConverter_16_32 as C
+
+  clone bv.BV_overflow_defs with
+    type t = t,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    predicate uge = uge,
+    type tBig = BV32.t,
+    function sto_big = C.stoBig,
+    function uto_big = C.toBig,
+    predicate ule = BV32.ule,
+    predicate sle = BV32.sle,
+    function add = BV32.add,
+    function sub = BV32.sub,
+    function mul = BV32.mul
+
 end
 
 module BVCheck32
   use export bv.BV32
 
-  constant minus_one : t = 0xFFFF_FFFF
-  constant min_sint : t = 0x8000_0000
-  constant max_sint : t = 0x7FFF_FFFF
-  constant max_uint : t = 0xFFFF_FFFF
-
-  use bv.BVConverter_32_128
-
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     constant size_bv = size_bv,
     function two_power_size = two_power_size,
-    function two_power_size_minus_one = two_power_size_minus_one,
+    function two_power_sizem1 = two_power_sizem1,
     function zeros = zeros,
     function minus_one = minus_one,
     function min_sint = min_sint,
@@ -374,6 +389,7 @@ module BVCheck32
     function add = add,
     function sub = sub,
     function mul = mul,
+    function neg = neg,
     function udiv = udiv,
     function urem = urem,
     function sdiv = sdiv,
@@ -392,26 +408,45 @@ module BVCheck32
     predicate slt = slt,
     predicate sge = sge,
     predicate sgt = sgt,
-    function sto_bv128 = stoBig,
-    function uto_bv128 = toBig
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+  use bv.BV64 as BV64
+  use bv.BVConverter_32_64 as C
+
+  clone bv.BV_overflow_defs with
+    type t = t,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    predicate uge = uge,
+    type tBig = BV64.t,
+    function sto_big = C.stoBig,
+    function uto_big = C.toBig,
+    predicate ule = BV64.ule,
+    predicate sle = BV64.sle,
+    function add = BV64.add,
+    function sub = BV64.sub,
+    function mul = BV64.mul
+
 end
 
 module BVCheck64
   use export bv.BV64
 
-  constant minus_one : t = 0xFFFF_FFFF_FFFF_FFFF
-  constant min_sint : t = 0x8000_0000_0000_0000
-  constant max_sint : t = 0x7FFF_FFFF_FFFF_FFFF
-  constant max_uint : t = 0xFFFF_FFFF_FFFF_FFFF
-
-  use bv.BVConverter_64_128
-
   clone export BVCheck_Gen with
     type t = t,
     constant size = size,
     constant size_bv = size_bv,
     function two_power_size = two_power_size,
-    function two_power_size_minus_one = two_power_size_minus_one,
+    function two_power_sizem1 = two_power_sizem1,
     function zeros = zeros,
     function minus_one = minus_one,
     function min_sint = min_sint,
@@ -423,6 +458,7 @@ module BVCheck64
     function add = add,
     function sub = sub,
     function mul = mul,
+    function neg = neg,
     function udiv = udiv,
     function urem = urem,
     function sdiv = sdiv,
@@ -441,6 +477,138 @@ module BVCheck64
     predicate slt = slt,
     predicate sge = sge,
     predicate sgt = sgt,
-    function sto_bv128 = stoBig,
-    function uto_bv128 = toBig
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+  use bv.BV128 as BV128
+  use bv.BVConverter_64_128 as C
+
+  clone bv.BV_overflow_defs with
+    type t = t,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    predicate uge = uge,
+    type tBig = BV128.t,
+    function sto_big = C.stoBig,
+    function uto_big = C.toBig,
+    predicate ule = BV128.ule,
+    predicate sle = BV128.sle,
+    function add = BV128.add,
+    function sub = BV128.sub,
+    function mul = BV128.mul
+
 end
+
+
+(* not ready
+
+module BVCheck128
+  use export bv.BV128
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    constant size_bv = size_bv,
+    function two_power_size = two_power_size,
+    function two_power_sizem1 = two_power_sizem1,
+    function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    function to_uint = t'int,
+    function to_int = to_int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function neg = neg,
+    function udiv = udiv,
+    function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt,
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+end
+
+
+module BVCheck256
+  use export bv.BV256
+
+  clone export BVCheck_Gen with
+    type t = t,
+    constant size = size,
+    constant size_bv = size_bv,
+    function two_power_size = two_power_size,
+    function two_power_sizem1 = two_power_sizem1,
+    function zeros = zeros,
+    function minus_one = minus_one,
+    function min_sint = min_sint,
+    function max_sint = max_sint,
+    function max_uint = max_uint,
+    function to_uint = t'int,
+    function to_int = to_int,
+    function of_int = of_int,
+    function add = add,
+    function sub = sub,
+    function mul = mul,
+    function neg = neg,
+    function udiv = udiv,
+    function urem = urem,
+    function sdiv = sdiv,
+    function srem = srem,
+    function lsl = lsl,
+    function lsl_bv = lsl_bv,
+    function lsr = lsr,
+    function lsr_bv = lsr_bv,
+    function asr = asr,
+    function asr_bv = asr_bv,
+    predicate ule = ule,
+    predicate ult = ult,
+    predicate uge = uge,
+    predicate ugt = ugt,
+    predicate sle = sle,
+    predicate slt = slt,
+    predicate sge = sge,
+    predicate sgt = sgt,
+    predicate u_add_o = u_add_o,
+    predicate s_add_o = s_add_o,
+    predicate u_sub_o = u_sub_o,
+    predicate s_sub_o = s_sub_o,
+    predicate u_mul_o = u_mul_o,
+    predicate s_mul_o = s_mul_o,
+    predicate s_neg_o = s_neg_o,
+    predicate s_div_o = s_div_o
+
+end
+
+*)

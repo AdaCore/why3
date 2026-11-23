@@ -47,7 +47,7 @@ theory bv.BV_Gen
   (* Conversions from/to integers *)
 
   remove prop two_power_size_val
-  remove prop two_power_size_minus_one_val
+  remove prop two_power_sizem1_val
   remove prop max_int_val
 
   (* function to_int  - solver specific *)
@@ -63,6 +63,10 @@ theory bv.BV_Gen
   remove prop to_uint_zeros
   remove prop to_uint_ones
   remove prop to_uint_one
+  remove prop to_int_minus_one
+  remove prop to_int_min_sint
+  remove prop to_int_max_sint
+  remove prop to_uint_max_uint
 
   (* comparison operators *)
 
@@ -128,10 +132,6 @@ theory bv.BV_Gen
   (* remove prop rotate_right_bv_is_rotate_right *)
 
   (** nth_bv *)
-
-  (* remove prop nth_bv_def *)
-  (* remove prop Nth_bv_is_nth *)
-  (* remove prop Nth_bv_is_nth2 *)
 
   remove prop Extensionality
 end

@@ -207,4 +207,22 @@ module MexArraySorted
     done;
     return last + 1
 
+  (* simpler code,
+     but less efficient as it always goes to the end of the array *)
+  let mex_bis (a: array int) : int
+    requires { forall i1, i2. 0 <= i1 <= i2 < length a -> a[i1] <= a[i2] }
+    ensures  { 0 <= result <= length a }
+    ensures  { not (mem result a) }
+    ensures  { forall x. 0 <= x < result -> mem x a }
+  = let n = length a in
+    let ref cand = 0 in
+    let ghost ref idx = (fun i -> i) in (* the position of each value *)
+    for i = 0 to n - 1 do
+      invariant { 0 <= cand  }
+      invariant { forall x. 0 <= x < cand -> 0 <= idx x < n && a[idx x] = x }
+      invariant { forall j. 0 <= j < i -> a[j] <> cand }
+      if a[i] = cand then (idx <- set idx a[i] i; incr cand);
+    done;
+    return cand
+
 end

@@ -2,36 +2,36 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="3" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="array_of_list.mlw"/>
 <theory name="Top" proved="true">
  <goal name="length&#39;vc" expl="VC for length" proved="true">
- <proof prover="0"><result status="valid" time="0.075067" steps="20344"/></proof>
+ <proof prover="1"><result status="valid" time="0.075067" steps="9528"/></proof>
  </goal>
  <goal name="array_of_list&#39;vc" expl="VC for array_of_list" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="array_of_list&#39;vc.0" expl="unreachable point" proved="true">
-  <proof prover="0"><result status="valid" time="0.022187" steps="1615"/></proof>
+  <proof prover="1"><result status="valid" time="0.022187" steps="750"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.1" expl="array creation size" proved="true">
-  <proof prover="0"><result status="valid" time="0.043010" steps="21877"/></proof>
+  <proof prover="1"><result status="valid" time="0.043010" steps="10511"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.034933" steps="25282"/></proof>
+  <proof prover="1"><result status="valid" time="0.034933" steps="24555"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.3" expl="index in array bounds" proved="true">
-  <proof prover="0"><result status="valid" time="0.042552" steps="25203"/></proof>
+  <proof prover="1"><result status="valid" time="0.042552" steps="23515"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.4" expl="integer overflow" proved="true">
-  <proof prover="0"><result status="valid" time="0.041830" steps="41330"/></proof>
+  <proof prover="1"><result status="valid" time="0.041830" steps="39043"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.5" expl="variant decrease" proved="true">
-  <proof prover="0"><result status="valid" time="0.042225" steps="42001"/></proof>
+  <proof prover="1"><result status="valid" time="0.042225" steps="38941"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.034368" steps="47771"/></proof>
+  <proof prover="1"><result status="valid" time="0.034368" steps="44027"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.7" expl="precondition" proved="true">
   <proof prover="3"><result status="valid" time="0.142589" steps="19081"/></proof>
@@ -39,27 +39,27 @@
   <goal name="array_of_list&#39;vc.8" expl="precondition" proved="true">
   <transf name="split_vc" proved="true" >
    <goal name="array_of_list&#39;vc.8.0" expl="precondition" proved="true">
-   <proof prover="0"><result status="valid" time="0.078025" steps="79276"/></proof>
+   <proof prover="1"><result status="valid" time="0.078025" steps="64307"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="array_of_list&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.047917" steps="42979"/></proof>
+  <proof prover="1"><result status="valid" time="0.047917" steps="40234"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.052009" steps="25981"/></proof>
+  <proof prover="1"><result status="valid" time="0.052009" steps="13221"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.049106" steps="22307"/></proof>
+  <proof prover="1"><result status="valid" time="0.049106" steps="21766"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.042913" steps="23045"/></proof>
+  <proof prover="1"><result status="valid" time="0.042913" steps="22685"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.13" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.044551" steps="23358"/></proof>
+  <proof prover="1"><result status="valid" time="0.044551" steps="11682"/></proof>
   </goal>
   <goal name="array_of_list&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.048847" steps="23819"/></proof>
+  <proof prover="1"><result status="valid" time="0.048847" steps="22338"/></proof>
   </goal>
  </transf>
  </goal>

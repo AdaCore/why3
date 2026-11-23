@@ -3,7 +3,7 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="CVC5" version="1.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="Z3" version="4.13.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
@@ -12,7 +12,7 @@
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.042150" steps="8569"/></proof>
+  <proof prover="1"><result status="valid" time="0.042150" steps="8533"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.150198" steps="1308"/></proof>
@@ -21,7 +21,7 @@
   <proof prover="6"><result status="valid" time="0.008024" steps="10669"/></proof>
   </goal>
   <goal name="example1&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.214128" steps="2043"/></proof>
+  <proof prover="0"><result status="valid" time="0.214128" steps="2047"/></proof>
   </goal>
   <goal name="example1&#39;vc.4" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t3 = log (exp (to_real y)) in
@@ -62,19 +62,19 @@ abs (to_real r -. (t4 +. t3))
        <goal name="example1&#39;vc.4.0.0.0.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="log_single_error_propagation" arg2="with" arg3="exp_approx x">
         <goal name="example1&#39;vc.4.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.046267" steps="9201"/></proof>
+        <proof prover="1"><result status="valid" time="0.046267" steps="9165"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.040012" steps="9205"/></proof>
+        <proof prover="1"><result status="valid" time="0.040012" steps="9169"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.121428" steps="29526"/></proof>
+        <proof prover="1"><result status="valid" time="0.121428" steps="29168"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.171454" steps="1148"/></proof>
+        <proof prover="0"><result status="valid" time="0.320043" steps="1148"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.069814" steps="9193"/></proof>
+        <proof prover="1"><result status="valid" time="0.069814" steps="9157"/></proof>
         </goal>
        </transf>
        </goal>
@@ -105,24 +105,24 @@ abs (to_real r -. (t4 +. t3))
        <goal name="example1&#39;vc.4.0.0.1.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="log_single_error_propagation" arg2="with" arg3="exp_approx y">
         <goal name="example1&#39;vc.4.0.0.1.0.0.0" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.048169" steps="9201"/></proof>
+        <proof prover="1"><result status="valid" time="0.048169" steps="9165"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.1.0.0.1" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.075712" steps="177"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.1.0.0.2" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.135770" steps="29554"/></proof>
+        <proof prover="1"><result status="valid" time="0.135770" steps="29196"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.1.0.0.3" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.284735" steps="1066"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.1.0.0.4" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.066574" steps="9193"/></proof>
+        <proof prover="1"><result status="valid" time="0.066574" steps="9157"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="example1&#39;vc.4.0.0.1.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="1.509286" steps="14549"/></proof>
+       <proof prover="0"><result status="valid" time="1.902424" steps="14549"/></proof>
        </goal>
       </transf>
       </goal>
@@ -141,7 +141,7 @@ abs (to_real r -. (t4 +. t3))
      <proof prover="0"><result status="valid" time="0.046847" steps="143"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.5" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.037786" steps="9193"/></proof>
+     <proof prover="1"><result status="valid" time="0.037786" steps="9157"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.6" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.243861" steps="927"/></proof>
@@ -150,12 +150,12 @@ abs (to_real r -. (t4 +. t3))
      <proof prover="0"><result status="valid" time="0.167006" steps="927"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.8" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.066688" steps="7974"/></proof>
+     <proof prover="1"><result status="valid" time="0.066688" steps="7938"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.4.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.043319" steps="9473"/></proof>
+    <proof prover="1"><result status="valid" time="0.043319" steps="9437"/></proof>
     </goal>
    </transf>
    </goal>
@@ -169,7 +169,7 @@ abs (to_real r -. (t4 +. t3))
  <goal name="example2&#39;vc" expl="VC for example2" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example2&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044545" steps="8580"/></proof>
+  <proof prover="1"><result status="valid" time="0.044545" steps="8544"/></proof>
   </goal>
   <goal name="example2&#39;vc.1" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.009296" steps="10482"/></proof>
@@ -214,7 +214,7 @@ abs (to_real r -. t)
        <goal name="example2&#39;vc.3.0.0.0.0.0" expl="asserted formula" proved="true">
        <transf name="apply" proved="true" arg1="uadd_single_error_propagation" arg2="with" arg3="exp_approx x,exp_approx y">
         <goal name="example2&#39;vc.3.0.0.0.0.0.0" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.066878" steps="9140"/></proof>
+        <proof prover="1"><result status="valid" time="0.066878" steps="9104"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.1" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.074961" steps="142"/></proof>
@@ -223,7 +223,7 @@ abs (to_real r -. t)
         <proof prover="0"><result status="valid" time="0.217967" steps="1323"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.144757" steps="30070"/></proof>
+        <proof prover="1"><result status="valid" time="0.144757" steps="29648"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.009187" steps="10825"/></proof>
@@ -232,7 +232,7 @@ abs (to_real r -. t)
         <proof prover="6"><result status="valid" time="0.017552" steps="10825"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.055508" steps="7941"/></proof>
+        <proof prover="1"><result status="valid" time="0.055508" steps="7905"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.7" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.039359" steps="131"/></proof>
@@ -243,7 +243,7 @@ abs (to_real r -. t)
        </transf>
        </goal>
        <goal name="example2&#39;vc.3.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.050623" steps="9241"/></proof>
+       <proof prover="1"><result status="valid" time="0.050623" steps="9205"/></proof>
        </goal>
       </transf>
       </goal>
@@ -309,7 +309,7 @@ abs (to_real r -. t)
        <proof prover="0"><result status="valid" time="0.100879" steps="862"/></proof>
        </goal>
        <goal name="example3&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.057635" steps="8903"/></proof>
+       <proof prover="1"><result status="valid" time="0.057635" steps="8867"/></proof>
        </goal>
       </transf>
       </goal>
@@ -317,13 +317,13 @@ abs (to_real r -. t)
       <proof prover="6"><result status="valid" time="0.010022" steps="10735"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.055125" steps="9487"/></proof>
+      <proof prover="1"><result status="valid" time="0.055125" steps="9451"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.051740" steps="9507"/></proof>
+      <proof prover="1"><result status="valid" time="0.051740" steps="9471"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.040921" steps="8792"/></proof>
+      <proof prover="1"><result status="valid" time="0.040921" steps="8756"/></proof>
       </goal>
      </transf>
      </goal>
@@ -376,7 +376,7 @@ abs (to_real r -. t)
        <proof prover="0"><result status="valid" time="0.112458" steps="843"/></proof>
        </goal>
        <goal name="example4&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.038597" steps="8903"/></proof>
+       <proof prover="1"><result status="valid" time="0.038597" steps="8867"/></proof>
        </goal>
       </transf>
       </goal>
@@ -400,12 +400,12 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="example4&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.074834" steps="8945"/></proof>
+    <proof prover="1"><result status="valid" time="0.074834" steps="8909"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example4&#39;vc.1.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.059466" steps="8945"/></proof>
+   <proof prover="1"><result status="valid" time="0.059466" steps="8909"/></proof>
    </goal>
   </transf>
   </goal>
@@ -419,10 +419,10 @@ abs (to_real r -. t)
  <goal name="example1&#39;vc" expl="VC for example1" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="example1&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.071508" steps="8829"/></proof>
+  <proof prover="1"><result status="valid" time="0.071508" steps="8793"/></proof>
   </goal>
   <goal name="example1&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.043825" steps="802"/></proof>
+  <proof prover="0"><result status="valid" time="0.180652" steps="802"/></proof>
   </goal>
   <goal name="example1&#39;vc.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.077216" steps="124"/></proof>
@@ -472,10 +472,10 @@ abs (to_real r -. (t4 +. t3))
         <proof prover="6"><result status="valid" time="0.016718" steps="11221"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.076396" steps="9350"/></proof>
+        <proof prover="1"><result status="valid" time="0.076396" steps="9314"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.231695" steps="29649"/></proof>
+        <proof prover="1"><result status="valid" time="0.231695" steps="29291"/></proof>
         </goal>
         <goal name="example1&#39;vc.4.0.0.0.0.0.3" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.276325" steps="1034"/></proof>
@@ -486,12 +486,12 @@ abs (to_real r -. (t4 +. t3))
        </transf>
        </goal>
        <goal name="example1&#39;vc.4.0.0.0.0.1" expl="asserted formula" proved="true">
-       <proof prover="0"><result status="valid" time="1.707835" steps="14204"/></proof>
+       <proof prover="0"><result status="valid" time="2.232482" steps="14204"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example1&#39;vc.4.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.054319" steps="9497"/></proof>
+      <proof prover="1"><result status="valid" time="0.054319" steps="9461"/></proof>
       </goal>
      </transf>
      </goal>
@@ -539,16 +539,16 @@ abs (to_real r -. (t4 +. t3))
      </transf>
      </goal>
      <goal name="example1&#39;vc.4.0.0.2" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.047032" steps="8149"/></proof>
+     <proof prover="1"><result status="valid" time="0.047032" steps="8113"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.3" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.063093" steps="148"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.4" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.054429" steps="9338"/></proof>
+     <proof prover="1"><result status="valid" time="0.054429" steps="9302"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.5" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.049197" steps="9338"/></proof>
+     <proof prover="1"><result status="valid" time="0.049197" steps="9302"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.6" expl="apply premises" proved="true">
      <proof prover="0"><result status="valid" time="0.258986" steps="864"/></proof>
@@ -557,17 +557,17 @@ abs (to_real r -. (t4 +. t3))
      <proof prover="0"><result status="valid" time="0.204234" steps="864"/></proof>
      </goal>
      <goal name="example1&#39;vc.4.0.0.8" expl="apply premises" proved="true">
-     <proof prover="3"><result status="valid" time="0.053246" steps="8147"/></proof>
+     <proof prover="1"><result status="valid" time="0.053246" steps="8111"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example1&#39;vc.4.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.075277" steps="9618"/></proof>
+    <proof prover="1"><result status="valid" time="0.075277" steps="9582"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="example1&#39;vc.4.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.046361" steps="9618"/></proof>
+   <proof prover="1"><result status="valid" time="0.046361" steps="9582"/></proof>
    </goal>
   </transf>
   </goal>
@@ -630,16 +630,16 @@ abs (to_real r -. t)
         <proof prover="0"><result status="valid" time="0.165830" steps="1257"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.206104" steps="30253"/></proof>
+        <proof prover="1"><result status="valid" time="0.206104" steps="29831"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.048993" steps="9277"/></proof>
+        <proof prover="1"><result status="valid" time="0.048993" steps="9241"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.073960" steps="9277"/></proof>
+        <proof prover="1"><result status="valid" time="0.073960" steps="9241"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.054169" steps="8114"/></proof>
+        <proof prover="1"><result status="valid" time="0.054169" steps="8078"/></proof>
         </goal>
         <goal name="example2&#39;vc.3.0.0.0.0.0.7" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.016136" steps="11229"/></proof>
@@ -650,7 +650,7 @@ abs (to_real r -. t)
        </transf>
        </goal>
        <goal name="example2&#39;vc.3.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.068188" steps="9386"/></proof>
+       <proof prover="1"><result status="valid" time="0.068188" steps="9350"/></proof>
        </goal>
       </transf>
       </goal>
@@ -669,12 +669,12 @@ abs (to_real r -. t)
      </transf>
      </goal>
      <goal name="example2&#39;vc.3.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="1.971524" steps="26814"/></proof>
+     <proof prover="0"><result status="valid" time="1.971524" steps="14633"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="example2&#39;vc.3.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.043302" steps="9446"/></proof>
+    <proof prover="1"><result status="valid" time="0.043302" steps="9410"/></proof>
     </goal>
    </transf>
    </goal>
@@ -688,7 +688,7 @@ abs (to_real r -. t)
  <goal name="lse4&#39;vc" expl="VC for lse4" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse4&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.043793" steps="8930"/></proof>
+  <proof prover="1"><result status="valid" time="0.043793" steps="8894"/></proof>
   </goal>
   <goal name="lse4&#39;vc.1" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.009908" steps="10936"/></proof>
@@ -697,10 +697,10 @@ abs (to_real r -. t)
   <proof prover="6"><result status="valid" time="0.011206" steps="10999"/></proof>
   </goal>
   <goal name="lse4&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.049691" steps="9173"/></proof>
+  <proof prover="1"><result status="valid" time="0.049691" steps="9137"/></proof>
   </goal>
   <goal name="lse4&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="1.891445" steps="5767"/></proof>
+  <proof prover="0"><result status="valid" time="1.239889" steps="5767"/></proof>
   </goal>
   <goal name="lse4&#39;vc.5" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t =
@@ -804,28 +804,28 @@ abs (to_real r -. t)
            <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
            <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.069985" steps="9583"/></proof>
+            <proof prover="1"><result status="valid" time="0.069985" steps="9547"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.069456" steps="9583"/></proof>
+            <proof prover="1"><result status="valid" time="0.069456" steps="9547"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.264310" steps="34152"/></proof>
+            <proof prover="1"><result status="valid" time="0.264310" steps="33647"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.310996" steps="34197"/></proof>
+            <proof prover="1"><result status="valid" time="0.310996" steps="33692"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.059709" steps="149"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.049819" steps="9575"/></proof>
+            <proof prover="1"><result status="valid" time="0.049819" steps="9539"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.011942" steps="11573"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.043019" steps="8280"/></proof>
+            <proof prover="1"><result status="valid" time="0.043019" steps="8244"/></proof>
             </goal>
             <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.064182" steps="149"/></proof>
@@ -844,19 +844,19 @@ abs (to_real r -. t)
           <proof prover="0"><result status="valid" time="0.309273" steps="1790"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.259155" steps="33644"/></proof>
+          <proof prover="1"><result status="valid" time="0.259155" steps="33153"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.050449" steps="87533"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.061162" steps="9575"/></proof>
+          <proof prover="1"><result status="valid" time="0.061162" steps="9539"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.013108" steps="11573"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.049518" steps="8280"/></proof>
+          <proof prover="1"><result status="valid" time="0.049518" steps="8244"/></proof>
           </goal>
           <goal name="lse4&#39;vc.5.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.077395" steps="149"/></proof>
@@ -864,7 +864,7 @@ abs (to_real r -. t)
          </transf>
          </goal>
          <goal name="lse4&#39;vc.5.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.045163" steps="9704"/></proof>
+         <proof prover="1"><result status="valid" time="0.045163" steps="9668"/></proof>
          </goal>
         </transf>
         </goal>
@@ -872,22 +872,22 @@ abs (to_real r -. t)
         <proof prover="0"><result status="valid" time="0.067659" steps="162"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.351182" steps="1988"/></proof>
+        <proof prover="0"><result status="valid" time="0.215890" steps="1988"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.196025" steps="33659"/></proof>
+        <proof prover="1"><result status="valid" time="0.196025" steps="33168"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.062964" steps="10200"/></proof>
+        <proof prover="1"><result status="valid" time="0.062964" steps="10164"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.049460" steps="9575"/></proof>
+        <proof prover="1"><result status="valid" time="0.049460" steps="9539"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.6" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.017078" steps="11573"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.048346" steps="8280"/></proof>
+        <proof prover="1"><result status="valid" time="0.048346" steps="8244"/></proof>
         </goal>
         <goal name="lse4&#39;vc.5.0.0.0.0.0.8" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.056051" steps="149"/></proof>
@@ -895,12 +895,12 @@ abs (to_real r -. t)
        </transf>
        </goal>
        <goal name="lse4&#39;vc.5.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.052154" steps="9720"/></proof>
+       <proof prover="1"><result status="valid" time="0.052154" steps="9684"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="lse4&#39;vc.5.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.049526" steps="9587"/></proof>
+      <proof prover="1"><result status="valid" time="0.049526" steps="9551"/></proof>
       </goal>
       <goal name="lse4&#39;vc.5.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.291833" steps="957"/></proof>
@@ -914,17 +914,17 @@ abs (to_real r -. t)
      </transf>
      </goal>
      <goal name="lse4&#39;vc.5.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="3.747781" steps="57217"/></proof>
+     <proof prover="0"><result status="valid" time="3.115400" steps="57217"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="lse4&#39;vc.5.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.088208" steps="9760"/></proof>
+    <proof prover="1"><result status="valid" time="0.088208" steps="9724"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse4&#39;vc.5.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.047825" steps="9802"/></proof>
+   <proof prover="1"><result status="valid" time="0.047825" steps="9766"/></proof>
    </goal>
   </transf>
   </goal>
@@ -936,16 +936,16 @@ abs (to_real r -. t)
   <proof prover="6"><result status="valid" time="0.009163" steps="10898"/></proof>
   </goal>
   <goal name="lse5&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044314" steps="9056"/></proof>
+  <proof prover="1"><result status="valid" time="0.044314" steps="9020"/></proof>
   </goal>
   <goal name="lse5&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044047" steps="9137"/></proof>
+  <proof prover="1"><result status="valid" time="0.044047" steps="9101"/></proof>
   </goal>
   <goal name="lse5&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.046704" steps="9218"/></proof>
+  <proof prover="1"><result status="valid" time="0.046704" steps="9182"/></proof>
   </goal>
   <goal name="lse5&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.053751" steps="9299"/></proof>
+  <proof prover="1"><result status="valid" time="0.053751" steps="9263"/></proof>
   </goal>
   <goal name="lse5&#39;vc.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="4.998853" steps="14619"/></proof>
@@ -1092,47 +1092,47 @@ abs (to_real r -. t)
              <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
              <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.049216" steps="9732"/></proof>
+              <proof prover="1"><result status="valid" time="0.049216" steps="9696"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.049571" steps="9732"/></proof>
+              <proof prover="1"><result status="valid" time="0.049571" steps="9696"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.274897" steps="35985"/></proof>
+              <proof prover="1"><result status="valid" time="0.274897" steps="35461"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.273631" steps="36054"/></proof>
+              <proof prover="1"><result status="valid" time="0.273631" steps="35511"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.044529" steps="9724"/></proof>
+              <proof prover="1"><result status="valid" time="0.044529" steps="9688"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.074608" steps="9724"/></proof>
+              <proof prover="1"><result status="valid" time="0.074608" steps="9688"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.052870" steps="8363"/></proof>
+              <proof prover="1"><result status="valid" time="0.052870" steps="8327"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.066687" steps="8363"/></proof>
+              <proof prover="1"><result status="valid" time="0.066687" steps="8327"/></proof>
               </goal>
               <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.056343" steps="8361"/></proof>
+              <proof prover="1"><result status="valid" time="0.056343" steps="8325"/></proof>
               </goal>
              </transf>
              </goal>
              <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="3"><result status="valid" time="0.065693" steps="9835"/></proof>
+             <proof prover="1"><result status="valid" time="0.065693" steps="9799"/></proof>
              </goal>
             </transf>
             </goal>
             <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.057788" steps="9732"/></proof>
+            <proof prover="1"><result status="valid" time="0.057788" steps="9696"/></proof>
             </goal>
             <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.306203" steps="2059"/></proof>
             </goal>
             <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.218670" steps="35542"/></proof>
+            <proof prover="1"><result status="valid" time="0.218670" steps="35008"/></proof>
             </goal>
             <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.069086" steps="160"/></proof>
@@ -1147,23 +1147,23 @@ abs (to_real r -. t)
             <proof prover="4"><result status="valid" time="0.086822" steps="19832"/></proof>
             </goal>
             <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.046217" steps="8361"/></proof>
+            <proof prover="1"><result status="valid" time="0.046217" steps="8325"/></proof>
             </goal>
            </transf>
            </goal>
            <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="3"><result status="valid" time="0.048246" steps="9853"/></proof>
+           <proof prover="1"><result status="valid" time="0.048246" steps="9817"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.051953" steps="9732"/></proof>
+          <proof prover="1"><result status="valid" time="0.051953" steps="9696"/></proof>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.277886" steps="2242"/></proof>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.288031" steps="35569"/></proof>
+          <proof prover="1"><result status="valid" time="0.288031" steps="35035"/></proof>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.042501" steps="88945"/></proof>
@@ -1172,7 +1172,7 @@ abs (to_real r -. t)
           <proof prover="0"><result status="valid" time="0.087676" steps="160"/></proof>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.050007" steps="8363"/></proof>
+          <proof prover="1"><result status="valid" time="0.050007" steps="8327"/></proof>
           </goal>
           <goal name="lse5&#39;vc.6.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.088090" steps="160"/></proof>
@@ -1183,18 +1183,18 @@ abs (to_real r -. t)
          </transf>
          </goal>
          <goal name="lse5&#39;vc.6.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.054228" steps="9871"/></proof>
+         <proof prover="1"><result status="valid" time="0.054228" steps="9835"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.052805" steps="9732"/></proof>
+        <proof prover="1"><result status="valid" time="0.052805" steps="9696"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.2" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.319436" steps="2580"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.183075" steps="35584"/></proof>
+        <proof prover="1"><result status="valid" time="0.183075" steps="35050"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.034064" steps="88953"/></proof>
@@ -1203,23 +1203,23 @@ abs (to_real r -. t)
         <proof prover="0"><result status="valid" time="0.084166" steps="160"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.075420" steps="8363"/></proof>
+        <proof prover="1"><result status="valid" time="0.075420" steps="8327"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.070860" steps="8363"/></proof>
+        <proof prover="1"><result status="valid" time="0.070860" steps="8327"/></proof>
         </goal>
         <goal name="lse5&#39;vc.6.0.0.0.0.0.8" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.046264" steps="8361"/></proof>
+        <proof prover="1"><result status="valid" time="0.046264" steps="8325"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="lse5&#39;vc.6.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.054600" steps="9887"/></proof>
+       <proof prover="1"><result status="valid" time="0.054600" steps="9851"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="lse5&#39;vc.6.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.047154" steps="9736"/></proof>
+      <proof prover="1"><result status="valid" time="0.047154" steps="9700"/></proof>
       </goal>
       <goal name="lse5&#39;vc.6.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.258393" steps="1046"/></proof>
@@ -1233,17 +1233,17 @@ abs (to_real r -. t)
      </transf>
      </goal>
      <goal name="lse5&#39;vc.6.0.0.1" expl="asserted formula" proved="true">
-     <proof prover="0"><result status="valid" time="4.131585" steps="25478"/></proof>
+     <proof prover="0"><result status="valid" time="3.043938" steps="25478"/></proof>
      </goal>
     </transf>
     </goal>
     <goal name="lse5&#39;vc.6.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.052414" steps="9917"/></proof>
+    <proof prover="1"><result status="valid" time="0.052414" steps="9881"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse5&#39;vc.6.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.053501" steps="9959"/></proof>
+   <proof prover="1"><result status="valid" time="0.053501" steps="9923"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1252,25 +1252,25 @@ abs (to_real r -. t)
  <goal name="lse6&#39;vc" expl="VC for lse6" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse6&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.045838" steps="9020"/></proof>
+  <proof prover="1"><result status="valid" time="0.045838" steps="8984"/></proof>
   </goal>
   <goal name="lse6&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070231" steps="9101"/></proof>
+  <proof prover="1"><result status="valid" time="0.070231" steps="9065"/></proof>
   </goal>
   <goal name="lse6&#39;vc.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.067015" steps="131"/></proof>
   </goal>
   <goal name="lse6&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.072852" steps="9263"/></proof>
+  <proof prover="1"><result status="valid" time="0.072852" steps="9227"/></proof>
   </goal>
   <goal name="lse6&#39;vc.4" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.064469" steps="148"/></proof>
   </goal>
   <goal name="lse6&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.085078" steps="9425"/></proof>
+  <proof prover="1"><result status="valid" time="0.085078" steps="9389"/></proof>
   </goal>
   <goal name="lse6&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="0" timelimit="60"><result status="valid" time="7.911037" steps="21117"/></proof>
+  <proof prover="0" timelimit="60"><result status="valid" time="7.911037" steps="23271"/></proof>
   </goal>
   <goal name="lse6&#39;vc.7" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t =
@@ -1463,16 +1463,16 @@ abs (to_real r -. t)
                <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
                <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.050571" steps="9881"/></proof>
+                <proof prover="1"><result status="valid" time="0.050571" steps="9845"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.051062" steps="9881"/></proof>
+                <proof prover="1"><result status="valid" time="0.051062" steps="9845"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.263505" steps="37988"/></proof>
+                <proof prover="1"><result status="valid" time="0.263505" steps="37347"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                <proof prover="0"><result status="valid" time="0.256414" steps="2110"/></proof>
+                <proof prover="0"><result status="valid" time="0.423013" steps="2110"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.019095" steps="11917"/></proof>
@@ -1481,7 +1481,7 @@ abs (to_real r -. t)
                 <proof prover="4"><result status="valid" time="0.105697" steps="20018"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.074197" steps="8446"/></proof>
+                <proof prover="1"><result status="valid" time="0.074197" steps="8410"/></proof>
                 </goal>
                 <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.016084" steps="11917"/></proof>
@@ -1492,7 +1492,7 @@ abs (to_real r -. t)
                </transf>
                </goal>
                <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-               <proof prover="3"><result status="valid" time="0.050325" steps="9984"/></proof>
+               <proof prover="1"><result status="valid" time="0.050325" steps="9948"/></proof>
                </goal>
               </transf>
               </goal>
@@ -1503,27 +1503,27 @@ abs (to_real r -. t)
               <proof prover="0"><result status="valid" time="0.301078" steps="2289"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.235502" steps="37576"/></proof>
+              <proof prover="1"><result status="valid" time="0.235502" steps="36939"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
               <proof prover="0"><result status="valid" time="0.083955" steps="172"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.045140" steps="9873"/></proof>
+              <proof prover="1"><result status="valid" time="0.045140" steps="9837"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.047007" steps="8446"/></proof>
+              <proof prover="1"><result status="valid" time="0.047007" steps="8410"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.084088" steps="8446"/></proof>
+              <proof prover="1"><result status="valid" time="0.084088" steps="8410"/></proof>
               </goal>
               <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.067815" steps="8444"/></proof>
+              <proof prover="1"><result status="valid" time="0.067815" steps="8408"/></proof>
               </goal>
              </transf>
              </goal>
              <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="3"><result status="valid" time="0.050064" steps="10002"/></proof>
+             <proof prover="1"><result status="valid" time="0.050064" steps="9966"/></proof>
              </goal>
             </transf>
             </goal>
@@ -1534,7 +1534,7 @@ abs (to_real r -. t)
             <proof prover="0"><result status="valid" time="0.344200" steps="2461"/></proof>
             </goal>
             <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.310389" steps="37608"/></proof>
+            <proof prover="1"><result status="valid" time="0.310389" steps="36971"/></proof>
             </goal>
             <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.054157" steps="90349"/></proof>
@@ -1546,7 +1546,7 @@ abs (to_real r -. t)
             <proof prover="6"><result status="valid" time="0.021065" steps="11917"/></proof>
             </goal>
             <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.080911" steps="8446"/></proof>
+            <proof prover="1"><result status="valid" time="0.080911" steps="8410"/></proof>
             </goal>
             <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.070634" steps="172"/></proof>
@@ -1559,44 +1559,44 @@ abs (to_real r -. t)
           </transf>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.065213" steps="9881"/></proof>
+          <proof prover="1"><result status="valid" time="0.065213" steps="9845"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.408767" steps="2880"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.200308" steps="37635"/></proof>
+          <proof prover="1"><result status="valid" time="0.200308" steps="36998"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.040187" steps="90357"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.060404" steps="9873"/></proof>
+          <proof prover="1"><result status="valid" time="0.060404" steps="9837"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.015162" steps="11917"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.051893" steps="8446"/></proof>
+          <proof prover="1"><result status="valid" time="0.051893" steps="8410"/></proof>
           </goal>
           <goal name="lse6&#39;vc.7.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.049934" steps="8444"/></proof>
+          <proof prover="1"><result status="valid" time="0.049934" steps="8408"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="lse6&#39;vc.7.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.052443" steps="10038"/></proof>
+         <proof prover="1"><result status="valid" time="0.052443" steps="10002"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.051323" steps="9881"/></proof>
+        <proof prover="1"><result status="valid" time="0.051323" steps="9845"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.2" expl="apply premises" proved="true">
         <proof prover="0"><result status="valid" time="0.394282" steps="3359"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.326973" steps="37650"/></proof>
+        <proof prover="1"><result status="valid" time="0.326973" steps="37013"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.036351" steps="90365"/></proof>
@@ -1605,23 +1605,23 @@ abs (to_real r -. t)
         <proof prover="0"><result status="valid" time="0.077810" steps="172"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.070275" steps="8446"/></proof>
+        <proof prover="1"><result status="valid" time="0.070275" steps="8410"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.081828" steps="8446"/></proof>
+        <proof prover="1"><result status="valid" time="0.081828" steps="8410"/></proof>
         </goal>
         <goal name="lse6&#39;vc.7.0.0.0.0.0.8" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.061546" steps="8444"/></proof>
+        <proof prover="1"><result status="valid" time="0.061546" steps="8408"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="lse6&#39;vc.7.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.067220" steps="10054"/></proof>
+       <proof prover="1"><result status="valid" time="0.067220" steps="10018"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="lse6&#39;vc.7.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.058604" steps="9885"/></proof>
+      <proof prover="1"><result status="valid" time="0.058604" steps="9849"/></proof>
       </goal>
       <goal name="lse6&#39;vc.7.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.278793" steps="1137"/></proof>
@@ -1630,7 +1630,7 @@ abs (to_real r -. t)
       <proof prover="0"><result status="valid" time="0.512463" steps="1735"/></proof>
       </goal>
       <goal name="lse6&#39;vc.7.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.072443" steps="9873"/></proof>
+      <proof prover="1"><result status="valid" time="0.072443" steps="9837"/></proof>
       </goal>
      </transf>
      </goal>
@@ -1640,12 +1640,12 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="lse6&#39;vc.7.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.052719" steps="10074"/></proof>
+    <proof prover="1"><result status="valid" time="0.052719" steps="10038"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse6&#39;vc.7.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.053824" steps="10116"/></proof>
+   <proof prover="1"><result status="valid" time="0.053824" steps="10080"/></proof>
    </goal>
   </transf>
   </goal>
@@ -1654,28 +1654,28 @@ abs (to_real r -. t)
  <goal name="lse7&#39;vc" expl="VC for lse7" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse7&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044749" steps="9065"/></proof>
+  <proof prover="1"><result status="valid" time="0.044749" steps="9029"/></proof>
   </goal>
   <goal name="lse7&#39;vc.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.081564" steps="129"/></proof>
   </goal>
   <goal name="lse7&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.052867" steps="9227"/></proof>
+  <proof prover="1"><result status="valid" time="0.052867" steps="9191"/></proof>
   </goal>
   <goal name="lse7&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.088692" steps="9308"/></proof>
+  <proof prover="1"><result status="valid" time="0.088692" steps="9272"/></proof>
   </goal>
   <goal name="lse7&#39;vc.4" expl="precondition" proved="true">
   <proof prover="6"><result status="valid" time="0.012010" steps="11200"/></proof>
   </goal>
   <goal name="lse7&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.053697" steps="9470"/></proof>
+  <proof prover="1"><result status="valid" time="0.053697" steps="9434"/></proof>
   </goal>
   <goal name="lse7&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044418" steps="9551"/></proof>
+  <proof prover="1"><result status="valid" time="0.044418" steps="9515"/></proof>
   </goal>
   <goal name="lse7&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="0" timelimit="60"><result status="valid" time="5.311734" steps="20281"/></proof>
+  <proof prover="0" timelimit="60"><result status="valid" time="6.606751" steps="20348"/></proof>
   </goal>
   <goal name="lse7&#39;vc.8" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t =
@@ -1923,67 +1923,67 @@ abs (to_real r -. t)
                  <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
                  <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.049661" steps="10030"/></proof>
+                  <proof prover="1"><result status="valid" time="0.049661" steps="9994"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.051791" steps="10030"/></proof>
+                  <proof prover="1"><result status="valid" time="0.051791" steps="9994"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.308205" steps="39999"/></proof>
+                  <proof prover="1"><result status="valid" time="0.308205" steps="39305"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.209874" steps="40059"/></proof>
+                  <proof prover="1"><result status="valid" time="0.209874" steps="39365"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                   <proof prover="6"><result status="valid" time="0.012808" steps="12089"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.060947" steps="10022"/></proof>
+                  <proof prover="1"><result status="valid" time="0.060947" steps="9986"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
                   <proof prover="6"><result status="valid" time="0.010918" steps="12089"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.043905" steps="8529"/></proof>
+                  <proof prover="1"><result status="valid" time="0.043905" steps="8493"/></proof>
                   </goal>
                   <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.054362" steps="8527"/></proof>
+                  <proof prover="1"><result status="valid" time="0.054362" steps="8491"/></proof>
                   </goal>
                  </transf>
                  </goal>
                  <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                 <proof prover="3"><result status="valid" time="0.050487" steps="10133"/></proof>
+                 <proof prover="1"><result status="valid" time="0.050487" steps="10097"/></proof>
                  </goal>
                 </transf>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.049318" steps="10030"/></proof>
+                <proof prover="1"><result status="valid" time="0.049318" steps="9994"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
                 <proof prover="0"><result status="valid" time="0.462921" steps="2551"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.236374" steps="39636"/></proof>
+                <proof prover="1"><result status="valid" time="0.236374" steps="38946"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.060022" steps="91745"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.077611" steps="10022"/></proof>
+                <proof prover="1"><result status="valid" time="0.077611" steps="9986"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.054313" steps="8529"/></proof>
+                <proof prover="1"><result status="valid" time="0.054313" steps="8493"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.016233" steps="12089"/></proof>
                 </goal>
                 <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.060410" steps="8527"/></proof>
+                <proof prover="1"><result status="valid" time="0.060410" steps="8491"/></proof>
                 </goal>
                </transf>
                </goal>
                <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-               <proof prover="3"><result status="valid" time="0.049797" steps="10151"/></proof>
+               <proof prover="1"><result status="valid" time="0.049797" steps="10115"/></proof>
                </goal>
               </transf>
               </goal>
@@ -1991,30 +1991,30 @@ abs (to_real r -. t)
               <proof prover="6"><result status="valid" time="0.012032" steps="12101"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-              <proof prover="0"><result status="valid" time="0.318048" steps="2831"/></proof>
+              <proof prover="0"><result status="valid" time="0.491875" steps="2831"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.207346" steps="39673"/></proof>
+              <proof prover="1"><result status="valid" time="0.207346" steps="38983"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.051844" steps="91753"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.049488" steps="10022"/></proof>
+              <proof prover="1"><result status="valid" time="0.049488" steps="9986"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.012294" steps="12089"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.048077" steps="8529"/></proof>
+              <proof prover="1"><result status="valid" time="0.048077" steps="8493"/></proof>
               </goal>
               <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.039197" steps="8527"/></proof>
+              <proof prover="1"><result status="valid" time="0.039197" steps="8491"/></proof>
               </goal>
              </transf>
              </goal>
              <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="3"><result status="valid" time="0.047209" steps="10169"/></proof>
+             <proof prover="1"><result status="valid" time="0.047209" steps="10133"/></proof>
              </goal>
             </transf>
             </goal>
@@ -2022,22 +2022,22 @@ abs (to_real r -. t)
             <proof prover="0"><result status="valid" time="0.061038" steps="195"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-            <proof prover="0"><result status="valid" time="0.362153" steps="3160"/></proof>
+            <proof prover="0"><result status="valid" time="0.520229" steps="3160"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.212387" steps="39705"/></proof>
+            <proof prover="1"><result status="valid" time="0.212387" steps="39015"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.055595" steps="91761"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.073970" steps="10022"/></proof>
+            <proof prover="1"><result status="valid" time="0.073970" steps="9986"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.016511" steps="12089"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.060093" steps="8529"/></proof>
+            <proof prover="1"><result status="valid" time="0.060093" steps="8493"/></proof>
             </goal>
             <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="0.069062" steps="183"/></proof>
@@ -2045,74 +2045,74 @@ abs (to_real r -. t)
            </transf>
            </goal>
            <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="3"><result status="valid" time="0.074978" steps="10187"/></proof>
+           <proof prover="1"><result status="valid" time="0.074978" steps="10151"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.053122" steps="10030"/></proof>
+          <proof prover="1"><result status="valid" time="0.053122" steps="9994"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.561560" steps="3467"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.301464" steps="39732"/></proof>
+          <proof prover="1"><result status="valid" time="0.301464" steps="39042"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.097190" steps="183"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.072433" steps="10022"/></proof>
+          <proof prover="1"><result status="valid" time="0.072433" steps="9986"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.053510" steps="8529"/></proof>
+          <proof prover="1"><result status="valid" time="0.053510" steps="8493"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.017437" steps="12089"/></proof>
           </goal>
           <goal name="lse7&#39;vc.8.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.048547" steps="8527"/></proof>
+          <proof prover="1"><result status="valid" time="0.048547" steps="8491"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="lse7&#39;vc.8.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.052129" steps="10205"/></proof>
+         <proof prover="1"><result status="valid" time="0.052129" steps="10169"/></proof>
          </goal>
         </transf>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.1" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.046238" steps="10030"/></proof>
+        <proof prover="1"><result status="valid" time="0.046238" steps="9994"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.434769" steps="4041"/></proof>
+        <proof prover="0"><result status="valid" time="0.603488" steps="4041"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.223572" steps="39747"/></proof>
+        <proof prover="1"><result status="valid" time="0.223572" steps="39057"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.4" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.092604" steps="10851"/></proof>
+        <proof prover="1"><result status="valid" time="0.092604" steps="10815"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.5" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.014959" steps="12089"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.061413" steps="8529"/></proof>
+        <proof prover="1"><result status="valid" time="0.061413" steps="8493"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.7" expl="apply premises" proved="true">
         <proof prover="4"><result status="valid" time="0.102440" steps="20212"/></proof>
         </goal>
         <goal name="lse7&#39;vc.8.0.0.0.0.0.8" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.062802" steps="8527"/></proof>
+        <proof prover="1"><result status="valid" time="0.062802" steps="8491"/></proof>
         </goal>
        </transf>
        </goal>
        <goal name="lse7&#39;vc.8.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.047315" steps="10221"/></proof>
+       <proof prover="1"><result status="valid" time="0.047315" steps="10185"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="lse7&#39;vc.8.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.049738" steps="10034"/></proof>
+      <proof prover="1"><result status="valid" time="0.049738" steps="9998"/></proof>
       </goal>
       <goal name="lse7&#39;vc.8.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.274261" steps="1240"/></proof>
@@ -2131,12 +2131,12 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="lse7&#39;vc.8.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.053996" steps="10231"/></proof>
+    <proof prover="1"><result status="valid" time="0.053996" steps="10195"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse7&#39;vc.8.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.073323" steps="10273"/></proof>
+   <proof prover="1"><result status="valid" time="0.073323" steps="10237"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2148,28 +2148,28 @@ abs (to_real r -. t)
   <proof prover="0"><result status="valid" time="0.082152" steps="124"/></proof>
   </goal>
   <goal name="lse8&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.047975" steps="9191"/></proof>
+  <proof prover="1"><result status="valid" time="0.047975" steps="9155"/></proof>
   </goal>
   <goal name="lse8&#39;vc.2" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.089258" steps="140"/></proof>
   </goal>
   <goal name="lse8&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.049348" steps="9353"/></proof>
+  <proof prover="1"><result status="valid" time="0.049348" steps="9317"/></proof>
   </goal>
   <goal name="lse8&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.048224" steps="9434"/></proof>
+  <proof prover="1"><result status="valid" time="0.048224" steps="9398"/></proof>
   </goal>
   <goal name="lse8&#39;vc.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.066744" steps="164"/></proof>
   </goal>
   <goal name="lse8&#39;vc.6" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.087228" steps="9596"/></proof>
+  <proof prover="1"><result status="valid" time="0.087228" steps="9560"/></proof>
   </goal>
   <goal name="lse8&#39;vc.7" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.093009" steps="179"/></proof>
   </goal>
   <goal name="lse8&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="0" timelimit="60"><result status="valid" time="7.868247" steps="28866"/></proof>
+  <proof prover="0" timelimit="60"><result status="valid" time="9.796028" steps="25093"/></proof>
   </goal>
   <goal name="lse8&#39;vc.9" expl="postcondition" proved="true">
   <transf name="assert" proved="true" arg1="let t =
@@ -2482,31 +2482,31 @@ abs (to_real r -. t)
                    <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
                    <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.070213" steps="10179"/></proof>
+                    <proof prover="1"><result status="valid" time="0.070213" steps="10143"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.054919" steps="10179"/></proof>
+                    <proof prover="1"><result status="valid" time="0.054919" steps="10143"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.235399" steps="42058"/></proof>
+                    <proof prover="1"><result status="valid" time="0.235399" steps="41335"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.231656" steps="42142"/></proof>
+                    <proof prover="1"><result status="valid" time="0.231656" steps="41400"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.059088" steps="10171"/></proof>
+                    <proof prover="1"><result status="valid" time="0.059088" steps="10135"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
                     <proof prover="4"><result status="valid" time="0.094103" steps="20398"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.074944" steps="8612"/></proof>
+                    <proof prover="1"><result status="valid" time="0.074944" steps="8576"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.070556" steps="8612"/></proof>
+                    <proof prover="1"><result status="valid" time="0.070556" steps="8576"/></proof>
                     </goal>
                     <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.054827" steps="8610"/></proof>
+                    <proof prover="1"><result status="valid" time="0.054827" steps="8574"/></proof>
                     </goal>
                    </transf>
                    </goal>
@@ -2516,56 +2516,56 @@ abs (to_real r -. t)
                   </transf>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.050007" steps="10179"/></proof>
+                  <proof prover="1"><result status="valid" time="0.050007" steps="10143"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
                   <proof prover="0"><result status="valid" time="0.367955" steps="2840"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.245723" steps="41772"/></proof>
+                  <proof prover="1"><result status="valid" time="0.245723" steps="41029"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                   <proof prover="6"><result status="valid" time="0.050082" steps="93133"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.058521" steps="10171"/></proof>
+                  <proof prover="1"><result status="valid" time="0.058521" steps="10135"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.057844" steps="8612"/></proof>
+                  <proof prover="1"><result status="valid" time="0.057844" steps="8576"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                   <proof prover="6"><result status="valid" time="0.016042" steps="12261"/></proof>
                   </goal>
                   <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.063908" steps="8610"/></proof>
+                  <proof prover="1"><result status="valid" time="0.063908" steps="8574"/></proof>
                   </goal>
                  </transf>
                  </goal>
                  <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                 <proof prover="3"><result status="valid" time="0.051811" steps="10300"/></proof>
+                 <proof prover="1"><result status="valid" time="0.051811" steps="10264"/></proof>
                  </goal>
                 </transf>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.042924" steps="10179"/></proof>
+                <proof prover="1"><result status="valid" time="0.042924" steps="10143"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
                 <proof prover="0"><result status="valid" time="0.387804" steps="3097"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.226380" steps="41814"/></proof>
+                <proof prover="1"><result status="valid" time="0.226380" steps="41071"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.091871" steps="11052"/></proof>
+                <proof prover="1"><result status="valid" time="0.091871" steps="11016"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
                 <proof prover="0"><result status="valid" time="0.084617" steps="194"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.064146" steps="8612"/></proof>
+                <proof prover="1"><result status="valid" time="0.064146" steps="8576"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.068455" steps="8612"/></proof>
+                <proof prover="1"><result status="valid" time="0.068455" steps="8576"/></proof>
                 </goal>
                 <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.014565" steps="12257"/></proof>
@@ -2578,25 +2578,25 @@ abs (to_real r -. t)
               </transf>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.072040" steps="10179"/></proof>
+              <proof prover="1"><result status="valid" time="0.072040" steps="10143"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
               <proof prover="0"><result status="valid" time="0.488902" steps="3461"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.255468" steps="41851"/></proof>
+              <proof prover="1"><result status="valid" time="0.255468" steps="41108"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.063328" steps="93149"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.092269" steps="10171"/></proof>
+              <proof prover="1"><result status="valid" time="0.092269" steps="10135"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.077330" steps="8612"/></proof>
+              <proof prover="1"><result status="valid" time="0.077330" steps="8576"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.057021" steps="8612"/></proof>
+              <proof prover="1"><result status="valid" time="0.057021" steps="8576"/></proof>
               </goal>
               <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.012025" steps="12257"/></proof>
@@ -2604,7 +2604,7 @@ abs (to_real r -. t)
              </transf>
              </goal>
              <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="3"><result status="valid" time="0.048730" steps="10336"/></proof>
+             <proof prover="1"><result status="valid" time="0.048730" steps="10300"/></proof>
              </goal>
             </transf>
             </goal>
@@ -2615,38 +2615,38 @@ abs (to_real r -. t)
             <proof prover="0"><result status="valid" time="0.596841" steps="3833"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.301368" steps="41883"/></proof>
+            <proof prover="1"><result status="valid" time="0.301368" steps="41140"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.040967" steps="93157"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.082480" steps="10171"/></proof>
+            <proof prover="1"><result status="valid" time="0.082480" steps="10135"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.061221" steps="8612"/></proof>
+            <proof prover="1"><result status="valid" time="0.061221" steps="8576"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.079782" steps="8612"/></proof>
+            <proof prover="1"><result status="valid" time="0.079782" steps="8576"/></proof>
             </goal>
             <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.069747" steps="8610"/></proof>
+            <proof prover="1"><result status="valid" time="0.069747" steps="8574"/></proof>
             </goal>
            </transf>
            </goal>
            <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="3"><result status="valid" time="0.082331" steps="10354"/></proof>
+           <proof prover="1"><result status="valid" time="0.082331" steps="10318"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.054513" steps="10179"/></proof>
+          <proof prover="1"><result status="valid" time="0.054513" steps="10143"/></proof>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.545722" steps="646885"/></proof>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.351371" steps="41910"/></proof>
+          <proof prover="1"><result status="valid" time="0.351371" steps="41167"/></proof>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
           <proof prover="6"><result status="valid" time="0.060794" steps="93165"/></proof>
@@ -2658,10 +2658,10 @@ abs (to_real r -. t)
           <proof prover="0"><result status="valid" time="0.073952" steps="195"/></proof>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.066109" steps="8612"/></proof>
+          <proof prover="1"><result status="valid" time="0.066109" steps="8576"/></proof>
           </goal>
           <goal name="lse8&#39;vc.9.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.081367" steps="8610"/></proof>
+          <proof prover="1"><result status="valid" time="0.081367" steps="8574"/></proof>
           </goal>
          </transf>
          </goal>
@@ -2674,10 +2674,10 @@ abs (to_real r -. t)
         <proof prover="4"><result status="valid" time="0.099154" steps="20412"/></proof>
         </goal>
         <goal name="lse8&#39;vc.9.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="0"><result status="valid" time="0.876714" steps="5219"/></proof>
+        <proof prover="0"><result status="valid" time="0.661971" steps="5219"/></proof>
         </goal>
         <goal name="lse8&#39;vc.9.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.340323" steps="41925"/></proof>
+        <proof prover="1"><result status="valid" time="0.340323" steps="41182"/></proof>
         </goal>
         <goal name="lse8&#39;vc.9.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.043590" steps="93173"/></proof>
@@ -2686,7 +2686,7 @@ abs (to_real r -. t)
         <proof prover="6"><result status="valid" time="0.019393" steps="12261"/></proof>
         </goal>
         <goal name="lse8&#39;vc.9.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.066964" steps="8612"/></proof>
+        <proof prover="1"><result status="valid" time="0.066964" steps="8576"/></proof>
         </goal>
         <goal name="lse8&#39;vc.9.0.0.0.0.0.7" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.019793" steps="12261"/></proof>
@@ -2697,7 +2697,7 @@ abs (to_real r -. t)
        </transf>
        </goal>
        <goal name="lse8&#39;vc.9.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.066239" steps="10388"/></proof>
+       <proof prover="1"><result status="valid" time="0.066239" steps="10352"/></proof>
        </goal>
       </transf>
       </goal>
@@ -2711,7 +2711,7 @@ abs (to_real r -. t)
       <proof prover="0"><result status="valid" time="0.449549" steps="2078"/></proof>
       </goal>
       <goal name="lse8&#39;vc.9.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.053369" steps="10171"/></proof>
+      <proof prover="1"><result status="valid" time="0.053369" steps="10135"/></proof>
       </goal>
      </transf>
      </goal>
@@ -2721,12 +2721,12 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="lse8&#39;vc.9.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.057537" steps="10388"/></proof>
+    <proof prover="1"><result status="valid" time="0.057537" steps="10352"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse8&#39;vc.9.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.065731" steps="10430"/></proof>
+   <proof prover="1"><result status="valid" time="0.065731" steps="10394"/></proof>
    </goal>
   </transf>
   </goal>
@@ -2735,19 +2735,19 @@ abs (to_real r -. t)
  <goal name="lse10&#39;vc" expl="VC for lse10" proved="true">
  <transf name="split_vc" proved="true" >
   <goal name="lse10&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.067163" steps="9200"/></proof>
+  <proof prover="1"><result status="valid" time="0.067163" steps="9164"/></proof>
   </goal>
   <goal name="lse10&#39;vc.1" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.061457" steps="138"/></proof>
   </goal>
   <goal name="lse10&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.050856" steps="9362"/></proof>
+  <proof prover="1"><result status="valid" time="0.050856" steps="9326"/></proof>
   </goal>
   <goal name="lse10&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.050152" steps="9443"/></proof>
+  <proof prover="1"><result status="valid" time="0.050152" steps="9407"/></proof>
   </goal>
   <goal name="lse10&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.044736" steps="9524"/></proof>
+  <proof prover="1"><result status="valid" time="0.044736" steps="9488"/></proof>
   </goal>
   <goal name="lse10&#39;vc.5" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.062195" steps="170"/></proof>
@@ -2756,16 +2756,16 @@ abs (to_real r -. t)
   <proof prover="6"><result status="valid" time="0.024454" steps="11401"/></proof>
   </goal>
   <goal name="lse10&#39;vc.7" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.042853" steps="9767"/></proof>
+  <proof prover="1"><result status="valid" time="0.042853" steps="9731"/></proof>
   </goal>
   <goal name="lse10&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.051196" steps="9848"/></proof>
+  <proof prover="1"><result status="valid" time="0.051196" steps="9812"/></proof>
   </goal>
   <goal name="lse10&#39;vc.9" expl="precondition" proved="true">
   <proof prover="0"><result status="valid" time="0.064252" steps="200"/></proof>
   </goal>
   <goal name="lse10&#39;vc.10" expl="assertion" proved="true">
-  <proof prover="0" timelimit="60"><result status="valid" time="14.329043" steps="39715"/></proof>
+  <proof prover="0" timelimit="60"><result status="valid" time="18.445203" steps="49758"/></proof>
   </goal>
   <goal name="lse10&#39;vc.11" expl="precondition" proved="true">
   <proof prover="4"><result status="valid" time="0.087059" steps="20466"/></proof>
@@ -3223,22 +3223,22 @@ abs (to_real r -. t)
                        <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="asserted formula" proved="true">
                        <transf name="apply" proved="true" arg1="uadd_double_error_propagation" arg2="with" arg3="exp_approx x1,exp_approx x2">
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.073863" steps="10496"/></proof>
+                        <proof prover="1"><result status="valid" time="0.073863" steps="10460"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.068927" steps="10496"/></proof>
+                        <proof prover="1"><result status="valid" time="0.068927" steps="10460"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.291967" steps="46391"/></proof>
+                        <proof prover="1"><result status="valid" time="0.291967" steps="45672"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
                         <proof prover="4"><result status="valid" time="0.453524" steps="65208"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.078496" steps="10488"/></proof>
+                        <proof prover="1"><result status="valid" time="0.078496" steps="10452"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.088174" steps="10488"/></proof>
+                        <proof prover="1"><result status="valid" time="0.088174" steps="10452"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
                         <proof prover="6"><result status="valid" time="0.018086" steps="12744"/></proof>
@@ -3247,12 +3247,12 @@ abs (to_real r -. t)
                         <proof prover="6"><result status="valid" time="0.020168" steps="12744"/></proof>
                         </goal>
                         <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                        <proof prover="3"><result status="valid" time="0.085304" steps="8784"/></proof>
+                        <proof prover="1"><result status="valid" time="0.085304" steps="8748"/></proof>
                         </goal>
                        </transf>
                        </goal>
                        <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                       <proof prover="3"><result status="valid" time="0.073769" steps="10599"/></proof>
+                       <proof prover="1"><result status="valid" time="0.073769" steps="10563"/></proof>
                        </goal>
                       </transf>
                       </goal>
@@ -3260,25 +3260,25 @@ abs (to_real r -. t)
                       <proof prover="6"><result status="valid" time="0.022023" steps="12756"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
-                      <proof prover="0"><result status="valid" time="0.543188" steps="4041"/></proof>
+                      <proof prover="0"><result status="valid" time="0.724265" steps="4041"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                      <proof prover="3"><result status="valid" time="0.283806" steps="46220"/></proof>
+                      <proof prover="1"><result status="valid" time="0.283806" steps="45471"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                       <proof prover="0"><result status="valid" time="0.093478" steps="217"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-                      <proof prover="3"><result status="valid" time="0.079969" steps="10488"/></proof>
+                      <proof prover="1"><result status="valid" time="0.079969" steps="10452"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                      <proof prover="3"><result status="valid" time="0.087707" steps="8786"/></proof>
+                      <proof prover="1"><result status="valid" time="0.087707" steps="8750"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
-                      <proof prover="3"><result status="valid" time="0.080799" steps="8786"/></proof>
+                      <proof prover="1"><result status="valid" time="0.080799" steps="8750"/></proof>
                       </goal>
                       <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                      <proof prover="3"><result status="valid" time="0.082780" steps="8784"/></proof>
+                      <proof prover="1"><result status="valid" time="0.082780" steps="8748"/></proof>
                       </goal>
                      </transf>
                      </goal>
@@ -3288,13 +3288,13 @@ abs (to_real r -. t)
                     </transf>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.080397" steps="10496"/></proof>
+                    <proof prover="1"><result status="valid" time="0.080397" steps="10460"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
                     <proof prover="0"><result status="valid" time="0.737017" steps="4500"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.407909" steps="46272"/></proof>
+                    <proof prover="1"><result status="valid" time="0.227484" steps="45523"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                     <proof prover="6"><result status="valid" time="0.055824" steps="96330"/></proof>
@@ -3303,13 +3303,13 @@ abs (to_real r -. t)
                     <proof prover="6"><result status="valid" time="0.019091" steps="12744"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.076588" steps="8786"/></proof>
+                    <proof prover="1"><result status="valid" time="0.076588" steps="8750"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                     <proof prover="6"><result status="valid" time="0.017031" steps="12744"/></proof>
                     </goal>
                     <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                    <proof prover="3"><result status="valid" time="0.059823" steps="8784"/></proof>
+                    <proof prover="1"><result status="valid" time="0.059823" steps="8748"/></proof>
                     </goal>
                    </transf>
                    </goal>
@@ -3319,33 +3319,33 @@ abs (to_real r -. t)
                   </transf>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.064634" steps="10496"/></proof>
+                  <proof prover="1"><result status="valid" time="0.064634" steps="10460"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
                   <proof prover="0"><result status="valid" time="0.648322" steps="5054"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.275308" steps="46319"/></proof>
+                  <proof prover="1"><result status="valid" time="0.275308" steps="45570"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.083066" steps="11503"/></proof>
+                  <proof prover="1"><result status="valid" time="0.083066" steps="11467"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
                   <proof prover="6"><result status="valid" time="0.013436" steps="12744"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.069427" steps="8786"/></proof>
+                  <proof prover="1"><result status="valid" time="0.069427" steps="8750"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                   <proof prover="0"><result status="valid" time="0.092926" steps="217"/></proof>
                   </goal>
                   <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-                  <proof prover="3"><result status="valid" time="0.060500" steps="8784"/></proof>
+                  <proof prover="1"><result status="valid" time="0.060500" steps="8748"/></proof>
                   </goal>
                  </transf>
                  </goal>
                  <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-                 <proof prover="3"><result status="valid" time="0.061877" steps="10653"/></proof>
+                 <proof prover="1"><result status="valid" time="0.061877" steps="10617"/></proof>
                  </goal>
                 </transf>
                 </goal>
@@ -3356,7 +3356,7 @@ abs (to_real r -. t)
                 <proof prover="0"><result status="valid" time="0.678766" steps="5751"/></proof>
                 </goal>
                 <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.333099" steps="46361"/></proof>
+                <proof prover="1"><result status="valid" time="0.333099" steps="45612"/></proof>
                 </goal>
                 <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
                 <proof prover="6"><result status="valid" time="0.049913" steps="96346"/></proof>
@@ -3365,7 +3365,7 @@ abs (to_real r -. t)
                 <proof prover="6"><result status="valid" time="0.012984" steps="12744"/></proof>
                 </goal>
                 <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-                <proof prover="3"><result status="valid" time="0.055318" steps="8786"/></proof>
+                <proof prover="1"><result status="valid" time="0.055318" steps="8750"/></proof>
                 </goal>
                 <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
                 <proof prover="0"><result status="valid" time="0.082393" steps="217"/></proof>
@@ -3381,50 +3381,50 @@ abs (to_real r -. t)
               </transf>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.077781" steps="10496"/></proof>
+              <proof prover="1"><result status="valid" time="0.077781" steps="10460"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
               <proof prover="0"><result status="valid" time="0.795501" steps="6987"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.275100" steps="46398"/></proof>
+              <proof prover="1"><result status="valid" time="0.275100" steps="45649"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.070763" steps="11511"/></proof>
+              <proof prover="1"><result status="valid" time="0.070763" steps="11475"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.015001" steps="12744"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.063851" steps="8786"/></proof>
+              <proof prover="1"><result status="valid" time="0.063851" steps="8750"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.7" expl="apply premises" proved="true">
               <proof prover="6"><result status="valid" time="0.015531" steps="12744"/></proof>
               </goal>
               <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-              <proof prover="3"><result status="valid" time="0.068404" steps="8784"/></proof>
+              <proof prover="1"><result status="valid" time="0.068404" steps="8748"/></proof>
               </goal>
              </transf>
              </goal>
              <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-             <proof prover="3"><result status="valid" time="0.070020" steps="10689"/></proof>
+             <proof prover="1"><result status="valid" time="0.070020" steps="10653"/></proof>
              </goal>
             </transf>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.052557" steps="10496"/></proof>
+            <proof prover="1"><result status="valid" time="0.052557" steps="10460"/></proof>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
             <proof prover="0"><result status="valid" time="1.080017" steps="8390"/></proof>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.376789" steps="46430"/></proof>
+            <proof prover="1"><result status="valid" time="0.376789" steps="45681"/></proof>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.122465" steps="11515"/></proof>
+            <proof prover="1"><result status="valid" time="0.122465" steps="11479"/></proof>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-            <proof prover="3"><result status="valid" time="0.057860" steps="10488"/></proof>
+            <proof prover="1"><result status="valid" time="0.057860" steps="10452"/></proof>
             </goal>
             <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
             <proof prover="6"><result status="valid" time="0.019676" steps="12744"/></proof>
@@ -3438,24 +3438,24 @@ abs (to_real r -. t)
            </transf>
            </goal>
            <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-           <proof prover="3"><result status="valid" time="0.064299" steps="10707"/></proof>
+           <proof prover="1"><result status="valid" time="0.064299" steps="10671"/></proof>
            </goal>
           </transf>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.053109" steps="10496"/></proof>
+          <proof prover="1"><result status="valid" time="0.053109" steps="10460"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.2" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="1.359926" steps="9916"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.3" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.280520" steps="46457"/></proof>
+          <proof prover="1"><result status="valid" time="0.280520" steps="45708"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.4" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.088672" steps="11519"/></proof>
+          <proof prover="1"><result status="valid" time="0.088672" steps="11483"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.5" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.063203" steps="10488"/></proof>
+          <proof prover="1"><result status="valid" time="0.063203" steps="10452"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.6" expl="apply premises" proved="true">
           <proof prover="0"><result status="valid" time="0.099679" steps="217"/></proof>
@@ -3464,12 +3464,12 @@ abs (to_real r -. t)
           <proof prover="0"><result status="valid" time="0.106075" steps="217"/></proof>
           </goal>
           <goal name="lse10&#39;vc.12.0.0.0.0.0.0.0.8" expl="apply premises" proved="true">
-          <proof prover="3"><result status="valid" time="0.085502" steps="8784"/></proof>
+          <proof prover="1"><result status="valid" time="0.085502" steps="8748"/></proof>
           </goal>
          </transf>
          </goal>
          <goal name="lse10&#39;vc.12.0.0.0.0.0.0.1" expl="apply premises" proved="true">
-         <proof prover="3"><result status="valid" time="0.090092" steps="10725"/></proof>
+         <proof prover="1"><result status="valid" time="0.090092" steps="10689"/></proof>
          </goal>
         </transf>
         </goal>
@@ -3477,22 +3477,22 @@ abs (to_real r -. t)
         <proof prover="6"><result status="valid" time="0.020331" steps="12756"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.2" expl="apply premises" proved="true">
-        <proof prover="6"><result status="valid" time="1.362839" steps="1096531"/></proof>
+        <proof prover="6"><result status="valid" time="0.963295" steps="1096531"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.3" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.415079" steps="46472"/></proof>
+        <proof prover="1"><result status="valid" time="0.415079" steps="45723"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.4" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.060965" steps="96378"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.5" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.073943" steps="10488"/></proof>
+        <proof prover="1"><result status="valid" time="0.073943" steps="10452"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.6" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.059342" steps="8786"/></proof>
+        <proof prover="1"><result status="valid" time="0.059342" steps="8750"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.7" expl="apply premises" proved="true">
-        <proof prover="3"><result status="valid" time="0.089324" steps="8786"/></proof>
+        <proof prover="1"><result status="valid" time="0.089324" steps="8750"/></proof>
         </goal>
         <goal name="lse10&#39;vc.12.0.0.0.0.0.8" expl="apply premises" proved="true">
         <proof prover="6"><result status="valid" time="0.020667" steps="12740"/></proof>
@@ -3505,16 +3505,16 @@ abs (to_real r -. t)
       </transf>
       </goal>
       <goal name="lse10&#39;vc.12.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.095768" steps="10500"/></proof>
+      <proof prover="1"><result status="valid" time="0.095768" steps="10464"/></proof>
       </goal>
       <goal name="lse10&#39;vc.12.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.449955" steps="1563"/></proof>
       </goal>
       <goal name="lse10&#39;vc.12.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="0"><result status="valid" time="0.777562" steps="2861"/></proof>
+      <proof prover="0"><result status="valid" time="0.566042" steps="2861"/></proof>
       </goal>
       <goal name="lse10&#39;vc.12.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.086505" steps="10488"/></proof>
+      <proof prover="1"><result status="valid" time="0.086505" steps="10452"/></proof>
       </goal>
      </transf>
      </goal>
@@ -3524,12 +3524,12 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="lse10&#39;vc.12.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.083694" steps="10721"/></proof>
+    <proof prover="1"><result status="valid" time="0.083694" steps="10685"/></proof>
     </goal>
    </transf>
    </goal>
    <goal name="lse10&#39;vc.12.1" expl="postcondition" proved="true">
-   <proof prover="3"><result status="valid" time="0.068558" steps="10763"/></proof>
+   <proof prover="1"><result status="valid" time="0.068558" steps="10727"/></proof>
    </goal>
   </transf>
   </goal>
@@ -3569,12 +3569,12 @@ abs (to_real r -. t)
        <proof prover="0"><result status="valid" time="0.275331" steps="977"/></proof>
        </goal>
        <goal name="example3&#39;vc.1.0.0.0.0.1" expl="apply premises" proved="true">
-       <proof prover="3"><result status="valid" time="0.079426" steps="9253"/></proof>
+       <proof prover="1"><result status="valid" time="0.079426" steps="9217"/></proof>
        </goal>
       </transf>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.1" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.043425" steps="9154"/></proof>
+      <proof prover="1"><result status="valid" time="0.043425" steps="9118"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.067000" steps="117"/></proof>
@@ -3583,7 +3583,7 @@ abs (to_real r -. t)
       <proof prover="0"><result status="valid" time="0.062812" steps="127"/></proof>
       </goal>
       <goal name="example3&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.039310" steps="9142"/></proof>
+      <proof prover="1"><result status="valid" time="0.039310" steps="9106"/></proof>
       </goal>
      </transf>
      </goal>
@@ -3593,7 +3593,7 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="example3&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.056831" steps="9299"/></proof>
+    <proof prover="1"><result status="valid" time="0.056831" steps="9263"/></proof>
     </goal>
    </transf>
    </goal>
@@ -3644,10 +3644,10 @@ abs (to_real r -. t)
       <proof prover="0"><result status="valid" time="0.066047" steps="140"/></proof>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.2" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.081315" steps="9837"/></proof>
+      <proof prover="1"><result status="valid" time="0.081315" steps="9801"/></proof>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.3" expl="apply premises" proved="true">
-      <proof prover="3"><result status="valid" time="0.052146" steps="9857"/></proof>
+      <proof prover="1"><result status="valid" time="0.052146" steps="9821"/></proof>
       </goal>
       <goal name="example4&#39;vc.1.0.0.0.4" expl="apply premises" proved="true">
       <proof prover="0"><result status="valid" time="0.074801" steps="109"/></proof>
@@ -3660,7 +3660,7 @@ abs (to_real r -. t)
     </transf>
     </goal>
     <goal name="example4&#39;vc.1.0.1" expl="asserted formula" proved="true">
-    <proof prover="3"><result status="valid" time="0.075181" steps="9283"/></proof>
+    <proof prover="1"><result status="valid" time="0.075181" steps="9247"/></proof>
     </goal>
    </transf>
    </goal>

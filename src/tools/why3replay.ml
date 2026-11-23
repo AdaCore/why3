@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -34,9 +34,11 @@ let debug = Debug.register_info_flag
 let files = Queue.create ()
 let opt_stats = ref true
 let opt_force = ref false
+let opt_dont_save = ref false
 let opt_obsolete_only = ref false
 let opt_ignore_shapes = ref false
 let opt_use_steps = ref false
+let opt_time_factor = ref 10.0
 let opt_merging_only = ref false
 let opt_provers = ref []
 let opt_verbose = ref true
@@ -68,8 +70,12 @@ let option_list =
   let open Getopt in
   [ Key ('f', "force"), Hnd0 (fun () -> opt_force := true),
     " enforce saving the session after replay";
+    KLong "dont-save", Hnd0 (fun () -> opt_dont_save := true),
+    " don't save session after replay, whatever the results";
     KLong "use-steps", Hnd0 (fun () -> opt_use_steps := true),
     " replay using recorded number of proof steps (when\npossible)";
+    KLong "time-factor", Hnd1 (AFloat, fun f -> opt_time_factor := f),
+    " factor applied to the time limit when replaying (default: 10.0)";
     KLong "obsolete-only", Hnd0 (fun () -> opt_obsolete_only := true),
     " replay only if session is obsolete";
     KLong "ignore-shapes", Hnd0 (fun () -> opt_ignore_shapes := true),
@@ -196,13 +202,27 @@ let same_result r1 r2 =
       -> false
 
 let save cont =
+  if !opt_dont_save then
+    Format.eprintf "Not saving the session, as requested by --dont-save@.";
   Debug.dprintf debug "Saving session...@?";
   S.save_session cont.Controller_itp.controller_session;
   Debug.dprintf debug " done@."
 
+let pp_status fmt s =
+  match s with
+  | Controller_itp.Removed p -> fprintf fmt "%a removed" Whyconf.print_prover p
+  | Controller_itp.UpgradeProver(p1,p2) ->
+      fprintf fmt "%a -> %a" Whyconf.print_prover p1 Whyconf.print_prover p2
+  | _ -> assert false
+
+let pp_updated_provers fmt l =
+  if l <> [] then
+    fprintf fmt ", updated provers: %a"
+      (Pp.print_list Pp.comma pp_status) l
+
 let run_replay some_merge_miss found_obs cont =
   let session = cont.Controller_itp.controller_session in
-  let final_callback found_upgraded_prover report =
+  let final_callback updated_provers report =
     Debug.dprintf debug "@.";
     let files,n,m =
       S.Hfile.fold (file_statistics session)
@@ -232,12 +252,12 @@ let run_replay some_merge_miss found_obs cont =
       begin
         match !opt_smoke with
         | SD_None ->
-           printf "(replay OK%s%s)@."
-                  (if found_obs then ", obsolete session" else "")
-                  (if found_upgraded_prover then ", upgraded prover" else "");
+           printf "(replay OK%s%a)@."
+             (if found_obs then ", obsolete session" else "")
+             pp_updated_provers updated_provers;
            if !opt_stats && n<m then print_statistics session files;
            Debug.dprintf debug "Everything replayed OK.@.";
-           if !opt_force || found_obs || found_upgraded_prover then save cont;
+           if !opt_force || found_obs || updated_provers <> [] then save cont;
            exit 0
         | _ ->
            printf "No smoke detected@.";
@@ -246,8 +266,10 @@ let run_replay some_merge_miss found_obs cont =
     else
       let report = List.rev report in
       begin
-        printf "(replay failed%s)@."
-          (if some_merge_miss then ", with some merge miss" else "");
+        printf "(replay failed%s%s%a)@."
+          (if some_merge_miss then ", with some merge miss" else "")
+          (if found_obs then ", obsolete session" else "")
+          pp_updated_provers updated_provers;
         List.iter (print_report session) report;
         eprintf "Replay failed.@.";
         if !opt_force then save cont;
@@ -266,6 +288,7 @@ let run_replay some_merge_miss found_obs cont =
       Format.eprintf "Progress: %d/%d/%d                       \r%!" w s r
   in
   C.register_observer update_monitor;
+  C.set_time_factor !opt_time_factor;
   if !opt_provers = [] then
     let () =
       C.replay ~valid_only:false ~obsolete_only:!opt_obsolete_only ~use_steps:!opt_use_steps
@@ -406,7 +429,7 @@ let () =
     if found_obs then eprintf "[Warning] session is obsolete@.";
     if found_detached then eprintf "[Warning] found detached goals or theories or transformations@.";
     if !opt_merging_only then
-      exit (if found_detached then 1 else 0);
+      exit (if found_obs || found_detached then 1 else 0);
 (*
     if !opt_bench then run_as_bench env_session;
  *)

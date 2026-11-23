@@ -3,8 +3,8 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.12.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="bignum.mlw"/>
 <theory name="BigNum" proved="true">
@@ -17,39 +17,39 @@
   <proof prover="2"><result status="valid" time="0.010000" steps="31"/></proof>
   </goal>
   <goal name="nonneg&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="6758"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="6802"/></proof>
   </goal>
   <goal name="nonneg&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.020000" steps="5418"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.020000" steps="5418"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="msd&#39;vc" expl="VC for msd" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="msd&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="542"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="543"/></proof>
   </goal>
   <goal name="msd&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="5189"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="5189"/></proof>
   </goal>
   <goal name="msd&#39;vc.2" expl="postcondition" proved="true">
-  <proof prover="3" timelimit="5"><result status="valid" time="0.010000" steps="5827"/></proof>
+  <proof prover="1" timelimit="5"><result status="valid" time="0.010000" steps="5827"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="add_digit&#39;vc" expl="VC for add_digit" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="add_digit&#39;vc.0" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.010000" steps="559"/></proof>
+  <proof prover="2"><result status="valid" time="0.010000" steps="557"/></proof>
   </goal>
   <goal name="add_digit&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="5951"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="5951"/></proof>
   </goal>
   <goal name="add_digit&#39;vc.2" expl="precondition" proved="true">
   <proof prover="2"><result status="valid" time="0.000000" steps="16"/></proof>
   </goal>
   <goal name="add_digit&#39;vc.3" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="8981"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="9049"/></proof>
   </goal>
   <goal name="add_digit&#39;vc.4" expl="postcondition" proved="true">
   <proof prover="2"><result status="valid" time="0.030000" steps="912"/></proof>
@@ -77,16 +77,16 @@
   <proof prover="2"><result status="valid" time="0.000000" steps="18"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.6" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="3512"/></proof>
+  <proof prover="2"><result status="valid" time="0.030000" steps="3489"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.7" expl="precondition" proved="true">
   <proof prover="0" timelimit="1"><result status="valid" time="0.030000" steps="2807"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.8" expl="variant decrease" proved="true">
-  <proof prover="2"><result status="valid" time="0.030000" steps="3512"/></proof>
+  <proof prover="2"><result status="valid" time="0.030000" steps="3489"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="6574"/></proof>
+  <proof prover="1"><result status="valid" time="0.010000" steps="6574"/></proof>
   </goal>
   <goal name="add_cin&#39;vc.10" expl="postcondition" proved="true">
   <transf name="split_goal_right" proved="true" >

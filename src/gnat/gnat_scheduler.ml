@@ -7,7 +7,7 @@ module Gnat_scheduler = struct
     *)
     let multiplier = 50
 
-    let idle ~(prio:int) f =
+    let idle ~prio:(_ : int) f =
       while f () do ()
       done
 

@@ -1,0 +1,38 @@
+
+use int.Int
+
+constant x : int
+
+goal g1 : (if x > 0 then 1+2 else 3+4) = 0
+
+
+use list.List
+
+constant l : list int
+
+goal g2 : (match l with
+   | Nil -> 1+2
+   | Cons _y _z -> 3+4
+   end) = 0
+
+
+let rec function f (n:int) : int
+  variant { n }
+= if n <= 0 then 1 else n * f (n-1)
+
+lemma l : forall n. f n = if n <= 0 then 1 else n * f (n-1)
+meta "rewrite" lemma l
+
+goal g3 : f x > 0
+
+type nat = O | S nat
+
+function g(n:nat) : nat =
+  match n with
+  | O -> S O
+  | S m -> S (g m)
+  end
+
+ constant z : nat
+
+ goal g4 : g z = O

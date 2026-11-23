@@ -3,13 +3,13 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.12.2" timelimit="15" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.12.6" timelimit="15" steplimit="0" memlimit="1000"/>
 <prover id="3" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="dfs.mlw"/>
 <theory name="DFS" proved="true">
  <goal name="set&#39;vc" expl="VC for set" proved="true">
- <proof prover="2"><result status="valid" time="0.010000" steps="915"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="915"/></proof>
  </goal>
  <goal name="dfs&#39;vc" expl="VC for dfs" proved="true">
  <proof prover="0"><result status="valid" time="0.489174" steps="77551"/></proof>
@@ -19,14 +19,14 @@
   <goal name="reformulation.0" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="reformulation.0.0" proved="true">
-   <proof prover="2" timelimit="6"><result status="valid" time="0.010000" steps="908"/></proof>
+   <proof prover="1" timelimit="6"><result status="valid" time="0.010000" steps="908"/></proof>
    </goal>
   </transf>
   </goal>
   <goal name="reformulation.1" proved="true">
   <transf name="simplify_trivial_quantification" proved="true" >
    <goal name="reformulation.1.0" proved="true">
-   <proof prover="2"><result status="valid" time="0.010000" steps="3080"/></proof>
+   <proof prover="1"><result status="valid" time="0.010000" steps="3080"/></proof>
    <proof prover="3"><result status="valid" time="0.000000" steps="32"/></proof>
    </goal>
   </transf>
@@ -34,7 +34,7 @@
  </transf>
  </goal>
  <goal name="traverse&#39;vc" expl="VC for traverse" proved="true">
- <proof prover="2"><result status="valid" time="0.010000" steps="9093"/></proof>
+ <proof prover="1"><result status="valid" time="0.010000" steps="9379"/></proof>
  </goal>
 </theory>
 </file>

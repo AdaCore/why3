@@ -6,10 +6,23 @@ stages:
   - deploy
 
 variables:
-  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2025-05-20"
-  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2025-12-11C"
+  BUILD_IMAGE: "$CI_REGISTRY_IMAGE:ci-master-2026-05-22"
+  BENCH_IMAGE: "$CI_REGISTRY_IMAGE:ci-bench-2026-05-25"
   SPHINX_IMAGE: "$CI_REGISTRY_IMAGE:ci-sphinx"
   GIT_CLEAN_FLAGS: "-ffdxq"
+
+workflow:
+  rules:
+    # No CI for a branch without MR except for master
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  auto_cancel:
+    # Cancel jobs if the branch receive a new pipeline except docker image creation (slow)
+    # on_new_commit is misnamed: resetting to a previous commit do not cancel the previous pipeline
+    on_new_commit: interruptible
+
+default:
+  interruptible: true
 
 build-image:
   stage: docker
@@ -23,6 +36,7 @@ build-image:
   rules:
     - changes:
         - misc/Dockerfile.build
+  interruptible: false
   tags:
     - large
 
@@ -38,6 +52,10 @@ bench-image:
   rules:
     - changes:
         - misc/Dockerfile.bench
+  interruptible: false
+  artifacts:
+    paths:
+      - eprover-build.log
   tags:
     - large
 
@@ -58,8 +76,11 @@ sphinx-image:
 .docker_template:
   image: "$BUILD_IMAGE"
   dependencies: []
+  variables:
+    FF_DISABLE_UMASK_FOR_DOCKER_EXECUTOR: "true"
   tags:
     - medium
+
 
 build-system:
   stage: build
@@ -109,7 +130,7 @@ full:
   artifacts:
     paths:
       - trywhy3
-    expire_in: 1 day
+    expire_in: 7 day
   extends: .docker_template
 
 nightly-bench:
@@ -125,7 +146,7 @@ nightly-bench:
 
 nightly-bench-long:
   timeout: 12h
-  stage: build
+  stage: nightly
   variables:
     COMPILER: bench
   when: manual
@@ -133,6 +154,10 @@ nightly-bench-long:
     - misc/ci-local.sh nightly-bench-long
   image: "$BENCH_IMAGE"
   dependencies: []
+  artifacts:
+    paths:
+      - nightly-bench-long.out
+    expire_in: never
   tags:
     - large
 
@@ -167,7 +192,7 @@ opam-full:
 
 trywhy3-extra:
   stage: build
-  image: "debian:bullseye-slim"
+  image: "debian:trixie-slim"
   script:
     - misc/ci-trywhy3.sh
   when: manual

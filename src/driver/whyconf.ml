@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -308,7 +308,7 @@ let empty_main =
     stdlib = true;
     load_default_plugins = true;
     timelimit = 5.;   (* 5 seconds *)
-    memlimit = 1000; (* 1 Mb *)
+    memlimit = 2000; (* 2 Gb *)
     running_provers_max = 2; (* two provers run in parallel *)
     plugins = [];
     default_editor = Config.editor ^ " %f"
@@ -770,9 +770,6 @@ type filter_prover =
   }
 
 let mk_filter_prover ?version ?altern name =
-  begin match version with
-  | Some "" -> invalid_arg "mk_filter_prover: version can't be an empty string"
-  | _ -> () end;
   { filter_name    = mk_regexp name;
     filter_version = Option.map mk_regexp version;
     filter_altern  = Option.map mk_regexp altern;
@@ -1145,7 +1142,9 @@ module Args = struct
       "<file> read configuration from <file>";
       KLong "extra-config", Hnd1 (AString, fun s -> opt_extra := !opt_extra @ [s]),
       "<file> read additional configuration from <file>";
-      Key ('L', "library"), Hnd1 (AString, fun s -> opt_loadpath := s :: !opt_loadpath),
+      Key ('L', "library"), Hnd1 (AString, fun s ->
+          let s = Sysutil.concat (Sys.getcwd ()) s in
+          opt_loadpath := s :: !opt_loadpath),
       "<dir> add <dir> to the library search path";
       KLong "no-stdlib", Hnd0 (fun () -> opt_stdlib := false),
       " do not add the standard library to the loadpath";

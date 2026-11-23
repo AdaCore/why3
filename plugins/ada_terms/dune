@@ -1,0 +1,10 @@
+(ocamllex ada_lexer)
+
+(menhir
+ (modules ada_parser)
+ (flags --table --strict --explain)
+ (infer false))
+
+(library
+ (name ada_terms)
+ (libraries why3 menhirLib))

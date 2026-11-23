@@ -2,346 +2,345 @@
 <!DOCTYPE why3session PUBLIC "-//Why3//proof session v5//EN"
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
-<prover id="0" name="Alt-Ergo" version="2.0.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="1" name="CVC4" version="1.5" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="5" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="2" name="CVC4" version="1.8" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="4" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="6" name="CVC5" version="1.2.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Z3" version="4.14.1" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="verifythis_2016_tree_traversal.mlw"/>
 <theory name="TreeShape" proved="true">
  <goal name="ext_set&#39;vc" expl="VC for ext_set" proved="true">
- <proof prover="3"><result status="valid" time="0.190000" steps="4343"/></proof>
+ <proof prover="4"><result status="valid" time="0.218108" steps="1334"/></proof>
  </goal>
  <goal name="ext_cur&#39;vc" expl="VC for ext_cur" proved="true">
- <proof prover="3"><result status="valid" time="0.000000" steps="10"/></proof>
+ <proof prover="7"><result status="valid" time="0.017633" steps="25148"/></proof>
  </goal>
  <goal name="unicity&#39;vc" expl="VC for unicity" proved="true">
- <proof prover="3"><result status="valid" time="0.030000" steps="321"/></proof>
+ <proof prover="7"><result status="valid" time="0.012843" steps="19687"/></proof>
  </goal>
  <goal name="not_below&#39;vc" expl="VC for not_below" proved="true">
- <proof prover="3"><result status="valid" time="0.046452" steps="528"/></proof>
+ <proof prover="7"><result status="valid" time="0.090793" steps="70847"/></proof>
  </goal>
 </theory>
 <theory name="Recursive" proved="true">
  <goal name="markTree&#39;vc" expl="VC for markTree" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="markTree&#39;vc.0" expl="exceptional postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="4"><result status="valid" time="0.048585" steps="12"/></proof>
   </goal>
   <goal name="markTree&#39;vc.1" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="7"><result status="valid" time="0.019874" steps="22125"/></proof>
   </goal>
   <goal name="markTree&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="22"/></proof>
+  <proof prover="7"><result status="valid" time="0.018130" steps="26198"/></proof>
   </goal>
   <goal name="markTree&#39;vc.3" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="24"/></proof>
+  <proof prover="2"><result status="valid" time="0.063961" steps="8942"/></proof>
   </goal>
   <goal name="markTree&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="30"/></proof>
+  <proof prover="7"><result status="valid" time="0.022587" steps="27071"/></proof>
   </goal>
   <goal name="markTree&#39;vc.5" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="2"><result status="valid" time="0.080366" steps="8411"/></proof>
   </goal>
   <goal name="markTree&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="29"/></proof>
+  <proof prover="7"><result status="valid" time="0.017515" steps="27560"/></proof>
   </goal>
   <goal name="markTree&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="12"/></proof>
+  <proof prover="7"><result status="valid" time="0.021096" steps="27734"/></proof>
   </goal>
   <goal name="markTree&#39;vc.8" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="28"/></proof>
+  <proof prover="6"><result status="valid" time="0.052293" steps="4997"/></proof>
   </goal>
   <goal name="markTree&#39;vc.9" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="69"/></proof>
+  <proof prover="6"><result status="valid" time="0.067507" steps="5921"/></proof>
   </goal>
   <goal name="markTree&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="23"/></proof>
+  <proof prover="7"><result status="valid" time="0.021873" steps="27237"/></proof>
   </goal>
   <goal name="markTree&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="23"/></proof>
+  <proof prover="6"><result status="valid" time="0.052733" steps="4785"/></proof>
   </goal>
   <goal name="markTree&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="23"/></proof>
+  <proof prover="7"><result status="valid" time="0.025432" steps="27297"/></proof>
   </goal>
   <goal name="markTree&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="40"/></proof>
+  <proof prover="6"><result status="valid" time="0.056846" steps="5034"/></proof>
   </goal>
   <goal name="markTree&#39;vc.14" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="40"/></proof>
+  <proof prover="7"><result status="valid" time="0.021936" steps="27979"/></proof>
   </goal>
   <goal name="markTree&#39;vc.15" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="78"/></proof>
+  <proof prover="7"><result status="valid" time="0.026142" steps="28828"/></proof>
   </goal>
   <goal name="markTree&#39;vc.16" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="53"/></proof>
+  <proof prover="7"><result status="valid" time="0.016740" steps="30039"/></proof>
   </goal>
   <goal name="markTree&#39;vc.17" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="104"/></proof>
+  <proof prover="7"><result status="valid" time="0.014043" steps="30362"/></proof>
   </goal>
   <goal name="markTree&#39;vc.18" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="51"/></proof>
+  <proof prover="6"><result status="valid" time="0.046279" steps="5988"/></proof>
   </goal>
   <goal name="markTree&#39;vc.19" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="84"/></proof>
+  <proof prover="6"><result status="valid" time="0.053767" steps="6346"/></proof>
   </goal>
   <goal name="markTree&#39;vc.20" expl="postcondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.061524" steps="258"/></proof>
+  <proof prover="2"><result status="valid" time="0.260233" steps="20197"/></proof>
   </goal>
   <goal name="markTree&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="7"><result status="valid" time="0.004128" steps="1856"/></proof>
   </goal>
   <goal name="markTree&#39;vc.22" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="2"><result status="valid" time="0.050052" steps="5458"/></proof>
   </goal>
   <goal name="markTree&#39;vc.23" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="12"/></proof>
+  <proof prover="6"><result status="valid" time="0.035224" steps="3574"/></proof>
   </goal>
   <goal name="markTree&#39;vc.24" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="20"/></proof>
+  <proof prover="7"><result status="valid" time="0.012250" steps="20679"/></proof>
   </goal>
   <goal name="markTree&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="58"/></proof>
+  <proof prover="7"><result status="valid" time="0.018479" steps="30653"/></proof>
   </goal>
   <goal name="markTree&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.037225" steps="6155"/></proof>
   </goal>
   <goal name="markTree&#39;vc.27" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="38"/></proof>
+  <proof prover="6"><result status="valid" time="0.049121" steps="5755"/></proof>
   </goal>
   <goal name="markTree&#39;vc.28" expl="postcondition" proved="true">
-  <proof prover="1"><result status="valid" time="0.070000" steps="19367"/></proof>
+  <proof prover="7"><result status="valid" time="0.042739" steps="46142"/></proof>
   </goal>
   <goal name="markTree&#39;vc.29" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="192"/></proof>
+  <proof prover="6"><result status="valid" time="0.132345" steps="8801"/></proof>
   </goal>
   <goal name="markTree&#39;vc.30" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="41"/></proof>
+  <proof prover="7"><result status="valid" time="0.020634" steps="32011"/></proof>
   </goal>
   <goal name="markTree&#39;vc.31" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="126"/></proof>
+  <proof prover="4"><result status="valid" time="0.045276" steps="122"/></proof>
   </goal>
   <goal name="markTree&#39;vc.32" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="205"/></proof>
+  <proof prover="7"><result status="valid" time="0.078812" steps="67252"/></proof>
   </goal>
   <goal name="markTree&#39;vc.33" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="129"/></proof>
+  <proof prover="7"><result status="valid" time="0.068612" steps="66761"/></proof>
   </goal>
   <goal name="markTree&#39;vc.34" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.050000" steps="305"/></proof>
+  <proof prover="7"><result status="valid" time="0.065060" steps="68446"/></proof>
   </goal>
   <goal name="markTree&#39;vc.35" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.010144" steps="2357"/></proof>
   </goal>
   <goal name="markTree&#39;vc.36" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="404"/></proof>
+  <proof prover="4"><result status="valid" time="0.092467" steps="330"/></proof>
   </goal>
   <goal name="markTree&#39;vc.37" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="57"/></proof>
+  <proof prover="7"><result status="valid" time="0.032956" steps="36416"/></proof>
   </goal>
   <goal name="markTree&#39;vc.38" expl="variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="177"/></proof>
+  <proof prover="6"><result status="valid" time="0.066927" steps="6271"/></proof>
   </goal>
   <goal name="markTree&#39;vc.39" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="456"/></proof>
+  <proof prover="4"><result status="valid" time="0.101337" steps="441"/></proof>
   </goal>
   <goal name="markTree&#39;vc.40" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="310"/></proof>
+  <proof prover="7"><result status="valid" time="0.094361" steps="72335"/></proof>
   </goal>
   <goal name="markTree&#39;vc.41" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.130000" steps="636"/></proof>
+  <proof prover="7"><result status="valid" time="0.052136" steps="74823"/></proof>
   </goal>
   <goal name="markTree&#39;vc.42" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.011142" steps="2357"/></proof>
   </goal>
   <goal name="markTree&#39;vc.43" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.090000" steps="590"/></proof>
+  <proof prover="4"><result status="valid" time="0.117255" steps="587"/></proof>
   </goal>
   <goal name="markTree&#39;vc.44" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="191"/></proof>
+  <proof prover="7"><result status="valid" time="0.041853" steps="41352"/></proof>
   </goal>
   <goal name="markTree&#39;vc.45" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.137769" steps="1859"/></proof>
+  <proof prover="4"><result status="valid" time="0.215448" steps="641"/></proof>
   </goal>
   <goal name="markTree&#39;vc.46" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="6"><result status="valid" time="0.029800" steps="4929"/></proof>
   </goal>
   <goal name="markTree&#39;vc.47" expl="exceptional postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.056934" steps="8281"/></proof>
   </goal>
   <goal name="markTree&#39;vc.48" expl="exceptional postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="6"><result status="valid" time="0.030059" steps="3552"/></proof>
   </goal>
   <goal name="markTree&#39;vc.49" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="83"/></proof>
+  <proof prover="7"><result status="valid" time="0.020150" steps="31117"/></proof>
   </goal>
   <goal name="markTree&#39;vc.50" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="83"/></proof>
+  <proof prover="6"><result status="valid" time="0.046674" steps="6032"/></proof>
   </goal>
   <goal name="markTree&#39;vc.51" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="480"/></proof>
+  <proof prover="4"><result status="valid" time="0.114708" steps="243"/></proof>
   </goal>
   <goal name="markTree&#39;vc.52" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.036476" steps="2"/></proof>
   </goal>
   <goal name="markTree&#39;vc.53" expl="exceptional postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="6"><result status="valid" time="0.028979" steps="2816"/></proof>
   </goal>
   <goal name="markTree&#39;vc.54" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="0"/></proof>
+  <proof prover="7"><result status="valid" time="0.006049" steps="1758"/></proof>
   </goal>
   <goal name="markTree&#39;vc.55" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="2"><result status="valid" time="0.040444" steps="5239"/></proof>
   </goal>
   <goal name="markTree&#39;vc.56" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="0"/></proof>
+  <proof prover="7"><result status="valid" time="0.007100" steps="1595"/></proof>
   </goal>
   <goal name="markTree&#39;vc.57" expl="loop invariant init" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="34"/></proof>
+  <proof prover="7"><result status="valid" time="0.017965" steps="28064"/></proof>
   </goal>
   <goal name="markTree&#39;vc.58" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="6"><result status="valid" time="0.034264" steps="3456"/></proof>
   </goal>
   <goal name="markTree&#39;vc.59" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.010870" steps="2508"/></proof>
   </goal>
   <goal name="markTree&#39;vc.60" expl="loop variant decrease" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="4"><result status="valid" time="0.026085" steps="2"/></proof>
   </goal>
   <goal name="markTree&#39;vc.61" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.007068" steps="2208"/></proof>
   </goal>
   <goal name="markTree&#39;vc.62" expl="loop invariant preservation" proved="true">
-  <proof prover="3"><result status="valid" time="0.000000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.009141" steps="2208"/></proof>
   </goal>
   <goal name="markTree&#39;vc.63" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="44"/></proof>
+  <proof prover="7"><result status="valid" time="0.021253" steps="29883"/></proof>
   </goal>
   <goal name="markTree&#39;vc.64" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="6"><result status="valid" time="0.028689" steps="3808"/></proof>
   </goal>
   <goal name="markTree&#39;vc.65" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="2"/></proof>
+  <proof prover="7"><result status="valid" time="0.011230" steps="2208"/></proof>
   </goal>
   <goal name="markTree&#39;vc.66" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="7"><result status="valid" time="0.015252" steps="27438"/></proof>
   </goal>
   <goal name="markTree&#39;vc.67" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="16"/></proof>
+  <proof prover="4"><result status="valid" time="0.028551" steps="16"/></proof>
   </goal>
  </transf>
  </goal>
 </theory>
 <theory name="Iterative" proved="true">
  <goal name="stack_size_pos&#39;vc" expl="VC for stack_size_pos" proved="true">
- <proof prover="3"><result status="valid" time="0.070000" steps="681"/></proof>
+ <proof prover="7"><result status="valid" time="0.023381" steps="49487"/></proof>
  </goal>
  <goal name="opening&#39;vc" expl="VC for opening" proved="true">
- <proof prover="3"><result status="valid" time="0.030000" steps="302"/></proof>
+ <proof prover="4"><result status="valid" time="0.074079" steps="301"/></proof>
  </goal>
  <goal name="closing&#39;vc" expl="VC for closing" proved="true">
- <proof prover="3"><result status="valid" time="0.270000" steps="1864"/></proof>
+ <proof prover="4"><result status="valid" time="0.324895" steps="1880"/></proof>
  </goal>
  <goal name="continuing&#39;vc" expl="VC for continuing" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="continuing&#39;vc.0" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.012275" steps="3907"/></proof>
   </goal>
   <goal name="continuing&#39;vc.1" expl="unreachable point" proved="true">
-  <proof prover="3"><result status="valid" time="0.010000" steps="47"/></proof>
+  <proof prover="6"><result status="valid" time="0.034763" steps="6168"/></proof>
   </goal>
   <goal name="continuing&#39;vc.2" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="78"/></proof>
+  <proof prover="7"><result status="valid" time="0.015897" steps="42671"/></proof>
   </goal>
   <goal name="continuing&#39;vc.3" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="4.988001" steps="59973"/></proof>
-  <proof prover="5"><result status="valid" time="0.093639" steps="531"/></proof>
+  <proof prover="7"><result status="valid" time="0.020841" steps="47666"/></proof>
   </goal>
   <goal name="continuing&#39;vc.4" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="79"/></proof>
+  <proof prover="7"><result status="valid" time="0.020164" steps="44115"/></proof>
   </goal>
   <goal name="continuing&#39;vc.5" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.122606" steps="1472"/></proof>
+  <proof prover="7"><result status="valid" time="0.487662" steps="943112"/></proof>
   </goal>
   <goal name="continuing&#39;vc.6" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="42"/></proof>
+  <proof prover="4"><result status="valid" time="0.037791" steps="42"/></proof>
   </goal>
   <goal name="continuing&#39;vc.7" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="133"/></proof>
+  <proof prover="7"><result status="valid" time="0.016619" steps="44777"/></proof>
   </goal>
   <goal name="continuing&#39;vc.8" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.099404" steps="850"/></proof>
+  <proof prover="7"><result status="valid" time="0.022953" steps="50758"/></proof>
   </goal>
   <goal name="continuing&#39;vc.9" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="68"/></proof>
+  <proof prover="7"><result status="valid" time="0.022498" steps="45197"/></proof>
   </goal>
   <goal name="continuing&#39;vc.10" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.070000" steps="429"/></proof>
+  <proof prover="4"><result status="valid" time="0.088145" steps="427"/></proof>
   </goal>
   <goal name="continuing&#39;vc.11" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.138763" steps="1581"/></proof>
+  <proof prover="6"><result status="valid" time="0.208539" steps="15455"/></proof>
   </goal>
   <goal name="continuing&#39;vc.12" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.120000" steps="1126"/></proof>
+  <proof prover="7"><result status="valid" time="0.037167" steps="48385"/></proof>
   </goal>
   <goal name="continuing&#39;vc.13" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.140000" steps="1078"/></proof>
+  <proof prover="7"><result status="valid" time="0.043224" steps="48517"/></proof>
   </goal>
   <goal name="continuing&#39;vc.14" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="44"/></proof>
+  <proof prover="7"><result status="valid" time="0.033419" steps="43263"/></proof>
   </goal>
   <goal name="continuing&#39;vc.15" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.040000" steps="178"/></proof>
+  <proof prover="7"><result status="valid" time="0.036428" steps="47357"/></proof>
   </goal>
   <goal name="continuing&#39;vc.16" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.184489" steps="1494"/></proof>
+  <proof prover="7"><result status="valid" time="0.042417" steps="51604"/></proof>
   </goal>
   <goal name="continuing&#39;vc.17" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="69"/></proof>
+  <proof prover="7"><result status="valid" time="0.018824" steps="44584"/></proof>
   </goal>
   <goal name="continuing&#39;vc.18" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.060000" steps="459"/></proof>
+  <proof prover="6"><result status="valid" time="0.160376" steps="12745"/></proof>
   </goal>
   <goal name="continuing&#39;vc.19" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.117020" steps="1093"/></proof>
+  <proof prover="7"><result status="valid" time="0.021618" steps="52303"/></proof>
   </goal>
   <goal name="continuing&#39;vc.20" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.300000" steps="2739"/></proof>
+  <proof prover="7"><result status="valid" time="0.038743" steps="52078"/></proof>
   </goal>
   <goal name="continuing&#39;vc.21" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.290000" steps="2727"/></proof>
+  <proof prover="7"><result status="valid" time="0.049634" steps="52147"/></proof>
   </goal>
   <goal name="continuing&#39;vc.22" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="47"/></proof>
+  <proof prover="7"><result status="valid" time="0.020405" steps="42672"/></proof>
   </goal>
   <goal name="continuing&#39;vc.23" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="164"/></proof>
+  <proof prover="7"><result status="valid" time="0.019973" steps="46706"/></proof>
   </goal>
   <goal name="continuing&#39;vc.24" expl="assertion" proved="true">
-  <proof prover="3"><result status="valid" time="0.270000" steps="4956"/></proof>
+  <proof prover="7"><result status="valid" time="0.046434" steps="53174"/></proof>
   </goal>
   <goal name="continuing&#39;vc.25" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="71"/></proof>
+  <proof prover="4"><result status="valid" time="0.052261" steps="71"/></proof>
   </goal>
   <goal name="continuing&#39;vc.26" expl="precondition" proved="true">
-  <proof prover="3"><result status="valid" time="1.109224" steps="19391"/></proof>
+  <proof prover="2"><result status="valid" time="0.283436" steps="44665"/></proof>
   </goal>
   <goal name="continuing&#39;vc.27" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="40"/></proof>
+  <proof prover="2"><result status="valid" time="0.068018" steps="14954"/></proof>
   </goal>
   <goal name="continuing&#39;vc.28" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="120"/></proof>
+  <proof prover="7"><result status="valid" time="0.020000" steps="44520"/></proof>
   </goal>
   <goal name="continuing&#39;vc.29" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.030000" steps="685"/></proof>
+  <proof prover="7"><result status="valid" time="0.025572" steps="48648"/></proof>
   </goal>
   <goal name="continuing&#39;vc.30" expl="postcondition" proved="true">
-  <proof prover="3"><result status="valid" time="0.020000" steps="702"/></proof>
+  <proof prover="7"><result status="valid" time="0.027760" steps="48689"/></proof>
   </goal>
  </transf>
  </goal>
  <goal name="markTree&#39;vc" expl="VC for markTree" proved="true">
- <proof prover="3"><result status="valid" time="1.682998" steps="21619"/></proof>
+ <proof prover="2"><result status="valid" time="0.870189" steps="136139"/></proof>
  </goal>
 </theory>
 </file>

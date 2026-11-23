@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -203,7 +203,7 @@ Lemma divides_mod_euclidean :
   divides b a -> ((int.EuclideanDivision.mod1 a b) = 0%Z).
 Proof.
 intros a b Zb H.
-assert (Zmod a b = Z0).
+assert (Z.modulo a b = Z0).
 now apply Zdivide_mod.
 unfold mod1, div.
 rewrite H0.

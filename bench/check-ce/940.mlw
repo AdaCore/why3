@@ -1,0 +1,13 @@
+(* Minimal reproducer for the missing [sid:N] attribute on Call_result
+   counterexample entries. *)
+module M
+  use int.Int
+
+  val f () : int
+    ensures { result >= 0 }
+
+  let test () : int
+    ensures { result < 0 }
+  = let x = [@sid:42] f () in
+    x
+end

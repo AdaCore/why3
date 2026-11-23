@@ -4,7 +4,7 @@
 <why3session shape_version="6">
 <prover id="0" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="1" name="CVC4" version="1.8" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="2" name="Z3" version="4.12.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Z3" version="4.12.6" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC5" version="1.0.5" timelimit="1" steplimit="0" memlimit="1000"/>
 <file format="whyml" proved="true">
 <path name=".."/><path name="patience.mlw"/>
@@ -70,10 +70,10 @@
  <proof prover="0"><result status="valid" time="0.033155" steps="220"/></proof>
  </goal>
  <goal name="push_card&#39;vc" expl="VC for push_card" proved="true">
- <proof prover="0"><result status="valid" time="0.034191" steps="219"/></proof>
+ <proof prover="0"><result status="valid" time="0.034191" steps="218"/></proof>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
- <proof prover="0"><result status="valid" time="0.017079" steps="78"/></proof>
+ <proof prover="0"><result status="valid" time="0.017079" steps="83"/></proof>
  </goal>
  <goal name="play_game&#39;vc" expl="VC for play_game" proved="true">
  <proof prover="0"><result status="valid" time="0.013847" steps="2"/></proof>
@@ -116,7 +116,7 @@
      <proof prover="0"><result status="valid" time="0.096065" steps="501"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.7" expl="VC for play_card" proved="true">
-     <proof prover="0"><result status="valid" time="0.097067" steps="509"/></proof>
+     <proof prover="0"><result status="valid" time="0.097067" steps="507"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.8" expl="VC for play_card" proved="true">
      <proof prover="0"><result status="valid" time="0.108726" steps="586"/></proof>
@@ -128,13 +128,13 @@
      <proof prover="0"><result status="valid" time="0.119582" steps="645"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.11" expl="VC for play_card" proved="true">
-     <proof prover="0"><result status="valid" time="0.140584" steps="1518"/></proof>
+     <proof prover="0"><result status="valid" time="0.308220" steps="1518"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.12" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="84551"/></proof>
+     <proof prover="3"><result status="valid" time="0.020000" steps="118492"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.13" expl="VC for play_card" proved="true">
-     <proof prover="6"><result status="valid" time="0.816585" steps="76219"/></proof>
+     <proof prover="6"><result status="valid" time="1.046998" steps="76219"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.14" expl="VC for play_card" proved="true">
      <proof prover="0"><result status="valid" time="0.067419" steps="399"/></proof>
@@ -149,7 +149,7 @@
      <proof prover="0"><result status="valid" time="0.125833" steps="599"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.18" expl="VC for play_card" proved="true">
-     <proof prover="0"><result status="valid" time="0.075860" steps="767"/></proof>
+     <proof prover="0"><result status="valid" time="0.207992" steps="767"/></proof>
      </goal>
      <goal name="play_card&#39;vc.1.0.0.19" expl="VC for play_card" proved="true">
      <proof prover="0"><result status="valid" time="0.142985" steps="623"/></proof>
@@ -200,7 +200,7 @@
      <proof prover="1"><result status="valid" time="0.163078" steps="28847"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.5" expl="VC for play_card" proved="true">
-     <proof prover="1"><result status="valid" time="0.281819" steps="42517"/></proof>
+     <proof prover="1"><result status="valid" time="0.435316" steps="42517"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.6" expl="VC for play_card" proved="true">
      <proof prover="0"><result status="valid" time="0.068260" steps="425"/></proof>
@@ -224,7 +224,7 @@
      <proof prover="6"><result status="valid" time="0.144303" steps="15468"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.13" expl="VC for play_card" proved="true">
-     <proof prover="2"><result status="valid" time="0.020000" steps="51407"/></proof>
+     <proof prover="3"><result status="valid" time="0.020000" steps="58718"/></proof>
      </goal>
      <goal name="play_card&#39;vc.7.0.0.14" expl="VC for play_card" proved="true">
      <proof prover="0"><result status="valid" time="0.053972" steps="309"/></proof>
@@ -265,12 +265,12 @@
  </transf>
  </goal>
  <goal name="play_cards&#39;vc" expl="VC for play_cards" proved="true">
- <proof prover="0"><result status="valid" time="0.100392" steps="373"/></proof>
+ <proof prover="0"><result status="valid" time="0.100392" steps="357"/></proof>
  </goal>
  <goal name="play_game&#39;vc" expl="VC for play_game" proved="true">
  <transf name="split_goal_right" proved="true" >
   <goal name="play_game&#39;vc.0" expl="precondition" proved="true">
-  <proof prover="0"><result status="valid" time="0.020100" steps="69"/></proof>
+  <proof prover="0"><result status="valid" time="0.020100" steps="67"/></proof>
   </goal>
   <goal name="play_game&#39;vc.1" expl="assertion" proved="true">
   <proof prover="0"><result status="valid" time="0.012665" steps="20"/></proof>

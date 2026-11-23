@@ -1,7 +1,7 @@
 (********************************************************************)
 (*                                                                  *)
 (*  The Why3 Verification Platform   /   The Why3 Development Team  *)
-(*  Copyright 2010-2025 --  Inria - CNRS - Paris-Saclay University  *)
+(*  Copyright 2010-2026 --  Inria - CNRS - Paris-Saclay University  *)
 (*                                                                  *)
 (*  This software is distributed under the terms of the GNU Lesser  *)
 (*  General Public License version 2.1, with the special exception  *)
@@ -1653,7 +1653,7 @@ let on_selected_row r =
           Pp.sprintf "internal failure: %a" Exn_printer.exn_printer e
         | Controller_itp.Uninstalled _p -> "uninstalled prover"
         | Controller_itp.Removed _p -> "removed proof attempt"
-        | Controller_itp.UpgradeProver _p -> "upgraded prover"
+        | Controller_itp.UpgradeProver _ -> "upgraded prover"
       in
       let output_text =
         if output_text = "" then
@@ -1867,7 +1867,7 @@ let image_of_pa_status ~obsolete pa =
   | Controller_itp.Detached -> !image_undone (* TODO !image_detached *)
   | Controller_itp.Uninstalled _p -> !image_undone (* TODO !image_uninstalled *)
   | Controller_itp.Removed _p -> !image_undone (* TODO !image_removed *)
-  | Controller_itp.UpgradeProver _p -> !image_undone
+  | Controller_itp.UpgradeProver _ -> !image_undone
   | Controller_itp.Done r -> (
     let pr_answer = r.Call_provers.pr_answer in
     match pr_answer with

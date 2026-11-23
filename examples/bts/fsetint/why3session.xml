@@ -3,49 +3,70 @@
 "https://www.why3.org/why3session.dtd">
 <why3session shape_version="6">
 <prover id="0" name="CVC3" version="2.4.1" timelimit="1" steplimit="0" memlimit="1000"/>
-<prover id="1" name="Z3" version="4.8.10" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="1" name="Z3" version="4.8.17" timelimit="1" steplimit="0" memlimit="1000"/>
 <prover id="2" name="Alt-Ergo" version="2.2.0" timelimit="5" steplimit="0" memlimit="1000"/>
-<prover id="3" name="Alt-Ergo" version="2.6.0" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="3" name="Alt-Ergo" version="2.6.2" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="4" name="Z3" version="3.2" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="5" name="Eprover" version="3.2.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <prover id="6" name="CVC4" version="1.4" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="7" name="Spass" version="3.9" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="8" name="Alt-Ergo" version="2.4.3" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="9" name="Vampire" version="5.0.1" timelimit="5" steplimit="0" memlimit="1000"/>
+<prover id="10" name="Z3" version="4.14.1" timelimit="1" steplimit="0" memlimit="1000"/>
+<prover id="11" name="colibri2" version="0.5" timelimit="5" steplimit="0" memlimit="1000"/>
 <file format="whyml">
 <path name=".."/><path name="fsetint.why"/>
 <theory name="Th1">
  <goal name="l_false">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1484113"/></proof>
- <proof prover="2"><result status="unknown" time="0.004299" steps="0"/></proof>
- <proof prover="3" timelimit="1"><result status="unknown" time="0.010000" steps="6"/></proof>
- <proof prover="4"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="3" timelimit="1"><result status="unknown" time="0.010000" steps="3"/></proof>
+ <proof prover="5"><result status="timeout" time="5.000000"/></proof>
  <proof prover="6"><result status="unknown" time="0.010000"/></proof>
+ <proof prover="8"><result status="unknown" time="0.004299" steps="0"/></proof>
+ <proof prover="9"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="10"><result status="timeout" time="1.000000" steps="1090580"/></proof>
+ <proof prover="11"><result status="unknown" time="0.032009" steps="58"/></proof>
  </goal>
 </theory>
 <theory name="Th2">
  <goal name="mem_integer">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1383076"/></proof>
- <proof prover="2"><result status="unknown" time="0.010203" steps="2"/></proof>
- <proof prover="3"><result status="timeout" time="5.000000" steps="104479"/></proof>
- <proof prover="4"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="3"><result status="timeout" time="5.000000" steps="16842"/></proof>
+ <proof prover="5"><result status="timeout" time="5.000000"/></proof>
  <proof prover="6"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="7"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="8"><result status="timeout" time="5.000000" steps="10725"/></proof>
+ <proof prover="9"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="10"><result status="timeout" time="1.000000" steps="414329"/></proof>
+ <proof prover="11"><result status="timeout" time="5.000000"/></proof>
  </goal>
- <goal name="foo">
+ <goal name="foo" proved="true">
  <proof prover="0"><result status="timeout" time="1.000000"/></proof>
- <proof prover="1"><result status="timeout" time="1.000000" steps="1604114"/></proof>
- <proof prover="2"><result status="unknown" time="0.003895" steps="0"/></proof>
- <proof prover="3"><result status="timeout" time="5.000000" steps="82505"/></proof>
- <proof prover="4"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="1"><result status="timeout" time="1.000000"/></proof>
+ <proof prover="3"><result status="timeout" time="5.000000" steps="6185"/></proof>
+ <proof prover="5"><result status="timeout" time="5.000000"/></proof>
  <proof prover="6"><result status="unknown" time="0.020000"/></proof>
+ <proof prover="7"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="8"><result status="timeout" time="5.000000" steps="9148"/></proof>
+ <proof prover="9"><result status="valid" time="0.041980"/></proof>
+ <proof prover="10"><result status="timeout" time="1.000000" steps="250804"/></proof>
+ <proof prover="11"><result status="unknown" time="0.038645" steps="62"/></proof>
  </goal>
 </theory>
-<theory name="Th3">
- <goal name="foo">
+<theory name="Th3" proved="true">
+ <goal name="foo" proved="true">
  <proof prover="0"><result status="unknown" time="0.000000"/></proof>
  <proof prover="1"><result status="timeout" time="1.000000" steps="406775"/></proof>
  <proof prover="2"><result status="unknown" time="0.003676" steps="0"/></proof>
  <proof prover="3" timelimit="1"><result status="unknown" time="0.000000" steps="2"/></proof>
  <proof prover="4"><result status="unknown" time="0.020000"/></proof>
+ <proof prover="5"><result status="valid" time="0.121733"/></proof>
  <proof prover="6"><result status="unknown" time="0.000000"/></proof>
+ <proof prover="7"><result status="timeout" time="5.000000"/></proof>
+ <proof prover="9"><result status="valid" time="0.005246"/></proof>
+ <proof prover="11"><result status="unknown" time="0.038234" steps="12"/></proof>
  </goal>
 </theory>
 </file>
